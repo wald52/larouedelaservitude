@@ -445,16 +445,14 @@ function showOverlay(text){
   if (infoBtn && errorBtn) {
     infoBtn.addEventListener("click", (e) => {
       e.preventDefault();
-      // préremplit et ouvre le formulaire
-      document.getElementById("formResult").value = text + " (complément d'information)";
-      openFeedback(text);
+      const userMsg = prompt("💬 Ajoutez votre complément d'information :");
+      if (userMsg) sendFeedbackToGitHub(text, userMsg, "info");
     });
 
     errorBtn.addEventListener("click", (e) => {
       e.preventDefault();
-      // préremplit et ouvre le formulaire
-      document.getElementById("formResult").value = text + " (signalement d'erreur)";
-      openFeedback(text);
+      const userMsg = prompt("⚠️ Décrivez l'erreur que vous avez trouvée :");
+      if (userMsg) sendFeedbackToGitHub(text, userMsg, "error");
     });
   }
 }
@@ -755,6 +753,7 @@ function sendFeedbackToGitHub(resultText, userMessage, type) {
 </script>
 </body>
 </html>
+
 
 
 
