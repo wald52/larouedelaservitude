@@ -734,9 +734,28 @@ window._animFrame = requestAnimationFrame(animate);
 /* keyboard accessibility */
 document.addEventListener('keydown',(e)=>{ if (e.code === 'Space') { e.preventDefault(); boostWheel(); }});
 
+// === 🧩 Fonction d’envoi vers GitHub Discussions via Netlify ===
+function sendFeedbackToGitHub(resultText, userMessage, type) {
+  fetch("/.netlify/functions/sendFeedback", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ resultText, userMessage, type })
+  })
+    .then(r => r.json())
+    .then(data => {
+      alert("✅ Merci ! Votre retour a été envoyé.");
+      if (data.url) window.open(data.url, "_blank");
+    })
+    .catch(err => {
+      console.error("Erreur lors de l'envoi du feedback :", err);
+      alert("⚠️ Une erreur s'est produite lors de l'envoi du message.");
+    });
+}
+  
 </script>
 </body>
 </html>
+
 
 
 
