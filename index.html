@@ -5,8 +5,22 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>La roue de la servitude</title>
 
+<!-- Manifest PWA -->
+<link rel="manifest" href="/test-appli-windows/site.webmanifest">
+<meta name="theme-color" content="#0078d7">
+  
 <!-- Favicons (nouveaux fichiers dans le dossier /icons) -->
-<link rel="icon" type="image/x-icon" href="icons/favicon.ico">
+<link rel="icon" href="/larouedelaservitude/icons/favicon.ico" type="image/x-icon">
+
+<!-- Apple PWA support -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Super Site">
+
+<!-- Apple Touch Icons -->
+<link rel="apple-touch-icon" sizes="180x180" href="/larouedelaservitude/icons/favicon-180x180.png">
+<link rel="apple-touch-icon" sizes="167x167" href="/larouedelaservitude/icons/favicon-167x167.png">
+<link rel="apple-touch-icon" sizes="152x152" href="/larouedelaservitude/icons/favicon-152x152.png">
   
 <!-- Formats PNG multiples -->
 <meta name="msapplication-TileColor" content="#ffffff00">
@@ -16,9 +30,7 @@
 <link rel="icon" type="image/png" sizes="256x256" href="/larouedelaservitude/icons/favicon-256x256.png">
 <link rel="apple-touch-icon" sizes="228x228" href="/larouedelaservitude/icons/favicon-228x228.png">
 <link rel="icon" type="image/png" sizes="192x192" href="/larouedelaservitude/icons/favicon-192x192.png">
-<link rel="apple-touch-icon" sizes="180x180" href="/larouedelaservitude/icons/favicon-180x180.png">
-<link rel="apple-touch-icon" sizes="167x167" href="/larouedelaservitude/icons/favicon-167x167.png">
-<link rel="apple-touch-icon" sizes="152x152" href="/larouedelaservitude/icons/favicon-152x152.png">
+
 <meta name="msapplication-square150x150logo" content="/larouedelaservitude/icons/favicon-150x150.png">
 <meta name="msapplication-TileImage" content="/larouedelaservitude/icons/favicon-144x144.png">
 <link rel="icon" type="image/png" sizes="128x128" href="/larouedelaservitude/icons/favicon-128x128.png">
@@ -792,8 +804,14 @@ function sendFeedbackToGitHub(resultText, userMessage, type) {
 }
   
 </script>
+
+  <button id="install-btn" style="display:none; padding:10px 20px; font-size:16px;">
+    Installer l'application
+  </button>
+
 </body>
 </html>
+
 
 
 
