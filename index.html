@@ -102,6 +102,36 @@ transform:translate(-50%,-50%);animation:spark 450ms ease-out forwards;z-index:8
 .overlay[aria-hidden="true"] {
   display: none !important;
 }
+
+  /* Boutons de retour utilisateur */
+.feedback-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 14px;
+}
+
+.feedback-btn {
+  background: #c00;
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 15px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.feedback-btn:hover {
+  background: #900;
+  transform: scale(1.05);
+}
+
+.feedback-btn:active {
+  transform: scale(0.97);
+}
+
 </style>
 </head>
 <body>
@@ -139,6 +169,16 @@ transform:translate(-50%,-50%);animation:spark 450ms ease-out forwards;z-index:8
   </div>
 </div>
 
+<!-- Boutons de retour utilisateur -->
+<div class="feedback-buttons">
+  <a id="btn-info" class="feedback-btn" target="_blank">
+    Donner un complément d'information
+  </a>
+  <a id="btn-error" class="feedback-btn" target="_blank">
+    Signaler une erreur
+  </a>
+</div>
+  
 <script>
 /* =======================
    RESSOURCES / CONFIG
@@ -348,6 +388,8 @@ function showOverlay(text){
   overlayText.innerHTML = `${intro}<br><br>${formatted.replace(/\n/g,"<br>")}`;
   overlay.style.display = 'flex';
   overlay.setAttribute('aria-hidden','false');
+
+  updateFeedbackLinks(text);
 }
 overlayClose.addEventListener('click',()=>{ overlay.style.display='none'; overlay.setAttribute('aria-hidden','true'); });
 overlay.addEventListener('click', e => { if (e.target === overlay) { overlay.style.display='none'; overlay.setAttribute('aria-hidden','true'); }});
@@ -573,6 +615,40 @@ window._animFrame = requestAnimationFrame(animate);
 
 /* keyboard accessibility */
 document.addEventListener('keydown',(e)=>{ if (e.code === 'Space') { e.preventDefault(); boostWheel(); }});
+
+// === CONFIGURATION GITHUB ===
+const repoOwner = "wald52";
+const repoName = "larouedelaservitude";
+const infoCategory = "complements-dinformation";      // slug de la catégorie
+const errorCategory = "signalements-derreurs";        // slug de la catégorie
+
+// === FONCTION POUR METTRE À JOUR LES LIENS ===
+function updateFeedbackLinks(resultText) {
+  const encodedResult = encodeURIComponent(resultText);
+  const baseUrl = `https://github.com/${repoOwner}/${repoName}/discussions/new?`;
+
+  // Lien pour "Donner un complément"
+  const infoUrl =
+    `${baseUrl}category=${infoCategory}` +
+    `&title=Complément%20sur%20${encodedResult}` +
+    `&body=Résultat%20:%20${encodedResult}%0A%0AVotre%20complément%20:%20`;
+
+  // Lien pour "Signaler une erreur"
+  const errorUrl =
+    `${baseUrl}category=${errorCategory}` +
+    `&title=Erreur%20concernant%20${encodedResult}` +
+    `&body=Résultat%20:%20${encodedResult}%0A%0ADétail%20de%20l'erreur%20:%20`;
+
+  // Mise à jour dynamique des liens
+  const infoBtn = document.querySelector("#btn-info");
+  const errorBtn = document.querySelector("#btn-error");
+  if (infoBtn && errorBtn) {
+    infoBtn.href = infoUrl;
+    errorBtn.href = errorUrl;
+  }
+}
+
 </script>
 </body>
 </html>
+
