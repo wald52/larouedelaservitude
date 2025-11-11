@@ -28,7 +28,9 @@ exports.handler = async (event) => {
 
     const { resultText, userMessage, type } = JSON.parse(event.body);
 
-    // 🧩 Anti-spam simple côté serveur
+    // Anti-spam simple côté serveur
+
+    // 1. Message trop court ou vide
   if (!userMessage || userMessage.trim().length < 10) {
     return {
       statusCode: 400,
@@ -36,6 +38,18 @@ exports.handler = async (event) => {
       body: "Message trop court ou vide — merci de détailler un peu plus votre retour."
     };
   }
+
+    // 2. Trop de liens (anti-spam)
+const linkCount = (userMessage.match(/https?:\/\//g) || []).length;
+if (linkCount > 3) {
+  return {
+    statusCode: 400,
+    headers,
+    body: `🚫 Votre message contient ${linkCount} liens. 
+Pour éviter le spam automatique, seuls 3 liens maximum sont autorisés. 
+Merci de réduire le nombre de liens et de réessayer.`
+  };
+}
 
     // Configuration
     const repoOwner = "wald52";
