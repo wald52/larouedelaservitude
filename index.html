@@ -169,14 +169,28 @@ transform:translate(-50%,-50%);animation:spark 450ms ease-out forwards;z-index:8
   </div>
 </div>
 
-<!-- Boutons de retour utilisateur -->
-<div class="feedback-buttons">
-  <a id="btn-info" class="feedback-btn" target="_blank">
-    Donner un complément d'information
-  </a>
-  <a id="btn-error" class="feedback-btn" target="_blank">
-    Signaler une erreur
-  </a>
+<!-- Modal feedback (placer dans body) -->
+<button id="openFeedbackForm" class="feedback-btn" style="display:none">Donner un complément d'information</button>
+
+<div id="feedbackModal" style="display:none;position:fixed;inset:0;z-index:12000;align-items:center;justify-content:center;background:rgba(0,0,0,0.45);">
+  <form id="feedbackForm" style="background:#fff;padding:18px;border-radius:10px;max-width:520px;width:92%;box-sizing:border-box;">
+    <h3>Donner un complément d'information</h3>
+    <input type="hidden" id="formResult" name="resultText" value="">
+    <input type="text" name="honeypot" id="honeypot" style="display:none" autocomplete="off">
+    <label style="display:block;margin-top:8px;">
+      Votre message
+      <textarea id="formMessage" name="userMessage" required style="width:100%;height:120px"></textarea>
+    </label>
+    <label style="display:block;margin-top:8px;">
+      Votre email (optionnel)
+      <input id="formEmail" name="userEmail" type="email" style="width:100%">
+    </label>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px;">
+      <button type="button" id="closeFeedback">Annuler</button>
+      <button type="submit">Envoyer</button>
+    </div>
+    <div id="feedbackStatus" style="margin-top:10px;font-size:13px;color:#333;display:none;"></div>
+  </form>
 </div>
   
 <script>
@@ -401,9 +415,57 @@ function showOverlay(text){
   overlay.style.display = 'flex';
   overlay.setAttribute('aria-hidden','false');
 
-  // 🔗 Met à jour les liens GitHub dynamiquement
-  updateFeedbackLinks(text);
 }
+
+// handlers for the feedback modal (adapt to your showOverlay call)
+const openBtn = document.getElementById('openFeedbackForm');
+const modal = document.getElementById('feedbackModal');
+const form = document.getElementById('feedbackForm');
+const closeBtn = document.getElementById('closeFeedback');
+const status = document.getElementById('feedbackStatus');
+
+function openFeedback(resultText){
+  document.getElementById('formResult').value = resultText;
+  document.getElementById('formMessage').value = '';
+  document.getElementById('formEmail').value = '';
+  document.getElementById('honeypot').value = '';
+  status.style.display = 'none';
+  modal.style.display = 'flex';
+}
+
+closeBtn.addEventListener('click', ()=> modal.style.display='none');
+modal.addEventListener('click', (e)=> { if (e.target === modal) modal.style.display='none'; });
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  status.style.display = 'block'; status.textContent = 'Envoi en cours…';
+  const payload = {
+    resultText: document.getElementById('formResult').value,
+    userMessage: document.getElementById('formMessage').value,
+    userEmail: document.getElementById('formEmail').value,
+    honeypot: document.getElementById('honeypot').value || ''
+  };
+  try {
+    const resp = await fetch('/.netlify/functions/sendFeedback', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const json = await resp.json();
+    if (json.ok) {
+      status.textContent = 'Merci — votre message a été envoyé !';
+      if (json.url) {
+        status.innerHTML += `<br><a href="${json.url}" target="_blank" rel="noopener">Voir le ticket sur GitHub</a>`;
+      }
+      setTimeout(()=> modal.style.display='none', 1500);
+    } else {
+      status.textContent = 'Erreur lors de l’envoi : ' + (json.error || 'unknown');
+    }
+  } catch (err) {
+    console.error(err);
+    status.textContent = 'Erreur réseau lors de l’envoi.';
+  }
+});
 
 overlayClose.addEventListener('click',()=>{ overlay.style.display='none'; overlay.setAttribute('aria-hidden','true'); });
 overlay.addEventListener('click', e => { if (e.target === overlay) { overlay.style.display='none'; overlay.setAttribute('aria-hidden','true'); }});
@@ -630,41 +692,10 @@ window._animFrame = requestAnimationFrame(animate);
 /* keyboard accessibility */
 document.addEventListener('keydown',(e)=>{ if (e.code === 'Space') { e.preventDefault(); boostWheel(); }});
 
-// === CONFIGURATION GITHUB ===
-const repoOwner = "wald52";
-const repoName = "larouedelaservitude";
-const infoCategory = "compléments-d-information";      // slug de la catégorie
-const errorCategory = "signalements-d-erreurs";        // slug de la catégorie
-
-// === FONCTION POUR METTRE À JOUR LES LIENS ===
-function updateFeedbackLinks(resultText) {
-  const encodedResult = encodeURIComponent(resultText);
-  const baseUrl = `https://github.com/${repoOwner}/${repoName}/discussions/new?`;
-
-  // Lien pour "Donner un complément"
-  const infoUrl =
-    `${baseUrl}category=${infoCategory}` +
-    `&title=Complément%20sur%20${encodedResult}` +
-    `&body=Résultat%20:%20${encodedResult}%0A%0AVotre%20complément%20:%20`;
-
-  // Lien pour "Signaler une erreur"
-  const errorUrl =
-    `${baseUrl}category=${errorCategory}` +
-    `&title=Erreur%20concernant%20${encodedResult}` +
-    `&body=Résultat%20:%20${encodedResult}%0A%0ADétail%20de%20l'erreur%20:%20`;
-
-  // Mise à jour dynamique des liens
-  const infoBtn = document.querySelector("#btn-info");
-  const errorBtn = document.querySelector("#btn-error");
-  if (infoBtn && errorBtn) {
-    infoBtn.href = infoUrl;
-    errorBtn.href = errorUrl;
-  }
-}
-
 </script>
 </body>
 </html>
+
 
 
 
