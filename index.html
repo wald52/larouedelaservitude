@@ -739,9 +739,24 @@ const isNetlifyHost = window.location.hostname.includes("netlify.app");
 const NETLIFY_FUNCTION_URL = isNetlifyHost
   ? "/.netlify/functions/sendFeedback"
   : "https://larouedelaservitude.netlify.app/.netlify/functions/sendFeedback";
+
+// 🧩 Limite anti-abus côté client : 1 envoi par minute max
+let lastFeedbackTime = 0;
   
 // === 🧩 Fonction d’envoi vers GitHub Discussions via Netlify ===
 function sendFeedbackToGitHub(resultText, userMessage, type) {
+  const now = Date.now();
+
+  // Vérifie s'il y a eu un envoi récent
+  if (now - lastFeedbackTime < 60000) { // 60 000 ms = 1 minute
+    alert("Merci d’attendre une minute avant d’envoyer un nouveau message.");
+    return;
+  }
+
+  // Met à jour la dernière heure d'envoi
+  lastFeedbackTime = now;
+
+  // Envoi normal
   console.log("📡 Envoi du feedback vers :", NETLIFY_FUNCTION_URL);
   
   fetch(NETLIFY_FUNCTION_URL, {
@@ -763,14 +778,6 @@ function sendFeedbackToGitHub(resultText, userMessage, type) {
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
 
 
 
