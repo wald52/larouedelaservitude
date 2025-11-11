@@ -5,7 +5,7 @@
     "start_url": "/larouedelaservitude/",
     "scope": "/larouedelaservitude/",
     "display": "standalone",
-    "background_color": "#ffffff",
+    "background_color": "#FFFFFF",
     "theme_color": "#FFFFFF",
     
     "icons": [
@@ -118,6 +118,7 @@
     ],
     "prefer_related_applications": false
   }
+
 
 
 
