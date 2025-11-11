@@ -1,69 +1,58 @@
-// netlify/functions/sendFeedback.js
-export async function handler(event) {
-  if (event.httpMethod !== 'POST') {
-    return { statusCode: 405, body: 'Method Not Allowed' };
-  }
+const fetch = require("node-fetch");
 
+exports.handler = async (event) => {
   try {
-    const payload = JSON.parse(event.body || '{}');
-    const { resultText, userMessage, userEmail, honeypot } = payload;
-
-    // basic spam prevention
-    if (honeypot) {
-      return { statusCode: 200, body: JSON.stringify({ ok: true, note: 'spam' }) };
-    }
-    if (!resultText || !userMessage || userMessage.trim().length < 3) {
-      return { statusCode: 400, body: JSON.stringify({ ok: false, error: 'Invalid input' }) };
+    if (event.httpMethod !== "POST") {
+      return { statusCode: 405, body: "Method Not Allowed" };
     }
 
-    const REPO_OWNER = process.env.REPO_OWNER;
-    const REPO_NAME  = process.env.REPO_NAME;
-    const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
-    if (!REPO_OWNER || !REPO_NAME || !GITHUB_TOKEN) {
-      return { statusCode: 500, body: JSON.stringify({ ok:false, error:'Server not configured' }) };
-    }
+    const { resultText, userMessage, type } = JSON.parse(event.body);
 
-    const title = `Retour : ${resultText.slice(0, 80)}`;
-    const body = [
-      `**Résultat:** ${resultText}`,
-      ``,
-      `**Message utilisateur:**`,
-      userMessage,
-      ``,
-      `**Email (optionnel):** ${userEmail || '(non précisé)'}`,
-      ``,
-      `*Envoyé depuis la page La roue de la servitude*`
-    ].join('\n');
+    // Configuration
+    const repoOwner = "wald52";
+    const repoName = "larouedelaservitude";
+    const token = process.env.GITHUB_TOKEN;
 
-    const apiUrl = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/issues`;
-    const resp = await fetch(apiUrl, {
-      method: 'POST',
+    // Remplace ici avec les category_id que tu as trouvés
+    const categoryIds = {
+      info: "46570623",   // Compléments d'information
+      error: "46570630"   // Signalements d'erreurs
+    };
+
+    const categoryId = categoryIds[type] || categoryIds.info;
+
+    // Corps de la discussion
+    const discussionTitle = `${type === "error" ? "🛠️ Signalement" : "💡 Complément"} sur le résultat : ${resultText}`;
+    const discussionBody = `**Résultat :** ${resultText}\n\n**Message de l'utilisateur :**\n${userMessage}`;
+
+    // Appel à l'API GitHub
+    const response = await fetch(`https://api.github.com/repos/${repoOwner}/${repoName}/discussions`, {
+      method: "POST",
       headers: {
-        'Authorization': `Bearer ${GITHUB_TOKEN}`,
-        'Accept': 'application/vnd.github+json',
-        'Content-Type': 'application/json'
+        Authorization: `Bearer ${token}`,
+        Accept: "application/vnd.github+json",
+        "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        title,
-        body,
-        labels: ['feedback']
+        title: discussionTitle,
+        body: discussionBody,
+        category_id: categoryId
       })
     });
 
-    if (!resp.ok) {
-      const text = await resp.text();
-      console.error('GitHub API error', resp.status, text);
-      return { statusCode: 502, body: JSON.stringify({ ok:false, error:'GitHub API error' }) };
+    if (!response.ok) {
+      const err = await response.text();
+      console.error("Erreur GitHub:", err);
+      return { statusCode: 500, body: "Erreur GitHub API" };
     }
 
-    const data = await resp.json();
+    const data = await response.json();
     return {
       statusCode: 200,
-      body: JSON.stringify({ ok: true, url: data.html_url })
+      body: JSON.stringify({ url: data.html_url })
     };
-
   } catch (err) {
     console.error(err);
-    return { statusCode: 500, body: JSON.stringify({ ok:false, error: 'Server error' }) };
+    return { statusCode: 500, body: "Erreur serveur" };
   }
-}
+};
