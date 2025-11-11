@@ -384,13 +384,27 @@ function getSelectedIndex(a){
 function showOverlay(text){
   const intros = ["🎯 Le sort a parlé !", "✨ Voici le résultat :", "🍀 Et le gagnant est…"];
   const intro = intros[Math.floor(Math.random()*intros.length)];
-  const formatted = String(text).replace(/(Recette\s*:)/gi,"\n$1").replace(/(Date de création\s*:)/gi,"\n$1");
-  overlayText.innerHTML = `${intro}<br><br>${formatted.replace(/\n/g,"<br>")}`;
+  const formatted = String(text)
+    .replace(/(Recette\s*:)/gi,"\n$1")
+    .replace(/(Date de création\s*:)/gi,"\n$1")
+    .replace(/\n/g,"<br>");
+
+  // 💬 contenu principal du résultat
+  overlayText.innerHTML = `
+    ${intro}<br><br>${formatted}
+    <div class="feedback-buttons">
+      <a id="btn-info" class="feedback-btn" target="_blank">Donner un complément d'information</a>
+      <a id="btn-error" class="feedback-btn" target="_blank">Signaler une erreur</a>
+    </div>
+  `;
+
   overlay.style.display = 'flex';
   overlay.setAttribute('aria-hidden','false');
 
+  // 🔗 Met à jour les liens GitHub dynamiquement
   updateFeedbackLinks(text);
 }
+
 overlayClose.addEventListener('click',()=>{ overlay.style.display='none'; overlay.setAttribute('aria-hidden','true'); });
 overlay.addEventListener('click', e => { if (e.target === overlay) { overlay.style.display='none'; overlay.setAttribute('aria-hidden','true'); }});
 overlay.querySelector('.bubble').addEventListener('click', e => e.stopPropagation());
@@ -651,4 +665,5 @@ function updateFeedbackLinks(resultText) {
 </script>
 </body>
 </html>
+
 
