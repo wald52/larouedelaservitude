@@ -430,8 +430,8 @@ function showOverlay(text){
   overlayText.innerHTML = `
     ${intro}<br><br>${formatted}
     <div class="feedback-buttons">
-      <a id="btn-info" class="feedback-btn" target="_blank">Donner un complément d'information</a>
-      <a id="btn-error" class="feedback-btn" target="_blank">Signaler une erreur</a>
+      <a id="btn-info" class="feedback-btn" href="#">Donner un complément d'information</a>
+      <a id="btn-error" class="feedback-btn" href="#">Signaler une erreur</a>
     </div>
   `;
 
@@ -753,6 +753,7 @@ function sendFeedbackToGitHub(resultText, userMessage, type) {
 </script>
 </body>
 </html>
+
 
 
 
