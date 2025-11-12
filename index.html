@@ -223,32 +223,7 @@ if("serviceWorker" in navigator){
 drawWheel();
 </script>
 
-  <script>
-function loadButtons() {
-  fetch('/larouedelaservitude/buttons.html')
-    .then(r => r.text())
-    .then(html => {
-      const overlay = document.getElementById('overlayText');
-      overlay.insertAdjacentHTML('beforeend', html);
-      console.log("✅ Boutons chargés (en ligne)");
-    })
-    .catch(() => console.log("⚠️ Impossible de charger les boutons (hors ligne)"));
-}
-
-// 🔌 Détection en ligne / hors ligne
-window.addEventListener('online', () => {
-  navigator.serviceWorker?.controller?.postMessage('refresh-buttons');
-  loadButtons();
-});
-window.addEventListener('offline', () => {
-  console.log("🚫 Hors ligne — boutons masqués");
-  document.getElementById('dynamic-buttons')?.remove();
-});
-
-// Charger une première fois si en ligne
-if (navigator.onLine) loadButtons();
-</script>
-
 </body>
 </html>
+
 
