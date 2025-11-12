@@ -284,27 +284,11 @@ function drawWheel(a){
   ctx.restore();
 }
 
-/* petit effet visuel sur appui */
-function createSpark(e){
-  const rect = wheelArea.getBoundingClientRect();
-  let x = rect.width/2, y = rect.height/2;
-  if (e) {
-    if (e.touches && e.touches[0]) { x = e.touches[0].clientX - rect.left; y = e.touches[0].clientY - rect.top; }
-    else if (e.clientX !== undefined) { x = e.clientX - rect.left; y = e.clientY - rect.top; }
-  }
-  const s = document.createElement('div');
-  s.className = 'sparkle';
-  s.style.left = `${x}px`; s.style.top = `${y}px`;
-  wheelArea.appendChild(s);
-  setTimeout(()=>s.remove(),450);
-}
-
 /* =======================
    INTERACTION / BOOST
    ======================= */
 function boostWheel(e){
   hasBeenSpun = true;
-  createSpark(e);
 
   if (Math.abs(angularVelocity) < 0.01) {
     targetVelocity = Math.min(MAX_VEL, targetVelocity + BOOST * 3.0);
@@ -373,6 +357,45 @@ function showOverlay(text){
   overlay.setAttribute('aria-hidden','false');
 
 }
+// handlers for the feedback modal (adapt to your showOverlay call)
+const openBtn = document.getElementById('openFeedbackForm');
+const modal = document.getElementById('feedbackModal');
+const form = document.getElementById('feedbackForm');
+const closeBtn = document.getElementById('closeFeedback');
+const status = document.getElementById('feedbackStatus');
+
+closeBtn.addEventListener('click', ()=> modal.style.display='none');
+modal.addEventListener('click', (e)=> { if (e.target === modal) modal.style.display='none'; });
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  status.style.display = 'block'; status.textContent = 'Envoi en cours…';
+
+  try {
+    const resp = await fetch('/.netlify/functions/sendFeedback', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const json = await resp.json();
+    if (json.ok) {
+      status.textContent = 'Merci — votre message a été envoyé !';
+      if (json.url) {
+        status.innerHTML += `<br><a href="${json.url}" target="_blank" rel="noopener">Voir le ticket sur GitHub</a>`;
+      }
+      setTimeout(()=> modal.style.display='none', 1500);
+    } else {
+      status.textContent = 'Erreur lors de l’envoi : ' + (json.error || 'unknown');
+    }
+  } catch (err) {
+    console.error(err);
+    status.textContent = 'Erreur réseau lors de l’envoi.';
+  }
+});
+
+overlayClose.addEventListener('click',()=>{ overlay.style.display='none'; overlay.setAttribute('aria-hidden','true'); });
+overlay.addEventListener('click', e => { if (e.target === overlay) { overlay.style.display='none'; overlay.setAttribute('aria-hidden','true'); }});
+overlay.querySelector('.bubble').addEventListener('click', e => e.stopPropagation());
 
 /* =======================
    ANIMATION
@@ -668,6 +691,7 @@ function sendFeedbackToGitHub(resultText, userMessage, type) {
 
 </body>
 </html>
+
 
 
 
