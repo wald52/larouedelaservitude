@@ -5,105 +5,167 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>La roue de la servitude</title>
 
-<!-- PWA -->
+<!-- Manifest PWA -->
 <link rel="manifest" href="/larouedelaservitude/site.webmanifest">
 <meta name="theme-color" content="#FFFFFF">
-
-<!-- Favicons -->
+  
+<!-- Favicons (nouveaux fichiers dans le dossier /icons) -->
 <link rel="icon" href="/larouedelaservitude/icons/favicon.ico" type="image/x-icon">
 
-<!-- Apple support -->
+<!-- Apple PWA support -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="La roue de la servitude">
+
+<!-- Apple Touch Icons -->
 <link rel="apple-touch-icon" sizes="180x180" href="/larouedelaservitude/icons/favicon-180x180.png">
+<link rel="apple-touch-icon" sizes="167x167" href="/larouedelaservitude/icons/favicon-167x167.png">
+<link rel="apple-touch-icon" sizes="152x152" href="/larouedelaservitude/icons/favicon-152x152.png">
+  
+<!-- Formats PNG multiples -->
+<meta name="msapplication-TileColor" content="#ffffff">
+<link rel="icon" type="image/png" sizes="1024x1024" href="/larouedelaservitude/icons/favicon-1024x1024.png">
+<link rel="icon" type="image/png" sizes="512x512" href="/larouedelaservitude/icons/favicon-512x512.png">
+<meta name="msapplication-square310x310logo" content="/larouedelaservitude/icons/favicon-310x310.png">
+<link rel="icon" type="image/png" sizes="256x256" href="/larouedelaservitude/icons/favicon-256x256.png">
+<link rel="apple-touch-icon" sizes="228x228" href="/larouedelaservitude/icons/favicon-228x228.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/larouedelaservitude/icons/favicon-192x192.png">
 
-<!-- Police -->
+<meta name="msapplication-square150x150logo" content="/larouedelaservitude/icons/favicon-150x150.png">
+<meta name="msapplication-TileImage" content="/larouedelaservitude/icons/favicon-144x144.png">
+<link rel="icon" type="image/png" sizes="128x128" href="/larouedelaservitude/icons/favicon-128x128.png">
+<link rel="icon" type="image/png" sizes="96x96" href="/larouedelaservitude/icons/favicon-96x96.png">
+<meta name="msapplication-square70x70logo" content="/larouedelaservitude/icons/favicon-70x70.png">
+<link rel="icon" type="image/png" sizes="64x64" href="/larouedelaservitude/icons/favicon-64x64.png">
+<link rel="icon" type="image/png" sizes="48x48" href="/larouedelaservitude/icons/favicon-48x48.png">
+<link rel="icon" type="image/png" sizes="36x36" href="/larouedelaservitude/icons/favicon-36x36.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/larouedelaservitude/icons/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/larouedelaservitude/icons/favicon-16x16.png">
+
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-
-<!-- html2canvas -->
+<!-- html2canvas pour la capture -->
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
 <style>
-:root {
+:root{
   --bg:#f7f7f7; --fg:#111; --ring:#e5e7eb;
   --emoji-size:80px; --bg-size:200vw;
 }
-html, body {
-  height:100%; margin:0; font-family:'Poppins',sans-serif;
-  background:var(--bg); color:var(--fg);
-  overflow:hidden; overscroll-behavior:contain; touch-action:none;
-}
-body::before, body::after {
-  content:""; position:fixed; z-index:0; width:var(--bg-size); height:var(--bg-size);
-  top:calc(50% - var(--bg-size)/2); left:calc(50% - var(--bg-size)/2);
+html,body{height:100%;margin:0;font-family:'Poppins',sans-serif;
+background:var(--bg);color:var(--fg);}
+body::before,body::after{
+  content:"";position:fixed;z-index:0;width:var(--bg-size);height:var(--bg-size);
+  top:calc(50% - var(--bg-size)/2);left:calc(50% - var(--bg-size)/2);
   pointer-events:none;
-  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'><text x='40' y='40' font-size='50'>☭</text><text x='120' y='120' font-size='50'>☭</text></svg>");
-  background-repeat:repeat; background-size:var(--emoji-size) var(--emoji-size);
+  background-image:url("data:image/svg+xml;utf8,\
+<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'>\
+<text x='40' y='40' font-size='50'>☭</text>\
+<text x='120' y='120' font-size='50'>☭</text>\
+</svg>");
+  background-repeat:repeat;background-size:var(--emoji-size) var(--emoji-size);
 }
-body::after { background-position:calc(var(--emoji-size)/2) calc(var(--emoji-size)/2); }
+body::after{background-position:calc(var(--emoji-size)/2) calc(var(--emoji-size)/2);}
 
-.wrap { position:relative; z-index:1; min-height:100vh; display:flex; flex-direction:column; align-items:center;
-  padding-top:clamp(24px,6vh,80px); padding-bottom:24px; box-sizing:border-box; }
-.container { width:100%; max-width:720px; padding-inline:12px; display:grid; gap:12px; justify-items:center; }
-h1 { margin:0; font-size:clamp(18px,2.6vw,22px); font-weight:700; text-transform:uppercase; text-align:center; }
-h1 .highlight { background:#c00; color:#fff; padding:4px 10px; border-radius:6px; }
-
-.board { background:#fff; border:1px solid var(--ring); border-radius:12px; padding:8px; display:grid;
-  gap:8px; justify-items:center; max-width:560px; box-sizing:border-box; }
-.wheel-area { position:relative; width:100%; display:grid; place-items:center; }
-.pointer { position:absolute; top:0; left:50%; transform:translateX(-50%);
-  width:0; height:0; z-index:6; --w:14px; --h:22px;
-  border-left:var(--w) solid transparent; border-right:var(--w) solid transparent;
-  border-top:var(--h) solid #111;
-}
-canvas { width:clamp(250px,80vw,540px); aspect-ratio:1/1; display:block;
-  border-radius:50%; background:#fafafa; box-shadow:inset 0 0 0 5px #f0f0f0;
-}
-.controls { display:flex; gap:8px; align-items:center; justify-content:center; flex-wrap:wrap; }
-button.primary { background:#111; color:#fff; border:none; border-radius:8px; padding:8px 12px;
-  font-size:13px; font-weight:700; cursor:pointer;
-}
-.legend { font-size:12px; color:#666; }
-
-.overlay {
-  position:fixed; top:0; left:0; right:0; bottom:0;
-  display:none; align-items:center; justify-content:center;
-  background:rgba(0,0,0,0.35); z-index:9999;
-}
-.bubble {
-  position:relative; max-width:92%; padding:20px 48px 20px 20px;
-  border-radius:14px; background:#111; color:#fff;
-  box-shadow:0 8px 24px rgba(0,0,0,0.25);
-  font-size:clamp(14px,2.4vw,20px); font-weight:600;
-  text-align:center; line-height:1.35;
-}
-.close { position:absolute; top:10px; right:10px; width:34px; height:34px;
-  border-radius:50%; border:none; background:rgba(255,255,255,0.12);
-  color:#fff; display:flex; align-items:center; justify-content:center;
-  cursor:pointer;
-}
-.close:hover { background:rgba(255,255,255,0.22); }
-
-.sparkle {
-  position:absolute; pointer-events:none; width:20px; height:20px; border-radius:50%;
-  background:radial-gradient(circle,rgba(255,215,0,0.95) 0%,rgba(255,215,0,0.12) 60%,transparent 100%);
-  transform:translate(-50%,-50%); animation:spark 450ms ease-out forwards; z-index:8;
-}
-@keyframes spark {
-  from { opacity:1; transform:translate(-50%,-50%) scale(1); }
-  to { opacity:0; transform:translate(-50%,-50%) scale(3); }
-}
-
+.wrap{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;align-items:center;
+padding-top:clamp(24px,6vh,80px);padding-bottom:24px;box-sizing:border-box;}
+.container{width:100%;max-width:720px;padding-inline:12px;display:grid;gap:12px;justify-items:center;}
+h1{margin:0;font-size:clamp(18px,2.6vw,22px);font-weight:700;text-transform:uppercase;text-align:center;}
+h1 .highlight{background:#c00;color:#fff;padding:4px 10px;border-radius:6px;}
+.board{background:#fff;border:1px solid var(--ring);border-radius:12px;padding:8px;display:grid;gap:8px;justify-items:center;max-width:560px;box-sizing:border-box;}
+.wheel-area{position:relative;width:100%;display:grid;place-items:center;}
+.pointer{position:absolute;top:0;left:50%;transform:translateX(-50%);width:0;height:0;z-index:6;
+--w:14px;--h:22px;border-left:var(--w) solid transparent;border-right:var(--w) solid transparent;border-top:var(--h) solid #111;}
+canvas{width:clamp(250px,80vw,540px);aspect-ratio:1/1;display:block;border-radius:50%;background:#fafafa;box-shadow:inset 0 0 0 5px #f0f0f0;}
+.controls{display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;}
+button.primary{background:#111;color:#fff;border:none;border-radius:8px;padding:8px 12px;font-size:13px;font-weight:700;cursor:pointer;}
+.legend{font-size:12px;color:#666;}
+.overlay{position:fixed;top:0;left:0;right:0;bottom:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.35);z-index:9999;}
+.bubble{position:relative;max-width:92%;padding:20px 48px 20px 20px;border-radius:14px;background:#111;color:#fff;
+box-shadow:0 8px 24px rgba(0,0,0,0.25);font-size:clamp(14px,2.4vw,20px);font-weight:600;text-align:center;line-height:1.35;}
+.close{position:absolute;top:10px;right:10px;width:34px;height:34px;border-radius:50%;border:none;background:rgba(255,255,255,0.12);color:#fff;
+display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.close:hover{background:rgba(255,255,255,0.22);}
+.share-bar{margin-top:14px;display:flex;gap:8px;flex-wrap:wrap;justify-content:center;position:relative;}
+.share-btn{width:36px;height:36px;border-radius:50%;border:none;background:#fff;color:#111;font-size:18px;cursor:pointer;position:relative;}
+.share-btn[title]:hover::after{content:attr(title);position:absolute;bottom:-28px;left:50%;transform:translateX(-50%);background:#111;color:#fff;padding:4px 8px;border-radius:6px;font-size:12px;white-space:nowrap;}
+.sparkle{position:absolute;pointer-events:none;width:20px;height:20px;border-radius:50%;
+background:radial-gradient(circle,rgba(255,215,0,0.95) 0%,rgba(255,215,0,0.12) 60%,transparent 100%);
+transform:translate(-50%,-50%);animation:spark 450ms ease-out forwards;z-index:8;}
+@keyframes spark{from{opacity:1;transform:translate(-50%,-50%) scale(1);}to{opacity:0;transform:translate(-50%,-50%) scale(3);}}
+/* Ajustement du cadre de résultat sur mobile */
 @media (max-width: 600px) {
+  .overlay {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 0;
+  }
   .bubble {
-    max-width: 340px; padding:16px 36px 16px 16px;
-    font-size:15px; border-radius:16px; margin:0 auto;
+    max-width: 90%;
+    max-width: 340px;
+    padding: 16px 36px 16px 16px;
+    font-size: 15px;
+    border-radius: 16px;
+    margin: 0 auto;
+    box-sizing: border-box;
   }
 }
+  /* Empêche l'affichage initial de la fenêtre de résultat */
+.overlay[aria-hidden="true"] {
+  display: none !important;
+}
+
+  /* Boutons de retour utilisateur */
+.feedback-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 14px;
+}
+
+.feedback-btn {
+  background: #c00;
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 15px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.feedback-btn:hover {
+  background: #900;
+  transform: scale(1.05);
+}
+
+.feedback-btn:active {
+  transform: scale(0.97);
+}
+
+/* Empêche le défilement de la page sur mobile */
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: contain; /* bloque l'effet "rebond" sur mobile */
+  touch-action: none; /* empêche le scroll tactile */
+}
+
+/* Empêche un fond plus grand que l’écran */
+body {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
 </style>
 </head>
-
 <body>
 <div class="wrap">
   <div class="container">
@@ -121,109 +183,649 @@ button.primary { background:#111; color:#fff; border:none; border-radius:8px; pa
   </div>
 </div>
 
-<!-- Fenêtre de résultat -->
 <div id="overlay" class="overlay" aria-hidden="true">
   <div class="bubble" role="dialog" aria-modal="true">
     <div id="overlayText"></div>
-    <div id="dynamicButtons"><!-- Les boutons seront chargés ici dynamiquement --></div>
+    <div class="share-bar" id="shareBar">
+      <button class="share-btn" data-platform="facebook" title="Partager sur Facebook">📘</button>
+      <button class="share-btn" data-platform="x" title="Partager sur X / Twitter">🐦</button>
+      <button class="share-btn" data-platform="instagram" title="Partager sur Instagram">📸</button>
+      <button class="share-btn" data-platform="linkedin" title="Partager sur LinkedIn">💼</button>
+      <button class="share-btn" data-platform="snapchat" title="Partager sur Snapchat">👻</button>
+      <button class="share-btn" data-platform="tiktok" title="Partager sur TikTok">🎵</button>
+      <button class="share-btn" data-platform="whatsapp" title="Partager sur WhatsApp">💬</button>
+      <button class="share-btn" data-platform="telegram" title="Partager sur Telegram">📨</button>
+      <button class="share-btn" id="copyText" title="Copier le texte">📋</button>
+    </div>
     <button id="overlayClose" class="close" aria-label="Fermer">✕</button>
   </div>
 </div>
 
+<!-- Modal feedback (placer dans body) -->
+<button id="openFeedbackForm" class="feedback-btn" style="display:none">Donner un complément d'information</button>
+
+<div id="feedbackModal" style="display:none;position:fixed;inset:0;z-index:12000;align-items:center;justify-content:center;background:rgba(0,0,0,0.45);">
+  <form id="feedbackForm" style="background:#fff;padding:18px;border-radius:10px;max-width:520px;width:92%;box-sizing:border-box;">
+    <h3>Donner un complément d'information</h3>
+    <input type="hidden" id="formResult" name="resultText" value="">
+    <input type="text" name="honeypot" id="honeypot" style="display:none" autocomplete="off">
+    <label style="display:block;margin-top:8px;">
+      Votre message
+      <textarea id="formMessage" name="userMessage" required style="width:100%;height:120px"></textarea>
+    </label>
+    <label style="display:block;margin-top:8px;">
+      Votre email (optionnel)
+      <input id="formEmail" name="userEmail" type="email" style="width:100%">
+    </label>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px;">
+      <button type="button" id="closeFeedback">Annuler</button>
+      <button type="submit">Envoyer</button>
+    </div>
+    <div id="feedbackStatus" style="margin-top:10px;font-size:13px;color:#333;display:none;"></div>
+  </form>
+</div>
+  
 <script>
-/* === Exemple d’entrée === */
-let ENTRIES = ["Exemple 1","Exemple 2","Exemple 3","Exemple 4"];
+/* =======================
+   RESSOURCES / CONFIG
+   ======================= */
+let ENTRIES = [
+  "Exemple 1",
+  "Exemple un peu plus long",
+  "Court",
+  "Autre exemple très long qui pourrait poser problème",
+  "Encore"
+];
 
-const canvas = document.getElementById("wheel");
-const ctx = canvas.getContext("2d");
-const overlay = document.getElementById("overlay");
-const overlayText = document.getElementById("overlayText");
-const overlayClose = document.getElementById("overlayClose");
-const dynamicButtons = document.getElementById("dynamicButtons");
+const canvas = document.getElementById('wheel'), 
+const ctx = canvas.getContext('2d');
+const W = canvas.width, 
+const H = canvas.height, 
+const CX = W/2, 
+const CY = H/2, 
+const R = Math.min(W,H) * 0.48;
+const wheelArea = document.getElementById('wheelArea');
+const btn = document.getElementById('spinBtn');
+const overlay = document.getElementById('overlay');
+const overlayText = document.getElementById('overlayText');
+const overlayClose = document.getElementById('overlayClose'), 
+const copyBtn = document.getElementById('copyText');
 
-const CX = canvas.width/2, CY = canvas.height/2, R = canvas.width*0.48;
-let angle = 0, spinning=false;
+const spinSoundSrc = 'wheel-spin.mp3'; // short click sound used per-sector
+const coinSound = new Audio('coin.mp3'); coinSound.volume = 0.95;
 
-/* === Fonction dessin === */
-function drawWheel(a=0){
-  ctx.clearRect(0,0,canvas.width,canvas.height);
+/* Tuning */
+const rotationFactor = 1.4;
+const MAX_VEL = 0.45 * rotationFactor;
+const BOOST = 0.05 * rotationFactor;
+const BASE_DAMPING = 0.9945 + (rotationFactor - 1) * 0.0015;
+const LERP = 0.10;
+
+/* STATE */
+let angle = -Math.PI/2;
+let angularVelocity = 0;
+let targetVelocity = 0;
+let frictionTimer = 0, frictionDuration = 0, frictionActive = false;
+let showedResult = false, hasBeenSpun = false;
+
+/* OFFSCREEN LAYER */
+const off = document.createElement('canvas'); off.width = W; off.height = H; const offctx = off.getContext('2d');
+
+/* COLORS PERSISTANTES */
+const COLOR_PALETTE = ["#f87171","#60a5fa","#34d399","#fbbf24","#a78bfa","#fb923c","#2dd4bf","#c084fc"];
+let entryColors = [];
+function buildColors(){
+  if(entryColors.length === 0) for(let i=0;i<ENTRIES.length;i++) entryColors.push(COLOR_PALETTE[i%COLOR_PALETTE.length]);
+  while(entryColors.length < ENTRIES.length) entryColors.push(COLOR_PALETTE[entryColors.length % COLOR_PALETTE.length]);
+  return entryColors;
+}
+
+/* IMAGE CENTRALE */
+const centerImg = new Image(); centerImg.src = 'center.png'; let centerLoaded = false;
+centerImg.onload = () => { centerLoaded = true; };
+
+/* =======================
+   DESSIN ROUE
+   ======================= */
+function buildStaticWheel(){
   const n = ENTRIES.length;
+  const colors = buildColors();
+  offctx.clearRect(0,0,W,H);
+  offctx.save(); offctx.translate(CX,CY);
   const step = (Math.PI*2)/n;
-  const colors = ["#f87171","#60a5fa","#34d399","#fbbf24","#a78bfa","#fb923c"];
-  ctx.save(); ctx.translate(CX,CY); ctx.rotate(a);
-  for(let i=0;i<n;i++){
-    ctx.beginPath(); ctx.moveTo(0,0);
-    ctx.arc(0,0,R,i*step,(i+1)*step);
-    ctx.fillStyle=colors[i%colors.length]; ctx.fill();
+
+  // secteurs colorés
+  for (let i=0;i<n;i++){
+    offctx.beginPath();
+    offctx.moveTo(0,0);
+    offctx.arc(0,0,R,i*step,(i+1)*step);
+    offctx.closePath();
+    offctx.fillStyle = colors[i];
+    offctx.fill();
+  }
+
+  // texte radial, réduit pour ne pas dépasser la zone colorée
+  offctx.fillStyle = "#111";
+  offctx.textAlign = "center";
+  offctx.textBaseline = "middle";
+  const labelR = R * 0.63;
+  const maxWidthBase = R * 0.45;
+
+  for (let i=0;i<n;i++){
+    let text = String(ENTRIES[i] || "");
+    const mid = (i + 0.5) * step;
+    const x = Math.cos(mid) * labelR;
+    const y = Math.sin(mid) * labelR;
+
+    offctx.save();
+    offctx.translate(x,y);
+    offctx.rotate(mid);
+
+    let fontSize = Math.max(10, 18 - text.length / 15);
+    offctx.font = `${fontSize}px Poppins, sans-serif`;
+    const maxWidth = maxWidthBase;
+
+    while (offctx.measureText(text).width > maxWidth && fontSize > 8) {
+      fontSize -= 1;
+      offctx.font = `${fontSize}px Poppins, sans-serif`;
+    }
+
+    let truncated = text;
+    while (offctx.measureText(truncated).width > maxWidth && truncated.length > 3) {
+      truncated = truncated.slice(0, -1);
+    }
+    if (truncated.length < text.length) truncated = truncated.trim() + "…";
+
+    offctx.fillText(truncated, 0, 0);
+    offctx.restore();
+  }
+
+  offctx.restore();
+}
+
+function drawWheel(a){
+  ctx.clearRect(0,0,W,H);
+  ctx.save();
+  ctx.translate(CX,CY);
+  ctx.rotate(a);
+  ctx.drawImage(off, -CX, -CY);
+
+  if (centerLoaded){
+    const imgSize = R * 1.05;
     ctx.save();
-    ctx.rotate(i*step+step/2);
-    ctx.fillStyle="#111"; ctx.font="16px Poppins"; ctx.textAlign="right";
-    ctx.fillText(ENTRIES[i],R-20,5);
+    ctx.rotate(Math.PI / 2);
+    ctx.beginPath();
+    ctx.arc(0,0,imgSize/2,0,Math.PI*2);
+    ctx.closePath();
+    ctx.clip();
+    // image dessinnée dans le contexte tourné -> elle tourne avec la roue
+    ctx.drawImage(centerImg, -imgSize/2, -imgSize/2, imgSize, imgSize);
     ctx.restore();
   }
+
   ctx.restore();
 }
 
-/* === Tourner la roue === */
-document.getElementById("spinBtn").addEventListener("click",()=>{
-  if(spinning) return;
-  spinning=true;
-  let vel=0.35;
-  const decel=0.995;
-  function step(){
-    drawWheel(angle);
-    angle+=vel;
-    vel*=decel;
-    if(vel<0.001){
-      spinning=false;
-      const idx=Math.floor(((Math.PI*1.5 - angle)%(2*Math.PI))/(2*Math.PI/ENTRIES.length));
-      showOverlay(ENTRIES[idx]);
-    } else requestAnimationFrame(step);
+/* petit effet visuel sur appui */
+function createSpark(e){
+  const rect = wheelArea.getBoundingClientRect();
+  let x = rect.width/2, y = rect.height/2;
+  if (e) {
+    if (e.touches && e.touches[0]) { x = e.touches[0].clientX - rect.left; y = e.touches[0].clientY - rect.top; }
+    else if (e.clientX !== undefined) { x = e.clientX - rect.left; y = e.clientY - rect.top; }
   }
-  step();
+  const s = document.createElement('div');
+  s.className = 'sparkle';
+  s.style.left = `${x}px`; s.style.top = `${y}px`;
+  wheelArea.appendChild(s);
+  setTimeout(()=>s.remove(),450);
+}
+
+/* =======================
+   INTERACTION / BOOST
+   ======================= */
+function boostWheel(e){
+  hasBeenSpun = true;
+  createSpark(e);
+
+  if (Math.abs(angularVelocity) < 0.01) {
+    targetVelocity = Math.min(MAX_VEL, targetVelocity + BOOST * 3.0);
+    angularVelocity = Math.min(MAX_VEL, angularVelocity + BOOST * 1.0);
+  } else {
+    const boostFactor = 1 + Math.min(Math.abs(angularVelocity) * 8, 1.8);
+    targetVelocity = Math.min(MAX_VEL, targetVelocity + BOOST * boostFactor);
+    angularVelocity = Math.min(MAX_VEL, angularVelocity + BOOST * 0.6);
+  }
+
+  // désactive brièvement la friction pour sentir le boost
+  frictionActive = false; frictionTimer = 0;
+  clearTimeout(window._frictionResume);
+  window._frictionResume = setTimeout(()=>{ frictionActive = true; }, 600);
+
+  showedResult = false;
+}
+canvas.addEventListener('mousedown', boostWheel);
+canvas.addEventListener('touchstart', boostWheel, {passive:true});
+btn.addEventListener('click', boostWheel);
+
+/* =======================
+   SON PAR PASSAGE DE SECTEUR
+   ======================= */
+animate && (animate.prevIndex = -1); // sécurité
+function playSectorClick(){
+  try {
+    const snd = new Audio(spinSoundSrc);
+    snd.volume = 0.7;
+    const absVel = Math.abs(angularVelocity);
+    const rate = Math.min(2.5, Math.max(0.5, absVel * 80 + 0.5));
+    snd.playbackRate = rate;
+    snd.play().catch(()=>{});
+  } catch(e){}
+}
+
+/* =======================
+   SELECTION / OVERLAY
+   ======================= */
+function getSelectedIndex(a){
+  const n = ENTRIES.length;
+  if (n === 0) return -1;
+  const step = (Math.PI*2)/n;
+  let theta = (-Math.PI/2 - a) % (Math.PI*2);
+  if (theta < 0) theta += Math.PI*2;
+  return Math.floor(theta / step);
+}
+
+function showOverlay(text){
+  const intros = [
+    "🎯 Le sort a parlé !", 
+    "✨ Voici le résultat :", 
+    "🍀 Et le gagnant est…"];
+  const intro = intros[Math.floor(Math.random()*intros.length)];
+  const formatted = String(text)
+    .replace(/(Recette\s*:)/gi,"\n$1")
+    .replace(/(Date de création\s*:)/gi,"\n$1")
+    .replace(/\n/g,"<br>");
+
+  // 💬 contenu principal du résultat
+  overlayText.innerHTML = `
+    ${intro}<br><br>${formatted}
+    <div class="feedback-buttons">
+      <a id="btn-info" class="feedback-btn" href="#">Donner un complément d'information</a>
+      <a id="btn-error" class="feedback-btn" href="#">Signaler une erreur</a>
+    </div>
+  `;
+
+  overlay.style.display = 'flex';
+  overlay.setAttribute('aria-hidden','false');
+
+  // 🧩 branche les deux boutons à ton formulaire Netlify
+  const infoBtn = document.getElementById("btn-info");
+  const errorBtn = document.getElementById("btn-error");
+
+  if (infoBtn && errorBtn) {
+    infoBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      const userMsg = prompt("💬 Ajoutez votre complément d'information :");
+      if (userMsg) sendFeedbackToGitHub(text, userMsg, "info");
+    });
+
+    errorBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      const userMsg = prompt("⚠️ Décrivez l'erreur que vous avez trouvée :");
+      if (userMsg) sendFeedbackToGitHub(text, userMsg, "error");
+    });
+  }
+}
+
+// handlers for the feedback modal (adapt to your showOverlay call)
+const openBtn = document.getElementById('openFeedbackForm');
+const modal = document.getElementById('feedbackModal');
+const form = document.getElementById('feedbackForm');
+const closeBtn = document.getElementById('closeFeedback');
+const status = document.getElementById('feedbackStatus');
+
+function openFeedback(resultText){
+  document.getElementById('formResult').value = resultText;
+  document.getElementById('formMessage').value = '';
+  document.getElementById('formEmail').value = '';
+  document.getElementById('honeypot').value = '';
+  status.style.display = 'none';
+  modal.style.display = 'flex';
+}
+
+closeBtn.addEventListener('click', ()=> modal.style.display='none');
+modal.addEventListener('click', (e)=> { if (e.target === modal) modal.style.display='none'; });
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  status.style.display = 'block'; status.textContent = 'Envoi en cours…';
+  const payload = {
+    resultText: document.getElementById('formResult').value,
+    userMessage: document.getElementById('formMessage').value,
+    userEmail: document.getElementById('formEmail').value,
+    honeypot: document.getElementById('honeypot').value || ''
+  };
+  try {
+    const resp = await fetch('/.netlify/functions/sendFeedback', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const json = await resp.json();
+    if (json.ok) {
+      status.textContent = 'Merci — votre message a été envoyé !';
+      if (json.url) {
+        status.innerHTML += `<br><a href="${json.url}" target="_blank" rel="noopener">Voir le ticket sur GitHub</a>`;
+      }
+      setTimeout(()=> modal.style.display='none', 1500);
+    } else {
+      status.textContent = 'Erreur lors de l’envoi : ' + (json.error || 'unknown');
+    }
+  } catch (err) {
+    console.error(err);
+    status.textContent = 'Erreur réseau lors de l’envoi.';
+  }
 });
 
-/* === Fenêtre résultat === */
-function showOverlay(text){
-  overlayText.innerHTML=`🎯 Résultat :<br><br>${text}`;
-  overlay.style.display="flex";
-  overlay.setAttribute("aria-hidden","false");
-  loadDynamicButtons();
-}
-overlayClose.addEventListener("click",()=>overlay.style.display="none");
+overlayClose.addEventListener('click',()=>{ overlay.style.display='none'; overlay.setAttribute('aria-hidden','true'); });
+overlay.addEventListener('click', e => { if (e.target === overlay) { overlay.style.display='none'; overlay.setAttribute('aria-hidden','true'); }});
+overlay.querySelector('.bubble').addEventListener('click', e => e.stopPropagation());
+copyBtn && copyBtn.addEventListener('click', async ()=>{
+  try { await navigator.clipboard.writeText(overlayText.innerText); copyBtn.textContent = '✅'; setTimeout(()=>copyBtn.textContent='📋',800); }
+  catch(e){ alert('Impossible de copier'); }
+});
 
-/* === Chargement dynamique des boutons === */
-function loadDynamicButtons(){
-  if (!navigator.onLine) {
-    dynamicButtons.innerHTML = "<p style='margin-top:12px;color:#aaa;'>⚠️ Vous êtes hors ligne — options de partage désactivées.</p>";
+/* =======================
+   ANIMATION
+   ======================= */
+let lastTime = performance.now();
+function animate(){
+  const now = performance.now();
+  const deltaTime = Math.min(10, (now - lastTime) / 16.67);
+  lastTime = now;
+
+  // lerp vers targetVelocity
+  angularVelocity += (targetVelocity - angularVelocity) * (LERP * deltaTime);
+  angle += angularVelocity * deltaTime;
+
+  // draw
+  drawWheel(angle);
+
+  // son : detecte passage d'un secteur (pointer fixed at -PI/2)
+  const n = ENTRIES.length;
+  if (n > 0) {
+    const step = (Math.PI*2)/n;
+    let pointerAngle = (-Math.PI/2 - angle) % (Math.PI*2);
+    if (pointerAngle < 0) pointerAngle += Math.PI*2;
+    const currentIndex = Math.floor(pointerAngle / step);
+    if (currentIndex !== (animate.prevIndex ?? -1)) {
+      animate.prevIndex = currentIndex;
+      // play short click
+      playSectorClick();
+    }
+  }
+
+  // friction / slowdown applied to targetVelocity
+  if (targetVelocity > 0.001) {
+    if (!frictionActive) {
+      frictionActive = true;
+      frictionTimer = 0;
+      frictionDuration = 180 + Math.random()*120;
+    }
+    const t = frictionTimer / frictionDuration;
+    if (t < 1) {
+      targetVelocity *= Math.pow(BASE_DAMPING - t * 0.03, deltaTime);
+      frictionTimer += deltaTime;
+    } else {
+      targetVelocity *= Math.pow(0.9, deltaTime);
+    }
+  } else {
+    frictionActive = false;
+    frictionTimer = 0;
+  }
+
+  // arrêt logique et affichage du résultat
+  if (Math.abs(angularVelocity) <= 0.001 && Math.abs(targetVelocity) <= 0.001) {
+    angularVelocity = 0; targetVelocity = 0;
+    if (hasBeenSpun && !showedResult) {
+      showedResult = true;
+      const idx = getSelectedIndex(angle);
+      if (idx >= 0 && ENTRIES[idx] !== undefined) {
+        const chosen = ENTRIES[idx];
+        try { coinSound.play().catch(()=>{}); } catch(e){}
+        showOverlay(chosen);
+        ENTRIES.splice(idx,1);
+        entryColors.splice(idx,1);
+        buildStaticWheel();
+        document.getElementById('countInfo').textContent = ENTRIES.length + " éléments restants";
+        setTimeout(()=>{ hasBeenSpun = false; }, 300);
+      }
+    }
+  }
+
+  window._animFrame = requestAnimationFrame(animate);
+}
+
+/* =======================
+   VISIBILITY / ONGLET
+   ======================= */
+let hiddenAt = null;
+let wasSpinning = false;
+
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) {
+    hiddenAt = performance.now();
+    wasSpinning = Math.abs(angularVelocity) > 0.001 || Math.abs(targetVelocity) > 0.001;
+    // pause any playing short sounds (can't control separate instances reliably), nothing to do
+    cancelAnimationFrame(window._animFrame);
+  } else {
+    const now = performance.now();
+    const elapsed = hiddenAt ? now - hiddenAt : 0;
+    hiddenAt = null;
+
+    if (wasSpinning) {
+      const decay = Math.exp(-elapsed / 3000);
+      angularVelocity *= decay;
+      targetVelocity *= decay;
+
+      if (Math.abs(angularVelocity) <= 0.001 && Math.abs(targetVelocity) <= 0.001 && hasBeenSpun && !showedResult) {
+        angularVelocity = 0; targetVelocity = 0;
+        try { coinSound.play().catch(()=>{}); } catch(e){}
+        showedResult = true;
+        const idx = getSelectedIndex(angle);
+        if (idx >= 0 && ENTRIES[idx] !== undefined) {
+          showOverlay(ENTRIES[idx]);
+          ENTRIES.splice(idx,1);
+          entryColors.splice(idx,1);
+          buildStaticWheel();
+          document.getElementById('countInfo').textContent = ENTRIES.length + " éléments restants";
+          setTimeout(()=>{ hasBeenSpun = false; },300);
+        }
+      } else {
+        lastTime = performance.now();
+        window._animFrame = requestAnimationFrame(animate);
+      }
+    } else {
+      lastTime = performance.now();
+      window._animFrame = requestAnimationFrame(animate);
+    }
+    wasSpinning = false;
+  }
+});
+
+/* =======================
+   PARTAGE / CAPTURE amélioré
+   ======================= */
+document.querySelectorAll('.share-btn[data-platform]').forEach(btn => {
+  btn.addEventListener('click', async () => {
+    const platform = btn.dataset.platform;
+    const text = overlayText.innerText;
+    const url = window.location.href;
+    const message = `${text}\n${url}`;
+
+    // cacher temporairement la barre de partage pour la capture
+    const shareBar = document.getElementById('shareBar');
+    const prevDisplay = shareBar.style.display;
+    shareBar.style.display = 'none';
+
+    try {
+      // capture un peu plus large (plus de décor)
+      const rect = wheelArea.getBoundingClientRect();
+      const margin = 120;
+      const canvasCap = await html2canvas(document.body, {
+        x: rect.left - margin,
+        y: rect.top - margin,
+        width: rect.width + margin*2,
+        height: rect.height + margin*2,
+        scale: 1.4,
+        useCORS: true,
+        backgroundColor: null
+      });
+      const imageData = canvasCap.toDataURL('image/png');
+
+      // mobile : Web Share API
+      if (navigator.share && /Android|iPhone|iPad/i.test(navigator.userAgent)) {
+        try {
+          const blob = await (await fetch(imageData)).blob();
+          const file = new File([blob], 'resultat.png', { type: 'image/png' });
+          await navigator.share({ title: 'La roue de la servitude', text, files: [file] });
+          shareBar.style.display = prevDisplay;
+          return;
+        } catch(e){}
+      }
+
+      // desktop : liens directs
+      const msg = encodeURIComponent(message);
+      let shareUrl = '';
+      switch (platform) {
+        case 'facebook': shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${msg}`; break;
+        case 'x': shareUrl = `https://twitter.com/intent/tweet?text=${msg}`; break;
+        case 'linkedin': shareUrl = `https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(url)}&title=${msg}`; break;
+        case 'reddit': shareUrl = `https://www.reddit.com/submit?url=${encodeURIComponent(url)}&title=${msg}`; break;
+        case 'pinterest': shareUrl = `https://pinterest.com/pin/create/button/?url=${encodeURIComponent(url)}&description=${msg}`; break;
+        case 'whatsapp': shareUrl = `https://api.whatsapp.com/send?text=${msg}`; break;
+        case 'telegram': shareUrl = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${msg}`; break;
+        case 'messenger': shareUrl = `https://www.facebook.com/dialog/send?app_id=1111222233334444&link=${encodeURIComponent(url)}&redirect_uri=${encodeURIComponent(url)}`; break;
+        case 'email': shareUrl = `mailto:?subject=${encodeURIComponent('La roue de la servitude')}&body=${msg}`; break;
+        default:
+          // pour Discord, Signal, YouTube, Instagram, Snapchat, TikTok
+          const a = document.createElement('a');
+          a.href = imageData;
+          a.download = 'capture-roue.png';
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          alert('✅ Capture enregistrée — ouvrez ' + platform + ' et ajoutez cette image manuellement (story, message ou post).');
+          shareBar.style.display = prevDisplay;
+          return;
+      }
+
+      if (shareUrl) window.open(shareUrl,'_blank','noopener,noreferrer');
+
+    } catch(err){
+      console.error('Erreur capture ou partage', err);
+      alert('Erreur lors du partage.');
+    } finally {
+      shareBar.style.display = prevDisplay;
+    }
+  });
+});
+
+/* =======================
+   INIT
+   ======================= */
+function updateBg(){
+  const d = Math.sqrt(innerWidth**2 + innerHeight**2);
+  document.documentElement.style.setProperty('--bg-size', `${Math.ceil(d*1.2)}px`);
+  const base = Math.max(36, Math.min(Math.round(innerWidth/12), 160));
+  document.documentElement.style.setProperty('--emoji-size', `${base}px`);
+}
+addEventListener('resize', updateBg);
+updateBg();
+
+buildStaticWheel();
+document.getElementById('countInfo').textContent = ENTRIES.length + " éléments";
+drawWheel(angle);
+lastTime = performance.now();
+window._animFrame = requestAnimationFrame(animate);
+
+// ✅ Gère la touche Espace uniquement quand aucune fenêtre n'est ouverte
+document.addEventListener('keydown',(e)=>{
+  if (e.code === 'Space') {
+    e.preventDefault();
+    
+    // Vérifie si une fenêtre (overlay) est visible
+    const anyModalOpen = 
+      document.getElementById('overlay')?.style.display === 'flex' ||
+      document.getElementById('feedbackForm')?.style.display === 'flex';
+
+    // Si aucune fenêtre ouverte -> autorise la rotation
+    if (!anyModalOpen) {
+      boostWheel();
+    }
+  }
+});
+
+// === Détection automatique de l'environnement (Netlify ou autre) ===
+const isNetlifyHost = window.location.hostname.includes("netlify.app");
+
+// Si le site n'est pas sur Netlify, on cible directement le domaine Netlify du projet
+const NETLIFY_FUNCTION_URL = isNetlifyHost
+  ? "/.netlify/functions/sendFeedback"
+  : "https://larouedelaservitude.netlify.app/.netlify/functions/sendFeedback";
+
+// 🧩 Limite anti-abus côté client : 1 envoi par minute max
+let lastFeedbackTime = 0;
+  
+// === 🧩 Fonction d’envoi vers GitHub Discussions via Netlify ===
+function sendFeedbackToGitHub(resultText, userMessage, type) {
+  const now = Date.now();
+
+  // Vérifie s'il y a eu un envoi récent
+  if (now - lastFeedbackTime < 60000) { // 60 000 ms = 1 minute
+    alert("Merci d’attendre une minute avant d’envoyer un nouveau message.");
     return;
   }
-  fetch("/larouedelaservitude/buttons.html")
-    .then(r=>r.text())
-    .then(html=>dynamicButtons.innerHTML=html)
-    .catch(()=>dynamicButtons.innerHTML="<p style='margin-top:12px;color:#aaa;'>❌ Impossible de charger les boutons.</p>");
+
+  // Met à jour la dernière heure d'envoi
+  lastFeedbackTime = now;
+
+  // Envoi normal
+  console.log("📡 Envoi du feedback vers :", NETLIFY_FUNCTION_URL);
+  
+  fetch(NETLIFY_FUNCTION_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ resultText, userMessage, type })
+  })
+    .then(r => r.json())
+    .then(data => {
+      alert("✅ Merci ! Votre retour a été envoyé.");
+      if (data.url) window.open(data.url, "_blank");
+    })
+    .catch(err => {
+      console.error("Erreur lors de l'envoi du feedback :", err);
+      if (err && err.message) {
+        alert("⚠️ " + err.message);
+      } else {
+        alert("⚠️ Une erreur s'est produite lors de l'envoi du message.");
+      }
+    });
 }
 
-/* === Réagit aux changements de connexion === */
-window.addEventListener("online", loadDynamicButtons);
-window.addEventListener("offline", () => {
-  dynamicButtons.innerHTML = "<p style='margin-top:12px;color:#aaa;'>⚠️ Vous êtes hors ligne — options de partage désactivées.</p>";
-});
-
-/* === Service Worker === */
-if("serviceWorker" in navigator){
-  window.addEventListener("load",()=>{
-    navigator.serviceWorker.register("/larouedelaservitude/service-worker.js")
-      .then(reg=>console.log("Service worker enregistré",reg.scope))
-      .catch(err=>console.log("SW échec",err));
-  });
-}
-
-/* === Dessin initial === */
-drawWheel();
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/larouedelaservitude/service-worker.js')
+        .then((registration) => {
+          console.log('ServiceWorker enregistré avec succès : ', registration.scope);
+        })
+        .catch((error) => {
+          console.log('Échec de l\'enregistrement du ServiceWorker : ', error);
+        });
+    });
+  }
+  
 </script>
 
 </body>
 </html>
-
-
