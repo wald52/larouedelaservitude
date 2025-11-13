@@ -42,7 +42,6 @@
 <link rel="icon" type="image/png" sizes="32x32" href="/larouedelaservitude/icons/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/larouedelaservitude/icons/favicon-16x16.png">
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 <!-- html2canvas pour la capture -->
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
@@ -51,7 +50,23 @@
   --bg:#f7f7f7; --fg:#111; --ring:#e5e7eb;
   --emoji-size:80px; --bg-size:200vw;
 }
-html,body{height:100%;margin:0;font-family:'Poppins',sans-serif;background:var(--bg);color:var(--fg);}
+  
+/* 1️⃣ Tout hérite de la police principale */
+*, *::before, *::after {
+  font-family: inherit;
+}
+
+/* 2️⃣ Police système + lissage */
+html,body {
+  height: 100%;
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: var(--bg);
+  color: var(--fg);
+}
+
 body::before,body::after{
   content:"";position:fixed;z-index:0;width:var(--bg-size);height:var(--bg-size);
   top:calc(50% - var(--bg-size)/2);left:calc(50% - var(--bg-size)/2);
@@ -821,6 +836,7 @@ function sendFeedbackToGitHub(resultText, userMessage, type) {
 
 </body>
 </html>
+
 
 
 
