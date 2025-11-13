@@ -4,8 +4,8 @@ const urlsToCache = [
   '/larouedelaservitude/icons/icon-192x192.png',
   '/larouedelaservitude/icons/icon-512x512.png',
   '/larouedelaservitude/images/center3.avif',
-  '/larouedelaservitude/audio/wheel-spin2.mp3',
-  '/larouedelaservitude/audio/coin2.mp3',
+  'https://wald52.github.io/larouedelaservitude/audio/coin2.mp3',
+  'https://wald52.github.io/larouedelaservitude/audio/wheel-spin2.mp3',
 ];
 
 self.addEventListener('install', (event) => {
