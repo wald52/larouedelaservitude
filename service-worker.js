@@ -23,61 +23,33 @@ self.addEventListener('install', (event) => {
 
 // Gestion des requêtes : stratégie "cache-first" pour TOUTES les requêtes
 self.addEventListener('fetch', (event) => {
-  // Vérifie si la requête concerne un fichier audio
-  if (event.request.url.includes('/audio/')) {
-    event.respondWith(
-      caches.match(event.request)
-        .then((cachedResponse) => {
-          // Retourne la version en cache si elle existe
-          if (cachedResponse) {
-            return cachedResponse;
-          }
-          // Sinon, essaie de récupérer depuis le réseau et met en cache
-          return fetch(event.request)
-            .then((response) => {
-              if (!response || response.status !== 200 || response.type !== 'basic') {
-                return response;
-              }
+  event.respondWith(
+    caches.match(event.request)
+      .then((cachedResponse) => {
+        // Retourne la version en cache si elle existe
+        if (cachedResponse) {
+          return cachedResponse;
+        }
+        // Sinon, essaie de récupérer depuis le réseau
+        return fetch(event.request)
+          .then((response) => {
+            // Met en cache la nouvelle réponse si la requête réseau réussit
+            if (response && response.status === 200 && response.type === 'basic') {
               const responseToCache = response.clone();
               caches.open(CACHE_NAME)
                 .then((cache) => {
                   cache.put(event.request, responseToCache);
                 });
-              return response;
-            })
-            .catch(() => {
-              // Retourne une réponse vide ou un message d'erreur personnalisé
-              return new Response('', { status: 200, statusText: 'OK' });
+            }
+            return response;
+          })
+          .catch(() => {
+            // Retourne une réponse par défaut si tout échoue
+            return new Response('Ressource non disponible hors-ligne.', {
+              status: 404,
+              statusText: 'Non trouvé dans le cache ou hors-ligne',
             });
-        })
-    );
-  } else {
-    // Pour les autres requêtes, utilise aussi "cache-first"
-    event.respondWith(
-      caches.match(event.request)
-        .then((cachedResponse) => {
-          if (cachedResponse) {
-            return cachedResponse;
-          }
-          return fetch(event.request)
-            .then((response) => {
-              if (!response || response.status !== 200 || response.type !== 'basic') {
-                return response;
-              }
-              const responseToCache = response.clone();
-              caches.open(CACHE_NAME)
-                .then((cache) => {
-                  cache.put(event.request, responseToCache);
-                });
-              return response;
-            })
-            .catch(() => {
-              return new Response('Ressource non disponible hors-ligne.', {
-                status: 404,
-                statusText: 'Non trouvé dans le cache ou hors-ligne',
-              });
-            });
-        })
-    );
-  }
+          });
+      })
+  );
 });
