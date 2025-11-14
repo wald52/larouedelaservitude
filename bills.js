@@ -8,7 +8,7 @@
   const AIR = 0.995;           // damping
   const LIFETIME = 5200;       // durée avant fade
   const SIZE_BASE = 28;        // taille de base emoji
-  const OUTER_FORCE = 6.5;     // force initiale d'éjection
+  const OUTER_FORCE = 9.5;     // force initiale d'éjection
   const ROT_RANGE = 360;       // degrés max de rotation initiale
 
   const pool = [];
