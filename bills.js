@@ -3,7 +3,7 @@
 // eventOrCoords can be an Event (mousedown/touchstart) or {x:.., y:..}
 
 (() => {
-  const MAX_BILLS = 48;        // max éléments en DOM
+  const MAX_BILLS = 1000;        // max éléments en DOM
   const GRAVITY = 12;         // gravité
   const AIR = 0.980;           // damping
   const LIFETIME = 10000;       // durée avant fade
