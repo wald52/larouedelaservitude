@@ -4,9 +4,9 @@
 
 (() => {
   const MAX_BILLS = 48;        // max éléments en DOM
-  const GRAVITY = 0.8;         // gravité
+  const GRAVITY = 12;         // gravité
   const AIR = 0.980;           // damping
-  const LIFETIME = 5200;       // durée avant fade
+  const LIFETIME = 10000;       // durée avant fade
   const SIZE_BASE = 28;        // taille de base emoji
   const OUTER_FORCE = 9.5;     // force initiale d'éjection
   const ROT_RANGE = 360;       // degrés max de rotation initiale
