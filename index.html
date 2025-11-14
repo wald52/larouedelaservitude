@@ -31,6 +31,8 @@
 <!-- html2canvas pour la capture -->
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
+<link rel="stylesheet" href="bills.css">
+
 <style>
 :root{
   --bg:#f7f7f7; --fg:#111; --ring:#e5e7eb;
@@ -88,10 +90,6 @@ display:flex;align-items:center;justify-content:center;cursor:pointer;}
 .share-bar{margin-top:14px;display:flex;gap:8px;flex-wrap:wrap;justify-content:center;position:relative;}
 .share-btn{width:36px;height:36px;border-radius:50%;border:none;background:#fff;color:#111;font-size:18px;cursor:pointer;position:relative;}
 .share-btn[title]:hover::after{content:attr(title);position:absolute;bottom:-28px;left:50%;transform:translateX(-50%);background:#111;color:#fff;padding:4px 8px;border-radius:6px;font-size:12px;white-space:nowrap;}
-.sparkle{position:absolute;pointer-events:none;width:20px;height:20px;border-radius:50%;
-background:radial-gradient(circle,rgba(255,215,0,0.95) 0%,rgba(255,215,0,0.12) 60%,transparent 100%);
-transform:translate(-50%,-50%);animation:spark 450ms ease-out forwards;z-index:8;}
-@keyframes spark{from{opacity:1;transform:translate(-50%,-50%) scale(1);}to{opacity:0;transform:translate(-50%,-50%) scale(3);}}
 /* Ajustement du cadre de résultat sur mobile */
 @media (max-width: 600px) {
   .overlay {
@@ -224,6 +222,8 @@ body {
     <div id="feedbackStatus" style="margin-top:10px;font-size:13px;color:#333;display:none;"></div>
   </form>
 </div>
+
+<script src="bills.js"></script>
   
 <script>
 /* =======================
@@ -359,27 +359,24 @@ function drawWheel(a){
   ctx.restore();
 }
 
-/* petit effet visuel sur appui */
-function createSpark(e){
-  const rect = wheelArea.getBoundingClientRect();
-  let x = rect.width/2, y = rect.height/2;
-  if (e) {
-    if (e.touches && e.touches[0]) { x = e.touches[0].clientX - rect.left; y = e.touches[0].clientY - rect.top; }
-    else if (e.clientX !== undefined) { x = e.clientX - rect.left; y = e.clientY - rect.top; }
-  }
-  const s = document.createElement('div');
-  s.className = 'sparkle';
-  s.style.left = `${x}px`; s.style.top = `${y}px`;
-  wheelArea.appendChild(s);
-  setTimeout(()=>s.remove(),450);
-}
-
 /* =======================
    INTERACTION / BOOST
    ======================= */
 function boostWheel(e){
   hasBeenSpun = true;
-  createSpark(e);
+  // appels avec les coordonnées du clic
+const rect = wheelArea.getBoundingClientRect();
+
+let x, y;
+if (e.touches && e.touches[0]) {
+  x = e.touches[0].clientX - rect.left;
+  y = e.touches[0].clientY - rect.top;
+} else {
+  x = e.clientX - rect.left;
+  y = e.clientY - rect.top;
+}
+
+createBills(x, y);
 
   if (Math.abs(angularVelocity) < 0.01) {
     targetVelocity = Math.min(MAX_VEL, targetVelocity + BOOST * 3.0);
@@ -822,15 +819,3 @@ function sendFeedbackToGitHub(resultText, userMessage, type) {
 
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
