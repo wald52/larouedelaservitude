@@ -22,15 +22,19 @@
     recentSounds = 0; 
   }, 1000);
 
-  function playBillSound(i) {
-    if (recentSounds >= MAX_SOUNDS_PER_SEC) return;
-    recentSounds++;
+function playBillSound(i) {
+  if (recentSounds >= MAX_SOUNDS_PER_SEC) return;
+  recentSounds++;
 
-    const snd = billSoundBuffer.cloneNode(true);
+  const snd = billSoundBuffer.cloneNode(true);
 
-    const delay = i * 40; // léger décalage réaliste
-    setTimeout(() => snd.play().catch(() => {}), delay);
-  }
+  // 🎵 Variation subtile du pitch
+  snd.playbackRate = 0.95 + Math.random() * 0.10;  
+  // → entre 0.95 et 1.05
+
+  const delay = i * 40; 
+  setTimeout(() => snd.play().catch(() => {}), delay);
+}
 
   /* ======================================================= */
 
