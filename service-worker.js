@@ -15,8 +15,8 @@ const urlsToCache = [
   `${BASE}/images/center3.avif`,
 
   // 🎵 Préchargement des sons
-  `${BASE}/audio/coin3.mp3`,
-  `${BASE}/audio/wheel-spin2.mp3`,
+  //`${BASE}/audio/coin3.mp3`,
+  //`${BASE}/audio/wheel-spin2.mp3`
 
   // 📱 Icônes importantes pour PWA
   `${BASE}/icons/icon-192x192.png`,
