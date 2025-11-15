@@ -32,10 +32,7 @@
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
 <link rel="stylesheet" href="/larouedelaservitude/bills.css">
-<!--
-<link rel="preload" href="/larouedelaservitude/audio/coin3.mp3" as="audio">
-<link rel="preload" href="/larouedelaservitude/audio/wheel-spin2.mp3" as="audio">
--->
+
 <style>
 :root{
   --bg:#f7f7f7; --fg:#111; --ring:#e5e7eb;
@@ -251,13 +248,6 @@ const MAX_VEL = 0.45 * rotationFactor;
 const BOOST = 0.05 * rotationFactor;
 const BASE_DAMPING = 0.9945 + (rotationFactor - 1) * 0.0015;
 const LERP = 0.10;
-
-// Précharger manuellement pour s'assurer que le navigateur a les fichiers
-//['/larouedelaservitude/audio/coin3.mp3','/larouedelaservitude/audio/wheel-spin2.mp3'].forEach(src=>{
-//  const a = new Audio();
-//  a.preload='auto';
-//  a.src = src;
-//});
 
 /* STATE */
 let angle = -Math.PI/2;
@@ -816,6 +806,7 @@ function sendFeedbackToGitHub(resultText, userMessage, type) {
 
 </body>
 </html>
+
 
 
 
