@@ -1,9 +1,6 @@
 // bills.js — effet billets (option C)
 // Usage: spawnBills(eventOrCoords, count)
 // eventOrCoords can be an Event (mousedown/touchstart) or {x:.., y:..}
-// son joué pour chaque billet
-const billSoundBuffer = new Audio("audio/frottement-papier.mp3");
-billSoundBuffer.volume = 0.8;
 
 (() => {
   const MAX_BILLS = 64;        // max éléments en DOM
@@ -13,6 +10,29 @@ billSoundBuffer.volume = 0.8;
   const SIZE_BASE = 24;        // taille de base emoji
   const OUTER_FORCE = 9.5;     // force initiale d'éjection
   const ROT_RANGE = 360;       // degrés max de rotation initiale
+
+  // son joué pour chaque billet
+  const billSoundBuffer = new Audio("audio/frottement-papier.mp3");
+  billSoundBuffer.volume = 0.8;
+
+    let recentSounds = 0;
+  const MAX_SOUNDS_PER_SEC = 10;
+
+  setInterval(() => { 
+    recentSounds = 0; 
+  }, 1000);
+
+  function playBillSound(i) {
+    if (recentSounds >= MAX_SOUNDS_PER_SEC) return;
+    recentSounds++;
+
+    const snd = billSoundBuffer.cloneNode(true);
+
+    const delay = i * 40; // léger décalage réaliste
+    setTimeout(() => snd.play().catch(() => {}), delay);
+  }
+
+  /* ======================================================= */
 
   const pool = [];
   const active = new Set();
@@ -83,6 +103,9 @@ billSoundBuffer.volume = 0.8;
       node.born = now;
       node.ttl = LIFETIME + Math.random()*900;
       active.add(node);
+
+      /* 🎵 SON POUR CE BILLET */
+      playBillSound(i);
     }
     startLoop();
   };
