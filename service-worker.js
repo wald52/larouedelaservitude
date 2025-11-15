@@ -3,7 +3,6 @@ const CACHE_NAME = 'larouedelaservitude-v7';
 /*  
    IMPORTANT :
    - On corrige les chemins pour GitHub Pages.
-   - On précharge correctement les sons AVANT la première utilisation.
    - On évite de cacher les fichiers dynamiques (boutons, feedback, HTML dynamique).
    - On optimise la bande passante Netlify.
 */
@@ -13,10 +12,6 @@ const urlsToCache = [
   `${BASE}/`,
   `${BASE}/index.html`,
   `${BASE}/images/center3.avif`,
-
-  // 🎵 Préchargement des sons
-  //`${BASE}/audio/coin3.mp3`,
-  //`${BASE}/audio/wheel-spin2.mp3`
 
   // 📱 Icônes importantes pour PWA
   `${BASE}/icons/icon-192x192.png`,
