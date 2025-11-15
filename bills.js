@@ -13,7 +13,7 @@
 
   // son joué pour chaque billet
   const billSoundBuffer = new Audio("audio/frottement-papier.mp3");
-  billSoundBuffer.volume = 1.2;
+  billSoundBuffer.volume = 1;
 
     let recentSounds = 0;
   const MAX_SOUNDS_PER_SEC = 10;
