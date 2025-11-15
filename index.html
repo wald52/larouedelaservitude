@@ -33,7 +33,7 @@
 
 <link rel="stylesheet" href="/larouedelaservitude/bills.css">
 
-<link rel="preload" href="/larouedelaservitude/audio/coin2.mp3" as="audio">
+<link rel="preload" href="/larouedelaservitude/audio/coin3.mp3" as="audio">
 <link rel="preload" href="/larouedelaservitude/audio/wheel-spin2.mp3" as="audio">
 
 <style>
@@ -253,7 +253,7 @@ const BASE_DAMPING = 0.9945 + (rotationFactor - 1) * 0.0015;
 const LERP = 0.10;
 
 // Précharger manuellement pour s'assurer que le navigateur a les fichiers
-['/larouedelaservitude/audio/coin2.mp3','/larouedelaservitude/audio/wheel-spin2.mp3'].forEach(src=>{
+['/larouedelaservitude/audio/coin3.mp3','/larouedelaservitude/audio/wheel-spin2.mp3'].forEach(src=>{
   const a = new Audio();
   a.preload='auto';
   a.src = src;
@@ -816,6 +816,7 @@ function sendFeedbackToGitHub(resultText, userMessage, type) {
 
 </body>
 </html>
+
 
 
 
