@@ -29,8 +29,7 @@ function playBillSound(i) {
   const snd = billSoundBuffer.cloneNode(true);
 
   // 🎵 Variation subtile du pitch
-  snd.playbackRate = 0.95 + Math.random() * 0.10;  
-  // → entre 0.95 et 1.05
+  snd.playbackRate = 1.35 + Math.random() * 0.15;
 
   const delay = i * 40; 
   setTimeout(() => snd.play().catch(() => {}), delay);
