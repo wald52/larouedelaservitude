@@ -12,7 +12,7 @@
   const ROT_RANGE = 360;       // degrés max de rotation initiale
 
   // son joué pour chaque billet
-  const billSoundBuffer = new Audio("audio/frottement-papier.mp3");
+  const billSoundBuffer = new Audio("audio/frottement-papier2.mp3");
   billSoundBuffer.volume = 1;
 
     let recentSounds = 0;
