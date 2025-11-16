@@ -1,7 +1,7 @@
 [build]
-  command = "cd netlify/functions && npm install"
-  publish = ""
-  functions = "netlify/functions"
+  command = "echo 'Aucun build nécessaire'"  # Désactive toute commande de build
+  publish = ""  # Désactive le déploiement du site
+  functions = "netlify/functions"  # Dossier des fonctions
 
 [functions]
-  node_bundler = "nft"
+  node_bundler = "nft"  # Utilise le bundler intégré de Netlify
