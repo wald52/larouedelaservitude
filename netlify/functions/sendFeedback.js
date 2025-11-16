@@ -1,4 +1,4 @@
-const fetch = require("node-fetch");
+const axios = require("axios");
 
 exports.handler = async (event) => {
   // === 💡 Gestion des CORS pour plusieurs domaines autorisés ===
@@ -69,7 +69,7 @@ Merci de réduire le nombre de liens et de réessayer.`
     const discussionBody = `**Résultat :** ${resultText}\n\n**Message de l'utilisateur :**\n${userMessage}`;
 
     // Appel à l'API GitHub
-    const response = await fetch(`https://api.github.com/repos/${repoOwner}/${repoName}/discussions`, {
+    const response = await axios(`https://api.github.com/repos/${repoOwner}/${repoName}/discussions`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
