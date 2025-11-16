@@ -1,4 +1,4 @@
-const axios = require("axios");
+const axios = require("./axios.min.js");
 
 exports.handler = async (event) => {
   // === 💡 Gestion des CORS pour plusieurs domaines autorisés ===
