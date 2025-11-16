@@ -8,7 +8,6 @@ exports.handler = async (event) => {
     "https://larouedelaservitude.netlify.app",
     "https://www.larouedelaservitude.fr"
   ];
-
   const origin = event.headers.origin;
   const headers = {
     "Access-Control-Allow-Origin": allowedOrigins.includes(origin) ? origin : "null",
@@ -29,73 +28,69 @@ exports.handler = async (event) => {
     const { resultText, userMessage, type } = JSON.parse(event.body);
 
     // Anti-spam simple côté serveur
-
     // 1. Message trop court ou vide
-  if (!userMessage || userMessage.trim().length < 10) {
-    return {
-      statusCode: 400,
-      headers,
-      body: "Message trop court ou vide — merci de détailler un peu plus votre retour."
-    };
-  }
+    if (!userMessage || userMessage.trim().length < 10) {
+      return {
+        statusCode: 400,
+        headers,
+        body: "Message trop court ou vide — merci de détailler un peu plus votre retour."
+      };
+    }
 
     // 2. Trop de liens (anti-spam)
-const linkCount = (userMessage.match(/https?:\/\//g) || []).length;
-if (linkCount > 3) {
-  return {
-    statusCode: 400,
-    headers,
-    body: `🚫 Votre message contient ${linkCount} liens. 
-Pour éviter le spam automatique, seuls 3 liens maximum sont autorisés. 
+    const linkCount = (userMessage.match(/https?:\/\//g) || []).length;
+    if (linkCount > 3) {
+      return {
+        statusCode: 400,
+        headers,
+        body: `🚫 Votre message contient ${linkCount} liens.
+Pour éviter le spam automatique, seuls 3 liens maximum sont autorisés.
 Merci de réduire le nombre de liens et de réessayer.`
-  };
-}
+      };
+    }
 
     // Configuration
     const repoOwner = "wald52";
     const repoName = "larouedelaservitude";
     const token = process.env.GITHUB_TOKEN;
-
-    // Remplace ici avec les category_id que tu as trouvés
     const categoryIds = {
       info: "46570623",   // Compléments d'information
       error: "46570630"   // Signalements d'erreurs
     };
-
     const categoryId = categoryIds[type] || categoryIds.info;
 
     // Corps de la discussion
     const discussionTitle = `${type === "error" ? "🛠️ Signalement" : "💡 Complément"} sur le résultat : ${resultText}`;
     const discussionBody = `**Résultat :** ${resultText}\n\n**Message de l'utilisateur :**\n${userMessage}`;
 
-    // Appel à l'API GitHub
-    const response = await axios(`https://api.github.com/repos/${repoOwner}/${repoName}/discussions`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        Accept: "application/vnd.github+json",
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
+    // Appel à l'API GitHub avec axios
+    const response = await axios.post(
+      `https://api.github.com/repos/${repoOwner}/${repoName}/discussions`,
+      {
         title: discussionTitle,
         body: discussionBody,
         category_id: categoryId
-      })
-    });
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: "application/vnd.github+json",
+          "Content-Type": "application/json"
+        }
+      }
+    );
 
-    if (!response.ok) {
-      const err = await response.text();
-      console.error("Erreur GitHub:", err);
-      return { statusCode: 500, body: "Erreur GitHub API" };
-    }
-
-    const data = await response.json();
     return {
       statusCode: 200,
-      body: JSON.stringify({ url: data.html_url })
+      headers,
+      body: JSON.stringify({ url: response.data.html_url })
     };
   } catch (err) {
     console.error(err);
-    return { statusCode: 500, body: "Erreur serveur" };
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify({ error: "Erreur serveur", details: err.message })
+    };
   }
 };
