@@ -60,7 +60,7 @@ Merci de réduire le nombre de liens et de réessayer.`
     const discussionBody = `**Résultat :** ${resultText}\n\n**Message de l'utilisateur :**\n${userMessage}`;
 
     // Appel à l'API GitHub avec fetch natif
-    const response = await fetch(`https://api.github.com/repos/${repoOwner}/${repoName}/discussions`, {
+    const response = await fetch(`https://api.github.com/repos/${repoOwner}/${repoName}/discussions/`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
