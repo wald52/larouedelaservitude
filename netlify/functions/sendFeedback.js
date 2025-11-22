@@ -1,5 +1,5 @@
 exports.handler = async (event) => {
-  // === 💡 Gestion des CORS pour plusieurs domaines autorisés ===
+  // === 💡 Gestion des CORS ===
   const allowedOrigins = [
     "https://wald52.github.io",
     "https://wald52.github.io/larouedelaservitude",
@@ -7,30 +7,28 @@ exports.handler = async (event) => {
     "https://www.larouedelaservitude.fr"
   ];
   const origin = event.headers.origin;
-  const headers = {
+  const corsHeaders = {
     "Access-Control-Allow-Origin": allowedOrigins.includes(origin) ? origin : "null",
     "Access-Control-Allow-Headers": "Content-Type",
     "Access-Control-Allow-Methods": "POST, OPTIONS",
   };
 
-  // ✅ Répond au prévol (préflight CORS)
   if (event.httpMethod === "OPTIONS") {
-    return { statusCode: 200, headers, body: "OK" };
+    return { statusCode: 200, headers: corsHeaders, body: "OK" };
   }
 
-  const headers = { "Content-Type": "application/json" };
-  try {
-    if (event.httpMethod !== "POST") {
-      return { statusCode: 405, headers, body: "Method Not Allowed" };
-    }
+  if (event.httpMethod !== "POST") {
+    return { statusCode: 405, headers: corsHeaders, body: "Method Not Allowed" };
+  }
 
+  try {
     const { resultText, userMessage, type } = JSON.parse(event.body);
 
-    // Anti-spam simple côté serveur
+    // === 🛡️ Anti-spam ===
     if (!userMessage || userMessage.trim().length < 10) {
       return {
         statusCode: 400,
-        headers,
+        headers: corsHeaders,
         body: "Message trop court ou vide — merci de détailler un peu plus votre retour."
       };
     }
@@ -39,72 +37,88 @@ exports.handler = async (event) => {
     if (linkCount > 3) {
       return {
         statusCode: 400,
-        headers,
-        body: `🚫 Votre message contient ${linkCount} liens.
-Pour éviter le spam automatique, seuls 3 liens maximum sont autorisés.
-Merci de réduire le nombre de liens et de réessayer.`
+        headers: corsHeaders,
+        body: `🚫 Votre message contient ${linkCount} liens. Maximum 3 autorisés.`
       };
     }
 
-    // Configuration
-    const repoOwner = "wald52";
-    const repoName = "larouedelaservitude";
+    // === 🔧 Configuration GitHub ===
     const token = process.env.GITHUB_TOKEN;
+
     const categoryIds = {
-      info: "46570623",
-      error: "46570630"
+      info: "DIC_kwDOQOpIP84Cxpx_",
+      error: "DIC_kwDOQOpIP84CxpyG"
     };
     const categoryId = categoryIds[type] || categoryIds.info;
 
-    // Corps de la discussion
-    const discussionTitle = `${type === "error" ? "🛠️ Signalement" : "💡 Complément"} sur le résultat : ${resultText}`;
-    const discussionBody = `**Résultat :** ${resultText}\n\n**Message de l'utilisateur :**\n${userMessage}`;
+    // ⚠️ IMPORTANT : ID du REPOSITORY, pas son nom !
+    const repositoryId = "R_kgDOQOpIPw";
 
-    // Appel à l'API GitHub avec fetch natif
-    const response = await fetch(`https://api.github.com/repos/${repoOwner}/${repoName}/discussions/`, {
-    console.log("Token présent ?", !!token); // Vérifie que le jeton est chargé
-    const response = await fetch("https://api.github.com/repos/wald52/larouedelaservitude/discussions", {
+    // === 📝 Construction du titre + corps ===
+    const title =
+      `${type === "error" ? "🛠️ Signalement" : "💡 Complément"} sur le résultat : ${resultText}`;
+
+    const body =
+      `**Résultat :** ${resultText}\n\n` +
+      `**Message de l'utilisateur :**\n${userMessage}`;
+
+    // === 🧩 Mutation GraphQL ===
+    const query = `
+      mutation CreateDiscussion($input: CreateDiscussionInput!) {
+        createDiscussion(input: $input) {
+          discussion {
+            id
+            number
+            url
+          }
+        }
+      }
+    `;
+
+    const variables = {
+      input: {
+        repositoryId,
+        categoryId,
+        title,
+        body
+      }
+    };
+
+    // === 🚀 Appel GraphQL ===
+    const response = await fetch("https://api.github.com/graphql", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
-        Authorization: `token ${token}`,
-        Accept: "application/vnd.github.v3+json",
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        title: discussionTitle,
-        body: discussionBody,
-        category_id: categoryId
-        title: "Test Netlify",
-        body: "Message de test depuis Netlify.",
-        category_id: 46570623
-      })
+      body: JSON.stringify({ query, variables })
     });
 
-    const data = await response.text();
-    console.log("Réponse GitHub :", data); // Affiche la réponse brute
-    if (!response.ok) {
-      const errorData = await response.text();
-      console.error("Erreur GitHub:", errorData);
-      return { statusCode: 500, headers, body: JSON.stringify({ error: "Erreur GitHub API2", details: errorData }) };
-      return { statusCode: response.status, headers, body: data };
+    const data = await response.json();
+
+    if (data.errors) {
+      console.error("Erreur GraphQL :", data.errors);
+      return {
+        statusCode: 500,
+        headers: corsHeaders,
+        body: JSON.stringify({ error: "Erreur GitHub GraphQL", details: data.errors })
+      };
     }
 
-    const data = await response.json();
+    const url = data.data.createDiscussion.discussion.url;
+
     return {
       statusCode: 200,
-      headers,
-      body: JSON.stringify({ url: data.html_url })
+      headers: corsHeaders,
+      body: JSON.stringify({ url })
     };
-    return { statusCode: 200, headers, body: "Succès !" };
+
   } catch (err) {
-    console.error(err);
+    console.error("Erreur serveur :", err);
     return {
       statusCode: 500,
-      headers,
+      headers: corsHeaders,
       body: JSON.stringify({ error: "Erreur serveur", details: err.message })
     };
-    console.error("Erreur :", err);
-    return { statusCode: 500, headers, body: err.message };
   }
 };
