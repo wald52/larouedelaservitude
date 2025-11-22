@@ -226,6 +226,7 @@ body {
 
 <script type="module">
   import { getEntries } from "/larouedelaservitude/js/entries.js";
+  const ENTRIES = getEntries();
   console.log(ENTRIES.slice(0, 5));
 </script>
 
@@ -815,6 +816,7 @@ function sendFeedbackToGitHub(resultText, userMessage, type) {
 
 </body>
 </html>
+
 
 
 
