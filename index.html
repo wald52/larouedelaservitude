@@ -239,6 +239,10 @@ let ENTRIES = [
   "Encore"
 ];
 
+// Créer un pool d'objets Audio pour le son de rotation
+const spinSoundPool = [];
+const poolSize = 5; // Nombre d'objets Audio dans le pool
+  
 // Créer un contexte audio
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
@@ -261,9 +265,7 @@ for (let i = 0; i < poolSize; i++) {
     spinSoundPool.push(sound);
 }
 
-// Créer un pool d'objets Audio pour le son de rotation
-const spinSoundPool = [];
-const poolSize = 5; // Nombre d'objets Audio dans le pool
+
   
 const canvas = document.getElementById('wheel'), ctx = canvas.getContext('2d');
 const W = canvas.width, H = canvas.height, CX = W/2, CY = H/2, R = Math.min(W,H) * 0.48;
@@ -886,6 +888,7 @@ function sendFeedbackToGitHub(resultText, userMessage, type) {
 
 </body>
 </html>
+
 
 
 
