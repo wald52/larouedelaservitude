@@ -433,7 +433,7 @@ function playSectorClick() {
             // Utiliser l'API Web Audio pour un contrôle plus fin
             const source = audioContext.createBufferSource();
             source.buffer = spinSoundBuffer;
-            source.playbackRate.value = rate;
+            source.playbackRate.value = 1.0;
             source.connect(audioContext.destination);
             source.start();
         } else {
@@ -878,6 +878,7 @@ function sendFeedbackToGitHub(resultText, userMessage, type) {
 
 </body>
 </html>
+
 
 
 
