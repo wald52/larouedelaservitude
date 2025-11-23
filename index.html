@@ -467,9 +467,17 @@ function getSelectedIndex(a){
 
 function showOverlay(text){
   const intros = [
-    "🎯 Le sort a parlé !", 
-    "✨ Voici le résultat :", 
-    "🍀 Et le gagnant est…"];
+    "🎯 Le fisc a parlé !",
+    "✨ Voici votre contribution sociale :",
+    "🍀 Et le grand gagnant est… votre portefeuille !",
+    "💸 Félicitations, vous venez de gagner une nouvelle taxe !",
+    "🏆 Le grand gagnant est… l'État !",
+    "🎉 Bravo, vous avez été sélectionné pour payer plus !",
+    "💰 La taxe du jour :",
+    "🎁 Surprise ! Une nouvelle taxe pour vous !",
+    "🏅 Médaille d'or pour votre contribution fiscale !",
+    "💣 Boom ! Voici votre prochaine taxe !"
+  ];
   const intro = intros[Math.floor(Math.random()*intros.length)];
   const formatted = String(text)
     .replace(/(Recette\s*:)/gi,"\n$1")
@@ -878,6 +886,7 @@ function sendFeedbackToGitHub(resultText, userMessage, type) {
 
 </body>
 </html>
+
 
 
 
