@@ -225,19 +225,9 @@ body {
 </div>
 
 
-
-  
-
-
-<script>
-
-let ENTRIES = [
-  "Exemple 1",
-  "Exemple un peu plus long",
-  "Court",
-  "Autre exemple très long qui pourrait poser problème",
-  "Encore"
-];
+<script type="module">
+  import { getEntries } from "/larouedelaservitude/js/entries.js";
+  const ENTRIES = getEntries();
 
 // Créer un pool d'objets Audio pour le son de rotation
 const spinSoundPool = [];
@@ -888,6 +878,7 @@ function sendFeedbackToGitHub(resultText, userMessage, type) {
 
 </body>
 </html>
+
 
 
 
