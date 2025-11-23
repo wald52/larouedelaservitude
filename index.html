@@ -848,21 +848,46 @@ function sendFeedbackToGitHub(resultText, userMessage, type) {
   fetch(NETLIFY_FUNCTION_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ resultText, userMessage, type })
+    body: JSON.stringify({ message })
   })
-    .then(r => r.json())
-    .then(data => {
-      alert("✅ Merci ! Votre retour a été envoyé.");
-      if (data.url) window.open(data.url, "_blank");
-    })
-    .catch(err => {
-      console.error("Erreur lors de l'envoi du feedback :", err);
-      if (err && err.message) {
-        alert("⚠️ " + err.message);
-      } else {
-        alert("⚠️ Une erreur s'est produite lors de l'envoi du message.");
+  .then(async res => {
+    const contentType = res.headers.get("content-type") || "";
+    const text = await res.text();  // lit toujours la réponse, même si ce n’est pas du JSON
+
+  // si JSON → on parse
+    if (contentType.includes("application/json")) {
+      try {
+        const data = JSON.parse(text);
+        if (!res.ok) throw data;
+        return data;
+      } catch (e) {
+        throw {
+          ok: false,
+          error: "Réponse JSON invalide",
+          raw: text
+        };
       }
-    });
+    }
+
+  // si texte brut → c’est sûrement un message d’erreur humain du serveur
+    if (!res.ok) {
+      throw {
+        ok: false,
+        error: text   // c’est ici que "Message trop court..." remontera proprement
+      };
+    }
+
+    return { ok: true, text };
+  })
+  .then(data => {
+  // succès : message envoyé
+    alert("Merci pour votre retour !");
+  })
+  .catch(err => {
+  // ici, on affiche l’erreur lisible
+    alert(err.error || "Erreur inconnue");
+  });
+
 }
 
   if ('serviceWorker' in navigator) {
@@ -885,6 +910,7 @@ function sendFeedbackToGitHub(resultText, userMessage, type) {
 
 </body>
 </html>
+
 
 
 
