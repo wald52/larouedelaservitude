@@ -848,7 +848,7 @@ function sendFeedbackToGitHub(resultText, userMessage, type) {
   fetch(NETLIFY_FUNCTION_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ message })
+    body: JSON.stringify({ resultText, userMessage, type })
   })
   .then(async res => {
     const contentType = res.headers.get("content-type") || "";
@@ -910,6 +910,7 @@ function sendFeedbackToGitHub(resultText, userMessage, type) {
 
 </body>
 </html>
+
 
 
 
