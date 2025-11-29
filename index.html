@@ -706,7 +706,7 @@ document.addEventListener("visibilitychange", () => {
 });
 
 
-async function optimizeImageWebP(base64, maxWidth = 1600, quality = 1) {
+async function optimizeImageWebP(base64, maxWidth = 1200, quality = 1) {
   return new Promise((resolve) => {
     const img = new Image();
     img.onload = () => {
@@ -754,13 +754,13 @@ document.querySelectorAll('.share-btn[data-platform]').forEach(btn => {
     try {
       // capture un peu plus large (plus de décor)
       const rect = wheelArea.getBoundingClientRect();
-      const margin = 120;
+      const margin = 0;
       const canvasCap = await html2canvas(document.body, {
         x: rect.left - margin,
         y: rect.top - margin,
-        width: rect.width + margin*2,
-        height: rect.height + margin*2,
-        scale: 1.4,
+        width: rect.width + margin,
+        height: rect.height + margin,
+        scale: 1,
         useCORS: true,
         backgroundColor: null
       });
@@ -768,8 +768,11 @@ document.querySelectorAll('.share-btn[data-platform]').forEach(btn => {
       const rawBase64 = canvasCap.toDataURL("image/png");
 
       // WebP optimisé état de l'art
-      const optimizedBase64 = await optimizeImageWebP(rawBase64, 1600, 0.85);
-
+      const optimizedBase64 = await optimizeImageWebP(rawBase64, 1200, 1);
+      const filename = `capture-${Date.now()}.webp`;
+      const publicUrl = await uploadToGitHubDirect(filename, optimizedBase64);
+      console.log("Image envoyée :", publicUrl);
+      
       // On ajoute le prefixe data:image/webp;base64 pour les usages navigateur
       const imageData = "data:image/webp;base64," + optimizedBase64;
 
@@ -940,7 +943,58 @@ function sendFeedbackToGitHub(resultText, userMessage, type) {
     });
   }
 
+// Upload direct GitHub (méthode REST) — le plus économique
+async function uploadToGitHubDirect(filename, optimizedBase64) {
 
+  const owner = "wald52";           // ← ton nom GitHub
+  const repo = "larouedelaservitude";             // ← nom du repo
+  const branch = "main";           // ← branche
+  const folder = "public/shares";  // ← dossier de destination
+  const token = "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";       // ← fine-grained token limité
+
+  const path = `${folder}/${filename}`;
+
+  // 1) Vérifier si le fichier existe (pour éviter un écrasement accidentel)
+  const checkUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${path}?ref=${branch}`;
+
+  let sha = null;
+  const check = await fetch(checkUrl, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+
+  if (check.ok) {
+    const existing = await check.json();
+    sha = existing.sha; // si existe → on doit fournir le sha dans la requête PUT
+  }
+
+  // 2) Upload
+  const uploadUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+
+  const body = {
+    message: `Add share image: ${filename}`,
+    content: optimizedBase64,
+    branch
+  };
+
+  if (sha) body.sha = sha; // remplace si existant
+
+  const res = await fetch(uploadUrl, {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(body)
+  });
+
+  const out = await res.json();
+  if (!res.ok) throw new Error(out.message || "GitHub upload failed");
+
+  // 3) URL publique RAW
+  const rawUrl = `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${path}`;
+
+  return rawUrl;
+}
   
 </script>
 <script src="/larouedelaservitude/bills.js" defer></script>
@@ -948,52 +1002,3 @@ function sendFeedbackToGitHub(resultText, userMessage, type) {
 
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
