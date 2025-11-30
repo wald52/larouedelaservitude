@@ -1,27 +1,28 @@
 // netlify/functions/shareImage.js
-// === 💡 Gestion des CORS ===
-const allowedOrigins = [
-  "https://wald52.github.io",
-  "https://wald52.github.io/larouedelaservitude",
-  "https://larouedelaservitude.netlify.app"
-];
-const origin = event.headers.origin;
-const corsHeaders = {
-  "Access-Control-Allow-Origin": allowedOrigins.includes(origin) ? origin : "null",
-  "Access-Control-Allow-Headers": "Content-Type",
-  "Access-Control-Allow-Methods": "POST, OPTIONS"
-};
-
-// Préflight OPTIONS
-if (event.httpMethod === "OPTIONS") {
-  return { statusCode: 200, headers: corsHeaders, body: "OK" };
-}
 
 exports.handler = async (event, context) => {
+  // === 💡 Gestion des CORS ===
+  const allowedOrigins = [
+    "https://wald52.github.io",
+    "https://larouedelaservitude.netlify.app"
+  ];
+  const origin = event.headers.origin || "";
+  const corsHeaders = {
+    "Access-Control-Allow-Origin": allowedOrigins.includes(origin) ? origin : allowedOrigins[0],
+    "Access-Control-Allow-Headers": "Content-Type",
+    "Access-Control-Allow-Methods": "POST, OPTIONS"
+  };
+
+  // Préflight OPTIONS
+  if (event.httpMethod === "OPTIONS") {
+    return { statusCode: 200, headers: corsHeaders, body: "OK" };
+  }
+
   // Autoriser uniquement POST
   if (event.httpMethod !== 'POST') {
     return {
       statusCode: 405,
+      headers: corsHeaders,
       body: JSON.stringify({ error: 'Method not allowed' })
     };
   }
@@ -34,6 +35,7 @@ exports.handler = async (event, context) => {
     if (!imageData || !text) {
       return {
         statusCode: 400,
+        headers: corsHeaders,
         body: JSON.stringify({ error: 'Missing imageData or text' })
       };
     }
@@ -49,6 +51,7 @@ exports.handler = async (event, context) => {
     if (!IMGBB_API_KEY || !GITHUB_TOKEN) {
       return {
         statusCode: 500,
+        headers: corsHeaders,
         body: JSON.stringify({ 
           error: 'Server configuration error: Missing environment variables' 
         })
@@ -56,7 +59,7 @@ exports.handler = async (event, context) => {
     }
 
     // ========================================
-    // 1️⃣ UPLOAD VERS IMGBB (REST - pas de GraphQL disponible)
+    // 1️⃣ UPLOAD VERS IMGBB
     // ========================================
     
     const imgbbFormData = new URLSearchParams();
@@ -75,6 +78,7 @@ exports.handler = async (event, context) => {
     if (!imgbbResult.success) {
       return {
         statusCode: 500,
+        headers: corsHeaders,
         body: JSON.stringify({ 
           error: 'ImgBB upload failed', 
           details: imgbbResult.error 
@@ -210,6 +214,7 @@ exports.handler = async (event, context) => {
       console.error('GitHub GraphQL repo query error:', repoData.errors);
       return {
         statusCode: 500,
+        headers: corsHeaders,
         body: JSON.stringify({ 
           error: 'GitHub query failed', 
           details: repoData.errors 
@@ -271,6 +276,7 @@ exports.handler = async (event, context) => {
       console.error('GitHub GraphQL mutation error:', createData.errors);
       return {
         statusCode: 500,
+        headers: corsHeaders,
         body: JSON.stringify({ 
           error: 'GitHub file creation failed', 
           details: createData.errors 
@@ -288,10 +294,7 @@ exports.handler = async (event, context) => {
 
     return {
       statusCode: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      },
+      headers: corsHeaders,
       body: JSON.stringify({
         success: true,
         imageUrl,
@@ -304,6 +307,7 @@ exports.handler = async (event, context) => {
     console.error('Error in shareImage function:', error);
     return {
       statusCode: 500,
+      headers: corsHeaders,
       body: JSON.stringify({ 
         error: 'Internal server error', 
         message: error.message 
