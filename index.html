@@ -749,83 +749,152 @@ document.querySelectorAll('.share-btn[data-platform]').forEach(btn => {
   btn.addEventListener('click', async () => {
     const platform = btn.dataset.platform;
     const text = overlayText.innerText;
-    const url = window.location.href;
-    const message = `${text}\n${url}`;
 
-    // cacher temporairement la barre de partage pour la capture
-    const shareBar = document.getElementById('shareBar');
-    const prevDisplay = shareBar.style.display;
-    shareBar.style.display = 'none';
+    // CAS SPÉCIAUX : Téléchargement direct (Instagram, TikTok, Snapchat)
+    if (['instagram', 'tiktok', 'snapchat'].includes(platform)) {
+      try {
+        const shareBar = document.getElementById('shareBar');
+        const prevDisplay = shareBar.style.display;
+        shareBar.style.display = 'none';
+        await new Promise(resolve => setTimeout(resolve, 100));
 
+        const rect = wheelArea.getBoundingClientRect();
+        const canvasCap = await html2canvas(document.body, {
+          x: rect.left,
+          y: rect.top,
+          width: rect.width,
+          height: rect.height,
+          scale: 2,
+          useCORS: true,
+          backgroundColor: '#f7f7f7',
+          logging: false
+        });
+
+        shareBar.style.display = prevDisplay;
+
+        const rawBase64 = canvasCap.toDataURL("image/png");
+        const optimizedBase64 = await optimizeImageWebP(rawBase64, 1200, 0.85);
+        
+        const imageData = "data:image/webp;base64," + optimizedBase64;
+        const a = document.createElement('a');
+        a.href = imageData;
+        a.download = `roue-${platform}-${Date.now()}.webp`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+
+        alert(`✅ Image téléchargée !\n\n📱 Ouvrez ${platform.toUpperCase()} et publiez l'image depuis votre galerie.`);
+      } catch (error) {
+        console.error('Erreur téléchargement:', error);
+        alert('❌ Erreur lors du téléchargement de l\'image.');
+      }
+      return;
+    }
+
+    // AUTRES PLATEFORMES : Netlify Function
     try {
-      // capture un peu plus large (plus de décor)
+      btn.disabled = true;
+      btn.style.opacity = '0.5';
+      const originalText = btn.textContent;
+      btn.textContent = '⏳';
+
+      const shareBar = document.getElementById('shareBar');
+      const prevDisplay = shareBar.style.display;
+      shareBar.style.display = 'none';
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      console.log("📸 Capture en cours...");
       const rect = wheelArea.getBoundingClientRect();
-      const margin = 0;
       const canvasCap = await html2canvas(document.body, {
-        x: rect.left - margin,
-        y: rect.top - margin,
-        width: rect.width + margin,
-        height: rect.height + margin,
-        scale: 1,
+        x: rect.left,
+        y: rect.top,
+        width: rect.width,
+        height: rect.height,
+        scale: 2,
         useCORS: true,
-        backgroundColor: null
+        backgroundColor: '#f7f7f7',
+        logging: false
       });
-      // PNG brut
-      const rawBase64 = canvasCap.toDataURL("image/png");
 
-      // WebP optimisé état de l'art
-      const optimizedBase64 = await optimizeImageWebP(rawBase64);
-      const filename = `capture-${Date.now()}.webp`;
-      const publicUrl = await uploadToGitHubDirect(filename, optimizedBase64);
-      console.log("Image envoyée :", publicUrl);
-      
-      // On ajoute le prefixe data:image/webp;base64 pour les usages navigateur
-      const imageData = "data:image/webp;base64," + optimizedBase64;
-
-      // mobile : Web Share API
-      if (navigator.share && /Android|iPhone|iPad/i.test(navigator.userAgent)) {
-        try {
-          const blob = await (await fetch(imageData)).blob();
-          const file = new File([blob], 'resultat.webp', { type: 'image/webp' });
-          await navigator.share({ title: 'La roue de la servitude', text, files: [file] });
-          shareBar.style.display = prevDisplay;
-          return;
-        } catch(e){}
-      }
-
-      // desktop : liens directs
-      const msg = encodeURIComponent(message);
-      let shareUrl = '';
-      switch (platform) {
-        case 'facebook': shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${msg}`; break;
-        case 'x': shareUrl = `https://twitter.com/intent/tweet?text=${msg}`; break;
-        case 'linkedin': shareUrl = `https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(url)}&title=${msg}`; break;
-        case 'reddit': shareUrl = `https://www.reddit.com/submit?url=${encodeURIComponent(url)}&title=${msg}`; break;
-        case 'pinterest': shareUrl = `https://pinterest.com/pin/create/button/?url=${encodeURIComponent(url)}&description=${msg}`; break;
-        case 'whatsapp': shareUrl = `https://api.whatsapp.com/send?text=${msg}`; break;
-        case 'telegram': shareUrl = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${msg}`; break;
-        case 'messenger': shareUrl = `https://www.facebook.com/dialog/send?app_id=1111222233334444&link=${encodeURIComponent(url)}&redirect_uri=${encodeURIComponent(url)}`; break;
-        case 'email': shareUrl = `mailto:?subject=${encodeURIComponent('La roue de la servitude')}&body=${msg}`; break;
-        default:
-          // pour Discord, Signal, YouTube, Instagram, Snapchat, TikTok
-          const a = document.createElement('a');
-          a.href = imageData;
-          a.download = 'capture-roue.png';
-          document.body.appendChild(a);
-          a.click();
-          a.remove();
-          alert('✅ Capture enregistrée — ouvrez ' + platform + ' et ajoutez cette image manuellement (story, message ou post).');
-          shareBar.style.display = prevDisplay;
-          return;
-      }
-
-      if (shareUrl) window.open(shareUrl,'_blank','noopener,noreferrer');
-
-    } catch(err){
-      console.error('Erreur capture ou partage', err);
-      alert('Erreur lors du partage.');
-    } finally {
       shareBar.style.display = prevDisplay;
+
+      console.log("🔄 Optimisation de l'image...");
+      const rawBase64 = canvasCap.toDataURL("image/png");
+      const optimizedBase64 = await optimizeImageWebP(rawBase64, 1200, 0.85);
+
+      console.log("☁️ Upload sécurisé vers Netlify Function...");
+      
+      const response = await fetch('/.netlify/functions/shareImage', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          imageData: optimizedBase64,
+          text: text
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Erreur serveur');
+      }
+
+      const result = await response.json();
+
+      if (!result.success) {
+        throw new Error(result.error || 'Upload échoué');
+      }
+
+      const { imageUrl, sharePageUrl } = result;
+      console.log("✅ Upload réussi:", sharePageUrl);
+
+      const msg = encodeURIComponent(text);
+      const siteUrl = window.location.origin + window.location.pathname;
+      let shareUrl = '';
+
+      switch (platform) {
+        case 'facebook':
+          shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(sharePageUrl)}`;
+          break;
+        case 'x':
+          shareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(sharePageUrl)}&text=${encodeURIComponent(text.split('\n')[0])}`;
+          break;
+        case 'linkedin':
+          shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(sharePageUrl)}`;
+          break;
+        case 'pinterest':
+          shareUrl = `https://pinterest.com/pin/create/button/?url=${encodeURIComponent(siteUrl)}&media=${encodeURIComponent(imageUrl)}&description=${msg}`;
+          break;
+        case 'whatsapp':
+          shareUrl = `https://api.whatsapp.com/send?text=${msg}%0A%0A${encodeURIComponent(imageUrl)}`;
+          break;
+        case 'telegram':
+          shareUrl = `https://t.me/share/url?url=${encodeURIComponent(imageUrl)}&text=${msg}`;
+          break;
+        default:
+          alert('Plateforme non supportée');
+          btn.disabled = false;
+          btn.style.opacity = '1';
+          btn.textContent = originalText;
+          return;
+      }
+
+      console.log("🚀 Ouverture du partage...");
+      window.open(shareUrl, '_blank', 'noopener,noreferrer');
+
+      btn.disabled = false;
+      btn.style.opacity = '1';
+      btn.textContent = originalText;
+
+    } catch (error) {
+      console.error('❌ Erreur lors du partage:', error);
+      alert(`❌ Erreur : ${error.message}`);
+      btn.disabled = false;
+      btn.style.opacity = '1';
+      const emojis = {
+        'facebook': '📘', 'x': '🐦', 'linkedin': '💼',
+        'pinterest': '📌', 'whatsapp': '💬', 'telegram': '📨'
+      };
+      btn.textContent = emojis[platform] || '🔗';
     }
   });
 });
@@ -949,58 +1018,7 @@ function sendFeedbackToGitHub(resultText, userMessage, type) {
     });
   }
 
-// Upload direct GitHub (méthode REST) — le plus économique
-async function uploadToGitHubDirect(filename, optimizedBase64) {
 
-  const owner = "wald52";           // ← ton nom GitHub
-  const repo = "larouedelaservitude";             // ← nom du repo
-  const branch = "main";           // ← branche
-  const folder = "public/shares";  // ← dossier de destination
-  const token = "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";       // ← fine-grained token limité
-
-  const path = `${folder}/${filename}`;
-
-  // 1) Vérifier si le fichier existe (pour éviter un écrasement accidentel)
-  const checkUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${path}?ref=${branch}`;
-
-  let sha = null;
-  const check = await fetch(checkUrl, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
-
-  if (check.ok) {
-    const existing = await check.json();
-    sha = existing.sha; // si existe → on doit fournir le sha dans la requête PUT
-  }
-
-  // 2) Upload
-  const uploadUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
-
-  const body = {
-    message: `Add share image: ${filename}`,
-    content: optimizedBase64,
-    branch
-  };
-
-  if (sha) body.sha = sha; // remplace si existant
-
-  const res = await fetch(uploadUrl, {
-    method: "PUT",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify(body)
-  });
-
-  const out = await res.json();
-  if (!res.ok) throw new Error(out.message || "GitHub upload failed");
-
-  // 3) URL publique RAW
-  const rawUrl = `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${path}`;
-
-  return rawUrl;
-}
   
 </script>
 <script src="/larouedelaservitude/bills.js" defer></script>
@@ -1008,4 +1026,5 @@ async function uploadToGitHubDirect(filename, optimizedBase64) {
 
 </body>
 </html>
+
 
