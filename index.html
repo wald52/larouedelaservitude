@@ -823,8 +823,13 @@ document.querySelectorAll('.share-btn[data-platform]').forEach(btn => {
       const optimizedBase64 = await optimizeImageWebP(rawBase64, 1200, 0.85);
 
       console.log("☁️ Upload sécurisé vers Netlify Function...");
+
+      const SHARE_IMAGE_URL = window.location.hostname.includes("netlify.app")
+        ? "/.netlify/functions/shareImage"
+        : "https://larouedelaservitude.netlify.app/.netlify/functions/shareImage";
+
       
-      const response = await fetch('/.netlify/functions/shareImage', {
+      const response = await fetch(SHARE_IMAGE_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -1026,5 +1031,6 @@ function sendFeedbackToGitHub(resultText, userMessage, type) {
 
 </body>
 </html>
+
 
 
