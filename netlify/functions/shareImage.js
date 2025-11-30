@@ -39,7 +39,7 @@ exports.handler = async (event, context) => {
     }
 
     // ========================================
-    // 1️⃣ UPLOAD VERS IMGBB
+    // 1️⃣ UPLOAD VERS IMGBB (REST - pas de GraphQL disponible)
     // ========================================
     
     const imgbbFormData = new URLSearchParams();
@@ -69,7 +69,7 @@ exports.handler = async (event, context) => {
     console.log('✅ Image uploaded to ImgBB:', imageUrl);
 
     // ========================================
-    // 2️⃣ CRÉER PAGE OPENGRAPH SUR GITHUB
+    // 2️⃣ CRÉER PAGE OPENGRAPH SUR GITHUB (GRAPHQL)
     // ========================================
 
     const shareId = `share-${Date.now()}`;
@@ -161,36 +161,109 @@ exports.handler = async (event, context) => {
     // Encoder en base64
     const base64Html = Buffer.from(htmlContent, 'utf-8').toString('base64');
 
-    // Upload vers GitHub
+    // ✅ GRAPHQL MUTATION pour créer le fichier
     const githubPath = `shares/${shareId}.html`;
-    const githubUrl = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${githubPath}`;
+    
+    // 1️⃣ D'abord, récupérer l'OID du repository
+    const repoQuery = `
+      query {
+        repository(owner: "${GITHUB_OWNER}", name: "${GITHUB_REPO}") {
+          id
+          object(expression: "${GITHUB_BRANCH}:") {
+            ... on Tree {
+              oid
+            }
+          }
+        }
+      }
+    `;
 
-    const githubResponse = await fetch(githubUrl, {
-      method: 'PUT',
+    const repoResponse = await fetch('https://api.github.com/graphql', {
+      method: 'POST',
       headers: {
         'Authorization': `Bearer ${GITHUB_TOKEN}`,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({
-        message: `Add share page: ${shareId}`,
-        content: base64Html,
-        branch: GITHUB_BRANCH
-      })
+      body: JSON.stringify({ query: repoQuery })
     });
 
-    if (!githubResponse.ok) {
-      const githubError = await githubResponse.json();
+    const repoData = await repoResponse.json();
+
+    if (repoData.errors) {
+      console.error('GitHub GraphQL repo query error:', repoData.errors);
       return {
         statusCode: 500,
         body: JSON.stringify({ 
-          error: 'GitHub upload failed', 
-          details: githubError 
+          error: 'GitHub query failed', 
+          details: repoData.errors 
+        })
+      };
+    }
+
+    const repositoryId = repoData.data.repository.id;
+    const headOid = repoData.data.repository.object.oid;
+
+    // 2️⃣ Créer le fichier via GraphQL mutation
+    const createFileMutation = `
+      mutation($input: CreateCommitOnBranchInput!) {
+        createCommitOnBranch(input: $input) {
+          commit {
+            url
+            oid
+          }
+        }
+      }
+    `;
+
+    const variables = {
+      input: {
+        branch: {
+          repositoryNameWithOwner: `${GITHUB_OWNER}/${GITHUB_REPO}`,
+          branchName: GITHUB_BRANCH
+        },
+        message: {
+          headline: `Add share page: ${shareId}`
+        },
+        fileChanges: {
+          additions: [
+            {
+              path: githubPath,
+              contents: base64Html
+            }
+          ]
+        },
+        expectedHeadOid: headOid
+      }
+    };
+
+    const createResponse = await fetch('https://api.github.com/graphql', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${GITHUB_TOKEN}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ 
+        query: createFileMutation, 
+        variables 
+      })
+    });
+
+    const createData = await createResponse.json();
+
+    if (createData.errors) {
+      console.error('GitHub GraphQL mutation error:', createData.errors);
+      return {
+        statusCode: 500,
+        body: JSON.stringify({ 
+          error: 'GitHub file creation failed', 
+          details: createData.errors 
         })
       };
     }
 
     const sharePageUrl = `${siteUrl}/shares/${shareId}.html`;
-    console.log('✅ Share page created:', sharePageUrl);
+    console.log('✅ Share page created via GraphQL:', sharePageUrl);
+    console.log('✅ Commit URL:', createData.data.createCommitOnBranch.commit.url);
 
     // ========================================
     // 3️⃣ RETOURNER LES URLS
@@ -205,7 +278,8 @@ exports.handler = async (event, context) => {
       body: JSON.stringify({
         success: true,
         imageUrl,
-        sharePageUrl
+        sharePageUrl,
+        commitUrl: createData.data.createCommitOnBranch.commit.url
       })
     };
 
