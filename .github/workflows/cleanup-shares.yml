@@ -1,0 +1,190 @@
+# ========================================
+# WORKFLOW DE NETTOYAGE AUTOMATIQUE SÉCURISÉ
+# ========================================
+# Fichier à créer : .github/workflows/cleanup-shares.yml
+
+name: Cleanup old share pages
+
+on:
+  # Exécution automatique tous les dimanches à 3h du matin
+  schedule:
+    - cron: '0 3 * * 0'
+  
+  # Permet aussi l'exécution manuelle depuis l'interface GitHub
+  workflow_dispatch:
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Récupère tout l'historique
+      
+      - name: Configure Git
+        run: |
+          git config user.name "GitHub Actions Bot"
+          git config user.email "actions@github.com"
+      
+      - name: Find and delete old share pages
+        run: |
+          # Définir la limite d'âge (30 jours = 2592000 secondes)
+          AGE_LIMIT=2592000
+          CURRENT_TIME=$(date +%s)
+          DELETED_COUNT=0
+          KEPT_COUNT=0
+          
+          echo "🔍 Recherche des fichiers à supprimer..."
+          echo "📅 Date actuelle: $(date)"
+          echo "⏰ Fichiers de plus de 30 jours seront supprimés"
+          echo ""
+          
+          # Parcourir tous les fichiers dans shares/
+          if [ -d "shares" ]; then
+            for file in shares/share-*.html; do
+              # Vérifier si le fichier existe (évite l'erreur si le dossier est vide)
+              if [ -f "$file" ]; then
+                # Obtenir la date de dernière modification
+                FILE_TIME=$(stat -c %Y "$file" 2>/dev/null || stat -f %m "$file")
+                FILE_AGE=$((CURRENT_TIME - FILE_TIME))
+                FILE_AGE_DAYS=$((FILE_AGE / 86400))
+                
+                # Si le fichier a plus de 30 jours
+                if [ $FILE_AGE -gt $AGE_LIMIT ]; then
+                  echo "🗑️  Suppression: $file (âge: ${FILE_AGE_DAYS} jours)"
+                  git rm "$file"
+                  DELETED_COUNT=$((DELETED_COUNT + 1))
+                else
+                  echo "✅ Conservé: $file (âge: ${FILE_AGE_DAYS} jours)"
+                  KEPT_COUNT=$((KEPT_COUNT + 1))
+                fi
+              fi
+            done
+          else
+            echo "⚠️  Le dossier 'shares' n'existe pas encore"
+            exit 0
+          fi
+          
+          echo ""
+          echo "📊 RÉSUMÉ:"
+          echo "   🗑️  Fichiers supprimés: $DELETED_COUNT"
+          echo "   ✅ Fichiers conservés: $KEPT_COUNT"
+          
+          # Sauvegarder le nombre de fichiers supprimés pour l'étape suivante
+          echo "DELETED_COUNT=$DELETED_COUNT" >> $GITHUB_ENV
+      
+      - name: Commit and push if changes
+        run: |
+          # Vérifier s'il y a des changements à commiter
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "💾 Commit des changements..."
+            git commit -m "🧹 Auto-cleanup: Suppression de $DELETED_COUNT pages de plus de 30 jours"
+            git push
+            echo "✅ Nettoyage effectué avec succès!"
+          else
+            echo "ℹ️  Aucun fichier à supprimer (tous < 30 jours)"
+          fi
+      
+      - name: Create cleanup summary
+        if: always()
+        run: |
+          echo "## 🧹 Rapport de nettoyage" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "📅 **Date**: $(date +'%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "📊 **Statistiques**:" >> $GITHUB_STEP_SUMMARY
+          echo "- 🗑️ Fichiers supprimés: $DELETED_COUNT" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Fichiers conservés: $KEPT_COUNT" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "⏰ **Prochain nettoyage**: Dimanche prochain à 3h00 UTC" >> $GITHUB_STEP_SUMMARY
+
+# ========================================
+# INSTRUCTIONS D'INSTALLATION
+# ========================================
+
+# 1️⃣ Créer ce fichier dans votre repo :
+#    .github/workflows/cleanup-shares.yml
+
+# 2️⃣ Copier tout le contenu ci-dessus
+
+# 3️⃣ Commit et push
+
+# 4️⃣ Vérifier dans l'onglet "Actions" de votre repo GitHub
+
+# ========================================
+# COMMENT ÇA FONCTIONNE
+# ========================================
+
+# 📅 EXÉCUTION AUTOMATIQUE:
+# - Tous les dimanches à 3h00 UTC
+# - Vous pouvez changer l'heure en modifiant le cron
+# - Format cron: 'minute heure jour mois jour_semaine'
+
+# 🔍 PROCESSUS:
+# 1. Parcourt tous les fichiers dans /shares/
+# 2. Vérifie l'âge de chaque fichier
+# 3. Supprime uniquement les fichiers > 30 jours
+# 4. Commit et push automatiquement
+# 5. Génère un rapport de nettoyage
+
+# ✅ SÉCURITÉS:
+# - Ne supprime QUE les fichiers share-*.html
+# - Ne touche pas aux autres fichiers
+# - 30 jours = ultra-safe (Facebook a déjà tout en cache)
+# - Génère un log détaillé à chaque exécution
+
+# 📊 MONITORING:
+# - GitHub → Votre repo → Onglet "Actions"
+# - Vous verrez tous les nettoyages effectués
+# - Chaque exécution génère un rapport détaillé
+
+# 🚀 TEST MANUEL:
+# Pour tester immédiatement sans attendre dimanche :
+# 1. GitHub → Votre repo → Actions
+# 2. Cliquez sur "Cleanup old share pages"
+# 3. Bouton "Run workflow" → Run workflow
+
+# ========================================
+# PERSONNALISATION
+# ========================================
+
+# CHANGER LA FRÉQUENCE:
+# - Tous les jours à minuit: '0 0 * * *'
+# - Tous les lundis: '0 3 * * 1'
+# - Une fois par mois (1er du mois): '0 3 1 * *'
+
+# CHANGER L'ÂGE LIMITE:
+# - 7 jours: AGE_LIMIT=604800
+# - 15 jours: AGE_LIMIT=1296000
+# - 30 jours: AGE_LIMIT=2592000 (par défaut)
+# - 60 jours: AGE_LIMIT=5184000
+
+# ========================================
+# ALTERNATIVE : LIMITE PAR NOMBRE DE FICHIERS
+# ========================================
+
+# Si vous préférez garder seulement les X derniers fichiers
+# au lieu de supprimer par âge, remplacez l'étape
+# "Find and delete old share pages" par :
+
+# - name: Keep only last 1000 files
+#   run: |
+#     KEEP_COUNT=1000
+#     
+#     if [ -d "shares" ]; then
+#       FILE_COUNT=$(ls -1 shares/share-*.html 2>/dev/null | wc -l)
+#       
+#       if [ $FILE_COUNT -gt $KEEP_COUNT ]; then
+#         DELETE_COUNT=$((FILE_COUNT - KEEP_COUNT))
+#         echo "🗑️  Suppression des $DELETE_COUNT fichiers les plus anciens..."
+#         
+#         ls -1t shares/share-*.html | tail -n $DELETE_COUNT | xargs git rm
+#         
+#         git commit -m "🧹 Auto-cleanup: Limite de $KEEP_COUNT fichiers atteinte"
+#         git push
+#       else
+#         echo "✅ Seulement $FILE_COUNT fichiers (< $KEEP_COUNT)"
+#       fi
+#     fi
