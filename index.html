@@ -773,7 +773,13 @@ document.querySelectorAll('.share-btn[data-platform]').forEach(btn => {
         shareBar.style.display = prevDisplay;
 
         const rawBase64 = canvasCap.toDataURL("image/png");
-        const optimizedBase64 = await optimizeImageWebP(rawBase64, 1000, 0.70);
+
+        // On passe à 800px de large max et qualité 0.6 (suffisant pour Twitter/FB)
+        // Cela peut diviser le poids du fichier par 4 ou 5.
+        const optimizedBase64 = await optimizeImageWebP(rawBase64, 800, 0.60);
+
+        // Log pour vérifier la taille dans la console avant envoi
+        console.log("Taille approximative de l'image (ko):", Math.round(optimizedBase64.length / 1024));
         
         const imageData = "data:image/webp;base64," + optimizedBase64;
         const a = document.createElement('a');
@@ -1031,6 +1037,7 @@ function sendFeedbackToGitHub(resultText, userMessage, type) {
 
 </body>
 </html>
+
 
 
 
