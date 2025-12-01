@@ -773,7 +773,7 @@ document.querySelectorAll('.share-btn[data-platform]').forEach(btn => {
         shareBar.style.display = prevDisplay;
 
         const rawBase64 = canvasCap.toDataURL("image/png");
-        const optimizedBase64 = await optimizeImageWebP(rawBase64, 1200, 0.85);
+        const optimizedBase64 = await optimizeImageWebP(rawBase64, 1000, 0.70);
         
         const imageData = "data:image/webp;base64," + optimizedBase64;
         const a = document.createElement('a');
@@ -1031,6 +1031,7 @@ function sendFeedbackToGitHub(resultText, userMessage, type) {
 
 </body>
 </html>
+
 
 
 
