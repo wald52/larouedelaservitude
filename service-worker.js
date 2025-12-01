@@ -57,9 +57,10 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   const url = new URL(event.request.url);
 
-  // ⚠️ NE PAS cacher les fonctions Netlify → requête dynamique
+  // ⚠️ API Netlify : On sort immédiatement du Service Worker.
+  // Le navigateur fera la requête réseau standard sans interception.
   if (url.pathname.includes("/.netlify/functions/")) {
-    return event.respondWith(fetch(event.request));
+    return;
   }
 
   // ⚠️ NE PAS cacher buttons.html (chargé dynamiquement)
