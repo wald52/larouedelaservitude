@@ -2,7 +2,7 @@
 
 exports.handler = async (event, context) => {
   // === 💡 1. Gestion des CORS Renforcée ===
-  // On récupère l'origine qu'elle soit en minuscule ou majuscule
+  // On récupère l'origine qu'elle soit en minuscule ou  majuscule
   const origin = event.headers.origin || event.headers.Origin || "";
   
   const allowedOrigins = [
