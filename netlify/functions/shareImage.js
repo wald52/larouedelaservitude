@@ -15,8 +15,8 @@ exports.handler = async (event, context) => {
   const userOrigin = allowedOrigins.find(o => origin.startsWith(o)) ? origin : allowedOrigins[0];
 
   const corsHeaders = {
-    "Access-Control-Allow-Origin": userOrigin,
-    "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Headers": "Content-Type",
     "Access-Control-Allow-Methods": "POST, OPTIONS"
   };
 
