@@ -1,11 +1,15 @@
 [build]
-  # Pas de commande de build = build instantané
-  command = ""
-  publish = "."
-  
-[functions]
-  directory = "netlify/functions"
+  functions = "netlify/functions"
 
-# Désactiver les builds automatiques pour les branches
-[context.branch-deploy]
-  command = ""
+# 1. Forcer la version de Node pour avoir accès à 'fetch' natif
+[build.environment]
+  NODE_VERSION = "20"
+
+# 2. Forcer les en-têtes CORS au niveau du serveur (CDN)
+# Cela répond aux requêtes OPTIONS sans réveiller la fonction
+[[headers]]
+  for = "/.netlify/functions/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Headers = "Content-Type, Authorization"
+    Access-Control-Allow-Methods = "GET, POST, OPTIONS"
