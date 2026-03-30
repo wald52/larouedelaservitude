@@ -4,6 +4,24 @@
 
 // Import du module audio pour le son offline-first
 let playBillAudio = null;
+const SETTINGS_KEY = 'larouedelaservitude_settings';
+
+function isSoundEnabled() {
+  try {
+    const attr = document.documentElement?.getAttribute('data-sound-enabled');
+    if (attr === 'true') return true;
+    if (attr === 'false') return false;
+
+    const stored = localStorage.getItem(SETTINGS_KEY);
+    if (!stored) return true;
+
+    const parsed = JSON.parse(stored);
+    return parsed.soundEnabled !== false;
+  } catch (e) {
+    console.warn('[BILLS] Impossible de lire le réglage son:', e);
+    return true;
+  }
+}
 
 // Fonction d'initialisation (appelée par index.html)
 export function initBills() {
@@ -20,6 +38,7 @@ export function initBills() {
     
     playBillAudio = (delay) => {
       setTimeout(() => {
+        if (!isSoundEnabled()) return;
         const snd = fallbackSound.cloneNode(true);
         snd.playbackRate = 1.35 + Math.random() * 0.20;
         snd.play().catch(() => {});
@@ -45,6 +64,7 @@ export function initBills() {
   }, 1000);
 
   function playBillSound(i) {
+    if (!isSoundEnabled()) return;
     if (recentSounds >= MAX_SOUNDS_PER_SEC) return;
     recentSounds++;
 
@@ -56,6 +76,7 @@ export function initBills() {
     } else {
       // Fallback immédiat si pas encore initialisé
       setTimeout(() => {
+        if (!isSoundEnabled()) return;
         const snd = new Audio('/larouedelaservitude/audio/frottement-papier2.mp3');
         snd.volume = 0.5;
         snd.playbackRate = 1.35 + Math.random() * 0.20;
