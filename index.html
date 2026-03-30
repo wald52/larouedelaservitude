@@ -243,7 +243,7 @@ async function initializeApp() {
   try {
     // Initialiser le menu (historique + réglages)
     initMenu();
-    
+
     // Charger les données légères (noms courts)
     const lightData = await initWheel();
     ENTRIES = lightData.map(e => e.nom);
@@ -257,6 +257,13 @@ async function initializeApp() {
 
     // Mettre à jour le compteur
     document.getElementById('countInfo').textContent = ENTRIES.length + " éléments restants";
+
+    // Dessiner la roue initiale
+    drawWheel(angle);
+
+    // Lancer l'animation
+    lastTime = performance.now();
+    window._animFrame = requestAnimationFrame(animate);
 
     // Charger les données complètes en arrière-plan
     loadFullData().then(() => {
@@ -929,21 +936,17 @@ function updateBg(){
 addEventListener('resize', updateBg);
 updateBg();
 
-buildStaticWheel();
-document.getElementById('countInfo').textContent = ENTRIES.length + " éléments";
-drawWheel(angle);
-lastTime = performance.now();
-window._animFrame = requestAnimationFrame(animate);
-
 // ✅ Gère la touche Espace uniquement quand aucune fenêtre n'est ouverte
 document.addEventListener('keydown',(e)=>{
   if (e.code === 'Space') {
     e.preventDefault();
-    
+
     // Vérifie si une fenêtre (overlay) est visible
-    const anyModalOpen = 
+    const anyModalOpen =
       document.getElementById('overlay')?.style.display === 'flex' ||
-      document.getElementById('feedbackForm')?.style.display === 'flex';
+      document.getElementById('feedbackForm')?.style.display === 'flex' ||
+      document.getElementById('menuSidebar')?.classList.contains('active') ||
+      document.querySelector('.menu-panel.active');
 
     // Si aucune fenêtre ouverte -> autorise la rotation
     if (!anyModalOpen) {
