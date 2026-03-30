@@ -279,9 +279,13 @@ function attachMenuEvents() {
   const overlay = document.getElementById('menuOverlay');
   const menuItems = document.querySelectorAll('.menu-item');
   
-  // Ouvrir le menu
+  // Ouvrir / fermer le menu
   toggle.addEventListener('click', () => {
-    openMenu();
+    if (document.getElementById('menuSidebar')?.classList.contains('active')) {
+      closeMenu();
+    } else {
+      openMenu();
+    }
   });
   
   overlay.addEventListener('click', () => {
@@ -355,20 +359,24 @@ function attachMenuEvents() {
   // Keyboard navigation
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
-      closeAllPanels();
+      closeMenu();
     }
   });
 }
 
 function openMenu() {
-  document.getElementById('menuToggle').classList.add('active');
+  const toggle = document.getElementById('menuToggle');
+  toggle.classList.add('active');
+  toggle.setAttribute('aria-label', 'Fermer le menu');
   document.getElementById('menuOverlay').classList.add('active');
   document.getElementById('menuSidebar').classList.add('active');
   document.body.style.overflow = 'hidden';
 }
 
 function closeMenu() {
-  document.getElementById('menuToggle').classList.remove('active');
+  const toggle = document.getElementById('menuToggle');
+  toggle.classList.remove('active');
+  toggle.setAttribute('aria-label', 'Ouvrir le menu');
   document.getElementById('menuOverlay').classList.remove('active');
   document.getElementById('menuSidebar').classList.remove('active');
   closeAllPanels();
