@@ -1,5 +1,5 @@
 // Version du cache - À INCRÉMENTER à chaque déploiement
-const CACHE_VERSION = 'v14';
+const CACHE_VERSION = 'v15';
 const CACHE_NAME = `larouedelaservitude-${CACHE_VERSION}`;
 
 /*
@@ -34,20 +34,22 @@ const BASE = '/larouedelaservitude';
 const urlsToCache = [
   `${BASE}/`,
   `${BASE}/index.html`,
-  
+
   // 📜 Scripts (critique)
   `${BASE}/js/entries.js`,
   `${BASE}/js/audio.js`,
+  `${BASE}/js/menu.js`,
   `${BASE}/bills.js`,
-  
+
   // 🎨 Styles
   `${BASE}/bills.css`,
-  
+  `${BASE}/menu.css`,
+
   // 🎵 Sons (critique pour offline)
   `${BASE}/audio/wheel-spin2.mp3`,
   `${BASE}/audio/coin4.mp3`,
   `${BASE}/audio/frottement-papier2.mp3`,
-  
+
   // 📱 Icônes PWA
   `${BASE}/icons/icon-192x192.png`,
   `${BASE}/icons/icon-512x512.png`,

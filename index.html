@@ -33,6 +33,7 @@
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
 <link rel="stylesheet" href="/larouedelaservitude/bills.css">
+<link rel="stylesheet" href="/larouedelaservitude/menu.css">
 
 <style>
 :root{
@@ -228,6 +229,7 @@ body {
 <script type="module">
   import { initWheel, loadFullData, getEntryDetails, formatEntryForDisplay } from "/larouedelaservitude/js/entries.js";
   import { initAudio, playSpinClick, playWinSound } from "/larouedelaservitude/js/audio.js";
+  import { initMenu, recordSpin, isInfiniteMode, isSoundEnabled } from "/larouedelaservitude/js/menu.js";
 
 // ===============================
 //  INITIALISATION ASYNCHRONE
@@ -239,30 +241,33 @@ let entriesData = [];    // Données complètes avec id, nom, recette, annee
 // Initialiser la roue avec les données légères
 async function initializeApp() {
   try {
+    // Initialiser le menu (historique + réglages)
+    initMenu();
+    
     // Charger les données légères (noms courts)
     const lightData = await initWheel();
     ENTRIES = lightData.map(e => e.nom);
     entriesData = lightData;
-    
+
     // Initialiser les couleurs
     buildColors();
-    
+
     // Construire la roue
     buildStaticWheel();
-    
+
     // Mettre à jour le compteur
     document.getElementById('countInfo').textContent = ENTRIES.length + " éléments restants";
-    
+
     // Charger les données complètes en arrière-plan
     loadFullData().then(() => {
       console.log('[APP] Données complètes chargées');
     });
-    
+
     // Initialiser le système audio (offline-safe)
     initAudio().then(() => {
       console.log('[APP] Audio prêt (offline-safe)');
     });
-    
+
     console.log('[APP] Roue initialisée avec', ENTRIES.length, 'entrées');
   } catch (e) {
     console.error('[APP] Erreur initialisation:', e);
@@ -666,12 +671,24 @@ document.addEventListener("visibilitychange", () => {
         showedResult = true;
         const idx = getSelectedIndex(angle);
         if (idx >= 0 && ENTRIES[idx] !== undefined) {
-          showOverlay(idx);
-          ENTRIES.splice(idx,1);
-          ENTRY_COLORS.splice(idx,1);
-          buildStaticWheel();
-          document.getElementById('countInfo').textContent = ENTRIES.length + " éléments restants";
-          setTimeout(()=>{ hasBeenSpun = false; },300);
+          // Récupérer les détails complets pour l'historique
+          getEntryDetails(idx).then(entry => {
+            // Enregistrer dans l'historique
+            recordSpin(entry);
+            
+            // Afficher l'overlay
+            showOverlay(idx);
+            
+            // Mode infini : ne pas retirer la taxe
+            if (!isInfiniteMode()) {
+              ENTRIES.splice(idx, 1);
+              ENTRY_COLORS.splice(idx, 1);
+              buildStaticWheel();
+              document.getElementById('countInfo').textContent = ENTRIES.length + " éléments restants";
+            }
+            
+            setTimeout(()=>{ hasBeenSpun = false; }, 300);
+          });
         }
       } else {
         lastTime = performance.now();
