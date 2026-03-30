@@ -1006,15 +1006,13 @@ function sendFeedbackToGitHub(resultText, userMessage, type) {
           // 🔄 Détecter les mises à jour du Service Worker
           registration.addEventListener('updatefound', () => {
             const newWorker = registration.installing;
-            console.log('[SW] Nouvelle version disponible');
+            console.log('[SW] Nouvelle version en installation...');
             
             newWorker.addEventListener('statechange', () => {
               if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                // Nouveau SW installé, ancien en contrôle
-                console.log('[SW] Contenu mis à jour disponible. Rafraîchir pour appliquer.');
-                
-                // Optionnel : Afficher un bouton "Mettre à jour"
-                // showUpdateBanner();
+                // Nouveau SW installé, prêt à activer
+                console.log('[SW] Nouvelle version prête. Activation immédiate...');
+                // Le nouveau SW va prendre le contrôle automatiquement grâce à skipWaiting() + claim()
               }
             });
           });
@@ -1022,6 +1020,15 @@ function sendFeedbackToGitHub(resultText, userMessage, type) {
         .catch((error) => {
           console.log('Échec de l\'enregistrement du ServiceWorker : ', error);
         });
+      
+      // 📨 Écouter les messages du Service Worker
+      navigator.serviceWorker.addEventListener('message', (event) => {
+        if (event.data && event.data.type === 'SW_UPDATED') {
+          console.log('[SW] Mise à jour détectée:', event.data.cache);
+          // Optionnel : Afficher une notification ou refresh auto
+          // window.location.reload(); // Décommenter pour refresh automatique
+        }
+      });
     });
   }
 
