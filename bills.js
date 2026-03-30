@@ -8,7 +8,7 @@ let playBillAudio = null;
 // Fonction d'initialisation (appelée par index.html)
 export function initBills() {
   // Import dynamique du module audio
-  import('./audio.js').then(({ playBillSound }) => {
+  import('./js/audio.js').then(({ playBillSound }) => {
     playBillAudio = playBillSound;
     console.log('[BILLS] Module audio chargé pour les sons de billets');
   }).catch(e => {
@@ -212,6 +212,3 @@ export function initBills() {
   window.resumeBills = function() { /* no-op for now */ };
 
 })();
-
-// Export de la fonction d'initialisation
-export { initBills };

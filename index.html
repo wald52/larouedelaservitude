@@ -429,7 +429,9 @@ function boostWheel(e){
   
   hasBeenSpun = true;
 
-  spawnBills(e, 8);
+  if (typeof window.spawnBills === 'function') {
+    window.spawnBills(e, 8);
+  }
 
   if (Math.abs(angularVelocity) < 0.01) {
     targetVelocity = Math.min(MAX_VEL, targetVelocity + BOOST * 3.0);
@@ -1098,7 +1100,6 @@ function sendFeedbackToGitHub(resultText, userMessage, type) {
 
 </body>
 </html>
-
 
 
 
