@@ -4,14 +4,29 @@
 
 const HISTORY_KEY = 'larouedelaservitude_history';
 const SETTINGS_KEY = 'larouedelaservitude_settings';
-
-// État global
-let history = [];
-let settings = {
+const DEFAULT_SETTINGS = {
   darkMode: false,
   infiniteMode: false,
   soundEnabled: true
 };
+
+// État global
+let history = [];
+let settings = { ...DEFAULT_SETTINGS };
+
+function applySettingsToDocument() {
+  const root = document.documentElement;
+
+  if (settings.darkMode) {
+    root.setAttribute('data-theme', 'dark');
+  } else {
+    root.removeAttribute('data-theme');
+  }
+
+  root.setAttribute('data-sound-enabled', settings.soundEnabled ? 'true' : 'false');
+  root.setAttribute('data-infinite-mode', settings.infiniteMode ? 'true' : 'false');
+  window.__MENU_SETTINGS__ = { ...settings };
+}
 
 // ===============================
 // Historique
@@ -84,13 +99,8 @@ export function loadSettings() {
   } catch (e) {
     console.error('Erreur chargement réglages:', e);
   }
-  
-  // Appliquer le dark mode si activé
-  if (settings.darkMode) {
-    document.documentElement.setAttribute('data-theme', 'dark');
-  } else {
-    document.documentElement.removeAttribute('data-theme');
-  }
+
+  applySettingsToDocument();
   
   return settings;
 }
@@ -106,15 +116,7 @@ export function saveSettings() {
 export function updateSetting(key, value) {
   settings[key] = value;
   saveSettings();
-  
-  // Effets immédiats
-  if (key === 'darkMode') {
-    if (value) {
-      document.documentElement.setAttribute('data-theme', 'dark');
-    } else {
-      document.documentElement.removeAttribute('data-theme');
-    }
-  }
+  applySettingsToDocument();
   
   return settings;
 }
@@ -347,12 +349,13 @@ function attachMenuEvents() {
       localStorage.removeItem(HISTORY_KEY);
       localStorage.removeItem(SETTINGS_KEY);
       history = [];
-      settings = { darkMode: false, infiniteMode: false, soundEnabled: true };
+      settings = { ...DEFAULT_SETTINGS };
+      applySettingsToDocument();
       updateHistoryBadge();
       renderHistory();
-      // Reset toggles
-      document.querySelectorAll('.toggle').forEach(t => t.classList.remove('active'));
-      alert('Application réinitialisée.');
+      renderSettings();
+      closeMenu();
+      window.location.reload();
     }
   });
   

@@ -10,6 +10,7 @@ const BASE_PATH = '/larouedelaservitude';
 const AUDIO_DB_NAME = 'LaRoueAudio';
 const AUDIO_DB_VERSION = 1;
 const AUDIO_STORE_NAME = 'sounds';
+const SETTINGS_KEY = 'larouedelaservitude_settings';
 
 // Sons disponibles
 const SOUNDS = {
@@ -19,9 +20,39 @@ const SOUNDS = {
 };
 
 let audioContext = null;
+let masterGainNode = null;
 let dbInstance = null;
 let decodedBuffers = {};
 let isInitialized = false;
+let runtimeSoundEnabled = true;
+
+function readStoredSoundSetting() {
+  try {
+    const attr = document.documentElement?.getAttribute('data-sound-enabled');
+    if (attr === 'true') return true;
+    if (attr === 'false') return false;
+
+    const stored = localStorage.getItem(SETTINGS_KEY);
+    if (!stored) return true;
+
+    const parsed = JSON.parse(stored);
+    return parsed.soundEnabled !== false;
+  } catch (e) {
+    console.warn('[AUDIO] Impossible de lire le réglage son:', e);
+    return true;
+  }
+}
+
+function syncMasterGain() {
+  if (masterGainNode) {
+    masterGainNode.gain.value = runtimeSoundEnabled ? 1 : 0;
+  }
+}
+
+function setRuntimeSoundEnabled(enabled) {
+  runtimeSoundEnabled = enabled;
+  syncMasterGain();
+}
 
 // ===============================
 //  IndexedDB Helpers
@@ -105,9 +136,14 @@ async function cacheSound(name, arrayBuffer) {
  */
 export async function initAudio() {
   if (isInitialized) return;
+
+  runtimeSoundEnabled = readStoredSoundSetting();
   
   // Créer le contexte audio
   audioContext = new (window.AudioContext || window.webkitAudioContext)();
+  masterGainNode = audioContext.createGain();
+  masterGainNode.connect(audioContext.destination);
+  syncMasterGain();
   
   // Charger et décoder tous les sons
   const loadPromises = Object.entries(SOUNDS).map(async ([name, url]) => {
@@ -157,7 +193,11 @@ export async function initAudio() {
  * @param {number} playbackRate - Vitesse (0.5-2), par défaut 1
  */
 export function playSound(name, volume = 1, playbackRate = 1) {
-  if (!isInitialized || !decodedBuffers[name]) {
+  if (!runtimeSoundEnabled) {
+    return;
+  }
+
+  if (!isInitialized || !decodedBuffers[name] || !masterGainNode) {
     console.warn(`[AUDIO] Son "${name}" non disponible`);
     return;
   }
@@ -172,7 +212,7 @@ export function playSound(name, volume = 1, playbackRate = 1) {
     gainNode.gain.value = volume;
     
     source.connect(gainNode);
-    gainNode.connect(audioContext.destination);
+    gainNode.connect(masterGainNode);
     
     source.start(0);
     
@@ -210,6 +250,7 @@ export function playWinSound() {
  */
 export function playBillSound(delay = 0) {
   setTimeout(() => {
+    if (!runtimeSoundEnabled) return;
     const rate = 1.35 + Math.random() * 0.20;
     playSound('bill', 1, rate);
   }, delay);
@@ -256,6 +297,7 @@ export async function refreshSounds() {
 export function getAudioStatus() {
   return {
     initialized: isInitialized,
+    soundEnabled: runtimeSoundEnabled,
     contextState: audioContext?.state || 'none',
     sounds: Object.fromEntries(
       Object.keys(SOUNDS).map(name => [name, !!decodedBuffers[name]])
@@ -267,4 +309,7 @@ export function getAudioStatus() {
 // Pour débogage dans la console
 if (typeof window !== 'undefined') {
   window.__AUDIO_STATUS__ = getAudioStatus;
+  window.addEventListener('soundModeChange', (event) => {
+    setRuntimeSoundEnabled(event.detail !== false);
+  });
 }
