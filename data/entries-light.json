@@ -1,0 +1,1486 @@
+[
+  {
+    "id": "droits-agricoles",
+    "nom": "Droits agricoles"
+  },
+  {
+    "id": "droits-de-douane",
+    "nom": "Droits de douane"
+  },
+  {
+    "id": "taxe-a-la-production-sur-le-quota-de-sucre-le-quota-d-isoglu",
+    "nom": "Taxe à la production…"
+  },
+  {
+    "id": "cotisation-assise-sur-le-montant-total-des-honoraires-factur",
+    "nom": "Cotisation assise sur…"
+  },
+  {
+    "id": "participation-des-employeurs-a-l-effort-de-construction-tps-",
+    "nom": "Participation des employeurs…"
+  },
+  {
+    "id": "cotisation-hlm-et-sem",
+    "nom": "Cotisation HLM et SEM"
+  },
+  {
+    "id": "cotisation-versee-par-les-organismes-hlm-et-les-sem",
+    "nom": "Cotisation versée par…"
+  },
+  {
+    "id": "cotisation-additionnelle-versee-par-les-organismes-hlm-et-le",
+    "nom": "Cotisation additionnelle…"
+  },
+  {
+    "id": "redevance-pour-la-remuneration-pour-copie-privee",
+    "nom": "Redevance pour la rémunération…"
+  },
+  {
+    "id": "taxe-de-protection-des-obtentions-vegetales",
+    "nom": "Taxe de protection…"
+  },
+  {
+    "id": "redevance-percue-sur-formalites-de-l-institut-national-de-la",
+    "nom": "Redevance perçue sur…"
+  },
+  {
+    "id": "contribution-sur-les-abondements-des-employeurs-aux-plans-d-",
+    "nom": "Contribution sur les…"
+  },
+  {
+    "id": "contribution-sur-les-avantages-de-preretraite-d-entreprise",
+    "nom": "Contribution sur les…"
+  },
+  {
+    "id": "contribution-sur-les-regimes-de-retraite-conditionnant-la-co",
+    "nom": "Contribution sur les…"
+  },
+  {
+    "id": "contribution-sur-les-indemnites-de-mise-a-la-retraite",
+    "nom": "Contribution sur les…"
+  },
+  {
+    "id": "contributions-patronales-et-salariales-sur-les-attributions-",
+    "nom": "Contributions patronales…"
+  },
+  {
+    "id": "forfait-social",
+    "nom": "Forfait social"
+  },
+  {
+    "id": "contribution-salariale-sur-les-carried-interests",
+    "nom": "Contribution salariale…"
+  },
+  {
+    "id": "contribution-vente-en-gros",
+    "nom": "Contribution vente…"
+  },
+  {
+    "id": "contributions-taux-lv-lh",
+    "nom": "contributions taux…"
+  },
+  {
+    "id": "contribution-sur-les-depenses-de-promotion-des-medicaments",
+    "nom": "Contribution sur les…"
+  },
+  {
+    "id": "contribution-sur-le-chiffre-d-affaires",
+    "nom": "contribution sur le…"
+  },
+  {
+    "id": "cotisation-speciale-sur-les-boissons-alcooliques",
+    "nom": "Cotisation spéciale…"
+  },
+  {
+    "id": "droits-de-plaidoirie",
+    "nom": "Droits de plaidoirie"
+  },
+  {
+    "id": "cotisations-des-employeurs-au-fnal",
+    "nom": "Cotisations des employeurs…"
+  },
+  {
+    "id": "fraction-de-taxe-de-solidarite-additionnelle",
+    "nom": "Fraction de Taxe de…"
+  },
+  {
+    "id": "contribution-sociale-de-solidarite-des-societes-c3s",
+    "nom": "Contribution sociale…"
+  },
+  {
+    "id": "droit-departemental-de-passage-sur-les-ouvrages-d-art-relian",
+    "nom": "Droit départemental…"
+  },
+  {
+    "id": "contribution-additionnelle-de-solidarite-pour-l-autonomie-ca",
+    "nom": "Contribution additionnelle…"
+  },
+  {
+    "id": "contribution-a-la-vie-etudiante-et-de-campus",
+    "nom": "Contribution à la vie…"
+  },
+  {
+    "id": "redevance-proportionnelle-sur-l-energie-hydraulique",
+    "nom": "Redevance proportionnelle…"
+  },
+  {
+    "id": "droit-de-visa-de-regularisation-taxe-de-renouvellement-du-ti",
+    "nom": "Droit de visa de régularisation,…"
+  },
+  {
+    "id": "contribution-forfaitaire-representative-des-frais-de-reachem",
+    "nom": "Contribution forfaitaire…"
+  },
+  {
+    "id": "redevance-percue-a-l-occasion-de-l-introduction-des-familles",
+    "nom": "Redevance perçue à…"
+  },
+  {
+    "id": "redevance-pour-pollution-de-l-eau-d-origine-non-domestique",
+    "nom": "Redevance pour pollution…"
+  },
+  {
+    "id": "redevances-pour-pollutions-diffuses",
+    "nom": "Redevances pour pollutions…"
+  },
+  {
+    "id": "redevance-pour-stockage-d-eau-en-periode-d-etiage",
+    "nom": "Redevance pour stockage…"
+  },
+  {
+    "id": "redevance-pour-protection-du-milieu-aquatique",
+    "nom": "Redevance pour protection…"
+  },
+  {
+    "id": "redevances-de-l-eau-dans-les-departements-d-outre-mer",
+    "nom": "Redevances de l'eau…"
+  },
+  {
+    "id": "redevance-pour-delivrance-initiale-du-permis-de-chasse",
+    "nom": "Redevance pour délivrance…"
+  },
+  {
+    "id": "redevances-cynegetiques",
+    "nom": "Redevances cynégétiques"
+  },
+  {
+    "id": "redevance-de-mise-sur-le-marche-des-substances-actives-bioci",
+    "nom": "Redevance de mise sur…"
+  },
+  {
+    "id": "participation-pour-voirie-et-reseaux",
+    "nom": "Participation pour…"
+  },
+  {
+    "id": "redevance-pour-creation-de-bureaux-ou-de-locaux-de-recherche",
+    "nom": "Redevance pour création…"
+  },
+  {
+    "id": "fraction-des-produits-annuels-de-la-vente-de-biens-confisque",
+    "nom": "Fraction des produits…"
+  },
+  {
+    "id": "contributions-au-fonds-de-garantie-des-assurances-obligatoir",
+    "nom": "Contributions au Fonds…"
+  },
+  {
+    "id": "contribution-au-fonds-de-garantie-des-victimes-des-actes-de-",
+    "nom": "Contribution au Fonds…"
+  },
+  {
+    "id": "contribution-au-fonds-de-garantie-des-dommages-consecutifs-a",
+    "nom": "Contribution au fonds…"
+  },
+  {
+    "id": "prelevement",
+    "nom": "Prélèvement \\"
+  },
+  {
+    "id": "automobile",
+    "nom": "automobile"
+  },
+  {
+    "id": "droit-de-francisation-et-de-navigation-en-corse-droit-de-pas",
+    "nom": "Droit de francisation…"
+  },
+  {
+    "id": "droit-de-francisation-et-de-navigation",
+    "nom": "Droit de francisation…"
+  },
+  {
+    "id": "droit-de-passeport",
+    "nom": "Droit de passeport"
+  },
+  {
+    "id": "taxe-interieure-de-consommation-sur-les-produits-energetique",
+    "nom": "Taxe intérieure de…"
+  },
+  {
+    "id": "contribution-au-service-public-de-l-electricite-cspe",
+    "nom": "Contribution au service…"
+  },
+  {
+    "id": "taxe-generale-sur-les-activites-polluantes-materiaux-d-extra",
+    "nom": "Taxe générale sur les…"
+  },
+  {
+    "id": "taxe-generale-sur-les-activites-polluantes-emissions-polluan",
+    "nom": "Taxe générale sur les…"
+  },
+  {
+    "id": "taxe-generale-sur-les-activites-polluantes-installations-cla",
+    "nom": "Taxe générale sur les…"
+  },
+  {
+    "id": "taxe-interieure-sur-les-houilles-les-lignites-et-les-cokes-t",
+    "nom": "Taxe intérieure sur…"
+  },
+  {
+    "id": "taxe-generale-sur-les-activites-polluantes-lessives",
+    "nom": "Taxe générale sur les…"
+  },
+  {
+    "id": "taxe-generale-sur-les-activites-polluantes-tgap",
+    "nom": "Taxe générale sur les…"
+  },
+  {
+    "id": "taxe-speciale-sur-certains-vehicules-routiers",
+    "nom": "Taxe spéciale sur certains…"
+  },
+  {
+    "id": "taxe-due-par-les-entreprises-de-transport-public-aerien-et-m",
+    "nom": "Taxe due par les entreprises…"
+  },
+  {
+    "id": "taxe-sur-les-passagers-maritimes-embarques-a-destination-d-e",
+    "nom": "Taxe sur les passagers…"
+  },
+  {
+    "id": "redevance-relative-aux-controles-renforces-a-l-importation-d",
+    "nom": "Redevance relative…"
+  },
+  {
+    "id": "redevance-relative-aux-controles-renforces-a-l-importation-d",
+    "nom": "Redevance relative…"
+  },
+  {
+    "id": "redevances-d-usage-des-frequences-radioelectriques-part-anfr",
+    "nom": "Redevances d'usage…"
+  },
+  {
+    "id": "droit-du-par-les-entreprises-ferroviaires-pour-l-autorite-de",
+    "nom": "Droit dû par les entreprises…"
+  },
+  {
+    "id": "droit-de-securite",
+    "nom": "Droit de sécurité"
+  },
+  {
+    "id": "taxe-sur-les-titulaires-d-ouvrages-hydroelectriques-concedes",
+    "nom": "Taxe sur les titulaires…"
+  },
+  {
+    "id": "peage-plaisance",
+    "nom": "Péage plaisance"
+  },
+  {
+    "id": "taxe-sur-le-prix-des-entrees-aux-seances-organisees-par-les-",
+    "nom": "Taxe sur le prix des…"
+  },
+  {
+    "id": "cotisations-normale-et-supplementaire-des-entreprises-cinema",
+    "nom": "Cotisations (normale…"
+  },
+  {
+    "id": "redevance-d-archeologie-preventive",
+    "nom": "Redevance d'archéologie…"
+  },
+  {
+    "id": "redevances-percues-pour-la-surveillance-des-etablissements-d",
+    "nom": "Redevances perçues…"
+  },
+  {
+    "id": "contribution-des-employeurs-a-l-association-pour-la-gestion-",
+    "nom": "Contribution des employeurs…"
+  },
+  {
+    "id": "contribution-annuelle-au-fonds-de-developpement-pour-l-inser",
+    "nom": "Contribution annuelle…"
+  },
+  {
+    "id": "participation-des-entreprises-de-moins-de-10-salaries-au-dev",
+    "nom": "Participation des entreprises…"
+  },
+  {
+    "id": "pefpc-participation-des-entreprises-de-10-salaries-et-plus-a",
+    "nom": "PEFPC: Participation…"
+  },
+  {
+    "id": "participation-au-financement-de-la-formation-des-professions",
+    "nom": "Participation au financement…"
+  },
+  {
+    "id": "participation-au-financement-de-la-formation-des-travailleur",
+    "nom": "Participation au financement…"
+  },
+  {
+    "id": "participation-au-financement-de-la-formation-des-professions",
+    "nom": "Participation au financement…"
+  },
+  {
+    "id": "participation-au-financement-des-conges-individuels-de-forma",
+    "nom": "Participation au financement…"
+  },
+  {
+    "id": "contribution-speciale-versee-par-les-employeurs-des-etranger",
+    "nom": "Contribution spéciale…"
+  },
+  {
+    "id": "prelevement-sur-les-contrats-d-assurance-vie-en-desherence",
+    "nom": "Prélèvement sur les…"
+  },
+  {
+    "id": "taxe-dans-le-domaine-funeraire",
+    "nom": "Taxe dans le domaine…"
+  },
+  {
+    "id": "taxe-locale-sur-la-publicite-exterieure-tlpe",
+    "nom": "Taxe locale sur la…"
+  },
+  {
+    "id": "taxe-sur-les-remontees-mecaniques",
+    "nom": "Taxe sur les remontées…"
+  },
+  {
+    "id": "versement-transport",
+    "nom": "Versement transport"
+  },
+  {
+    "id": "taxe-sur-les-activites-commerciales-non-salaries-a-duree-sai",
+    "nom": "Taxe sur les activités…"
+  },
+  {
+    "id": "taxe-sur-les-activites-commerciales-saisonnieres-non-salarie",
+    "nom": "Taxe sur les activités…"
+  },
+  {
+    "id": "taxe-sur-les-dechets-receptionnes-dans-une-installation-de-s",
+    "nom": "Taxe sur les déchets…"
+  },
+  {
+    "id": "taxe-additionnelle-departementale-a-la-taxe-de-sejour",
+    "nom": "Taxe additionnelle…"
+  },
+  {
+    "id": "droits-assimiles-au-droit-d-octroi-de-mer-sur-les-rhums-et-s",
+    "nom": "Droits assimilés au…"
+  },
+  {
+    "id": "impot-sur-le-revenu-ir",
+    "nom": "Impôt sur le revenu (IR)"
+  },
+  {
+    "id": "taxe-sur-les-metaux-precieux-les-bijoux-les-objets-d-art-de-",
+    "nom": "Taxe sur les métaux…"
+  },
+  {
+    "id": "impot-sur-les-revenus-de-capitaux-mobiliers-ircm",
+    "nom": "Impôt sur les revenus…"
+  },
+  {
+    "id": "impot-sur-les-societes-is",
+    "nom": "Impôt sur les sociétés…"
+  },
+  {
+    "id": "taxe-sur-les-salaires",
+    "nom": "Taxe sur les salaires"
+  },
+  {
+    "id": "taxe-annuelle-sur-les-locaux-a-usage-de-bureaux-les-locaux-c",
+    "nom": "Taxe annuelle sur les…"
+  },
+  {
+    "id": "taxe-annuelle-sur-les-logements-vacants-if-aut-60",
+    "nom": "Taxe annuelle sur les…"
+  },
+  {
+    "id": "contribution-sur-les-revenus-locatifs-crl",
+    "nom": "contribution sur les…"
+  },
+  {
+    "id": "taxe-sur-les-excedents-de-provisions-des-entreprises-d-assur",
+    "nom": "Taxe sur les excédents…"
+  },
+  {
+    "id": "taxe-sur-les-ordres-annules-dans-le-cadre-d-operation-a-haut",
+    "nom": "Taxe sur les ordres…"
+  },
+  {
+    "id": "taxe-sur-les-contrats-d-echange-sur-defaut-d-un-etat",
+    "nom": "Taxe sur les contrats…"
+  },
+  {
+    "id": "taxe-sur-la-valeur-ajoutee-tva",
+    "nom": "Taxe sur la valeur…"
+  },
+  {
+    "id": "taxe-sur-les-services-numeriques",
+    "nom": "Taxe sur les services…"
+  },
+  {
+    "id": "taxe-de-solidarite-sur-les-billets-d-avion-dite-taxe-unitaid",
+    "nom": "Taxe de solidarité…"
+  },
+  {
+    "id": "taxe-de-l-aviation-civile-tac",
+    "nom": "Taxe de l'aviation…"
+  },
+  {
+    "id": "taxe-sur-certaines-depenses-de-publicite",
+    "nom": "Taxe sur certaines…"
+  },
+  {
+    "id": "taxe-sur-le-chiffre-d-affaires-des-exploitants-agricoles",
+    "nom": "Taxe sur le chiffre…"
+  },
+  {
+    "id": "redevance-sanitaire-d-abattage",
+    "nom": "Redevance sanitaire…"
+  },
+  {
+    "id": "redevance-sanitaire-de-decoupage",
+    "nom": "Redevance sanitaire…"
+  },
+  {
+    "id": "redevance-sanitaire-de-transformation-des-produits-de-la-pec",
+    "nom": "Redevance sanitaire…"
+  },
+  {
+    "id": "redevance-sanitaire-de-transformation-des-produits-de-la-pec",
+    "nom": "Redevance sanitaire…"
+  },
+  {
+    "id": "redevance-sanitaire-pour-le-controle-de-certaines-substances",
+    "nom": "Redevance sanitaire…"
+  },
+  {
+    "id": "redevance-pour-l-agrement-des-etablissements-du-secteur-de-l",
+    "nom": "Redevance pour l'agrément…"
+  },
+  {
+    "id": "taxe-due-par-les-concessionnaires-d-autoroutes",
+    "nom": "Taxe due par les concessionnaires…"
+  },
+  {
+    "id": "contribution-sur-la-cession-a-un-service-de-television-des-d",
+    "nom": "Contribution sur la…"
+  },
+  {
+    "id": "prelevements-sur-les-jeux-et-paris",
+    "nom": "Prélèvements sur les…"
+  },
+  {
+    "id": "fraction-du-prelevement-sur-les-mises-de-jeux-de-cercle-en-l",
+    "nom": "Fraction du Prélèvement…"
+  },
+  {
+    "id": "fraction-du-prelevement-sur-les-paris-hippiques-affectee-aux",
+    "nom": "Fraction du Prélèvement…"
+  },
+  {
+    "id": "droit-de-consommation-sur-les-produits-intermediaires",
+    "nom": "Droit de consommation…"
+  },
+  {
+    "id": "droits-de-consommation-sur-les-alcools",
+    "nom": "Droits de consommation…"
+  },
+  {
+    "id": "droit-de-circulation-sur-les-vins-cidres-poires-et-hydromels",
+    "nom": "Droit de circulation…"
+  },
+  {
+    "id": "droit-sur-les-bieres-et-les-boissons-non-alcoolisees",
+    "nom": "Droit sur les bières…"
+  },
+  {
+    "id": "droit-de-consommation-sur-les-tabacs-manufactures",
+    "nom": "Droit de consommation…"
+  },
+  {
+    "id": "mutations-a-titre-onereux-de-fonds-de-commerce",
+    "nom": "Mutations à titre onéreux…"
+  },
+  {
+    "id": "droits-de-succession",
+    "nom": "Droits de succession"
+  },
+  {
+    "id": "droit-fixe-pour-l-etablissement-d-un-contrat-de-mariage",
+    "nom": "Droit fixe pour l'établissement…"
+  },
+  {
+    "id": "fraction-des-droits-de-timbre-sur-les-passeports-securises",
+    "nom": "Fraction des droits…"
+  },
+  {
+    "id": "droit-de-timbre-sur-les-demandes-de-naturalisation-les-deman",
+    "nom": "Droit de timbre sur…"
+  },
+  {
+    "id": "impot-sur-la-fortune-immobiliere-pat-ifi",
+    "nom": "Impôt sur la fortune…"
+  },
+  {
+    "id": "taxe-speciale-sur-les-conventions-d-assurances",
+    "nom": "Taxe spéciale sur les…"
+  },
+  {
+    "id": "majoration-de-la-taxe-sur-les-assurances-de-protection-jurid",
+    "nom": "Majoration de la taxe…"
+  },
+  {
+    "id": "taxe-sur-les-vehicules-de-societes-tvs",
+    "nom": "Taxe sur les véhicules…"
+  },
+  {
+    "id": "taxe-sur-les-vehicules-de-tourisme-les-plus-polluants",
+    "nom": "Taxe sur les véhicules…"
+  },
+  {
+    "id": "malus-ou-ecopastille",
+    "nom": "Malus (ou « écopastille…"
+  },
+  {
+    "id": "malus-annuel",
+    "nom": "Malus annuel"
+  },
+  {
+    "id": "taxe-fonciere-sur-les-proprietes-baties-if-tfb",
+    "nom": "Taxe foncière sur les…"
+  },
+  {
+    "id": "taxe-fonciere-sur-les-proprietes-non-baties-if-tfnb",
+    "nom": "Taxe foncière sur les…"
+  },
+  {
+    "id": "taxe-d-habitation-if-th",
+    "nom": "Taxe d'habitation (IF-TH)"
+  },
+  {
+    "id": "taxe-d-habitation-sur-les-logements-vacants",
+    "nom": "Taxe d'habitation sur…"
+  },
+  {
+    "id": "cotisation-fonciere-des-entreprises-if-cfe",
+    "nom": "Cotisation foncière…"
+  },
+  {
+    "id": "redevances-communale-et-departementale-des-mines-tfp-mines",
+    "nom": "Redevances communale…"
+  },
+  {
+    "id": "imposition-forfaitaire-sur-les-pylones-tfp-pyl",
+    "nom": "Imposition forfaitaire…"
+  },
+  {
+    "id": "taxe-sur-les-eoliennes-maritimes-tfp-tem",
+    "nom": "Taxe sur les éoliennes…"
+  },
+  {
+    "id": "imposition-forfaitaire-sur-les-eoliennes-et-les-hydroliennes",
+    "nom": "Imposition forfaitaire…"
+  },
+  {
+    "id": "imposition-forfaitaire-sur-les-centrales-de-production-d-ene",
+    "nom": "Imposition forfaitaire…"
+  },
+  {
+    "id": "imposition-forfaitaire-sur-les-reseaux-de-gaz-naturel-et-can",
+    "nom": "Imposition forfaitaire…"
+  },
+  {
+    "id": "redevances-sur-la-production-d-electricite-au-moyen-de-la-ge",
+    "nom": "Redevances sur la production…"
+  },
+  {
+    "id": "taxe-additionnelle-a-la-taxe-fonciere-sur-les-proprietes-non",
+    "nom": "Taxe additionnelle…"
+  },
+  {
+    "id": "taxe-d-enlevement-des-ordures-menageres-if-aut-90",
+    "nom": "Taxe d'enlèvement des…"
+  },
+  {
+    "id": "taxe-de-balayage",
+    "nom": "Taxe de balayage"
+  },
+  {
+    "id": "taxe-forfaitaire-sur-la-cession-a-titre-onereux-des-terrains",
+    "nom": "Taxe forfaitaire sur…"
+  },
+  {
+    "id": "taxe-pour-la-gestion-des-milieux-aquatiques-et-la-prevention",
+    "nom": "Taxe pour la gestion…"
+  },
+  {
+    "id": "taxe-sur-les-friches-commerciales-if-aut-110",
+    "nom": "Taxe sur les friches…"
+  },
+  {
+    "id": "impot-sur-les-cercles-et-maisons-de-jeux",
+    "nom": "Impôt sur les cercles…"
+  },
+  {
+    "id": "surtaxe-sur-les-eaux-minerales",
+    "nom": "Surtaxe sur les eaux…"
+  },
+  {
+    "id": "taxe-percue-au-profit-des-communes-de-saint-martin-et-saint-",
+    "nom": "Taxe perçue au profit…"
+  },
+  {
+    "id": "taxe-sur-l-exploration-d-hydrocarbures-tfp-teh",
+    "nom": "Taxe sur l'exploration…"
+  },
+  {
+    "id": "taxe-de-publicite-fonciere",
+    "nom": "Taxe de publicité fonci…"
+  },
+  {
+    "id": "droits-departementaux-d-enregistrement-sur-les-mutations-a-t",
+    "nom": "Droits départementaux…"
+  },
+  {
+    "id": "taxe-departementale-additionnelle-aux-droits-d-enregistremen",
+    "nom": "Taxe départementale…"
+  },
+  {
+    "id": "taxe-d-apprentissage",
+    "nom": "Taxe d'apprentissage"
+  },
+  {
+    "id": "imposition-forfaitaire-sur-le-materiel-roulant-circulant-sur",
+    "nom": "Imposition forfaitaire…"
+  },
+  {
+    "id": "taxe-annuelle-sur-les-surfaces-de-stationnement",
+    "nom": "Taxe annuelle sur les…"
+  },
+  {
+    "id": "taxe-additionnelle-speciale-annuelle-au-profit-de-la-region-",
+    "nom": "Taxe additionnelle…"
+  },
+  {
+    "id": "taxe-percue-pour-la-region-de-guyane-tfp-guf",
+    "nom": "Taxe perçue pour la…"
+  },
+  {
+    "id": "taxe-sur-les-permis-de-conduire",
+    "nom": "Taxe sur les permis…"
+  },
+  {
+    "id": "taxe-regionale-sur-les-certificats-d-immatriculation-des-veh",
+    "nom": "Taxe régionale sur…"
+  },
+  {
+    "id": "taxe-due-par-les-entreprises-de-transport-public-aerien-et-m",
+    "nom": "Taxe due par les entreprises…"
+  },
+  {
+    "id": "taxe-pour-frais-de-chambres-de-commerce-et-d-industrie-if-au",
+    "nom": "Taxe pour frais de…"
+  },
+  {
+    "id": "contribution-sociale-generalisee-csg",
+    "nom": "Contribution sociale…"
+  },
+  {
+    "id": "prelevement-social-sur-les-revenus-du-patrimoine-et-les-prod",
+    "nom": "Prélèvement social…"
+  },
+  {
+    "id": "contribution-pour-le-remboursement-de-la-dette-sociale-crds",
+    "nom": "Contribution pour le…"
+  },
+  {
+    "id": "prelevement-de-solidarite-de-2-sur-les-revenus-du-patrimoine",
+    "nom": "Prélèvement de solidarité…"
+  },
+  {
+    "id": "taxe-pour-frais-de-chambres-de-metiers-et-de-l-artisanat-if-",
+    "nom": "Taxe pour frais de…"
+  },
+  {
+    "id": "contribution-au-fonds-d-assurance-formation-des-chefs-d-entr",
+    "nom": "Contribution au fonds…"
+  },
+  {
+    "id": "taxe-pour-frais-de-chambres-d-agriculture-if-aut-30",
+    "nom": "Taxe pour frais de…"
+  },
+  {
+    "id": "taxe-sur-la-cession-a-titre-onereux-de-terrains-nus-devenus-",
+    "nom": "Taxe sur la cession…"
+  },
+  {
+    "id": "contribution-a-l-audiovisuel-public-due-par-les-professionne",
+    "nom": "Contribution à l'audiovisuel…"
+  },
+  {
+    "id": "taxe-speciale-d-equipement",
+    "nom": "Taxe spéciale d'équipem…"
+  },
+  {
+    "id": "taxe-speciale-d-equipement-au-profit-de-l-epf-de-normandie",
+    "nom": "Taxe spéciale d'équipement…"
+  },
+  {
+    "id": "redevance-sur-les-paris-hippiques-en-ligne-percue-au-profit-",
+    "nom": "Redevance sur les paris…"
+  },
+  {
+    "id": "taxe-sur-les-nuisances-sonores-aeriennes",
+    "nom": "Taxe sur les nuisances…"
+  },
+  {
+    "id": "contribution-des-autoentrepreneurs-au-financement-des-action",
+    "nom": "Contribution des autoentrepreneurs…"
+  },
+  {
+    "id": "contribution-des-autoentrepreneurs-au-fonds-d-assurance-form",
+    "nom": "Contribution des autoentrepreneurs…"
+  },
+  {
+    "id": "taxe-sur-la-diffusion-en-video-physique-et-en-ligne-de-conte",
+    "nom": "Taxe sur la diffusion…"
+  },
+  {
+    "id": "contribution-supplementaire-a-l-apprentissage-versements-aux",
+    "nom": "Contribution supplémentaire…"
+  },
+  {
+    "id": "taxe-pour-le-developpement-de-la-formation-professionnelle-d",
+    "nom": "Taxe pour le développement…"
+  },
+  {
+    "id": "prelevements-sur-les-jeux-de-loterie-et-les-paris-sportifs-p",
+    "nom": "Prélèvements sur les…"
+  },
+  {
+    "id": "taxe-speciale-d-equipement-au-profit-de-l-epf-de-guyane-et-d",
+    "nom": "Taxe spéciale d'équipement…"
+  },
+  {
+    "id": "taxe-speciale-d-equipement-au-profit-de-la-societe-du-grand-",
+    "nom": "Taxe spéciale d'équipement…"
+  },
+  {
+    "id": "taxe-speciale-d-equipement-au-profit-de-l-epf-de-lorraine",
+    "nom": "Taxe spéciale d'équipement…"
+  },
+  {
+    "id": "taxe-speciale-d-equipement-au-profit-de-l-epf-de-paca",
+    "nom": "Taxe spéciale d'équipement…"
+  },
+  {
+    "id": "taxe-sur-les-boissons-premix",
+    "nom": "Taxe sur les boissons…"
+  },
+  {
+    "id": "contribution-percue-sur-les-boissons-et-preparations-liquide",
+    "nom": "Contribution perçue…"
+  },
+  {
+    "id": "droit-de-timbre-pour-la-delivrance-du-permis-de-conduire-en-",
+    "nom": "Droit de timbre pour…"
+  },
+  {
+    "id": "taxes-a-percevoir-pour-l-alimentation-du-fonds-commun-des-ac",
+    "nom": "Taxes à percevoir pour…"
+  },
+  {
+    "id": "fraction-des-droits-de-timbre-sur-les-cartes-nationales-d-id",
+    "nom": "Fraction des droits…"
+  },
+  {
+    "id": "taxe-pour-la-gestion-des-certificats-d-immatriculation-des-v",
+    "nom": "Taxe pour la gestion…"
+  },
+  {
+    "id": "contributions-additionnelles-aux-primes-ou-cotisations-affer",
+    "nom": "Contributions additionnelles…"
+  },
+  {
+    "id": "contribution-au-fonds-de-prevention-des-risques-naturels-maj",
+    "nom": "Contribution au Fonds…"
+  },
+  {
+    "id": "droits-percus-au-profit-de-la-caisse-nationale-de-l-assuranc",
+    "nom": "Droits perçus au profit…"
+  },
+  {
+    "id": "taxe-destinee-a-financer-le-developpement-de-la-formation-pr",
+    "nom": "Taxe destinée à financer…"
+  },
+  {
+    "id": "droit-d-examen-du-permis-de-chasse",
+    "nom": "Droit d'examen du permis…"
+  },
+  {
+    "id": "droits-affectes-au-fonds-d-indemnisation-de-la-profession-d-",
+    "nom": "Droits affectés au…"
+  },
+  {
+    "id": "imposition-forfaitaire-sur-les-entreprises-de-reseaux-tfp-if",
+    "nom": "Imposition forfaitaire…"
+  },
+  {
+    "id": "taxe-communale-sur-la-consommation-finale-d-electricite-tcfe",
+    "nom": "Taxe communale sur…"
+  },
+  {
+    "id": "taxe-departementale-des-espaces-naturels-sensibles-tdens",
+    "nom": "Taxe départementale…"
+  },
+  {
+    "id": "redevance-d-exploitation-de-substances-non-energetiques-sur-",
+    "nom": "Redevance d'exploitation…"
+  },
+  {
+    "id": "redevance-due-par-les-titulaires-de-titres-d-exploitation-de",
+    "nom": "Redevance due par les…"
+  },
+  {
+    "id": "redevance-due-par-les-titulaires-de-titres-d-exploitation-de",
+    "nom": "Redevance due par les…"
+  },
+  {
+    "id": "contribution-pour-frais-de-controle-acpr",
+    "nom": "Contribution pour frais…"
+  },
+  {
+    "id": "droits-et-contributions-pour-frais-de-controle",
+    "nom": "Droits et contributions…"
+  },
+  {
+    "id": "redevance-pour-controle-veterinaire-a-l-expedition",
+    "nom": "Redevance pour contrôle…"
+  },
+  {
+    "id": "redevance-relative-aux-controles-renforces-a-l-importation-d",
+    "nom": "Redevance relative…"
+  },
+  {
+    "id": "contribution-des-exploitants-agricoles-et-des-conchyliculteu",
+    "nom": "Contribution des exploitants…"
+  },
+  {
+    "id": "droit-sur-les-produits-beneficiant-d-une-appellation-d-origi",
+    "nom": "Droit sur les produits…"
+  },
+  {
+    "id": "participation-au-financement-de-la-formation-des-professions",
+    "nom": "Participation au financement…"
+  },
+  {
+    "id": "taxe-additionnelle-a-la-taxe-sur-les-installations-nucleaire",
+    "nom": "Taxe additionnelle…"
+  },
+  {
+    "id": "taxe-additionnelle-a-la-taxe-sur-les-installations-nucleaire",
+    "nom": "Taxe additionnelle…"
+  },
+  {
+    "id": "taxe-additionnelle-a-la-taxe-sur-les-installations-nucleaire",
+    "nom": "Taxe additionnelle…"
+  },
+  {
+    "id": "taxe-pour-le-developpement-des-industries-de-l-ameublement-a",
+    "nom": "Taxe pour le développement…"
+  },
+  {
+    "id": "taxe-pour-le-developpement-des-industries-du-cuir-de-la-maro",
+    "nom": "Taxe pour le développement…"
+  },
+  {
+    "id": "taxe-pour-le-developpement-des-industries-de-l-habillement",
+    "nom": "Taxe pour le développement…"
+  },
+  {
+    "id": "taxe-pour-le-developpement-des-industries-de-la-mecanique-de",
+    "nom": "Taxe pour le développement…"
+  },
+  {
+    "id": "taxe-pour-le-developpement-des-industries-de-l-horlogerie-bi",
+    "nom": "Taxe pour le développement…"
+  },
+  {
+    "id": "taxe-pour-le-developpement-des-industries-des-materiaux-de-c",
+    "nom": "Taxe pour le développement…"
+  },
+  {
+    "id": "taxe-pour-le-developpement-de-l-industrie-de-la-conservation",
+    "nom": "Taxe pour le développement…"
+  },
+  {
+    "id": "taxe-sur-les-spectacles-de-varietes",
+    "nom": "Taxe sur les spectacles…"
+  },
+  {
+    "id": "taxe-sur-les-spectacles-d-art-dramatique-lyrique-et-choregra",
+    "nom": "Taxe sur les spectacles…"
+  },
+  {
+    "id": "redevance-pour-frais-d-envoi-des-certificats-d-immatriculati",
+    "nom": "Redevance pour frais…"
+  },
+  {
+    "id": "fraction-affectee-du-produit-du-relevement-du-tarif-de-taxe-",
+    "nom": "Fraction affectée du…"
+  },
+  {
+    "id": "taxe-sur-les-hydrofluorocarbures",
+    "nom": "Taxe sur les hydrofluor…"
+  },
+  {
+    "id": "contribution-annuelle-au-profit-de-l-institut-de-radioprotec",
+    "nom": "Contribution annuelle…"
+  },
+  {
+    "id": "taxe-sur-les-transactions-financieres-ttf",
+    "nom": "Taxe sur les transactions…"
+  },
+  {
+    "id": "participation-pour-le-financement-de-l-assainissement-collec",
+    "nom": "Participation pour…"
+  },
+  {
+    "id": "contribution-speciale-pour-la-gestion-des-dechets-radioactif",
+    "nom": "Contribution spéciale…"
+  },
+  {
+    "id": "participation-des-concessionnaires-de-la-liaison-fixe-trans-",
+    "nom": "Participation des concessionnaires…"
+  },
+  {
+    "id": "redevance-proportionnelle-sur-l-energie-hydraulique",
+    "nom": "Redevance proportionnelle…"
+  },
+  {
+    "id": "taxe-pour-frais-de-chambre-de-metiers-de-moselle",
+    "nom": "Taxe pour frais de…"
+  },
+  {
+    "id": "taxe-pour-frais-de-chambre-de-metiers-d-alsace",
+    "nom": "Taxe pour frais de…"
+  },
+  {
+    "id": "prelevements-sur-les-benefices-tires-de-la-construction-immo",
+    "nom": "Prélèvements sur les…"
+  },
+  {
+    "id": "participation-des-employeurs-au-financement-de-la-formation-",
+    "nom": "Participation des employeurs…"
+  },
+  {
+    "id": "taxe-sur-les-surfaces-commerciales-tfp-tsc",
+    "nom": "Taxe sur les surfaces…"
+  },
+  {
+    "id": "taxe-additionnelle-a-la-taxe-sur-les-surfaces-commerciales-t",
+    "nom": "Taxe additionnelle…"
+  },
+  {
+    "id": "taxe-exceptionnelle-sur-la-reserve-de-capitalisation-des-ent",
+    "nom": "Taxe exceptionnelle…"
+  },
+  {
+    "id": "taxe-au-profit-du-fonds-de-soutien-aux-collectivites-territo",
+    "nom": "Taxe au profit du fonds…"
+  },
+  {
+    "id": "tfp-tfsct",
+    "nom": "(TFP-TFSCT)"
+  },
+  {
+    "id": "cotisation-obligatoire",
+    "nom": "Cotisation obligatoire"
+  },
+  {
+    "id": "cotisation-obligatoire",
+    "nom": "Cotisation obligatoire"
+  },
+  {
+    "id": "taxe-professionnelle-de-la-poste-et-de-france-telecom",
+    "nom": "Taxe professionnelle…"
+  },
+  {
+    "id": "fraction-du-produit-des-successions-en-desherence",
+    "nom": "Fraction du produit…"
+  },
+  {
+    "id": "droit-d-octroi-de-mer-et-droit-d-octroi-de-mer-regional",
+    "nom": "Droit d'octroi de mer…"
+  },
+  {
+    "id": "contribution-tarifaire-d-acheminement-cta",
+    "nom": "Contribution tarifaire…"
+  },
+  {
+    "id": "contributions-versees-par-la-sncf-au-titre-des-frais-de-surv",
+    "nom": "Contributions versées…"
+  },
+  {
+    "id": "redevance-versee-par-reseau-ferre-de-france-au-titre-des-fra",
+    "nom": "Redevance versée par…"
+  },
+  {
+    "id": "contributions-des-employeurs-de-main-d-uvre-etrangere-pour-l",
+    "nom": "Contributions des employeurs…"
+  },
+  {
+    "id": "contribution-des-employeurs-publics-au-fonds-pour-l-insertio",
+    "nom": "Contribution des employeurs…"
+  },
+  {
+    "id": "cotisation-au-profit-des-caisses-d-assurances-d-accidents-ag",
+    "nom": "Cotisation au profit…"
+  },
+  {
+    "id": "droits-d-apport-des-societes",
+    "nom": "Droits d'apport des…"
+  },
+  {
+    "id": "droits-de-donations",
+    "nom": "Droits de donations"
+  },
+  {
+    "id": "mutations-a-titre-onereux-de-creances-rentes-prix-d-offices",
+    "nom": "Mutations à titre onéreux…"
+  },
+  {
+    "id": "contributions-au-fonds-national-de-l-emploi-fne",
+    "nom": "Contributions au Fonds…"
+  },
+  {
+    "id": "retenue-a-la-source-sur-certains-benefices-non-commerciaux-e",
+    "nom": "Retenue à la source…"
+  },
+  {
+    "id": "contribution-des-institutions-financieres",
+    "nom": "Contribution des institutions…"
+  },
+  {
+    "id": "cotisations-aux-fonds-de-garantie-des-salaires-ags-et-agcc",
+    "nom": "Cotisations aux fonds…"
+  },
+  {
+    "id": "redevance-d-usage-des-frequences-radioelectriques",
+    "nom": "Redevance d'usage des…"
+  },
+  {
+    "id": "redevances-lors-du-lancement-de-certains-materiels-aeronauti",
+    "nom": "Redevances lors du…"
+  },
+  {
+    "id": "taxe-grossiste-repartiteurs",
+    "nom": "Taxe grossiste répartit…"
+  },
+  {
+    "id": "taxe-sur-les-stations-et-liaisons-radio-privees",
+    "nom": "Taxe sur les stations…"
+  },
+  {
+    "id": "taxe-additionnelle-aux-droits-de-mutation",
+    "nom": "Taxe additionnelle…"
+  },
+  {
+    "id": "impot-sur-les-spectacles-jeux-et-divertissements",
+    "nom": "Impôt sur les spectacles,…"
+  },
+  {
+    "id": "participation-depassement-du-cos",
+    "nom": "Participation dépassement…"
+  },
+  {
+    "id": "taxe-locale-d-equipement",
+    "nom": "Taxe locale d'équipement"
+  },
+  {
+    "id": "taxe-complementaire-a-la-tle-idf",
+    "nom": "Taxe complémentaire…"
+  },
+  {
+    "id": "taxe-de-sejour",
+    "nom": "Taxe de séjour"
+  },
+  {
+    "id": "taxe-sur-les-tabacs-corse",
+    "nom": "Taxe sur les tabacs…"
+  },
+  {
+    "id": "octroi-de-mer",
+    "nom": "Octroi de mer"
+  },
+  {
+    "id": "taxe-sur-le-ski-de-fond",
+    "nom": "Taxe sur le ski de fond"
+  },
+  {
+    "id": "contribution-annuelle-des-distributeurs-d-energie",
+    "nom": "Contribution annuelle…"
+  },
+  {
+    "id": "fonds-d-amortissement-des-charges-d-electrification-face",
+    "nom": "Fonds d'amortissement…"
+  },
+  {
+    "id": "prelevement-sur-entreprises-petrolieres",
+    "nom": "Prélèvement sur entreprises…"
+  },
+  {
+    "id": "taxe-sur-les-fournitures-d-electricite",
+    "nom": "Taxe sur les fournitures…"
+  },
+  {
+    "id": "droits-de-consommation-sur-les-alcools-corse",
+    "nom": "Droits de consommation…"
+  },
+  {
+    "id": "taxe-d-assainissement-agence-de-l-eau",
+    "nom": "Taxe d'assainissement…"
+  },
+  {
+    "id": "taxe-sur-les-rhums",
+    "nom": "Taxe sur les rhums"
+  },
+  {
+    "id": "taxe-sur-les-carburants-dom",
+    "nom": "Taxe sur les carburants…"
+  },
+  {
+    "id": "taxe-sur-les-syndicats-d-energie",
+    "nom": "Taxe sur les syndicats…"
+  },
+  {
+    "id": "redevance-pour-droit-de-construire-epad",
+    "nom": "Redevance pour droit…"
+  },
+  {
+    "id": "taxe-et-prelevement-sur-les-sommes-encaissees-par-les-societ",
+    "nom": "Taxe et prélèvement…"
+  },
+  {
+    "id": "mutation-a-titre-onereux-d-immeubles-et-droits-immobiliers-d",
+    "nom": "Mutation à titre onéreux…"
+  },
+  {
+    "id": "mutations-de-jouissance-baux",
+    "nom": "Mutations de jouissance…"
+  },
+  {
+    "id": "fraction-des-prelevements-sociaux-sur-les-jeux-prevus-aux-ar",
+    "nom": "Fraction des Prélèvements…"
+  },
+  {
+    "id": "prelevement-sur-la-participation-des-employeurs-a-l-effort-d",
+    "nom": "Prélèvement sur la…"
+  },
+  {
+    "id": "cotisation-obligatoire",
+    "nom": "Cotisation obligatoire"
+  },
+  {
+    "id": "taxe-fixe-due-a-chaque-delivrance-de-ci-ais-mob-10-20-20",
+    "nom": "Taxe fixe due à chaque…"
+  },
+  {
+    "id": "taxe-regionale-due-au-titre-de-la-delivrance-de-ci-consecuti",
+    "nom": "Taxe régionale due…"
+  },
+  {
+    "id": "taxe-sur-les-vehicules-de-transport-due-au-titre-de-la-deliv",
+    "nom": "Taxe sur les véhicules…"
+  },
+  {
+    "id": "taxe-sur-les-emissions-de-dioxyde-de-carbone",
+    "nom": "Taxe sur les émissions…"
+  },
+  {
+    "id": "taxe-sur-la-masse-en-ordre-de-marche",
+    "nom": "Taxe sur la masse en…"
+  },
+  {
+    "id": "taxe-annuelle-sur-les-emissions-de-dioxyde-de-carbone",
+    "nom": "Taxe annuelle sur les…"
+  },
+  {
+    "id": "taxe-annuelle-sur-les-emissions-de-polluants-atmospherique",
+    "nom": "Taxe annuelle sur les…"
+  },
+  {
+    "id": "taxe-sur-l-affectation-des-vehicules-lourds-de-transport-de-",
+    "nom": "Taxe sur l'affectation…"
+  },
+  {
+    "id": "taxe-sur-la-distance-parcourue-sur-le-reseau-autoroutier-con",
+    "nom": "Taxe sur la distance…"
+  },
+  {
+    "id": "taxes-sur-le-transport-aerien-ais-mob-20",
+    "nom": "Taxes sur le transport…"
+  },
+  {
+    "id": "taxes-sur-les-navigations-maritimes-et-fluviales-ais-mob-30",
+    "nom": "Taxes sur les navigations…"
+  },
+  {
+    "id": "taxes-sur-le-transport-guide-ais-mob-40",
+    "nom": "Taxes sur le transport…"
+  },
+  {
+    "id": "taxe-sur-l-exploitation-des-infrastructures-de-transport-de-",
+    "nom": "Taxe sur l'exploitation…"
+  },
+  {
+    "id": "taxe-sur-les-services-de-communications-electroniques-ais-cc",
+    "nom": "Taxe sur les services…"
+  },
+  {
+    "id": "taxe-sur-les-services-de-television-ais-ccn-30-20",
+    "nom": "Taxe sur les services…"
+  },
+  {
+    "id": "taxe-sur-les-services-d-acces-a-des-contenus-audiovisuels-a-",
+    "nom": "Taxe sur les services…"
+  },
+  {
+    "id": "taxe-sur-la-mise-en-relation-par-voie-electronique-en-vue-de",
+    "nom": "Taxe sur la mise en…"
+  },
+  {
+    "id": "taxe-sur-certains-services-numeriques-ais-ccn-30-50",
+    "nom": "Taxe sur certains services…"
+  },
+  {
+    "id": "taxe-sur-les-locations-en-france-de-phonogrammes-musicaux-et",
+    "nom": "Taxe sur les locations…"
+  },
+  {
+    "id": "cotisation-sur-la-valeur-ajoutee-des-entreprises-cvae",
+    "nom": "Cotisation sur la valeur…"
+  },
+  {
+    "id": "prelevements-au-profit-de-l-etat-if-aut-40",
+    "nom": "Prélèvements au profit…"
+  },
+  {
+    "id": "taxe-speciale-complementaire-au-profit-de-la-societe-du-gran",
+    "nom": "Taxe spéciale complémentaire…"
+  },
+  {
+    "id": "taxe-speciale-d-equipement-au-profit-des-etablissements-publ",
+    "nom": "Taxe spéciale d'équipement…"
+  },
+  {
+    "id": "taxe-speciale-d-equipement-au-profit-des-etablissements-publ",
+    "nom": "Taxe spéciale d'équipement…"
+  },
+  {
+    "id": "taxe-speciale-d-equipement-au-profit-des-etablissements-publ",
+    "nom": "Taxe spéciale d'équipement…"
+  },
+  {
+    "id": "taxe-speciale-d-equipement-au-profit-de-l-agence-pour-la-mis",
+    "nom": "Taxe spéciale d'équipement…"
+  },
+  {
+    "id": "taxe-speciale-d-equipement-au-profit-de-l-agence-pour-la-mis",
+    "nom": "Taxe spéciale d'équipement…"
+  },
+  {
+    "id": "taxe-speciale-d-equipement-au-profit-de-l-etablissement-publ",
+    "nom": "Taxe spéciale d'équipement…"
+  },
+  {
+    "id": "taxe-speciale-d-equipement-au-profit-de-l-etablissement-publ",
+    "nom": "Taxe spéciale d'équipement…"
+  },
+  {
+    "id": "taxe-additionnelle-speciale-annuelle-percue-au-profit-de-la-",
+    "nom": "Taxe additionnelle…"
+  },
+  {
+    "id": "taxe-annuelle-sur-les-surfaces-de-stationnement-percue-en-il",
+    "nom": "Taxe annuelle sur les…"
+  },
+  {
+    "id": "taxe-sur-la-valeur-venale-des-immeubles-des-entites-juridiqu",
+    "nom": "Taxe sur la valeur…"
+  },
+  {
+    "id": "contribution-exceptionnelle-sur-les-hauts-revenus-ir-chr",
+    "nom": "Contribution exceptionnelle…"
+  },
+  {
+    "id": "taxe-additionnelle-a-l-accise-sur-les-tabacs",
+    "nom": "Taxe additionnelle…"
+  },
+  {
+    "id": "participation-des-employeurs-agricoles-a-l-effort-de-constru",
+    "nom": "Participation des employeurs…"
+  },
+  {
+    "id": "cotisation-additionnelle-assise-sur-le-montant-total-des-hon",
+    "nom": "Cotisation additionnelle…"
+  },
+  {
+    "id": "contribution-forfaitaire-des-commissaires-aux-comptes-exerca",
+    "nom": "Contribution forfaitaire…"
+  },
+  {
+    "id": "cotisation-assise-sur-le-montant-total-des-honoraires-factur",
+    "nom": "Cotisation assise sur…"
+  },
+  {
+    "id": "cotisation-additionnelle-assise-sur-le-montant-total-des-hon",
+    "nom": "Cotisation additionnelle…"
+  },
+  {
+    "id": "eco-contribution-sur-la-taxe-de-solidarite-sur-les-billets-d",
+    "nom": "Eco-contribution sur…"
+  },
+  {
+    "id": "taxe-d-aeroport",
+    "nom": "Taxe d'aéroport"
+  },
+  {
+    "id": "taxe-d-embarquement-sur-les-passagers-dans-les-territoires-d",
+    "nom": "Taxe d'embarquement…"
+  },
+  {
+    "id": "taxe-d-atterrissage",
+    "nom": "Taxe d'atterrissage"
+  },
+  {
+    "id": "csg",
+    "nom": "CSG"
+  },
+  {
+    "id": "crds",
+    "nom": "CRDS"
+  },
+  {
+    "id": "contribution-solidarite-autonomie",
+    "nom": "Contribution solidarité…"
+  },
+  {
+    "id": "assurance-maladie-maternite-invalidite-deces",
+    "nom": "Assurance maladie -…"
+  },
+  {
+    "id": "assurance-vieillesse-plafonnee",
+    "nom": "Assurance vieillesse…"
+  },
+  {
+    "id": "assurance-vieillesse-deplafonnee",
+    "nom": "Assurance vieillesse…"
+  },
+  {
+    "id": "allocations-familiales",
+    "nom": "Allocations familiales"
+  },
+  {
+    "id": "accidents-du-travail",
+    "nom": "Accidents du travail"
+  },
+  {
+    "id": "aide-au-logement-entreprise-de-moins-de-50-salaries-fnal",
+    "nom": "Aide au logement entreprise…"
+  },
+  {
+    "id": "supplement-entreprise-de-50-salaries-et-plus-fnal",
+    "nom": "Supplément entreprise…"
+  },
+  {
+    "id": "cotisation-chomage",
+    "nom": "Cotisation chômage"
+  },
+  {
+    "id": "fonds-national-de-garantie-des-salaires-ags",
+    "nom": "Fonds national de garantie…"
+  },
+  {
+    "id": "retraite-complementaire-ceg-tranche-1",
+    "nom": "Retraite complémentaire…"
+  },
+  {
+    "id": "retraite-complementaire-ceg-tranche-2",
+    "nom": "Retraite complémentaire…"
+  },
+  {
+    "id": "retraite-complementaire-apec-cadres-seulement",
+    "nom": "Retraite complémentaire…"
+  },
+  {
+    "id": "retraite-complementaire-contribution-patronale-de-prevoyance",
+    "nom": "Retraite complémentaire…"
+  },
+  {
+    "id": "retraite-complementaire-contribution-patronale-de-prevoyance",
+    "nom": "Retraite complémentaire…"
+  },
+  {
+    "id": "retraite-complementaire-cotisations-de-base",
+    "nom": "Retraite complémentaire…"
+  },
+  {
+    "id": "retraite-complementaire-tranche-1",
+    "nom": "Retraite complémentaire…"
+  },
+  {
+    "id": "retraite-complementaire-tranche-2",
+    "nom": "Retraite complémentaire…"
+  },
+  {
+    "id": "retraite-complementaire-cet-t1-t2-si-remuneration-superieure",
+    "nom": "Retraite complémentaire…"
+  },
+  {
+    "id": "assurance-deces-cadre-adhesion-obligatoire-pour-les-cadres-q",
+    "nom": "assurance décès cadre…"
+  },
+  {
+    "id": "contribution-formation-professionnelle-entreprise-de-moins-d",
+    "nom": "Contribution formation…"
+  },
+  {
+    "id": "contribution-formation-professionnelle-entreprise-de-11-sala",
+    "nom": "Contribution formation…"
+  },
+  {
+    "id": "contribution-formation-professionnelle-entreprise-avec-cdd-c",
+    "nom": "Contribution formation…"
+  },
+  {
+    "id": "taxe-d-apprentissage",
+    "nom": "Taxe d'apprentissage"
+  },
+  {
+    "id": "taxe-sur-les-salaires-employeur-non-assujetti-a-la-tva",
+    "nom": "Taxe sur les salaires…"
+  },
+  {
+    "id": "versement-mobilite-transport-entreprises-de-11-salaries-et-p",
+    "nom": "Versement mobilité…"
+  },
+  {
+    "id": "participation-a-l-effort-de-construction-entreprises-de-50-s",
+    "nom": "Participation à l'effort…"
+  },
+  {
+    "id": "contribution-au-dialogue-social",
+    "nom": "Contribution au Dialogue…"
+  }
+]

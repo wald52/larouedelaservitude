@@ -1,0 +1,2602 @@
+{
+  "version": "2026-03-30",
+  "entries": [
+    {
+      "id": "droits-agricoles",
+      "nom": "Droits agricoles",
+      "nom_complet": "Droits agricoles",
+      "recette": "179,7 millions d'euros",
+      "annee": 1962
+    },
+    {
+      "id": "droits-de-douane",
+      "nom": "Droits de douane",
+      "nom_complet": "Droits de douane",
+      "recette": "1605,3 millions d'euros",
+      "annee": 1970
+    },
+    {
+      "id": "taxe-a-la-production-sur-le-quota-de-sucre-le-quota-d-isoglu",
+      "nom": "Taxe à la production…",
+      "nom_complet": "Taxe à la production sur le quota de sucre, le quota d'isoglucose et le quota de sirop d'inuline",
+      "recette": "306,4 millions d'euros",
+      "annee": 1970
+    },
+    {
+      "id": "cotisation-assise-sur-le-montant-total-des-honoraires-factur",
+      "nom": "Cotisation assise sur…",
+      "nom_complet": "Cotisation assise sur le montant total des honoraires facturés par les commissaires aux comptes lorsqu'ils certifient les comptes ou les informations en matière de durabilité",
+      "recette": null,
+      "annee": 2017
+    },
+    {
+      "id": "participation-des-employeurs-a-l-effort-de-construction-tps-",
+      "nom": "Participation des employeurs…",
+      "nom_complet": "Participation des employeurs à l'effort de construction (TPS-PEEC)",
+      "recette": null,
+      "annee": 1943
+    },
+    {
+      "id": "cotisation-hlm-et-sem",
+      "nom": "Cotisation HLM et SEM",
+      "nom_complet": "Cotisation HLM et SEM",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "cotisation-versee-par-les-organismes-hlm-et-les-sem",
+      "nom": "Cotisation versée par…",
+      "nom_complet": "Cotisation versée par les organismes HLM et les SEM",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "cotisation-additionnelle-versee-par-les-organismes-hlm-et-le",
+      "nom": "Cotisation additionnelle…",
+      "nom_complet": "Cotisation additionnelle versée par les organismes HLM et les SEM",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "redevance-pour-la-remuneration-pour-copie-privee",
+      "nom": "Redevance pour la rémunération…",
+      "nom_complet": "Redevance pour la rémunération pour copie privée",
+      "recette": "197 millions d'euros",
+      "annee": 1985
+    },
+    {
+      "id": "taxe-de-protection-des-obtentions-vegetales",
+      "nom": "Taxe de protection…",
+      "nom_complet": "Taxe de protection des obtentions végétales",
+      "recette": "1 millions d'euros",
+      "annee": 1970
+    },
+    {
+      "id": "redevance-percue-sur-formalites-de-l-institut-national-de-la",
+      "nom": "Redevance perçue sur…",
+      "nom_complet": "Redevance perçue sur formalités de l'Institut national de la propriété industrielle",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "contribution-sur-les-abondements-des-employeurs-aux-plans-d-",
+      "nom": "Contribution sur les…",
+      "nom_complet": "Contribution sur les abondements des employeurs aux plans d'épargne pour la retraite collectifs",
+      "recette": "5,3 millions d'euros",
+      "annee": 2001
+    },
+    {
+      "id": "contribution-sur-les-avantages-de-preretraite-d-entreprise",
+      "nom": "Contribution sur les…",
+      "nom_complet": "Contribution sur les avantages de préretraite d'entreprise",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "contribution-sur-les-regimes-de-retraite-conditionnant-la-co",
+      "nom": "Contribution sur les…",
+      "nom_complet": "Contribution sur les régimes de retraite conditionnant la constitution de droits à prestations à l'achèvement de la carrière du bénéficiaire dans l'entreprise",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "contribution-sur-les-indemnites-de-mise-a-la-retraite",
+      "nom": "Contribution sur les…",
+      "nom_complet": "Contribution sur les indemnités de mise à la retraite",
+      "recette": "39 millions d'euros",
+      "annee": 2007
+    },
+    {
+      "id": "contributions-patronales-et-salariales-sur-les-attributions-",
+      "nom": "Contributions patronales…",
+      "nom_complet": "Contributions patronales et salariales sur les attributions d'options (stock-options) de souscription ou d'achat des actions et sur les attributions gratuites",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "forfait-social",
+      "nom": "Forfait social",
+      "nom_complet": "Forfait social",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "contribution-salariale-sur-les-carried-interests",
+      "nom": "Contribution salariale…",
+      "nom_complet": "Contribution salariale sur les carried-interests",
+      "recette": "2 millions d'euros",
+      "annee": 2010
+    },
+    {
+      "id": "contribution-vente-en-gros",
+      "nom": "Contribution vente…",
+      "nom_complet": "Contribution vente en gros",
+      "recette": "265 millions d'euros",
+      "annee": 1991
+    },
+    {
+      "id": "contributions-taux-lv-lh",
+      "nom": "contributions taux…",
+      "nom_complet": "contributions taux « Lv/Lh »",
+      "recette": null,
+      "annee": 1999
+    },
+    {
+      "id": "contribution-sur-les-depenses-de-promotion-des-medicaments",
+      "nom": "Contribution sur les…",
+      "nom_complet": "Contribution sur les dépenses de promotion des médicaments",
+      "recette": "25 millions d'euros",
+      "annee": 2005
+    },
+    {
+      "id": "contribution-sur-le-chiffre-d-affaires",
+      "nom": "contribution sur le…",
+      "nom_complet": "contribution sur le chiffre d'affaires",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "cotisation-speciale-sur-les-boissons-alcooliques",
+      "nom": "Cotisation spéciale…",
+      "nom_complet": "Cotisation spéciale sur les boissons alcooliques",
+      "recette": "700 millions d'euros",
+      "annee": 1983
+    },
+    {
+      "id": "droits-de-plaidoirie",
+      "nom": "Droits de plaidoirie",
+      "nom_complet": "Droits de plaidoirie",
+      "recette": "9,8 millions d'euros",
+      "annee": 1921
+    },
+    {
+      "id": "cotisations-des-employeurs-au-fnal",
+      "nom": "Cotisations des employeurs…",
+      "nom_complet": "Cotisations des employeurs au FNAL",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "fraction-de-taxe-de-solidarite-additionnelle",
+      "nom": "Fraction de Taxe de…",
+      "nom_complet": "Fraction de Taxe de solidarité additionnelle",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "contribution-sociale-de-solidarite-des-societes-c3s",
+      "nom": "Contribution sociale…",
+      "nom_complet": "Contribution sociale de solidarité des sociétés (C3S)",
+      "recette": null,
+      "annee": 1992
+    },
+    {
+      "id": "droit-departemental-de-passage-sur-les-ouvrages-d-art-relian",
+      "nom": "Droit départemental…",
+      "nom_complet": "Droit départemental de passage sur les ouvrages d'art reliant le continent aux îles maritimes",
+      "recette": "1 millions d'euros",
+      "annee": 1995
+    },
+    {
+      "id": "contribution-additionnelle-de-solidarite-pour-l-autonomie-ca",
+      "nom": "Contribution additionnelle…",
+      "nom_complet": "Contribution additionnelle de solidarité pour l'autonomie (CASA)",
+      "recette": null,
+      "annee": 2013
+    },
+    {
+      "id": "contribution-a-la-vie-etudiante-et-de-campus",
+      "nom": "Contribution à la vie…",
+      "nom_complet": "Contribution à la vie étudiante et de campus",
+      "recette": null,
+      "annee": 2018
+    },
+    {
+      "id": "redevance-proportionnelle-sur-l-energie-hydraulique",
+      "nom": "Redevance proportionnelle…",
+      "nom_complet": "Redevance proportionnelle sur l'énergie hydraulique",
+      "recette": "0,9 millions d'euros",
+      "annee": 1919
+    },
+    {
+      "id": "droit-de-visa-de-regularisation-taxe-de-renouvellement-du-ti",
+      "nom": "Droit de visa de régularisation,…",
+      "nom_complet": "Droit de visa de régularisation, taxe de renouvellement du titre de séjour, taxe applicable aux documents de circulation pour étrangers mineurs et taxe perçue à l'occasion de la délivrance du premier titre de séjour",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "contribution-forfaitaire-representative-des-frais-de-reachem",
+      "nom": "Contribution forfaitaire…",
+      "nom_complet": "Contribution forfaitaire représentative des frais de réacheminement",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "redevance-percue-a-l-occasion-de-l-introduction-des-familles",
+      "nom": "Redevance perçue à…",
+      "nom_complet": "Redevance perçue à l'occasion de l'introduction des familles étrangères en France",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "redevance-pour-pollution-de-l-eau-d-origine-non-domestique",
+      "nom": "Redevance pour pollution…",
+      "nom_complet": "Redevance pour pollution de l'eau d'origine non domestique",
+      "recette": "107 millions d'euros",
+      "annee": 2006
+    },
+    {
+      "id": "redevances-pour-pollutions-diffuses",
+      "nom": "Redevances pour pollutions…",
+      "nom_complet": "Redevances pour pollutions diffuses",
+      "recette": "107 millions d'euros",
+      "annee": 1964
+    },
+    {
+      "id": "redevance-pour-stockage-d-eau-en-periode-d-etiage",
+      "nom": "Redevance pour stockage…",
+      "nom_complet": "Redevance pour stockage d'eau en période d'étiage",
+      "recette": "1,3 millions d'euros",
+      "annee": 2006
+    },
+    {
+      "id": "redevance-pour-protection-du-milieu-aquatique",
+      "nom": "Redevance pour protection…",
+      "nom_complet": "Redevance pour protection du milieu aquatique",
+      "recette": "8,5 millions d'euros",
+      "annee": 1941
+    },
+    {
+      "id": "redevances-de-l-eau-dans-les-departements-d-outre-mer",
+      "nom": "Redevances de l'eau…",
+      "nom_complet": "Redevances de l'eau dans les départements d'outre-mer",
+      "recette": "2 millions d'euros",
+      "annee": 2006
+    },
+    {
+      "id": "redevance-pour-delivrance-initiale-du-permis-de-chasse",
+      "nom": "Redevance pour délivrance…",
+      "nom_complet": "Redevance pour délivrance initiale du permis de chasse",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "redevances-cynegetiques",
+      "nom": "Redevances cynégétiques",
+      "nom_complet": "Redevances cynégétiques",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "redevance-de-mise-sur-le-marche-des-substances-actives-bioci",
+      "nom": "Redevance de mise sur…",
+      "nom_complet": "Redevance de mise sur le marché des substances actives biocides",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "participation-pour-voirie-et-reseaux",
+      "nom": "Participation pour…",
+      "nom_complet": "Participation pour voirie et réseaux",
+      "recette": null,
+      "annee": 2000
+    },
+    {
+      "id": "redevance-pour-creation-de-bureaux-ou-de-locaux-de-recherche",
+      "nom": "Redevance pour création…",
+      "nom_complet": "Redevance pour création de bureaux ou de locaux de recherche en région Ile-de-France",
+      "recette": "124,5 millions d'euros",
+      "annee": 1960
+    },
+    {
+      "id": "fraction-des-produits-annuels-de-la-vente-de-biens-confisque",
+      "nom": "Fraction des produits…",
+      "nom_complet": "Fraction des produits annuels de la vente de biens confisqués",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "contributions-au-fonds-de-garantie-des-assurances-obligatoir",
+      "nom": "Contributions au Fonds…",
+      "nom_complet": "Contributions au Fonds de garantie des assurances obligatoires de dommages (FGAO)",
+      "recette": null,
+      "annee": 1951
+    },
+    {
+      "id": "contribution-au-fonds-de-garantie-des-victimes-des-actes-de-",
+      "nom": "Contribution au Fonds…",
+      "nom_complet": "Contribution au Fonds de garantie des victimes des actes de terrorisme et d'autres infractions",
+      "recette": null,
+      "annee": 1986
+    },
+    {
+      "id": "contribution-au-fonds-de-garantie-des-dommages-consecutifs-a",
+      "nom": "Contribution au fonds…",
+      "nom_complet": "Contribution au fonds de garantie des dommages consécutifs à des actes de prévention, de diagnostic ou de soins dispensés par des professionnels de santé",
+      "recette": "0,9 millions d'euros",
+      "annee": 2011
+    },
+    {
+      "id": "prelevement",
+      "nom": "Prélèvement \\",
+      "nom_complet": "Prélèvement \\",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "automobile",
+      "nom": "automobile",
+      "nom_complet": "automobile",
+      "recette": "0 millions d'euros",
+      "annee": 2007
+    },
+    {
+      "id": "droit-de-francisation-et-de-navigation-en-corse-droit-de-pas",
+      "nom": "Droit de francisation…",
+      "nom_complet": "Droit de francisation et de navigation en Corse, Droit de passeport en Corse",
+      "recette": "3 millions d'euros",
+      "annee": 1994
+    },
+    {
+      "id": "droit-de-francisation-et-de-navigation",
+      "nom": "Droit de francisation…",
+      "nom_complet": "Droit de francisation et de navigation",
+      "recette": "39,2 millions d'euros",
+      "annee": 1967
+    },
+    {
+      "id": "droit-de-passeport",
+      "nom": "Droit de passeport",
+      "nom_complet": "Droit de passeport",
+      "recette": "2,2 millions d'euros",
+      "annee": 1967
+    },
+    {
+      "id": "taxe-interieure-de-consommation-sur-les-produits-energetique",
+      "nom": "Taxe intérieure de…",
+      "nom_complet": "Taxe intérieure de consommation sur les produits énergétiques (TICPE)",
+      "recette": "24500 millions d'euros",
+      "annee": 1928
+    },
+    {
+      "id": "contribution-au-service-public-de-l-electricite-cspe",
+      "nom": "Contribution au service…",
+      "nom_complet": "Contribution au service public de l'électricité (CSPE)",
+      "recette": null,
+      "annee": 2003
+    },
+    {
+      "id": "taxe-generale-sur-les-activites-polluantes-materiaux-d-extra",
+      "nom": "Taxe générale sur les…",
+      "nom_complet": "Taxe générale sur les activités polluantes - matériaux d'extraction",
+      "recette": "72,5 millions d'euros",
+      "annee": 1999
+    },
+    {
+      "id": "taxe-generale-sur-les-activites-polluantes-emissions-polluan",
+      "nom": "Taxe générale sur les…",
+      "nom_complet": "Taxe générale sur les activités polluantes - émissions polluantes",
+      "recette": "21,6 millions d'euros",
+      "annee": 1998
+    },
+    {
+      "id": "taxe-generale-sur-les-activites-polluantes-installations-cla",
+      "nom": "Taxe générale sur les…",
+      "nom_complet": "Taxe générale sur les activités polluantes - installations classées",
+      "recette": "25 millions d'euros",
+      "annee": 1999
+    },
+    {
+      "id": "taxe-interieure-sur-les-houilles-les-lignites-et-les-cokes-t",
+      "nom": "Taxe intérieure sur…",
+      "nom_complet": "Taxe intérieure sur les houilles, les lignites et les cokes (TICHLC)",
+      "recette": "7,6 millions d'euros",
+      "annee": 2006
+    },
+    {
+      "id": "taxe-generale-sur-les-activites-polluantes-lessives",
+      "nom": "Taxe générale sur les…",
+      "nom_complet": "Taxe générale sur les activités polluantes - lessives",
+      "recette": "44,4 millions d'euros",
+      "annee": 1999
+    },
+    {
+      "id": "taxe-generale-sur-les-activites-polluantes-tgap",
+      "nom": "Taxe générale sur les…",
+      "nom_complet": "Taxe générale sur les activités polluantes (TGAP)",
+      "recette": null,
+      "annee": 2000
+    },
+    {
+      "id": "taxe-speciale-sur-certains-vehicules-routiers",
+      "nom": "Taxe spéciale sur certains…",
+      "nom_complet": "Taxe spéciale sur certains véhicules routiers",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-due-par-les-entreprises-de-transport-public-aerien-et-m",
+      "nom": "Taxe due par les entreprises…",
+      "nom_complet": "Taxe due par les entreprises de transport public aérien et maritime (Outre-Mer)",
+      "recette": "9,4 millions d'euros",
+      "annee": 1994
+    },
+    {
+      "id": "taxe-sur-les-passagers-maritimes-embarques-a-destination-d-e",
+      "nom": "Taxe sur les passagers…",
+      "nom_complet": "Taxe sur les passagers maritimes embarqués à destination d'espaces naturels protégés",
+      "recette": "2,6 millions d'euros",
+      "annee": 1995
+    },
+    {
+      "id": "redevance-relative-aux-controles-renforces-a-l-importation-d",
+      "nom": "Redevance relative…",
+      "nom_complet": "Redevance relative aux contrôles renforcés à l'importation des denrées alimentaires d'origine non animale",
+      "recette": "3,4 millions d'euros",
+      "annee": 1998
+    },
+    {
+      "id": "redevance-relative-aux-controles-renforces-a-l-importation-d",
+      "nom": "Redevance relative…",
+      "nom_complet": "Redevance relative aux contrôles renforcés à l'importation des denrées alimentaires d'origine non animale",
+      "recette": "0 millions d'euros",
+      "annee": 2011
+    },
+    {
+      "id": "redevances-d-usage-des-frequences-radioelectriques-part-anfr",
+      "nom": "Redevances d'usage…",
+      "nom_complet": "Redevances d'usage des fréquences radioélectriques (part ANFR)",
+      "recette": "15,8 millions d'euros",
+      "annee": 1993
+    },
+    {
+      "id": "droit-du-par-les-entreprises-ferroviaires-pour-l-autorite-de",
+      "nom": "Droit dû par les entreprises…",
+      "nom_complet": "Droit dû par les entreprises ferroviaires pour l'autorité de régulation des activités ferroviaires",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "droit-de-securite",
+      "nom": "Droit de sécurité",
+      "nom_complet": "Droit de sécurité",
+      "recette": "16,8 millions d'euros",
+      "annee": 2006
+    },
+    {
+      "id": "taxe-sur-les-titulaires-d-ouvrages-hydroelectriques-concedes",
+      "nom": "Taxe sur les titulaires…",
+      "nom_complet": "Taxe sur les titulaires d'ouvrages hydroélectriques concédés",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "peage-plaisance",
+      "nom": "Péage plaisance",
+      "nom_complet": "Péage plaisance",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-sur-le-prix-des-entrees-aux-seances-organisees-par-les-",
+      "nom": "Taxe sur le prix des…",
+      "nom_complet": "Taxe sur le prix des entrées aux séances organisées par les exploitants d'établissements de spectacles cinématographiques",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "cotisations-normale-et-supplementaire-des-entreprises-cinema",
+      "nom": "Cotisations (normale…",
+      "nom_complet": "Cotisations (normale et supplémentaire) des entreprises cinématographiques",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "redevance-d-archeologie-preventive",
+      "nom": "Redevance d'archéologie…",
+      "nom_complet": "Redevance d'archéologie préventive",
+      "recette": "77 millions d'euros",
+      "annee": 2001
+    },
+    {
+      "id": "redevances-percues-pour-la-surveillance-des-etablissements-d",
+      "nom": "Redevances perçues…",
+      "nom_complet": "Redevances perçues pour la surveillance des établissements de jeux, hippodromes et cynodromes",
+      "recette": "0 millions d'euros",
+      "annee": 1979
+    },
+    {
+      "id": "contribution-des-employeurs-a-l-association-pour-la-gestion-",
+      "nom": "Contribution des employeurs…",
+      "nom_complet": "Contribution des employeurs à l'association pour la gestion du régime d'assurance des créances des salariés",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "contribution-annuelle-au-fonds-de-developpement-pour-l-inser",
+      "nom": "Contribution annuelle…",
+      "nom_complet": "Contribution annuelle au fonds de développement pour l'insertion professionnelle des handicapés",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "participation-des-entreprises-de-moins-de-10-salaries-au-dev",
+      "nom": "Participation des entreprises…",
+      "nom_complet": "Participation des entreprises de moins de 10 salariés au développement de la formation professionnelle continue",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "pefpc-participation-des-entreprises-de-10-salaries-et-plus-a",
+      "nom": "PEFPC: Participation…",
+      "nom_complet": "PEFPC: Participation des entreprises de 10 salariés et plus au développement de la formation professionnelle continue",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "participation-au-financement-de-la-formation-des-professions",
+      "nom": "Participation au financement…",
+      "nom_complet": "Participation au financement de la formation des professions non salariées (hors artisanat, agriculture et pêche)",
+      "recette": "58 millions d'euros",
+      "annee": 1991
+    },
+    {
+      "id": "participation-au-financement-de-la-formation-des-travailleur",
+      "nom": "Participation au financement…",
+      "nom_complet": "Participation au financement de la formation des travailleurs indépendants et des employeurs de la pêche maritime ou des cultures marines",
+      "recette": "0,4 millions d'euros",
+      "annee": 1997
+    },
+    {
+      "id": "participation-au-financement-de-la-formation-des-professions",
+      "nom": "Participation au financement…",
+      "nom_complet": "Participation au financement de la formation des professions non salariées dans le domaine agricole",
+      "recette": "49 millions d'euros",
+      "annee": 1991
+    },
+    {
+      "id": "participation-au-financement-des-conges-individuels-de-forma",
+      "nom": "Participation au financement…",
+      "nom_complet": "Participation au financement des congés individuels de formation des salariés sous contrats à durée déterminée CIF-CDD",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "contribution-speciale-versee-par-les-employeurs-des-etranger",
+      "nom": "Contribution spéciale…",
+      "nom_complet": "Contribution spéciale versée par les employeurs des étrangers sans autorisation de travail",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "prelevement-sur-les-contrats-d-assurance-vie-en-desherence",
+      "nom": "Prélèvement sur les…",
+      "nom_complet": "Prélèvement sur les contrats d'assurance-vie en déshérence",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-dans-le-domaine-funeraire",
+      "nom": "Taxe dans le domaine…",
+      "nom_complet": "Taxe dans le domaine funéraire",
+      "recette": "5 millions d'euros",
+      "annee": 1806
+    },
+    {
+      "id": "taxe-locale-sur-la-publicite-exterieure-tlpe",
+      "nom": "Taxe locale sur la…",
+      "nom_complet": "Taxe locale sur la publicité extérieure (TLPE)",
+      "recette": "153 millions d'euros",
+      "annee": 2009
+    },
+    {
+      "id": "taxe-sur-les-remontees-mecaniques",
+      "nom": "Taxe sur les remontées…",
+      "nom_complet": "Taxe sur les remontées mécaniques",
+      "recette": "54 millions d'euros",
+      "annee": 1968
+    },
+    {
+      "id": "versement-transport",
+      "nom": "Versement transport",
+      "nom_complet": "Versement transport",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-sur-les-activites-commerciales-non-salaries-a-duree-sai",
+      "nom": "Taxe sur les activités…",
+      "nom_complet": "Taxe sur les activités commerciales non salariés à durée saisonnière",
+      "recette": null,
+      "annee": 2000
+    },
+    {
+      "id": "taxe-sur-les-activites-commerciales-saisonnieres-non-salarie",
+      "nom": "Taxe sur les activités…",
+      "nom_complet": "Taxe sur les activités commerciales saisonnières non salariées (TACDS)",
+      "recette": null,
+      "annee": 2000
+    },
+    {
+      "id": "taxe-sur-les-dechets-receptionnes-dans-une-installation-de-s",
+      "nom": "Taxe sur les déchets…",
+      "nom_complet": "Taxe sur les déchets réceptionnés dans une installation de stockage ou un incinérateur de déchets ménagers",
+      "recette": "18,9 millions d'euros",
+      "annee": 2005
+    },
+    {
+      "id": "taxe-additionnelle-departementale-a-la-taxe-de-sejour",
+      "nom": "Taxe additionnelle…",
+      "nom_complet": "Taxe additionnelle départementale à la taxe de séjour",
+      "recette": "9 millions d'euros",
+      "annee": 1927
+    },
+    {
+      "id": "droits-assimiles-au-droit-d-octroi-de-mer-sur-les-rhums-et-s",
+      "nom": "Droits assimilés au…",
+      "nom_complet": "Droits assimilés au droit d'octroi de mer sur les rhums et spiritueux à base d'alcool de cru",
+      "recette": "5,1 millions d'euros",
+      "annee": 1963
+    },
+    {
+      "id": "impot-sur-le-revenu-ir",
+      "nom": "Impôt sur le revenu (IR)",
+      "nom_complet": "Impôt sur le revenu (IR)",
+      "recette": "74000 millions d'euros",
+      "annee": 1916
+    },
+    {
+      "id": "taxe-sur-les-metaux-precieux-les-bijoux-les-objets-d-art-de-",
+      "nom": "Taxe sur les métaux…",
+      "nom_complet": "Taxe sur les métaux précieux, les bijoux, les objets d'art, de collection et d'antiquité",
+      "recette": "96,7 millions d'euros",
+      "annee": 1976
+    },
+    {
+      "id": "impot-sur-les-revenus-de-capitaux-mobiliers-ircm",
+      "nom": "Impôt sur les revenus…",
+      "nom_complet": "Impôt sur les revenus de capitaux mobiliers (IRCM)",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "impot-sur-les-societes-is",
+      "nom": "Impôt sur les sociétés…",
+      "nom_complet": "Impôt sur les sociétés (IS)",
+      "recette": "36200 millions d'euros",
+      "annee": 1948
+    },
+    {
+      "id": "taxe-sur-les-salaires",
+      "nom": "Taxe sur les salaires",
+      "nom_complet": "Taxe sur les salaires",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-annuelle-sur-les-locaux-a-usage-de-bureaux-les-locaux-c",
+      "nom": "Taxe annuelle sur les…",
+      "nom_complet": "Taxe annuelle sur les locaux à usage de bureaux, les locaux commerciaux, les locaux de stockage et les surfaces de stationnement perçue dans certains départements (IF-AUT-50)",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-annuelle-sur-les-logements-vacants-if-aut-60",
+      "nom": "Taxe annuelle sur les…",
+      "nom_complet": "Taxe annuelle sur les logements vacants (IF-AUT-60)",
+      "recette": null,
+      "annee": 1998
+    },
+    {
+      "id": "contribution-sur-les-revenus-locatifs-crl",
+      "nom": "contribution sur les…",
+      "nom_complet": "contribution sur les revenus locatifs (CRL)",
+      "recette": "0,2 millions d'euros",
+      "annee": 2000
+    },
+    {
+      "id": "taxe-sur-les-excedents-de-provisions-des-entreprises-d-assur",
+      "nom": "Taxe sur les excédents…",
+      "nom_complet": "Taxe sur les excédents de provisions des entreprises d'assurances de dommages",
+      "recette": "114,6 millions d'euros",
+      "annee": 1983
+    },
+    {
+      "id": "taxe-sur-les-ordres-annules-dans-le-cadre-d-operation-a-haut",
+      "nom": "Taxe sur les ordres…",
+      "nom_complet": "Taxe sur les ordres annulés dans le cadre d'opération à haute fréquence",
+      "recette": "0,1 millions d'euros",
+      "annee": 2012
+    },
+    {
+      "id": "taxe-sur-les-contrats-d-echange-sur-defaut-d-un-etat",
+      "nom": "Taxe sur les contrats…",
+      "nom_complet": "Taxe sur les contrats d'échange sur défaut d'un État",
+      "recette": "0,6 millions d'euros",
+      "annee": 2012
+    },
+    {
+      "id": "taxe-sur-la-valeur-ajoutee-tva",
+      "nom": "Taxe sur la valeur…",
+      "nom_complet": "Taxe sur la valeur ajoutée (TVA)",
+      "recette": "141200 millions d'euros",
+      "annee": 1954
+    },
+    {
+      "id": "taxe-sur-les-services-numeriques",
+      "nom": "Taxe sur les services…",
+      "nom_complet": "Taxe sur les services numériques",
+      "recette": "350 millions d'euros",
+      "annee": 2019
+    },
+    {
+      "id": "taxe-de-solidarite-sur-les-billets-d-avion-dite-taxe-unitaid",
+      "nom": "Taxe de solidarité…",
+      "nom_complet": "Taxe de solidarité sur les billets d'avion (dite taxe Unitaid ou taxe Chirac)",
+      "recette": "161,99 millions d'euros",
+      "annee": 2006
+    },
+    {
+      "id": "taxe-de-l-aviation-civile-tac",
+      "nom": "Taxe de l'aviation…",
+      "nom_complet": "Taxe de l'aviation civile (TAC)",
+      "recette": "401 millions d'euros",
+      "annee": 1999
+    },
+    {
+      "id": "taxe-sur-certaines-depenses-de-publicite",
+      "nom": "Taxe sur certaines…",
+      "nom_complet": "Taxe sur certaines dépenses de publicité",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-sur-le-chiffre-d-affaires-des-exploitants-agricoles",
+      "nom": "Taxe sur le chiffre…",
+      "nom_complet": "Taxe sur le chiffre d'affaires des exploitants agricoles",
+      "recette": "138,2 millions d'euros",
+      "annee": 1947
+    },
+    {
+      "id": "redevance-sanitaire-d-abattage",
+      "nom": "Redevance sanitaire…",
+      "nom_complet": "Redevance sanitaire d'abattage",
+      "recette": "48 millions d'euros",
+      "annee": 1989
+    },
+    {
+      "id": "redevance-sanitaire-de-decoupage",
+      "nom": "Redevance sanitaire…",
+      "nom_complet": "Redevance sanitaire de découpage",
+      "recette": "48,1 millions d'euros",
+      "annee": 1989
+    },
+    {
+      "id": "redevance-sanitaire-de-transformation-des-produits-de-la-pec",
+      "nom": "Redevance sanitaire…",
+      "nom_complet": "Redevance sanitaire de transformation des produits de la pêche et de l'aquaculture",
+      "recette": "0,3 millions d'euros",
+      "annee": 1998
+    },
+    {
+      "id": "redevance-sanitaire-de-transformation-des-produits-de-la-pec",
+      "nom": "Redevance sanitaire…",
+      "nom_complet": "Redevance sanitaire de transformation des produits de la pêche et de l'aquaculture",
+      "recette": "0,1 millions d'euros",
+      "annee": 1998
+    },
+    {
+      "id": "redevance-sanitaire-pour-le-controle-de-certaines-substances",
+      "nom": "Redevance sanitaire…",
+      "nom_complet": "Redevance sanitaire pour le contrôle de certaines substances et de leurs résidus",
+      "recette": "0,8 millions d'euros",
+      "annee": 1998
+    },
+    {
+      "id": "redevance-pour-l-agrement-des-etablissements-du-secteur-de-l",
+      "nom": "Redevance pour l'agrément…",
+      "nom_complet": "Redevance pour l'agrément des établissements du secteur de l'alimentation animale",
+      "recette": "0 millions d'euros",
+      "annee": 2009
+    },
+    {
+      "id": "taxe-due-par-les-concessionnaires-d-autoroutes",
+      "nom": "Taxe due par les concessionnaires…",
+      "nom_complet": "Taxe due par les concessionnaires d'autoroutes",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "contribution-sur-la-cession-a-un-service-de-television-des-d",
+      "nom": "Contribution sur la…",
+      "nom_complet": "Contribution sur la cession à un service de télévision des droits de diffusion de manifestations ou de compétitions sportives",
+      "recette": "43 millions d'euros",
+      "annee": 1999
+    },
+    {
+      "id": "prelevements-sur-les-jeux-et-paris",
+      "nom": "Prélèvements sur les…",
+      "nom_complet": "Prélèvements sur les jeux et paris",
+      "recette": "115,3 millions d'euros",
+      "annee": 2010
+    },
+    {
+      "id": "fraction-du-prelevement-sur-les-mises-de-jeux-de-cercle-en-l",
+      "nom": "Fraction du Prélèvement…",
+      "nom_complet": "Fraction du Prélèvement sur les mises de jeux de cercle en ligne affectée aux communes dans le ressort territorial desquelles sont ouverts au public un ou plusieurs casinos",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "fraction-du-prelevement-sur-les-paris-hippiques-affectee-aux",
+      "nom": "Fraction du Prélèvement…",
+      "nom_complet": "Fraction du Prélèvement sur les paris hippiques affectée aux EPCI sur le territoire desquels sont ouverts au public un ou plusieurs hippodromes",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "droit-de-consommation-sur-les-produits-intermediaires",
+      "nom": "Droit de consommation…",
+      "nom_complet": "Droit de consommation sur les produits intermédiaires",
+      "recette": "104,7 millions d'euros",
+      "annee": 1945
+    },
+    {
+      "id": "droits-de-consommation-sur-les-alcools",
+      "nom": "Droits de consommation…",
+      "nom_complet": "Droits de consommation sur les alcools",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "droit-de-circulation-sur-les-vins-cidres-poires-et-hydromels",
+      "nom": "Droit de circulation…",
+      "nom_complet": "Droit de circulation sur les vins, cidres, poirés et hydromels",
+      "recette": "122,2 millions d'euros",
+      "annee": 1945
+    },
+    {
+      "id": "droit-sur-les-bieres-et-les-boissons-non-alcoolisees",
+      "nom": "Droit sur les bières…",
+      "nom_complet": "Droit sur les bières et les boissons non alcoolisées",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "droit-de-consommation-sur-les-tabacs-manufactures",
+      "nom": "Droit de consommation…",
+      "nom_complet": "Droit de consommation sur les tabacs manufacturés",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "mutations-a-titre-onereux-de-fonds-de-commerce",
+      "nom": "Mutations à titre onéreux…",
+      "nom_complet": "Mutations à titre onéreux de fonds de commerce",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "droits-de-succession",
+      "nom": "Droits de succession",
+      "nom_complet": "Droits de succession",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "droit-fixe-pour-l-etablissement-d-un-contrat-de-mariage",
+      "nom": "Droit fixe pour l'établissement…",
+      "nom_complet": "Droit fixe pour l'établissement d'un contrat de mariage",
+      "recette": "4,5 millions d'euros",
+      "annee": null
+    },
+    {
+      "id": "fraction-des-droits-de-timbre-sur-les-passeports-securises",
+      "nom": "Fraction des droits…",
+      "nom_complet": "Fraction des droits de timbre sur les passeports sécurisés",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "droit-de-timbre-sur-les-demandes-de-naturalisation-les-deman",
+      "nom": "Droit de timbre sur…",
+      "nom_complet": "Droit de timbre sur les demandes de naturalisation, les demandes de réintégration dans la nationalité française et les déclarations d'acquisition de la nationalité en raison du mariage",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "impot-sur-la-fortune-immobiliere-pat-ifi",
+      "nom": "Impôt sur la fortune…",
+      "nom_complet": "Impôt sur la fortune immobilière (PAT-IFI)",
+      "recette": "5043 millions d'euros",
+      "annee": 1982
+    },
+    {
+      "id": "taxe-speciale-sur-les-conventions-d-assurances",
+      "nom": "Taxe spéciale sur les…",
+      "nom_complet": "Taxe spéciale sur les conventions d'assurances",
+      "recette": null,
+      "annee": 1944
+    },
+    {
+      "id": "majoration-de-la-taxe-sur-les-assurances-de-protection-jurid",
+      "nom": "Majoration de la taxe…",
+      "nom_complet": "Majoration de la taxe sur les assurances de protection juridique au profit Conseil national des barreaux",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-sur-les-vehicules-de-societes-tvs",
+      "nom": "Taxe sur les véhicules…",
+      "nom_complet": "Taxe sur les véhicules de sociétés (TVS)",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-sur-les-vehicules-de-tourisme-les-plus-polluants",
+      "nom": "Taxe sur les véhicules…",
+      "nom_complet": "Taxe sur les véhicules de tourisme les plus polluants",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "malus-ou-ecopastille",
+      "nom": "Malus (ou « écopastille…",
+      "nom_complet": "Malus (ou « écopastille »)",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "malus-annuel",
+      "nom": "Malus annuel",
+      "nom_complet": "Malus annuel",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-fonciere-sur-les-proprietes-baties-if-tfb",
+      "nom": "Taxe foncière sur les…",
+      "nom_complet": "Taxe foncière sur les propriétés bâties (IF-TFB)",
+      "recette": "27285 millions d'euros",
+      "annee": null
+    },
+    {
+      "id": "taxe-fonciere-sur-les-proprietes-non-baties-if-tfnb",
+      "nom": "Taxe foncière sur les…",
+      "nom_complet": "Taxe foncière sur les propriétés non bâties (IF-TFNB)",
+      "recette": "980 millions d'euros",
+      "annee": null
+    },
+    {
+      "id": "taxe-d-habitation-if-th",
+      "nom": "Taxe d'habitation (IF-TH)",
+      "nom_complet": "Taxe d'habitation (IF-TH)",
+      "recette": "19352 millions d'euros",
+      "annee": null
+    },
+    {
+      "id": "taxe-d-habitation-sur-les-logements-vacants",
+      "nom": "Taxe d'habitation sur…",
+      "nom_complet": "Taxe d'habitation sur les logements vacants",
+      "recette": null,
+      "annee": 2007
+    },
+    {
+      "id": "cotisation-fonciere-des-entreprises-if-cfe",
+      "nom": "Cotisation foncière…",
+      "nom_complet": "Cotisation foncière des entreprises (IF-CFE)",
+      "recette": "21872 millions d'euros",
+      "annee": null
+    },
+    {
+      "id": "redevances-communale-et-departementale-des-mines-tfp-mines",
+      "nom": "Redevances communale…",
+      "nom_complet": "Redevances communale et départementale des mines (TFP-MINES)",
+      "recette": "23,4 millions d'euros",
+      "annee": 1919
+    },
+    {
+      "id": "imposition-forfaitaire-sur-les-pylones-tfp-pyl",
+      "nom": "Imposition forfaitaire…",
+      "nom_complet": "Imposition forfaitaire sur les pylônes (TFP-PYL)",
+      "recette": "343,4 millions d'euros",
+      "annee": 1980
+    },
+    {
+      "id": "taxe-sur-les-eoliennes-maritimes-tfp-tem",
+      "nom": "Taxe sur les éoliennes…",
+      "nom_complet": "Taxe sur les éoliennes maritimes (TFP-TEM)",
+      "recette": "0 millions d'euros",
+      "annee": 2005
+    },
+    {
+      "id": "imposition-forfaitaire-sur-les-eoliennes-et-les-hydroliennes",
+      "nom": "Imposition forfaitaire…",
+      "nom_complet": "Imposition forfaitaire sur les éoliennes et les hydroliennes",
+      "recette": "44,9 millions d'euros",
+      "annee": 2010
+    },
+    {
+      "id": "imposition-forfaitaire-sur-les-centrales-de-production-d-ene",
+      "nom": "Imposition forfaitaire…",
+      "nom_complet": "Imposition forfaitaire sur les centrales de production d'énergie électrique d'origine photovoltaïque ou hydraulique",
+      "recette": "75,9 millions d'euros",
+      "annee": 2010
+    },
+    {
+      "id": "imposition-forfaitaire-sur-les-reseaux-de-gaz-naturel-et-can",
+      "nom": "Imposition forfaitaire…",
+      "nom_complet": "Imposition forfaitaire sur les réseaux de gaz naturel et canalisations d'hydrocarbures",
+      "recette": "38,5 millions d'euros",
+      "annee": 2010
+    },
+    {
+      "id": "redevances-sur-la-production-d-electricite-au-moyen-de-la-ge",
+      "nom": "Redevances sur la production…",
+      "nom_complet": "Redevances sur la production d'électricité au moyen de la géothermie",
+      "recette": "0 millions d'euros",
+      "annee": 2017
+    },
+    {
+      "id": "taxe-additionnelle-a-la-taxe-fonciere-sur-les-proprietes-non",
+      "nom": "Taxe additionnelle…",
+      "nom_complet": "Taxe additionnelle à la taxe foncière sur les propriétés non bâties (IF-AUT-80)",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-d-enlevement-des-ordures-menageres-if-aut-90",
+      "nom": "Taxe d'enlèvement des…",
+      "nom_complet": "Taxe d'enlèvement des ordures ménagères (IF-AUT-90))",
+      "recette": "6087 millions d'euros",
+      "annee": null
+    },
+    {
+      "id": "taxe-de-balayage",
+      "nom": "Taxe de balayage",
+      "nom_complet": "Taxe de balayage",
+      "recette": "108,9 millions d'euros",
+      "annee": 1873
+    },
+    {
+      "id": "taxe-forfaitaire-sur-la-cession-a-titre-onereux-des-terrains",
+      "nom": "Taxe forfaitaire sur…",
+      "nom_complet": "Taxe forfaitaire sur la cession à titre onéreux des terrains nus qui ont été rendus constructibles du fait de leur classement",
+      "recette": "54 millions d'euros",
+      "annee": 2006
+    },
+    {
+      "id": "taxe-pour-la-gestion-des-milieux-aquatiques-et-la-prevention",
+      "nom": "Taxe pour la gestion…",
+      "nom_complet": "Taxe pour la gestion des milieux aquatiques et la prévention des inondations",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-sur-les-friches-commerciales-if-aut-110",
+      "nom": "Taxe sur les friches…",
+      "nom_complet": "Taxe sur les friches commerciales (IF-AUT-110)",
+      "recette": null,
+      "annee": 2006
+    },
+    {
+      "id": "impot-sur-les-cercles-et-maisons-de-jeux",
+      "nom": "Impôt sur les cercles…",
+      "nom_complet": "Impôt sur les cercles et maisons de jeux",
+      "recette": "34,5 millions d'euros",
+      "annee": 1941
+    },
+    {
+      "id": "surtaxe-sur-les-eaux-minerales",
+      "nom": "Surtaxe sur les eaux…",
+      "nom_complet": "Surtaxe sur les eaux minérales",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-percue-au-profit-des-communes-de-saint-martin-et-saint-",
+      "nom": "Taxe perçue au profit…",
+      "nom_complet": "Taxe perçue au profit des communes de Saint-Martin et Saint-Barthélemy",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-sur-l-exploration-d-hydrocarbures-tfp-teh",
+      "nom": "Taxe sur l'exploration…",
+      "nom_complet": "Taxe sur l'exploration d'hydrocarbures (TFP-TEH)",
+      "recette": "0,8 millions d'euros",
+      "annee": 2017
+    },
+    {
+      "id": "taxe-de-publicite-fonciere",
+      "nom": "Taxe de publicité fonci…",
+      "nom_complet": "Taxe de publicité foncière",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "droits-departementaux-d-enregistrement-sur-les-mutations-a-t",
+      "nom": "Droits départementaux…",
+      "nom_complet": "Droits départementaux d'enregistrement sur les mutations à titre onéreux d'immeubles",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-departementale-additionnelle-aux-droits-d-enregistremen",
+      "nom": "Taxe départementale…",
+      "nom_complet": "Taxe départementale additionnelle aux droits d'enregistrement ou à la taxe de publicité foncière exigible sur les mutations à titre onéreux",
+      "recette": "99,8 millions d'euros",
+      "annee": 1798
+    },
+    {
+      "id": "taxe-d-apprentissage",
+      "nom": "Taxe d'apprentissage",
+      "nom_complet": "Taxe d'apprentissage",
+      "recette": "2000 millions d'euros",
+      "annee": 1925
+    },
+    {
+      "id": "imposition-forfaitaire-sur-le-materiel-roulant-circulant-sur",
+      "nom": "Imposition forfaitaire…",
+      "nom_complet": "Imposition forfaitaire sur le matériel roulant circulant sur le réseau de transport ferroviaire et guidé géré par la RATP -IFER-STIF RATP",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-annuelle-sur-les-surfaces-de-stationnement",
+      "nom": "Taxe annuelle sur les…",
+      "nom_complet": "Taxe annuelle sur les surfaces de stationnement",
+      "recette": null,
+      "annee": 2015
+    },
+    {
+      "id": "taxe-additionnelle-speciale-annuelle-au-profit-de-la-region-",
+      "nom": "Taxe additionnelle…",
+      "nom_complet": "Taxe additionnelle spéciale annuelle au profit de la région Île-de-France (TASA)",
+      "recette": null,
+      "annee": 2015
+    },
+    {
+      "id": "taxe-percue-pour-la-region-de-guyane-tfp-guf",
+      "nom": "Taxe perçue pour la…",
+      "nom_complet": "Taxe perçue pour la région de Guyane (TFP-GUF)",
+      "recette": "0,4 millions d'euros",
+      "annee": 2008
+    },
+    {
+      "id": "taxe-sur-les-permis-de-conduire",
+      "nom": "Taxe sur les permis…",
+      "nom_complet": "Taxe sur les permis de conduire",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-regionale-sur-les-certificats-d-immatriculation-des-veh",
+      "nom": "Taxe régionale sur…",
+      "nom_complet": "Taxe régionale sur les certificats d'immatriculation des véhicules",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-due-par-les-entreprises-de-transport-public-aerien-et-m",
+      "nom": "Taxe due par les entreprises…",
+      "nom_complet": "Taxe due par les entreprises de transport public aérien et maritime (Corse)",
+      "recette": "47,4 millions d'euros",
+      "annee": 1991
+    },
+    {
+      "id": "taxe-pour-frais-de-chambres-de-commerce-et-d-industrie-if-au",
+      "nom": "Taxe pour frais de…",
+      "nom_complet": "Taxe pour frais de chambres de commerce et d'industrie (IF-AUT-10)",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "contribution-sociale-generalisee-csg",
+      "nom": "Contribution sociale…",
+      "nom_complet": "Contribution sociale généralisée (CSG)",
+      "recette": "99000 millions d'euros",
+      "annee": 1991
+    },
+    {
+      "id": "prelevement-social-sur-les-revenus-du-patrimoine-et-les-prod",
+      "nom": "Prélèvement social…",
+      "nom_complet": "Prélèvement social sur les revenus du patrimoine et les produits de placements",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "contribution-pour-le-remboursement-de-la-dette-sociale-crds",
+      "nom": "Contribution pour le…",
+      "nom_complet": "Contribution pour le remboursement de la dette sociale (CRDS)",
+      "recette": "6150 millions d'euros",
+      "annee": 1996
+    },
+    {
+      "id": "prelevement-de-solidarite-de-2-sur-les-revenus-du-patrimoine",
+      "nom": "Prélèvement de solidarité…",
+      "nom_complet": "Prélèvement de solidarité de 2 % sur les revenus du patrimoine et les produits de placements",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-pour-frais-de-chambres-de-metiers-et-de-l-artisanat-if-",
+      "nom": "Taxe pour frais de…",
+      "nom_complet": "Taxe pour frais de chambres de métiers et de l'artisanat (IF-AUT-20)",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "contribution-au-fonds-d-assurance-formation-des-chefs-d-entr",
+      "nom": "Contribution au fonds…",
+      "nom_complet": "Contribution au fonds d'assurance formation des chefs d'entreprise inscrite au répertoire des métiers",
+      "recette": "58 millions d'euros",
+      "annee": 1982
+    },
+    {
+      "id": "taxe-pour-frais-de-chambres-d-agriculture-if-aut-30",
+      "nom": "Taxe pour frais de…",
+      "nom_complet": "Taxe pour frais de chambres d'agriculture (IF-AUT-30)",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-sur-la-cession-a-titre-onereux-de-terrains-nus-devenus-",
+      "nom": "Taxe sur la cession…",
+      "nom_complet": "Taxe sur la cession à titre onéreux de terrains nus devenus constructibles; perçue au profit de l'agence de services et de paiement",
+      "recette": "11 millions d'euros",
+      "annee": 2010
+    },
+    {
+      "id": "contribution-a-l-audiovisuel-public-due-par-les-professionne",
+      "nom": "Contribution à l'audiovisuel…",
+      "nom_complet": "Contribution à l'audiovisuel public due par les professionnels (TFP-CAP)",
+      "recette": "3500 millions d'euros",
+      "annee": 1933
+    },
+    {
+      "id": "taxe-speciale-d-equipement",
+      "nom": "Taxe spéciale d'équipem…",
+      "nom_complet": "Taxe spéciale d'équipement",
+      "recette": "350 millions d'euros",
+      "annee": 1991
+    },
+    {
+      "id": "taxe-speciale-d-equipement-au-profit-de-l-epf-de-normandie",
+      "nom": "Taxe spéciale d'équipement…",
+      "nom_complet": "Taxe spéciale d'équipement au profit de l'EPF de Normandie",
+      "recette": "13 millions d'euros",
+      "annee": 1968
+    },
+    {
+      "id": "redevance-sur-les-paris-hippiques-en-ligne-percue-au-profit-",
+      "nom": "Redevance sur les paris…",
+      "nom_complet": "Redevance sur les paris hippiques en ligne perçue au profit des sociétés de courses",
+      "recette": "61 millions d'euros",
+      "annee": 2014
+    },
+    {
+      "id": "taxe-sur-les-nuisances-sonores-aeriennes",
+      "nom": "Taxe sur les nuisances…",
+      "nom_complet": "Taxe sur les nuisances sonores aériennes",
+      "recette": "57 millions d'euros",
+      "annee": 1992
+    },
+    {
+      "id": "contribution-des-autoentrepreneurs-au-financement-des-action",
+      "nom": "Contribution des autoentrepreneurs…",
+      "nom_complet": "Contribution des autoentrepreneurs au financement des actions de formation des chambres de métiers et d'artisanat",
+      "recette": "2 millions d'euros",
+      "annee": 2010
+    },
+    {
+      "id": "contribution-des-autoentrepreneurs-au-fonds-d-assurance-form",
+      "nom": "Contribution des autoentrepreneurs…",
+      "nom_complet": "Contribution des autoentrepreneurs au fonds d'assurance formation des chefs d'entreprise artisanale",
+      "recette": "3 millions d'euros",
+      "annee": 2010
+    },
+    {
+      "id": "taxe-sur-la-diffusion-en-video-physique-et-en-ligne-de-conte",
+      "nom": "Taxe sur la diffusion…",
+      "nom_complet": "Taxe sur la diffusion en vidéo physique et en ligne de contenus audiovisuels",
+      "recette": "30,95 millions d'euros",
+      "annee": 1993
+    },
+    {
+      "id": "contribution-supplementaire-a-l-apprentissage-versements-aux",
+      "nom": "Contribution supplémentaire…",
+      "nom_complet": "Contribution supplémentaire à l'apprentissage - versements aux CFA",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-pour-le-developpement-de-la-formation-professionnelle-d",
+      "nom": "Taxe pour le développement…",
+      "nom_complet": "Taxe pour le développement de la formation professionnelle dans les métiers de la réparation automobile, du cycle et du motocycle",
+      "recette": "32 millions d'euros",
+      "annee": 1968
+    },
+    {
+      "id": "prelevements-sur-les-jeux-de-loterie-et-les-paris-sportifs-p",
+      "nom": "Prélèvements sur les…",
+      "nom_complet": "Prélèvements sur les jeux de loterie et les paris sportifs perçus au profit du Centre national pour le développement du sport",
+      "recette": "35,9 millions d'euros",
+      "annee": 2010
+    },
+    {
+      "id": "taxe-speciale-d-equipement-au-profit-de-l-epf-de-guyane-et-d",
+      "nom": "Taxe spéciale d'équipement…",
+      "nom_complet": "Taxe spéciale d'équipement au profit de l'EPF de Guyane et de Mayotte",
+      "recette": "2 millions d'euros",
+      "annee": 1994
+    },
+    {
+      "id": "taxe-speciale-d-equipement-au-profit-de-la-societe-du-grand-",
+      "nom": "Taxe spéciale d'équipement…",
+      "nom_complet": "Taxe spéciale d'équipement au profit de la Société du Grand Paris",
+      "recette": "117 millions d'euros",
+      "annee": 2010
+    },
+    {
+      "id": "taxe-speciale-d-equipement-au-profit-de-l-epf-de-lorraine",
+      "nom": "Taxe spéciale d'équipement…",
+      "nom_complet": "Taxe spéciale d'équipement au profit de l'EPF de Lorraine",
+      "recette": "23 millions d'euros",
+      "annee": 1973
+    },
+    {
+      "id": "taxe-speciale-d-equipement-au-profit-de-l-epf-de-paca",
+      "nom": "Taxe spéciale d'équipement…",
+      "nom_complet": "Taxe spéciale d'équipement au profit de l'EPF de PACA",
+      "recette": "50 millions d'euros",
+      "annee": 2001
+    },
+    {
+      "id": "taxe-sur-les-boissons-premix",
+      "nom": "Taxe sur les boissons…",
+      "nom_complet": "Taxe sur les boissons prémix",
+      "recette": "2,3 millions d'euros",
+      "annee": 1996
+    },
+    {
+      "id": "contribution-percue-sur-les-boissons-et-preparations-liquide",
+      "nom": "Contribution perçue…",
+      "nom_complet": "Contribution perçue sur les boissons et préparations liquides destinées à la consommation humaine contenant des édulcorants de synthèse et ne contenant pas de sucres ajoutés",
+      "recette": "58,4 millions d'euros",
+      "annee": 2011
+    },
+    {
+      "id": "droit-de-timbre-pour-la-delivrance-du-permis-de-conduire-en-",
+      "nom": "Droit de timbre pour…",
+      "nom_complet": "Droit de timbre pour la délivrance du permis de conduire en cas de perte ou de vol",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxes-a-percevoir-pour-l-alimentation-du-fonds-commun-des-ac",
+      "nom": "Taxes à percevoir pour…",
+      "nom_complet": "Taxes à percevoir pour l'alimentation du fonds commun des accidents du travail agricole",
+      "recette": "17,3 millions d'euros",
+      "annee": 1957
+    },
+    {
+      "id": "fraction-des-droits-de-timbre-sur-les-cartes-nationales-d-id",
+      "nom": "Fraction des droits…",
+      "nom_complet": "Fraction des droits de timbre sur les cartes nationales d'identité",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-pour-la-gestion-des-certificats-d-immatriculation-des-v",
+      "nom": "Taxe pour la gestion…",
+      "nom_complet": "Taxe pour la gestion des certificats d'immatriculation des véhicules",
+      "recette": "42 millions d'euros",
+      "annee": 2009
+    },
+    {
+      "id": "contributions-additionnelles-aux-primes-ou-cotisations-affer",
+      "nom": "Contributions additionnelles…",
+      "nom_complet": "Contributions additionnelles aux primes ou cotisations afférentes à certaines conventions d'assurance",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "contribution-au-fonds-de-prevention-des-risques-naturels-maj",
+      "nom": "Contribution au Fonds…",
+      "nom_complet": "Contribution au Fonds de prévention des risques naturels majeurs (FPRNM, dit « fonds Barnier »)",
+      "recette": null,
+      "annee": 1995
+    },
+    {
+      "id": "droits-percus-au-profit-de-la-caisse-nationale-de-l-assuranc",
+      "nom": "Droits perçus au profit…",
+      "nom_complet": "Droits perçus au profit de la Caisse nationale de l'assurance maladie des travailleurs salariés (CNAMTS) en matière de produits de santé, taxe annuelle due par les laboratoires de biologie médicale",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-destinee-a-financer-le-developpement-de-la-formation-pr",
+      "nom": "Taxe destinée à financer…",
+      "nom_complet": "Taxe destinée à financer le développement de la formation professionnelle dans les transports routiers",
+      "recette": "65 millions d'euros",
+      "annee": 1968
+    },
+    {
+      "id": "droit-d-examen-du-permis-de-chasse",
+      "nom": "Droit d'examen du permis…",
+      "nom_complet": "Droit d'examen du permis de chasse",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "droits-affectes-au-fonds-d-indemnisation-de-la-profession-d-",
+      "nom": "Droits affectés au…",
+      "nom_complet": "Droits affectés au fonds d'indemnisation de la profession d'avoués près les cours d'appel",
+      "recette": "16 millions d'euros",
+      "annee": 2011
+    },
+    {
+      "id": "imposition-forfaitaire-sur-les-entreprises-de-reseaux-tfp-if",
+      "nom": "Imposition forfaitaire…",
+      "nom_complet": "Imposition forfaitaire sur les entreprises de réseaux (TFP-IFER)",
+      "recette": "1337 millions d'euros",
+      "annee": 2010
+    },
+    {
+      "id": "taxe-communale-sur-la-consommation-finale-d-electricite-tcfe",
+      "nom": "Taxe communale sur…",
+      "nom_complet": "Taxe communale sur la consommation finale d'électricité (TCFE)",
+      "recette": "61,9 millions d'euros",
+      "annee": 2010
+    },
+    {
+      "id": "taxe-departementale-des-espaces-naturels-sensibles-tdens",
+      "nom": "Taxe départementale…",
+      "nom_complet": "Taxe départementale des espaces naturels sensibles (TDENS)",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "redevance-d-exploitation-de-substances-non-energetiques-sur-",
+      "nom": "Redevance d'exploitation…",
+      "nom_complet": "Redevance d'exploitation de substances non énergétiques sur le plateau continental ou dans la zone économique exclusive",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "redevance-due-par-les-titulaires-de-titres-d-exploitation-de",
+      "nom": "Redevance due par les…",
+      "nom_complet": "Redevance due par les titulaires de titres d'exploitation de mines d'hydrocarbures liquides ou gazeux",
+      "recette": "3,1 millions d'euros",
+      "annee": 1956
+    },
+    {
+      "id": "redevance-due-par-les-titulaires-de-titres-d-exploitation-de",
+      "nom": "Redevance due par les…",
+      "nom_complet": "Redevance due par les titulaires de titres d'exploitation de mines d'hydrocarbures liquides ou gazeux au large de Saint-Pierre-et-Miquelon",
+      "recette": null,
+      "annee": 1999
+    },
+    {
+      "id": "contribution-pour-frais-de-controle-acpr",
+      "nom": "Contribution pour frais…",
+      "nom_complet": "Contribution pour frais de contrôle ACPR",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "droits-et-contributions-pour-frais-de-controle",
+      "nom": "Droits et contributions…",
+      "nom_complet": "Droits et contributions pour frais de contrôle",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "redevance-pour-controle-veterinaire-a-l-expedition",
+      "nom": "Redevance pour contrôle…",
+      "nom_complet": "Redevance pour contrôle vétérinaire à l'expédition",
+      "recette": null,
+      "annee": 2000
+    },
+    {
+      "id": "redevance-relative-aux-controles-renforces-a-l-importation-d",
+      "nom": "Redevance relative…",
+      "nom_complet": "Redevance relative aux contrôles renforcés à l'importation des denrées alimentaires d'origine non animale",
+      "recette": "1,1 millions d'euros",
+      "annee": 1998
+    },
+    {
+      "id": "contribution-des-exploitants-agricoles-et-des-conchyliculteu",
+      "nom": "Contribution des exploitants…",
+      "nom_complet": "Contribution des exploitants agricoles et des conchyliculteurs au Fonds national de gestion des risques en agriculture",
+      "recette": "102 millions d'euros",
+      "annee": 1993
+    },
+    {
+      "id": "droit-sur-les-produits-beneficiant-d-une-appellation-d-origi",
+      "nom": "Droit sur les produits…",
+      "nom_complet": "Droit sur les produits bénéficiant d'une appellation d’origine, d'une indication géographique ou d'un label rouge",
+      "recette": "7 millions d'euros",
+      "annee": 1935
+    },
+    {
+      "id": "participation-au-financement-de-la-formation-des-professions",
+      "nom": "Participation au financement…",
+      "nom_complet": "Participation au financement de la formation des professions non salariées dans le domaine agricole",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-additionnelle-a-la-taxe-sur-les-installations-nucleaire",
+      "nom": "Taxe additionnelle…",
+      "nom_complet": "Taxe additionnelle à la taxe sur les installations nucléaires de base - stockage",
+      "recette": "2,4 millions d'euros",
+      "annee": 2009
+    },
+    {
+      "id": "taxe-additionnelle-a-la-taxe-sur-les-installations-nucleaire",
+      "nom": "Taxe additionnelle…",
+      "nom_complet": "Taxe additionnelle à la taxe sur les installations nucléaires de base - Diffusion technologique",
+      "recette": "20 millions d'euros",
+      "annee": 2006
+    },
+    {
+      "id": "taxe-additionnelle-a-la-taxe-sur-les-installations-nucleaire",
+      "nom": "Taxe additionnelle…",
+      "nom_complet": "Taxe additionnelle à la taxe sur les installations nucléaires de base - Accompagnement",
+      "recette": "39 millions d'euros",
+      "annee": 2006
+    },
+    {
+      "id": "taxe-pour-le-developpement-des-industries-de-l-ameublement-a",
+      "nom": "Taxe pour le développement…",
+      "nom_complet": "Taxe pour le développement des industries de l'ameublement ainsi que les industries du bois",
+      "recette": "14,9 millions d'euros",
+      "annee": 1971
+    },
+    {
+      "id": "taxe-pour-le-developpement-des-industries-du-cuir-de-la-maro",
+      "nom": "Taxe pour le développement…",
+      "nom_complet": "Taxe pour le développement des industries du cuir, de la maroquinerie, de la ganterie et de la chaussure",
+      "recette": "12,5 millions d'euros",
+      "annee": 1978
+    },
+    {
+      "id": "taxe-pour-le-developpement-des-industries-de-l-habillement",
+      "nom": "Taxe pour le développement…",
+      "nom_complet": "Taxe pour le développement des industries de l'habillement",
+      "recette": "10 millions d'euros",
+      "annee": 1963
+    },
+    {
+      "id": "taxe-pour-le-developpement-des-industries-de-la-mecanique-de",
+      "nom": "Taxe pour le développement…",
+      "nom_complet": "Taxe pour le développement des industries de la mécanique, de la construction métallique, des matériels etc.",
+      "recette": "70,2 millions d'euros",
+      "annee": 1961
+    },
+    {
+      "id": "taxe-pour-le-developpement-des-industries-de-l-horlogerie-bi",
+      "nom": "Taxe pour le développement…",
+      "nom_complet": "Taxe pour le développement des industries de l'horlogerie, bijouterie, joaillerie et orfèvrerie ainsi que des arts de la table (taxe HBJOAT)",
+      "recette": "13,2 millions d'euros",
+      "annee": 1963
+    },
+    {
+      "id": "taxe-pour-le-developpement-des-industries-des-materiaux-de-c",
+      "nom": "Taxe pour le développement…",
+      "nom_complet": "Taxe pour le développement des industries des matériaux de construction regroupant les industries du béton, de la terre cuite et des roches ornementales et de construction",
+      "recette": "15,9 millions d'euros",
+      "annee": 1957
+    },
+    {
+      "id": "taxe-pour-le-developpement-de-l-industrie-de-la-conservation",
+      "nom": "Taxe pour le développement…",
+      "nom_complet": "Taxe pour le développement de l'industrie de la conservation des produits agricoles",
+      "recette": "2,6 millions d'euros",
+      "annee": 1950
+    },
+    {
+      "id": "taxe-sur-les-spectacles-de-varietes",
+      "nom": "Taxe sur les spectacles…",
+      "nom_complet": "Taxe sur les spectacles de variétés",
+      "recette": "24 millions d'euros",
+      "annee": 1977
+    },
+    {
+      "id": "taxe-sur-les-spectacles-d-art-dramatique-lyrique-et-choregra",
+      "nom": "Taxe sur les spectacles…",
+      "nom_complet": "Taxe sur les spectacles d'art dramatique, lyrique et chorégraphique",
+      "recette": "5,1 millions d'euros",
+      "annee": 1964
+    },
+    {
+      "id": "redevance-pour-frais-d-envoi-des-certificats-d-immatriculati",
+      "nom": "Redevance pour frais…",
+      "nom_complet": "Redevance pour frais d'envoi des certificats d'immatriculation des véhicules",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "fraction-affectee-du-produit-du-relevement-du-tarif-de-taxe-",
+      "nom": "Fraction affectée du…",
+      "nom_complet": "Fraction affectée du produit du relèvement du tarif de taxe intérieure de consommation sur les produits énergétiques (TICPE) sur le carburant gazole",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-sur-les-hydrofluorocarbures",
+      "nom": "Taxe sur les hydrofluor…",
+      "nom_complet": "Taxe sur les hydrofluorocarbures",
+      "recette": null,
+      "annee": 2018
+    },
+    {
+      "id": "contribution-annuelle-au-profit-de-l-institut-de-radioprotec",
+      "nom": "Contribution annuelle…",
+      "nom_complet": "Contribution annuelle au profit de l'Institut de radioprotection et de sûreté nucléaire (IRSN)",
+      "recette": "48 millions d'euros",
+      "annee": 2010
+    },
+    {
+      "id": "taxe-sur-les-transactions-financieres-ttf",
+      "nom": "Taxe sur les transactions…",
+      "nom_complet": "Taxe sur les transactions financières (TTF)",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "participation-pour-le-financement-de-l-assainissement-collec",
+      "nom": "Participation pour…",
+      "nom_complet": "Participation pour le Financement de l'Assainissement Collectif (PFAC)",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "contribution-speciale-pour-la-gestion-des-dechets-radioactif",
+      "nom": "Contribution spéciale…",
+      "nom_complet": "Contribution spéciale pour la gestion des déchets radioactifs - Conception",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "participation-des-concessionnaires-de-la-liaison-fixe-trans-",
+      "nom": "Participation des concessionnaires…",
+      "nom_complet": "Participation des concessionnaires de la liaison fixe Trans-Manche au fonctionnement de la commission intergouvernementale et du comité de sécurité chargés de superviser la construction et l'exploitation de l'ouvrage",
+      "recette": "2,5 millions d'euros",
+      "annee": 1986
+    },
+    {
+      "id": "redevance-proportionnelle-sur-l-energie-hydraulique",
+      "nom": "Redevance proportionnelle…",
+      "nom_complet": "Redevance proportionnelle sur l'énergie hydraulique",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-pour-frais-de-chambre-de-metiers-de-moselle",
+      "nom": "Taxe pour frais de…",
+      "nom_complet": "Taxe pour frais de chambre de métiers de Moselle",
+      "recette": "7 millions d'euros",
+      "annee": 1919
+    },
+    {
+      "id": "taxe-pour-frais-de-chambre-de-metiers-d-alsace",
+      "nom": "Taxe pour frais de…",
+      "nom_complet": "Taxe pour frais de chambre de métiers d'Alsace",
+      "recette": "9 millions d'euros",
+      "annee": 1919
+    },
+    {
+      "id": "prelevements-sur-les-benefices-tires-de-la-construction-immo",
+      "nom": "Prélèvements sur les…",
+      "nom_complet": "Prélèvements sur les bénéfices tirés de la construction immobilière",
+      "recette": "0,4 millions d'euros",
+      "annee": 1963
+    },
+    {
+      "id": "participation-des-employeurs-au-financement-de-la-formation-",
+      "nom": "Participation des employeurs…",
+      "nom_complet": "Participation des employeurs au financement de la formation professionnelle continue, versée à l'État",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-sur-les-surfaces-commerciales-tfp-tsc",
+      "nom": "Taxe sur les surfaces…",
+      "nom_complet": "Taxe sur les surfaces commerciales (TFP-TSC)",
+      "recette": "609 millions d'euros",
+      "annee": null
+    },
+    {
+      "id": "taxe-additionnelle-a-la-taxe-sur-les-surfaces-commerciales-t",
+      "nom": "Taxe additionnelle…",
+      "nom_complet": "Taxe additionnelle à la taxe sur les surfaces commerciales (TFP-TASC)",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-exceptionnelle-sur-la-reserve-de-capitalisation-des-ent",
+      "nom": "Taxe exceptionnelle…",
+      "nom_complet": "Taxe exceptionnelle sur la réserve de capitalisation des entreprises d'assurance (TFP-ASSUR)",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-au-profit-du-fonds-de-soutien-aux-collectivites-territo",
+      "nom": "Taxe au profit du fonds…",
+      "nom_complet": "Taxe au profit du fonds de soutien aux collectivités territoriales ayant contracté des produits structurés dits \\",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "tfp-tfsct",
+      "nom": "(TFP-TFSCT)",
+      "nom_complet": "(TFP-TFSCT)",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "cotisation-obligatoire",
+      "nom": "Cotisation obligatoire",
+      "nom_complet": "Cotisation obligatoire",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "cotisation-obligatoire",
+      "nom": "Cotisation obligatoire",
+      "nom_complet": "Cotisation obligatoire",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-professionnelle-de-la-poste-et-de-france-telecom",
+      "nom": "Taxe professionnelle…",
+      "nom_complet": "Taxe professionnelle de la Poste et de France Telecom",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "fraction-du-produit-des-successions-en-desherence",
+      "nom": "Fraction du produit…",
+      "nom_complet": "Fraction du produit des successions en déshérence",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "droit-d-octroi-de-mer-et-droit-d-octroi-de-mer-regional",
+      "nom": "Droit d'octroi de mer…",
+      "nom_complet": "Droit d'octroi de mer et droit d'octroi de mer régional",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "contribution-tarifaire-d-acheminement-cta",
+      "nom": "Contribution tarifaire…",
+      "nom_complet": "Contribution tarifaire d'acheminement (CTA)",
+      "recette": null,
+      "annee": 2004
+    },
+    {
+      "id": "contributions-versees-par-la-sncf-au-titre-des-frais-de-surv",
+      "nom": "Contributions versées…",
+      "nom_complet": "Contributions versées par la SNCF au titre des frais de surveillance et de contrôle des chemins de fer",
+      "recette": null,
+      "annee": 1981
+    },
+    {
+      "id": "redevance-versee-par-reseau-ferre-de-france-au-titre-des-fra",
+      "nom": "Redevance versée par…",
+      "nom_complet": "Redevance versée par Réseau ferré de France au titre des frais de surveillance et de contrôle",
+      "recette": null,
+      "annee": 1981
+    },
+    {
+      "id": "contributions-des-employeurs-de-main-d-uvre-etrangere-pour-l",
+      "nom": "Contributions des employeurs…",
+      "nom_complet": "Contributions des employeurs de main d'œuvre étrangère pour l'OMI",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "contribution-des-employeurs-publics-au-fonds-pour-l-insertio",
+      "nom": "Contribution des employeurs…",
+      "nom_complet": "Contribution des employeurs publics au fonds pour l'insertion des personnes handicapées dans la fonction publique",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "cotisation-au-profit-des-caisses-d-assurances-d-accidents-ag",
+      "nom": "Cotisation au profit…",
+      "nom_complet": "Cotisation au profit des caisses d'assurances d'accidents agricoles d'Alsace-Moselle",
+      "recette": "12 millions d'euros",
+      "annee": 1912
+    },
+    {
+      "id": "droits-d-apport-des-societes",
+      "nom": "Droits d'apport des…",
+      "nom_complet": "Droits d'apport des sociétés",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "droits-de-donations",
+      "nom": "Droits de donations",
+      "nom_complet": "Droits de donations",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "mutations-a-titre-onereux-de-creances-rentes-prix-d-offices",
+      "nom": "Mutations à titre onéreux…",
+      "nom_complet": "Mutations à titre onéreux de créances, rentes, prix d'offices",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "contributions-au-fonds-national-de-l-emploi-fne",
+      "nom": "Contributions au Fonds…",
+      "nom_complet": "Contributions au Fonds national de l'emploi (FNE)",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "retenue-a-la-source-sur-certains-benefices-non-commerciaux-e",
+      "nom": "Retenue à la source…",
+      "nom_complet": "Retenue à la source sur certains bénéfices non commerciaux et de l'impôt sur le revenu",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "contribution-des-institutions-financieres",
+      "nom": "Contribution des institutions…",
+      "nom_complet": "Contribution des institutions financières",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "cotisations-aux-fonds-de-garantie-des-salaires-ags-et-agcc",
+      "nom": "Cotisations aux fonds…",
+      "nom_complet": "Cotisations aux fonds de garantie des salaires (AGS et AGCC)",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "redevance-d-usage-des-frequences-radioelectriques",
+      "nom": "Redevance d'usage des…",
+      "nom_complet": "Redevance d'usage des fréquences radioélectriques",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "redevances-lors-du-lancement-de-certains-materiels-aeronauti",
+      "nom": "Redevances lors du…",
+      "nom_complet": "Redevances lors du lancement de certains matériels aéronautiques",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-grossiste-repartiteurs",
+      "nom": "Taxe grossiste répartit…",
+      "nom_complet": "Taxe grossiste répartiteurs",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-sur-les-stations-et-liaisons-radio-privees",
+      "nom": "Taxe sur les stations…",
+      "nom_complet": "Taxe sur les stations et liaisons radio privées",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-additionnelle-aux-droits-de-mutation",
+      "nom": "Taxe additionnelle…",
+      "nom_complet": "Taxe additionnelle aux droits de mutation",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "impot-sur-les-spectacles-jeux-et-divertissements",
+      "nom": "Impôt sur les spectacles,…",
+      "nom_complet": "Impôt sur les spectacles, jeux et divertissements",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "participation-depassement-du-cos",
+      "nom": "Participation dépassement…",
+      "nom_complet": "Participation dépassement du COS",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-locale-d-equipement",
+      "nom": "Taxe locale d'équipement",
+      "nom_complet": "Taxe locale d'équipement",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-complementaire-a-la-tle-idf",
+      "nom": "Taxe complémentaire…",
+      "nom_complet": "Taxe complémentaire à la TLE (IdF)",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-de-sejour",
+      "nom": "Taxe de séjour",
+      "nom_complet": "Taxe de séjour",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-sur-les-tabacs-corse",
+      "nom": "Taxe sur les tabacs…",
+      "nom_complet": "Taxe sur les tabacs (Corse)",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "octroi-de-mer",
+      "nom": "Octroi de mer",
+      "nom_complet": "Octroi de mer",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-sur-le-ski-de-fond",
+      "nom": "Taxe sur le ski de fond",
+      "nom_complet": "Taxe sur le ski de fond",
+      "recette": "10 millions d'euros",
+      "annee": 1985
+    },
+    {
+      "id": "contribution-annuelle-des-distributeurs-d-energie",
+      "nom": "Contribution annuelle…",
+      "nom_complet": "Contribution annuelle des distributeurs d'énergie",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "fonds-d-amortissement-des-charges-d-electrification-face",
+      "nom": "Fonds d'amortissement…",
+      "nom_complet": "Fonds d'amortissement des charges d'électrification (FACÉ)",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "prelevement-sur-entreprises-petrolieres",
+      "nom": "Prélèvement sur entreprises…",
+      "nom_complet": "Prélèvement sur entreprises pétrolières",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-sur-les-fournitures-d-electricite",
+      "nom": "Taxe sur les fournitures…",
+      "nom_complet": "Taxe sur les fournitures d'électricité",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "droits-de-consommation-sur-les-alcools-corse",
+      "nom": "Droits de consommation…",
+      "nom_complet": "Droits de consommation sur les alcools (Corse)",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-d-assainissement-agence-de-l-eau",
+      "nom": "Taxe d'assainissement…",
+      "nom_complet": "Taxe d'assainissement (Agence de l'Eau)",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-sur-les-rhums",
+      "nom": "Taxe sur les rhums",
+      "nom_complet": "Taxe sur les rhums",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-sur-les-carburants-dom",
+      "nom": "Taxe sur les carburants…",
+      "nom_complet": "Taxe sur les carburants (DOM)",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-sur-les-syndicats-d-energie",
+      "nom": "Taxe sur les syndicats…",
+      "nom_complet": "Taxe sur les syndicats d'énergie",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "redevance-pour-droit-de-construire-epad",
+      "nom": "Redevance pour droit…",
+      "nom_complet": "Redevance pour droit de construire (EPAD)",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-et-prelevement-sur-les-sommes-encaissees-par-les-societ",
+      "nom": "Taxe et prélèvement…",
+      "nom_complet": "Taxe et prélèvement sur les sommes encaissées par les sociétés de télévision au titre de la redevance, de la diffusion des messages publicitaires et des abonnements",
+      "recette": "8 millions d'euros",
+      "annee": 1946
+    },
+    {
+      "id": "mutation-a-titre-onereux-d-immeubles-et-droits-immobiliers-d",
+      "nom": "Mutation à titre onéreux…",
+      "nom_complet": "Mutation à titre onéreux d'immeubles et droits immobiliers (Droits de mutation)",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "mutations-de-jouissance-baux",
+      "nom": "Mutations de jouissance…",
+      "nom_complet": "Mutations de jouissance (baux)",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "fraction-des-prelevements-sociaux-sur-les-jeux-prevus-aux-ar",
+      "nom": "Fraction des Prélèvements…",
+      "nom_complet": "Fraction des Prélèvements sociaux sur les jeux prévus aux Art L 137-20 à L 137-22 Code de la sécurité sociale",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "prelevement-sur-la-participation-des-employeurs-a-l-effort-d",
+      "nom": "Prélèvement sur la…",
+      "nom_complet": "Prélèvement sur la participation des employeurs à l'effort de construction",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "cotisation-obligatoire",
+      "nom": "Cotisation obligatoire",
+      "nom_complet": "Cotisation obligatoire",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-fixe-due-a-chaque-delivrance-de-ci-ais-mob-10-20-20",
+      "nom": "Taxe fixe due à chaque…",
+      "nom_complet": "Taxe fixe due à chaque délivrance de CI (AIS-MOB-10-20-20)",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-regionale-due-au-titre-de-la-delivrance-de-ci-consecuti",
+      "nom": "Taxe régionale due…",
+      "nom_complet": "Taxe régionale due au titre de la délivrance de CI consécutive d'un changement de propriétaire",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-sur-les-vehicules-de-transport-due-au-titre-de-la-deliv",
+      "nom": "Taxe sur les véhicules…",
+      "nom_complet": "Taxe sur les véhicules de transport due au titre de la délivrance de CI consécutive à un changement de propriétaire",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-sur-les-emissions-de-dioxyde-de-carbone",
+      "nom": "Taxe sur les émissions…",
+      "nom_complet": "Taxe sur les émissions de dioxyde de carbone",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-sur-la-masse-en-ordre-de-marche",
+      "nom": "Taxe sur la masse en…",
+      "nom_complet": "Taxe sur la masse en ordre de marche",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-annuelle-sur-les-emissions-de-dioxyde-de-carbone",
+      "nom": "Taxe annuelle sur les…",
+      "nom_complet": "Taxe annuelle sur les émissions de dioxyde de carbone",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-annuelle-sur-les-emissions-de-polluants-atmospherique",
+      "nom": "Taxe annuelle sur les…",
+      "nom_complet": "Taxe annuelle sur les émissions de polluants atmosphérique",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-sur-l-affectation-des-vehicules-lourds-de-transport-de-",
+      "nom": "Taxe sur l'affectation…",
+      "nom_complet": "Taxe sur l'affectation des véhicules lourds de transport de marchandises (AIS-MOB-10-30-30)",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-sur-la-distance-parcourue-sur-le-reseau-autoroutier-con",
+      "nom": "Taxe sur la distance…",
+      "nom_complet": "Taxe sur la distance parcourue sur le réseau autoroutier concédé (AIS-MOB-10-40)",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxes-sur-le-transport-aerien-ais-mob-20",
+      "nom": "Taxes sur le transport…",
+      "nom_complet": "Taxes sur le transport aérien (AIS-MOB-20)",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxes-sur-les-navigations-maritimes-et-fluviales-ais-mob-30",
+      "nom": "Taxes sur les navigations…",
+      "nom_complet": "Taxes sur les navigations maritimes et fluviales (AIS-MOB-30)",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxes-sur-le-transport-guide-ais-mob-40",
+      "nom": "Taxes sur le transport…",
+      "nom_complet": "Taxes sur le transport guidé (AIS-MOB-40)",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-sur-l-exploitation-des-infrastructures-de-transport-de-",
+      "nom": "Taxe sur l'exploitation…",
+      "nom_complet": "Taxe sur l'exploitation des infrastructures de transport de longue distance (AIS-MOB-50)",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-sur-les-services-de-communications-electroniques-ais-cc",
+      "nom": "Taxe sur les services…",
+      "nom_complet": "Taxe sur les services de communications électroniques (AIS-CCN-30-10)",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-sur-les-services-de-television-ais-ccn-30-20",
+      "nom": "Taxe sur les services…",
+      "nom_complet": "Taxe sur les services de télévision (AIS-CCN-30-20)",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-sur-les-services-d-acces-a-des-contenus-audiovisuels-a-",
+      "nom": "Taxe sur les services…",
+      "nom_complet": "Taxe sur les services d'accès à des contenus audiovisuels à la demande (AIS-CCN-30-30)",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-sur-la-mise-en-relation-par-voie-electronique-en-vue-de",
+      "nom": "Taxe sur la mise en…",
+      "nom_complet": "Taxe sur la mise en relation par voie électronique en vue de fournir certaines prestations de transport (AIS-CCN-30-40)",
+      "recette": "2 millions d'euros",
+      "annee": 2021
+    },
+    {
+      "id": "taxe-sur-certains-services-numeriques-ais-ccn-30-50",
+      "nom": "Taxe sur certains services…",
+      "nom_complet": "Taxe sur certains services numériques (AIS-CCN-30-50)",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-sur-les-locations-en-france-de-phonogrammes-musicaux-et",
+      "nom": "Taxe sur les locations…",
+      "nom_complet": "Taxe sur les locations en France de phonogrammes musicaux et de vidéomusiques destinés à l’usage privé du public dans le cadre d’une mise à disposition à la demande sur les réseaux en ligne (AIS-CCN-30-60)",
+      "recette": "9,3 millions d'euros",
+      "annee": 2023
+    },
+    {
+      "id": "cotisation-sur-la-valeur-ajoutee-des-entreprises-cvae",
+      "nom": "Cotisation sur la valeur…",
+      "nom_complet": "Cotisation sur la valeur ajoutée des entreprises (CVAE)",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "prelevements-au-profit-de-l-etat-if-aut-40",
+      "nom": "Prélèvements au profit…",
+      "nom_complet": "Prélèvements au profit de l'État (IF-AUT-40)",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-speciale-complementaire-au-profit-de-la-societe-du-gran",
+      "nom": "Taxe spéciale complémentaire…",
+      "nom_complet": "Taxe spéciale complémentaire au profit de la Société du Grand Projet du Sud-Ouest (IF-AUT-150)",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-speciale-d-equipement-au-profit-des-etablissements-publ",
+      "nom": "Taxe spéciale d'équipement…",
+      "nom_complet": "Taxe spéciale d'équipement au profit des établissements publics fonciers locaux et de l'office foncier de Corse",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-speciale-d-equipement-au-profit-des-etablissements-publ",
+      "nom": "Taxe spéciale d'équipement…",
+      "nom_complet": "Taxe spéciale d'équipement au profit des établissements publics fonciers de l’État",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-speciale-d-equipement-au-profit-des-etablissements-publ",
+      "nom": "Taxe spéciale d'équipement…",
+      "nom_complet": "Taxe spéciale d'équipement au profit des établissements publics fonciers et d'aménagement de la Guyane et de Mayotte",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-speciale-d-equipement-au-profit-de-l-agence-pour-la-mis",
+      "nom": "Taxe spéciale d'équipement…",
+      "nom_complet": "Taxe spéciale d'équipement au profit de l'agence pour la mise en valeur des espaces urbains de la zone dite des cinquante pas géométriques en Guadeloupe",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-speciale-d-equipement-au-profit-de-l-agence-pour-la-mis",
+      "nom": "Taxe spéciale d'équipement…",
+      "nom_complet": "Taxe spéciale d'équipement au profit de l'agence pour la mise en valeur des espaces urbains de la zone dite des cinquante pas géométriques en Martinique.",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-speciale-d-equipement-au-profit-de-l-etablissement-publ",
+      "nom": "Taxe spéciale d'équipement…",
+      "nom_complet": "Taxe spéciale d'équipement au profit de l'établissement public Société des grands projets",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-speciale-d-equipement-au-profit-de-l-etablissement-publ",
+      "nom": "Taxe spéciale d'équipement…",
+      "nom_complet": "Taxe spéciale d'équipement au profit de l'établissement public local Société du Grand Projet du Sud-Ouest",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-additionnelle-speciale-annuelle-percue-au-profit-de-la-",
+      "nom": "Taxe additionnelle…",
+      "nom_complet": "Taxe additionnelle spéciale annuelle perçue au profit de la région Île-de-France (IF-AUT-130)",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-annuelle-sur-les-surfaces-de-stationnement-percue-en-il",
+      "nom": "Taxe annuelle sur les…",
+      "nom_complet": "Taxe annuelle sur les surfaces de stationnement perçue en Île-de-France (IF-AUT-140)",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-sur-la-valeur-venale-des-immeubles-des-entites-juridiqu",
+      "nom": "Taxe sur la valeur…",
+      "nom_complet": "Taxe sur la valeur vénale des immeubles des entités juridiques (PAT-TPC)",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "contribution-exceptionnelle-sur-les-hauts-revenus-ir-chr",
+      "nom": "Contribution exceptionnelle…",
+      "nom_complet": "Contribution exceptionnelle sur les hauts revenus (IR-CHR)",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-additionnelle-a-l-accise-sur-les-tabacs",
+      "nom": "Taxe additionnelle…",
+      "nom_complet": "Taxe additionnelle à l’accise sur les tabacs",
+      "recette": null,
+      "annee": 2025
+    },
+    {
+      "id": "participation-des-employeurs-agricoles-a-l-effort-de-constru",
+      "nom": "Participation des employeurs…",
+      "nom_complet": "Participation des employeurs agricoles à l'effort de construction (TPS-PEEC-60)",
+      "recette": null,
+      "annee": 2006
+    },
+    {
+      "id": "cotisation-additionnelle-assise-sur-le-montant-total-des-hon",
+      "nom": "Cotisation additionnelle…",
+      "nom_complet": "Cotisation additionnelle assise sur le montant total des honoraires facturés par les commissaires aux comptes lorsqu'ils certifient les comptes ou les informations en matière de durabilité des entités d'intérêt public",
+      "recette": null,
+      "annee": 2017
+    },
+    {
+      "id": "contribution-forfaitaire-des-commissaires-aux-comptes-exerca",
+      "nom": "Contribution forfaitaire…",
+      "nom_complet": "Contribution forfaitaire des commissaires aux comptes exerçant dans les pays tiers",
+      "recette": null,
+      "annee": 2017
+    },
+    {
+      "id": "cotisation-assise-sur-le-montant-total-des-honoraires-factur",
+      "nom": "Cotisation assise sur…",
+      "nom_complet": "Cotisation assise sur le montant total des honoraires facturés par les organismes tiers indépendants lorsqu'ils certifient les informations en matière de durabilité",
+      "recette": null,
+      "annee": 2017
+    },
+    {
+      "id": "cotisation-additionnelle-assise-sur-le-montant-total-des-hon",
+      "nom": "Cotisation additionnelle…",
+      "nom_complet": "Cotisation additionnelle assise sur le montant total des honoraires facturés par les organismes tiers indépendants lorsqu'ils certifient les informations en matière de durabilité des entités d'intérêt public",
+      "recette": null,
+      "annee": 2017
+    },
+    {
+      "id": "eco-contribution-sur-la-taxe-de-solidarite-sur-les-billets-d",
+      "nom": "Eco-contribution sur…",
+      "nom_complet": "Eco-contribution sur la taxe de solidarité sur les billets d'avion",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-d-aeroport",
+      "nom": "Taxe d'aéroport",
+      "nom_complet": "Taxe d'aéroport",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-d-embarquement-sur-les-passagers-dans-les-territoires-d",
+      "nom": "Taxe d'embarquement…",
+      "nom_complet": "Taxe d'embarquement sur les passagers dans les territoires d'outre-mer",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-d-atterrissage",
+      "nom": "Taxe d'atterrissage",
+      "nom_complet": "Taxe d'atterrissage",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "csg",
+      "nom": "CSG",
+      "nom_complet": "CSG",
+      "recette": "147500 millions d'euros",
+      "annee": null
+    },
+    {
+      "id": "crds",
+      "nom": "CRDS",
+      "nom_complet": "CRDS",
+      "recette": "8853 millions d'euros",
+      "annee": 1996
+    },
+    {
+      "id": "contribution-solidarite-autonomie",
+      "nom": "Contribution solidarité…",
+      "nom_complet": "Contribution solidarité autonomie",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "assurance-maladie-maternite-invalidite-deces",
+      "nom": "Assurance maladie -…",
+      "nom_complet": "Assurance maladie - maternité - invalidité - décès",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "assurance-vieillesse-plafonnee",
+      "nom": "Assurance vieillesse…",
+      "nom_complet": "Assurance vieillesse plafonnée",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "assurance-vieillesse-deplafonnee",
+      "nom": "Assurance vieillesse…",
+      "nom_complet": "Assurance vieillesse déplafonnée",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "allocations-familiales",
+      "nom": "Allocations familiales",
+      "nom_complet": "Allocations familiales",
+      "recette": "35600 millions d'euros",
+      "annee": null
+    },
+    {
+      "id": "accidents-du-travail",
+      "nom": "Accidents du travail",
+      "nom_complet": "Accidents du travail",
+      "recette": "16000 millions d'euros",
+      "annee": null
+    },
+    {
+      "id": "aide-au-logement-entreprise-de-moins-de-50-salaries-fnal",
+      "nom": "Aide au logement entreprise…",
+      "nom_complet": "Aide au logement entreprise de moins de 50 salariés (FNAL)",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "supplement-entreprise-de-50-salaries-et-plus-fnal",
+      "nom": "Supplément entreprise…",
+      "nom_complet": "Supplément entreprise de 50 salariés et plus (FNAL)",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "cotisation-chomage",
+      "nom": "Cotisation chômage",
+      "nom_complet": "Cotisation chômage",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "fonds-national-de-garantie-des-salaires-ags",
+      "nom": "Fonds national de garantie…",
+      "nom_complet": "Fonds national de garantie des salaires (AGS)",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "retraite-complementaire-ceg-tranche-1",
+      "nom": "Retraite complémentaire…",
+      "nom_complet": "Retraite complémentaire CEG tranche 1",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "retraite-complementaire-ceg-tranche-2",
+      "nom": "Retraite complémentaire…",
+      "nom_complet": "Retraite complémentaire CEG tranche 2",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "retraite-complementaire-apec-cadres-seulement",
+      "nom": "Retraite complémentaire…",
+      "nom_complet": "Retraite complémentaire APEC (cadres seulement)",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "retraite-complementaire-contribution-patronale-de-prevoyance",
+      "nom": "Retraite complémentaire…",
+      "nom_complet": "Retraite complémentaire Contribution patronale de prévoyance (forfait social) entreprises de 11 à 49 salariés",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "retraite-complementaire-contribution-patronale-de-prevoyance",
+      "nom": "Retraite complémentaire…",
+      "nom_complet": "Retraite complémentaire Contribution patronale de prévoyance (forfait social) entreprises de 50 salariés et plus",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "retraite-complementaire-cotisations-de-base",
+      "nom": "Retraite complémentaire…",
+      "nom_complet": "Retraite complémentaire Cotisations de base",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "retraite-complementaire-tranche-1",
+      "nom": "Retraite complémentaire…",
+      "nom_complet": "Retraite complémentaire tranche 1",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "retraite-complementaire-tranche-2",
+      "nom": "Retraite complémentaire…",
+      "nom_complet": "Retraite complémentaire tranche 2",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "retraite-complementaire-cet-t1-t2-si-remuneration-superieure",
+      "nom": "Retraite complémentaire…",
+      "nom_complet": "Retraite complémentaire CET: T1 + T2 si rémunération supérieure au plafond de la Sécurité sociale (3.666 €)",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "assurance-deces-cadre-adhesion-obligatoire-pour-les-cadres-q",
+      "nom": "assurance décès cadre…",
+      "nom_complet": "assurance décès cadre (adhésion obligatoire pour les cadres quel que soit le secteur d'activité)",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "contribution-formation-professionnelle-entreprise-de-moins-d",
+      "nom": "Contribution formation…",
+      "nom_complet": "Contribution formation professionnelle Entreprise de moins de 11 salariés",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "contribution-formation-professionnelle-entreprise-de-11-sala",
+      "nom": "Contribution formation…",
+      "nom_complet": "Contribution formation professionnelle Entreprise de 11 salariés ou plus",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "contribution-formation-professionnelle-entreprise-avec-cdd-c",
+      "nom": "Contribution formation…",
+      "nom_complet": "Contribution formation professionnelle Entreprise avec CDD (CPF-CDD)",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-d-apprentissage",
+      "nom": "Taxe d'apprentissage",
+      "nom_complet": "Taxe d'apprentissage",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "taxe-sur-les-salaires-employeur-non-assujetti-a-la-tva",
+      "nom": "Taxe sur les salaires…",
+      "nom_complet": "Taxe sur les salaires (employeur non assujetti à la TVA)",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "versement-mobilite-transport-entreprises-de-11-salaries-et-p",
+      "nom": "Versement mobilité…",
+      "nom_complet": "Versement mobilité (transport) entreprises de 11 salariés et plus",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "participation-a-l-effort-de-construction-entreprises-de-50-s",
+      "nom": "Participation à l'effort…",
+      "nom_complet": "Participation à l'effort de construction (entreprises de 50 salariés et plus)",
+      "recette": null,
+      "annee": null
+    },
+    {
+      "id": "contribution-au-dialogue-social",
+      "nom": "Contribution au Dialogue…",
+      "nom_complet": "Contribution au Dialogue social",
+      "recette": null,
+      "annee": null
+    }
+  ]
+}

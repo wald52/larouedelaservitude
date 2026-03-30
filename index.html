@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="description" content="La roue de la servitude - Découvrez les 371 taxes et prélèvements obligatoires français de manière ludique. Une application web progressive (PWA) utilisable hors ligne." />
 <title>La roue de la servitude</title>
   
 <!-- Favicons (nouveaux fichiers dans le dossier /icons) -->
@@ -225,14 +226,49 @@ body {
 </div>
 
 <script type="module">
-  import { getEntries } from "/larouedelaservitude/js/entries.js";
-  const ENTRIES = getEntries();
+  import { initWheel, loadFullData, getEntryDetails, formatEntryForDisplay } from "/larouedelaservitude/js/entries.js";
 
+// ===============================
+//  INITIALISATION ASYNCHRONE
+// ===============================
+let ENTRIES = [];        // Noms courts pour la roue
+let ENTRY_COLORS = [];   // Couleurs associées
+let entriesData = [];    // Données complètes avec id, nom, recette, annee
+
+// Initialiser la roue avec les données légères
+async function initializeApp() {
+  try {
+    // Charger les données légères (noms courts)
+    const lightData = await initWheel();
+    ENTRIES = lightData.map(e => e.nom);
+    entriesData = lightData;
+    
+    // Initialiser les couleurs
+    buildColors();
+    
+    // Construire la roue
+    buildStaticWheel();
+    
+    // Mettre à jour le compteur
+    document.getElementById('countInfo').textContent = ENTRIES.length + " éléments restants";
+    
+    // Charger les données complètes en arrière-plan
+    loadFullData().then(() => {
+      console.log('[APP] Données complètes chargées');
+    });
+    
+    console.log('[APP] Roue initialisée avec', ENTRIES.length, 'entrées');
+  } catch (e) {
+    console.error('[APP] Erreur initialisation:', e);
+    ENTRIES = ['Erreur de chargement', 'Veuillez rafraîchir la page'];
+    buildStaticWheel();
+  }
+}
 
 // Créer un pool d'objets Audio pour le son de rotation
 const spinSoundPool = [];
-const poolSize = 1; // Nombre d'objets Audio dans le pool
-  
+const poolSize = 1;
+
 // Créer un contexte audio
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
@@ -254,6 +290,9 @@ for (let i = 0; i < poolSize; i++) {
     sound.preload = "auto";
     spinSoundPool.push(sound);
 }
+
+// Démarrer l'initialisation
+initializeApp();
 
 
   
@@ -286,11 +325,17 @@ const off = document.createElement('canvas'); off.width = W; off.height = H; con
 
 /* COLORS PERSISTANTES */
 const COLOR_PALETTE = ["#f87171","#60a5fa","#34d399","#fbbf24","#a78bfa","#fb923c","#2dd4bf","#c084fc"];
-let entryColors = [];
+
 function buildColors(){
-  if(entryColors.length === 0) for(let i=0;i<ENTRIES.length;i++) entryColors.push(COLOR_PALETTE[i%COLOR_PALETTE.length]);
-  while(entryColors.length < ENTRIES.length) entryColors.push(COLOR_PALETTE[entryColors.length % COLOR_PALETTE.length]);
-  return entryColors;
+  if (ENTRY_COLORS.length === 0) {
+    for (let i = 0; i < ENTRIES.length; i++) {
+      ENTRY_COLORS.push(COLOR_PALETTE[i % COLOR_PALETTE.length]);
+    }
+  }
+  while (ENTRY_COLORS.length < ENTRIES.length) {
+    ENTRY_COLORS.push(COLOR_PALETTE[ENTRY_COLORS.length % COLOR_PALETTE.length]);
+  }
+  return ENTRY_COLORS;
 }
 
 /* IMAGE CENTRALE */
@@ -465,7 +510,7 @@ function getSelectedIndex(a){
   return Math.floor(theta / step);
 }
 
-function showOverlay(text){
+async function showOverlay(entryIndex){
   const intros = [
     "🎯 Le Fisc a parlé !",
     "✨ Voici votre contribution :",
@@ -478,10 +523,10 @@ function showOverlay(text){
     "💣 Boom ! Voici votre prochaine taxe !"
   ];
   const intro = intros[Math.floor(Math.random()*intros.length)];
-  const formatted = String(text)
-    .replace(/(Recette\s*:)/gi,"\n$1")
-    .replace(/(Date de création\s*:)/gi,"\n$1")
-    .replace(/\n/g,"<br>");
+  
+  // Récupérer les détails complets de l'entrée
+  const entry = await getEntryDetails(entryIndex);
+  const formatted = formatEntryForDisplay(entry);
 
   // 💬 contenu principal du résultat
   overlayText.innerHTML = `
@@ -498,18 +543,21 @@ function showOverlay(text){
   // 🧩 branche les deux boutons à ton formulaire Netlify
   const infoBtn = document.getElementById("btn-info");
   const errorBtn = document.getElementById("btn-error");
+  
+  // Stocker le texte complet pour le feedback
+  const feedbackText = entry ? `${entry.nom_complet}${entry.recette ? ' - Recette: ' + entry.recette : ''}${entry.annee ? ' - Année: ' + entry.annee : ''}` : ENTRIES[entryIndex];
 
   if (infoBtn && errorBtn) {
     infoBtn.addEventListener("click", (e) => {
       e.preventDefault();
       const userMsg = prompt("💬 Ajoutez votre complément d'information :");
-      if (userMsg) sendFeedbackToGitHub(text, userMsg, "info");
+      if (userMsg) sendFeedbackToGitHub(feedbackText, userMsg, "info");
     });
 
     errorBtn.addEventListener("click", (e) => {
       e.preventDefault();
       const userMsg = prompt("⚠️ Décrivez l'erreur que vous avez trouvée :");
-      if (userMsg) sendFeedbackToGitHub(text, userMsg, "error");
+      if (userMsg) sendFeedbackToGitHub(feedbackText, userMsg, "error");
     });
   }
 }
@@ -628,7 +676,6 @@ function animate(){
       showedResult = true;
       const idx = getSelectedIndex(angle);
       if (idx >= 0 && ENTRIES[idx] !== undefined) {
-        const chosen = ENTRIES[idx];
 //        try { coinSound.play().catch(()=>{}); } catch(e){}
           try {
             if (coinSoundBuffer) {
@@ -645,11 +692,16 @@ function animate(){
           } catch(e) {
             console.error("Erreur dans playCoinSound : ", e);
           }
-        showOverlay(chosen);
-        ENTRIES.splice(idx,1);
-        entryColors.splice(idx,1);
+        
+        // Afficher l'overlay avec les détails complets (async)
+        showOverlay(idx);
+        
+        // Supprimer l'entrée de la roue
+        ENTRIES.splice(idx, 1);
+        ENTRY_COLORS.splice(idx, 1);
         buildStaticWheel();
         document.getElementById('countInfo').textContent = ENTRIES.length + " éléments restants";
+        
         setTimeout(()=>{ hasBeenSpun = false; }, 300);
       }
     }
@@ -686,9 +738,9 @@ document.addEventListener("visibilitychange", () => {
         showedResult = true;
         const idx = getSelectedIndex(angle);
         if (idx >= 0 && ENTRIES[idx] !== undefined) {
-          showOverlay(ENTRIES[idx]);
+          showOverlay(idx);
           ENTRIES.splice(idx,1);
-          entryColors.splice(idx,1);
+          ENTRY_COLORS.splice(idx,1);
           buildStaticWheel();
           document.getElementById('countInfo').textContent = ENTRIES.length + " éléments restants";
           setTimeout(()=>{ hasBeenSpun = false; },300);
