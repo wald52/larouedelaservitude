@@ -289,6 +289,7 @@ const BOOST = 0.05 * rotationFactor;
 const BASE_DAMPING = 0.9945 + (rotationFactor - 1) * 0.0015;
 const LERP = 0.10;
 const INTRO_DURATION_MS = 650;
+const CENTER_INTRO_DURATION_MS = 360;
 const LABEL_MIN_ARC_PX = 20;
 const HTML2CANVAS_SRC = 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
 
@@ -324,6 +325,14 @@ const introState = {
   duration: INTRO_DURATION_MS
 };
 
+const centerIntroState = {
+  active: false,
+  completed: false,
+  pending: false,
+  startTime: 0,
+  duration: CENTER_INTRO_DURATION_MS
+};
+
 /* COLORS PERSISTANTES */
 const COLOR_PALETTE = ["#f87171", "#60a5fa", "#34d399", "#fbbf24", "#a78bfa", "#fb923c", "#2dd4bf", "#c084fc"];
 
@@ -334,6 +343,11 @@ centerImg.src = 'images/center3.avif';
 let centerLoaded = false;
 centerImg.onload = () => {
   centerLoaded = true;
+  if (centerIntroState.pending && !centerIntroState.completed) {
+    centerIntroState.pending = false;
+    startCenterIntro();
+    return;
+  }
   drawWheel(angle);
 };
 
@@ -504,6 +518,13 @@ function buildWheelLayers() {
   buildLabelLayer();
 }
 
+function resetCenterIntro() {
+  centerIntroState.active = false;
+  centerIntroState.completed = false;
+  centerIntroState.pending = false;
+  centerIntroState.startTime = 0;
+}
+
 function drawBuiltSectors(progress = 1) {
   if (progress >= 1 || ENTRIES.length === 0) {
     ctx.drawImage(sectorLayer, -CX, -CY, W, H);
@@ -539,12 +560,61 @@ function drawBuiltSectors(progress = 1) {
   }
 }
 
-function drawCenterLayer() {
+function startCenterIntro(now = performance.now()) {
+  if (centerIntroState.completed || centerIntroState.active) return;
+
+  if (!centerLoaded) {
+    centerIntroState.pending = true;
+    return;
+  }
+
+  centerIntroState.pending = false;
+  centerIntroState.active = true;
+  centerIntroState.startTime = now;
+  scheduleAnimationFrame();
+}
+
+function completeCenterIntro() {
+  centerIntroState.active = false;
+  centerIntroState.pending = false;
+  centerIntroState.completed = true;
+}
+
+function getCenterIntroProgress(now = performance.now()) {
+  if (centerIntroState.completed) {
+    return 1;
+  }
+
+  if (!centerLoaded) {
+    return 0;
+  }
+
+  if (!centerIntroState.active) {
+    return 0;
+  }
+
+  const rawProgress = Math.min(1, Math.max(0, (now - centerIntroState.startTime) / centerIntroState.duration));
+
+  if (rawProgress >= 1) {
+    completeCenterIntro();
+    return 1;
+  }
+
+  return easeOutCubic(rawProgress);
+}
+
+function drawCenterLayer(now = performance.now()) {
   if (!centerLoaded) return;
+
+  const progress = getCenterIntroProgress(now);
+  if (progress <= 0) return;
 
   const imgSize = R * 1.05;
   ctx.save();
   ctx.rotate(Math.PI / 2);
+  ctx.globalAlpha = progress;
+  const scale = 0.82 + (0.18 * progress);
+  ctx.scale(scale, scale);
   ctx.beginPath();
   ctx.arc(0, 0, imgSize / 2, 0, Math.PI * 2);
   ctx.closePath();
@@ -562,6 +632,7 @@ function getIntroProgress(now = performance.now()) {
 
   if (rawProgress >= 1) {
     introState.active = false;
+    startCenterIntro(now);
     return 1;
   }
 
@@ -571,10 +642,12 @@ function getIntroProgress(now = performance.now()) {
 function finishIntroBuild() {
   if (!introState.active) return;
   introState.active = false;
+  completeCenterIntro();
   drawWheel(angle);
 }
 
 function runIntroBuild() {
+  resetCenterIntro();
   introState.active = true;
   introState.startTime = performance.now();
   introState.duration = INTRO_DURATION_MS;
@@ -598,7 +671,7 @@ function drawWheel(a, now = performance.now()) {
     ctx.drawImage(labelLayer, -CX, -CY, W, H);
   }
 
-  drawCenterLayer();
+  drawCenterLayer(now);
   ctx.restore();
 }
 
@@ -688,7 +761,7 @@ function scheduleDeferredInit() {
 }
 
 function shouldAnimate() {
-  return introState.active || Math.abs(angularVelocity) > 0.001 || Math.abs(targetVelocity) > 0.001;
+  return introState.active || centerIntroState.active || Math.abs(angularVelocity) > 0.001 || Math.abs(targetVelocity) > 0.001;
 }
 
 async function initializeApp() {
@@ -731,6 +804,7 @@ function boostWheel(e) {
   }
 
   finishIntroBuild();
+  completeCenterIntro();
   ensureAudioInitialized();
   hasBeenSpun = true;
 
