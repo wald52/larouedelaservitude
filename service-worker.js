@@ -1,5 +1,5 @@
 // Version du cache - À INCRÉMENTER à chaque déploiement
-const CACHE_VERSION = 'v12';
+const CACHE_VERSION = 'v13';
 const CACHE_NAME = `larouedelaservitude-${CACHE_VERSION}`;
 
 /*
@@ -14,13 +14,16 @@ const CACHE_NAME = `larouedelaservitude-${CACHE_VERSION}`;
    - Tous les fichiers critiques sont pré-cachés à l'installation
    - Fonctionne sans connexion après première visite
 
-   📊 STRATÉGIES (TOUS en Network First) :
+   📊 STRATÉGIES (100% Network First) :
    - HTML : Network First (toujours le dernier)
    - JS/CSS : Network First (MAJ auto + offline)
    - JSON : Network First (entries.json toujours à jour)
-   - Images/Fonts : Cache First (statiques, ne changent jamais)
+   - Images : Network First (icônes, centre roue, etc.)
+   - Fonts : Network First (toujours à jour)
    - Audio : Network First (pré-cachés mais vérifiés)
    - Tout autre fichier : Network First (fallback global)
+   
+   💯 TOUS les fichiers sont vérifiés sur le réseau en premier !
 */
 
 const BASE = '/larouedelaservitude';
@@ -197,24 +200,24 @@ self.addEventListener("fetch", (event) => {
     );
   }
 
-  // 🖼️ Images et fonts → Cache First (assets statiques)
-  // Une fois chargés, ils ne changent jamais
+  // 🖼️ Images et fonts → Network First avec fallback cache
+  // Même les images sont vérifiées à chaque fois (MAJ auto)
   if (url.pathname.match(/\.(png|jpg|jpeg|gif|svg|webp|ico|woff|woff2|ttf|eot)$/i)) {
     return event.respondWith(
-      caches.match(request)
-        .then((cacheRes) => {
-          if (cacheRes) return cacheRes;
+      fetch(request)
+        .then((res) => {
+          if (!res || res.status !== 200) return res;
           
-          return fetch(request)
-            .then((res) => {
-              if (!res || res.status !== 200) return res;
-              const clone = res.clone();
-              caches.open(CACHE_NAME).then((cache) => {
-                cache.put(request, clone);
-              });
-              return res;
-            })
-            .catch(() => null);
+          const clone = res.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(request, clone);
+            console.log('[SW] Image/Font: cache mis à jour:', url.pathname);
+          });
+          return res;
+        })
+        .catch(() => {
+          console.log('[SW] Image/Font: fallback sur cache (offline):', url.pathname);
+          return caches.match(request);
         })
     );
   }
