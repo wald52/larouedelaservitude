@@ -167,7 +167,6 @@ function createMenuHTML() {
   sidebar.innerHTML = `
     <div class="menu-header">
       <h2>Menu</h2>
-      <button class="menu-close" id="menuClose" aria-label="Fermer le menu">✕</button>
     </div>
     <div class="menu-nav">
       <button class="menu-item" data-panel="historique">
@@ -277,19 +276,12 @@ function createMenuHTML() {
 
 function attachMenuEvents() {
   const toggle = document.getElementById('menuToggle');
-  const close = document.getElementById('menuClose');
   const overlay = document.getElementById('menuOverlay');
-  const sidebar = document.getElementById('menuSidebar');
   const menuItems = document.querySelectorAll('.menu-item');
   
   // Ouvrir le menu
   toggle.addEventListener('click', () => {
     openMenu();
-  });
-  
-  // Fermer le menu
-  close.addEventListener('click', () => {
-    closeMenu();
   });
   
   overlay.addEventListener('click', () => {
