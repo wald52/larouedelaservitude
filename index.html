@@ -40,6 +40,9 @@
   --bubble-bg:#111; --bubble-fg:#fff; --close-bg:rgba(255,255,255,0.12); --close-hover:rgba(255,255,255,0.22);
   --share-bg:#fff; --share-fg:#111; --tooltip-bg:#111; --tooltip-fg:#fff;
   --modal-surface:#fff; --modal-text:#111; --modal-muted:#333;
+  --install-surface:#fff; --install-border:rgba(17,17,17,0.12); --install-shadow:0 18px 40px rgba(0,0,0,0.18);
+  --install-title:#111; --install-close:#4b5563; --install-close-hover:rgba(17,17,17,0.08);
+  --install-button:#c00; --install-button-hover:#900;
   --emoji-size:80px; --bg-size:200vw;
 }
 
@@ -50,6 +53,9 @@
   --bubble-bg:#f3f4f6; --bubble-fg:#101317; --close-bg:rgba(0,0,0,0.08); --close-hover:rgba(0,0,0,0.16);
   --share-bg:#101317; --share-fg:#f3f4f6; --tooltip-bg:#f3f4f6; --tooltip-fg:#101317;
   --modal-surface:#151922; --modal-text:#f3f4f6; --modal-muted:#cbd5e1;
+  --install-surface:#151922; --install-border:rgba(243,244,246,0.12); --install-shadow:0 18px 40px rgba(0,0,0,0.42);
+  --install-title:#f3f4f6; --install-close:#cbd5e1; --install-close-hover:rgba(243,244,246,0.1);
+  --install-button:#c00; --install-button-hover:#a30000;
 }
   
 /* 1️⃣ Tout hérite de la police principale */
@@ -202,6 +208,101 @@ body {
   color: var(--modal-muted) !important;
 }
 
+.install-banner{
+  position:fixed;
+  left:50%;
+  bottom:calc(16px + env(safe-area-inset-bottom, 0px));
+  transform:translate(-50%, calc(100% + 24px));
+  width:min(calc(100vw - 24px), 520px);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:12px 14px;
+  box-sizing:border-box;
+  border:1px solid var(--install-border);
+  border-radius:16px;
+  background:var(--install-surface);
+  box-shadow:var(--install-shadow);
+  z-index:9500;
+  opacity:0;
+  pointer-events:none;
+  transition:transform 0.24s ease, opacity 0.24s ease;
+}
+
+.install-banner.is-visible{
+  transform:translate(-50%, 0);
+  opacity:1;
+  pointer-events:auto;
+}
+
+.install-banner__title{
+  color:var(--install-title);
+  font-size:15px;
+  font-weight:700;
+  line-height:1.2;
+}
+
+.install-banner__actions{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-shrink:0;
+}
+
+.install-banner__button{
+  border:none;
+  border-radius:999px;
+  background:var(--install-button);
+  color:#fff;
+  padding:8px 14px;
+  font-size:14px;
+  font-weight:700;
+  cursor:pointer;
+  transition:background 0.2s ease, transform 0.15s ease;
+}
+
+.install-banner__button:hover{
+  background:var(--install-button-hover);
+}
+
+.install-banner__button:active{
+  transform:scale(0.97);
+}
+
+.install-banner__close{
+  width:32px;
+  height:32px;
+  display:grid;
+  place-items:center;
+  border:none;
+  border-radius:50%;
+  background:transparent;
+  color:var(--install-close);
+  font-size:18px;
+  cursor:pointer;
+}
+
+.install-banner__close:hover{
+  background:var(--install-close-hover);
+}
+
+@media (max-width: 520px) {
+  .install-banner{
+    gap:10px;
+    padding:12px;
+  }
+
+  .install-banner__title{
+    font-size:14px;
+  }
+
+  .install-banner__button{
+    padding:8px 12px;
+    font-size:13px;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -218,6 +319,14 @@ body {
         <div class="legend" id="countInfo"></div>
       </div>
     </div>
+  </div>
+</div>
+
+<div id="installPrompt" class="install-banner" hidden aria-hidden="true">
+  <div class="install-banner__title">Installer l'application</div>
+  <div class="install-banner__actions">
+    <button id="installPromptAction" class="install-banner__button" type="button">Installer</button>
+    <button id="installPromptClose" class="install-banner__close" type="button" aria-label="Fermer">✕</button>
   </div>
 </div>
 
@@ -273,6 +382,9 @@ const ctx = canvas.getContext('2d');
 const wheelArea = document.getElementById('wheelArea');
 const btn = document.getElementById('spinBtn');
 const countInfo = document.getElementById('countInfo');
+const installPromptBanner = document.getElementById('installPrompt');
+const installPromptAction = document.getElementById('installPromptAction');
+const installPromptClose = document.getElementById('installPromptClose');
 const overlay = document.getElementById('overlay');
 const overlayText = document.getElementById('overlayText');
 const overlayClose = document.getElementById('overlayClose');
@@ -292,6 +404,7 @@ const INTRO_DURATION_MS = 650;
 const CENTER_INTRO_DURATION_MS = 360;
 const LABEL_MIN_ARC_PX = 20;
 const HTML2CANVAS_SRC = 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
+const INSTALL_PROMPT_SPIN_THRESHOLD = 3;
 
 /* STATE */
 let ENTRIES = [];
@@ -318,6 +431,10 @@ let audioInitPromise = null;
 let html2canvasPromise = null;
 let menuInitialized = false;
 let fullDataLoadScheduled = false;
+let deferredInstallPrompt = null;
+let completedSpinCount = 0;
+let installPromptDismissed = false;
+let installPromptPendingAfterOverlay = false;
 
 const introState = {
   active: false,
@@ -353,6 +470,117 @@ centerImg.onload = () => {
 
 function easeOutCubic(t) {
   return 1 - Math.pow(1 - t, 3);
+}
+
+function isAppInstalled() {
+  return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+}
+
+function isOverlayOpen() {
+  return overlay.getAttribute('aria-hidden') === 'false';
+}
+
+function showInstallPromptBanner() {
+  if (!installPromptBanner || isAppInstalled()) return;
+  installPromptBanner.hidden = false;
+  installPromptBanner.setAttribute('aria-hidden', 'false');
+  requestAnimationFrame(() => {
+    installPromptBanner.classList.add('is-visible');
+  });
+}
+
+function hideInstallPromptBanner() {
+  if (!installPromptBanner) return;
+  installPromptBanner.classList.remove('is-visible');
+  installPromptBanner.setAttribute('aria-hidden', 'true');
+  clearTimeout(window._installPromptHideTimer);
+  window._installPromptHideTimer = setTimeout(() => {
+    if (!installPromptBanner.classList.contains('is-visible')) {
+      installPromptBanner.hidden = true;
+    }
+  }, 260);
+}
+
+function shouldShowInstallPrompt() {
+  return Boolean(deferredInstallPrompt)
+    && !installPromptDismissed
+    && !isAppInstalled()
+    && completedSpinCount >= INSTALL_PROMPT_SPIN_THRESHOLD;
+}
+
+function syncInstallPromptVisibility() {
+  if (!shouldShowInstallPrompt()) {
+    installPromptPendingAfterOverlay = false;
+    hideInstallPromptBanner();
+    return;
+  }
+
+  if (isOverlayOpen()) {
+    installPromptPendingAfterOverlay = true;
+    hideInstallPromptBanner();
+    return;
+  }
+
+  installPromptPendingAfterOverlay = false;
+  showInstallPromptBanner();
+}
+
+function registerCompletedSpin() {
+  completedSpinCount += 1;
+  syncInstallPromptVisibility();
+}
+
+function hideResultOverlay() {
+  overlay.style.display = 'none';
+  overlay.setAttribute('aria-hidden', 'true');
+
+  if (installPromptPendingAfterOverlay) {
+    syncInstallPromptVisibility();
+  }
+}
+
+window.addEventListener('beforeinstallprompt', (event) => {
+  event.preventDefault();
+  deferredInstallPrompt = event;
+  syncInstallPromptVisibility();
+});
+
+window.addEventListener('appinstalled', () => {
+  deferredInstallPrompt = null;
+  installPromptDismissed = true;
+  installPromptPendingAfterOverlay = false;
+  hideInstallPromptBanner();
+});
+
+if (installPromptClose) {
+  installPromptClose.addEventListener('click', () => {
+    installPromptDismissed = true;
+    installPromptPendingAfterOverlay = false;
+    hideInstallPromptBanner();
+  });
+}
+
+if (installPromptAction) {
+  installPromptAction.addEventListener('click', async () => {
+    if (!deferredInstallPrompt) return;
+
+    const installEvent = deferredInstallPrompt;
+    deferredInstallPrompt = null;
+    installPromptPendingAfterOverlay = false;
+    hideInstallPromptBanner();
+
+    try {
+      await installEvent.prompt();
+      await installEvent.userChoice;
+    } catch (error) {
+      console.warn('[PWA] Impossible d’ouvrir le prompt d’installation :', error);
+    }
+  });
+}
+
+const standaloneMediaQuery = window.matchMedia('(display-mode: standalone)');
+if (standaloneMediaQuery.addEventListener) {
+  standaloneMediaQuery.addEventListener('change', syncInstallPromptVisibility);
 }
 
 function scheduleAnimationFrame() {
@@ -969,8 +1197,8 @@ form.addEventListener('submit', async (e) => {
   }
 });
 
-overlayClose.addEventListener('click',()=>{ overlay.style.display='none'; overlay.setAttribute('aria-hidden','true'); });
-overlay.addEventListener('click', e => { if (e.target === overlay) { overlay.style.display='none'; overlay.setAttribute('aria-hidden','true'); }});
+overlayClose.addEventListener('click', hideResultOverlay);
+overlay.addEventListener('click', e => { if (e.target === overlay) { hideResultOverlay(); }});
 overlay.querySelector('.bubble').addEventListener('click', e => e.stopPropagation());
 copyBtn && copyBtn.addEventListener('click', async ()=>{
   try { await navigator.clipboard.writeText(overlayText.innerText); copyBtn.textContent = '✅'; setTimeout(()=>copyBtn.textContent='📋',800); }
@@ -986,6 +1214,7 @@ function finalizeSpinResult(idx) {
       recordSpin(entry);
     }
 
+    registerCompletedSpin();
     showOverlay(idx);
 
     if (!isInfiniteMode()) {
