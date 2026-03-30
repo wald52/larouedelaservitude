@@ -101,11 +101,13 @@
 
 /* Header du menu */
 .menu-header {
-  padding: 20px 16px;
+  padding: 20px 16px 20px 76px;
   border-bottom: 1px solid var(--menu-border);
   display: flex;
   align-items: center;
   justify-content: flex-start;
+  min-height: 44px;
+  box-sizing: border-box;
 }
 
 .menu-header h2 {
