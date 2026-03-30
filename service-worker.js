@@ -1,5 +1,5 @@
 // Version du cache - À INCRÉMENTER à chaque déploiement
-const CACHE_VERSION = 'v13';
+const CACHE_VERSION = 'v14';
 const CACHE_NAME = `larouedelaservitude-${CACHE_VERSION}`;
 
 /*
@@ -19,11 +19,13 @@ const CACHE_NAME = `larouedelaservitude-${CACHE_VERSION}`;
    - JS/CSS : Network First (MAJ auto + offline)
    - JSON : Network First (entries.json toujours à jour)
    - Images : Network First (icônes, centre roue, etc.)
-   - Fonts : Network First (toujours à jour)
    - Audio : Network First (pré-cachés mais vérifiés)
    - Tout autre fichier : Network First (fallback global)
    
    💯 TOUS les fichiers sont vérifiés sur le réseau en premier !
+   
+   ℹ️ FONTS : Aucun - utilisation de fonts système uniquement
+   (system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial)
 */
 
 const BASE = '/larouedelaservitude';
@@ -200,9 +202,9 @@ self.addEventListener("fetch", (event) => {
     );
   }
 
-  // 🖼️ Images et fonts → Network First avec fallback cache
+  // 🖼️ Images → Network First avec fallback cache
   // Même les images sont vérifiées à chaque fois (MAJ auto)
-  if (url.pathname.match(/\.(png|jpg|jpeg|gif|svg|webp|ico|woff|woff2|ttf|eot)$/i)) {
+  if (url.pathname.match(/\.(png|jpg|jpeg|gif|svg|webp|ico|avif)$/i)) {
     return event.respondWith(
       fetch(request)
         .then((res) => {
@@ -211,12 +213,12 @@ self.addEventListener("fetch", (event) => {
           const clone = res.clone();
           caches.open(CACHE_NAME).then((cache) => {
             cache.put(request, clone);
-            console.log('[SW] Image/Font: cache mis à jour:', url.pathname);
+            console.log('[SW] Image: cache mis à jour:', url.pathname);
           });
           return res;
         })
         .catch(() => {
-          console.log('[SW] Image/Font: fallback sur cache (offline):', url.pathname);
+          console.log('[SW] Image: fallback sur cache (offline):', url.pathname);
           return caches.match(request);
         })
     );
