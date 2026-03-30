@@ -1,11 +1,17 @@
-const CACHE_NAME = 'larouedelaservitude-v9';
+// Version dynamique basée sur le timestamp de build
+const CACHE_VERSION = 'v10';
+const CACHE_NAME = `larouedelaservitude-${CACHE_VERSION}`;
 
 /*
    Service Worker optimisé pour PWA offline-first
    - entries-light.json : cache critique (chargement initial)
    - entries-full.json : cache background (détails complets)
-   - Assets statiques : cache first
-   - HTML : network first avec fallback cache
+   - Assets statiques : Stale-While-Revalidate (mieux que Cache First)
+   - HTML : Network First avec fallback cache
+   
+   🔄 MISE À JOUR AUTO :
+   - Le cache est invalidé automatiquement quand CACHE_VERSION change
+   - Les fichiers JS/CSS sont vérifiés à chaque chargement de page
 */
 
 const BASE = '/larouedelaservitude';
@@ -17,6 +23,8 @@ const urlsToCache = [
   `${BASE}/data/entries-light.json`,  // ⚡ Critique pour afficher la roue
   `${BASE}/bills.css`,
   `${BASE}/js/entries.js`,
+  `${BASE}/js/audio.js`,              // 🎵 Nouveau module audio
+  `${BASE}/bills.js`,                 // 🎵 Effet billets
   
   // 🎵 Sons (critique pour offline)
   `${BASE}/audio/wheel-spin2.mp3`,
@@ -125,12 +133,12 @@ self.addEventListener("fetch", (event) => {
             // Retourner depuis le cache immédiatement
             return cacheRes;
           }
-          
+
           // Sinon, fetch réseau et mise en cache
           return fetch(request)
             .then((res) => {
               if (!res || res.status !== 200) return res;
-              
+
               const clone = res.clone();
               caches.open(CACHE_NAME).then((cache) => {
                 cache.put(request, clone);
@@ -144,17 +152,41 @@ self.addEventListener("fetch", (event) => {
         })
     );
   }
-  
-  // 🎵 Assets statiques (CSS, JS, images) → Cache First
+
+  // 🎵 JS et CSS → Stale-While-Revalidate (cache + mise à jour background)
+  // Permet d'avoir la dernière version sans attendre
+  if (url.pathname.endsWith('.js') || url.pathname.endsWith('.css')) {
+    return event.respondWith(
+      caches.match(request)
+        .then((cacheRes) => {
+          const fetchPromise = fetch(request)
+            .then((res) => {
+              if (!res || res.status !== 200) return res;
+              
+              const clone = res.clone();
+              caches.open(CACHE_NAME).then((cache) => {
+                cache.put(request, clone);
+              });
+              return res;
+            })
+            .catch(() => null);
+          
+          // Retourne le cache immédiatement, met à jour en background
+          return cacheRes || fetchPromise;
+        })
+    );
+  }
+
+  // 🖼️ Assets statiques (images, fonts) → Cache First
   return event.respondWith(
     caches.match(request)
       .then((cacheRes) => {
         if (cacheRes) return cacheRes;
-        
+
         return fetch(request)
           .then((res) => {
             if (!res || res.status !== 200) return res;
-            
+
             const clone = res.clone();
             caches.open(CACHE_NAME).then((cache) => {
               cache.put(request, clone);

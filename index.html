@@ -1002,6 +1002,22 @@ function sendFeedbackToGitHub(resultText, userMessage, type) {
       navigator.serviceWorker.register('/larouedelaservitude/service-worker.js')
         .then((registration) => {
           console.log('ServiceWorker enregistré avec succès : ', registration.scope);
+          
+          // 🔄 Détecter les mises à jour du Service Worker
+          registration.addEventListener('updatefound', () => {
+            const newWorker = registration.installing;
+            console.log('[SW] Nouvelle version disponible');
+            
+            newWorker.addEventListener('statechange', () => {
+              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                // Nouveau SW installé, ancien en contrôle
+                console.log('[SW] Contenu mis à jour disponible. Rafraîchir pour appliquer.');
+                
+                // Optionnel : Afficher un bouton "Mettre à jour"
+                // showUpdateBanner();
+              }
+            });
+          });
         })
         .catch((error) => {
           console.log('Échec de l\'enregistrement du ServiceWorker : ', error);
