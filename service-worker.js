@@ -1,24 +1,26 @@
 // Version du cache - À INCRÉMENTER à chaque déploiement
-const CACHE_VERSION = 'v11';
+const CACHE_VERSION = 'v12';
 const CACHE_NAME = `larouedelaservitude-${CACHE_VERSION}`;
 
 /*
    Service Worker PWA offline-first avec MAJ immédiate
    ================================================
-   
+
    🔄 MISE À JOUR IMMÉDIATE :
    - skipWaiting() + clients.claim() = activation instantanée
-   - Tous les onglets sont rechargés automatiquement avec la nouvelle version
-   
+   - Tous les onglets sont mis à jour automatiquement
+
    📦 CACHE OFFLINE :
    - Tous les fichiers critiques sont pré-cachés à l'installation
    - Fonctionne sans connexion après première visite
-   
-   📊 STRATÉGIES :
+
+   📊 STRATÉGIES (TOUS en Network First) :
    - HTML : Network First (toujours le dernier)
-   - JS/CSS : Network First avec fallback cache (MAJ auto + offline)
-   - JSON : Cache First (entries.json)
-   - Audio/Images : Cache First (une fois chargés = offline)
+   - JS/CSS : Network First (MAJ auto + offline)
+   - JSON : Network First (entries.json toujours à jour)
+   - Images/Fonts : Cache First (statiques, ne changent jamais)
+   - Audio : Network First (pré-cachés mais vérifiés)
+   - Tout autre fichier : Network First (fallback global)
 */
 
 const BASE = '/larouedelaservitude';
@@ -158,7 +160,7 @@ self.addEventListener("fetch", (event) => {
       fetch(request)
         .then((res) => {
           if (!res || res.status !== 200) return res;
-          
+
           const clone = res.clone();
           caches.open(CACHE_NAME).then((cache) => {
             cache.put(request, clone);
@@ -172,15 +174,37 @@ self.addEventListener("fetch", (event) => {
         })
     );
   }
-  
-  // 📊 JSON données → Cache First (sauf entries.json qui change souvent)
+
+  // 📊 TOUS les JSON → Network First avec fallback cache
+  // entries.json, site.webmanifest, etc. toujours à jour
   if (url.pathname.endsWith('.json')) {
+    return event.respondWith(
+      fetch(request)
+        .then((res) => {
+          if (!res || res.status !== 200) return res;
+          
+          const clone = res.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(request, clone);
+            console.log('[SW] JSON: cache mis à jour:', url.pathname);
+          });
+          return res;
+        })
+        .catch(() => {
+          console.log('[SW] JSON: fallback sur cache (offline):', url.pathname);
+          return caches.match(request);
+        })
+    );
+  }
+
+  // 🖼️ Images et fonts → Cache First (assets statiques)
+  // Une fois chargés, ils ne changent jamais
+  if (url.pathname.match(/\.(png|jpg|jpeg|gif|svg|webp|ico|woff|woff2|ttf|eot)$/i)) {
     return event.respondWith(
       caches.match(request)
         .then((cacheRes) => {
-          if (cacheRes) {
-            return cacheRes;
-          }
+          if (cacheRes) return cacheRes;
+          
           return fetch(request)
             .then((res) => {
               if (!res || res.status !== 200) return res;
@@ -194,23 +218,23 @@ self.addEventListener("fetch", (event) => {
         })
     );
   }
-  
-  // 🖼️ Assets statiques (images, fonts) → Cache First
+
+  // 🕳️ FALLBACK : Network First pour tout le reste
+  // Attrape tous les fichiers non listés ci-dessus
   return event.respondWith(
-    caches.match(request)
-      .then((cacheRes) => {
-        if (cacheRes) return cacheRes;
+    fetch(request)
+      .then((res) => {
+        if (!res || res.status !== 200) return res;
         
-        return fetch(request)
-          .then((res) => {
-            if (!res || res.status !== 200) return res;
-            const clone = res.clone();
-            caches.open(CACHE_NAME).then((cache) => {
-              cache.put(request, clone);
-            });
-            return res;
-          })
-          .catch(() => null);
+        const clone = res.clone();
+        caches.open(CACHE_NAME).then((cache) => {
+          cache.put(request, clone);
+        });
+        return res;
+      })
+      .catch(() => {
+        console.log('[SW] Fallback: récupération depuis le cache:', url.pathname);
+        return caches.match(request);
       })
   );
 });
