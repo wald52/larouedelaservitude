@@ -227,6 +227,7 @@ body {
 
 <script type="module">
   import { initWheel, loadFullData, getEntryDetails, formatEntryForDisplay } from "/larouedelaservitude/js/entries.js";
+  import { initAudio, playSpinClick, playWinSound } from "/larouedelaservitude/js/audio.js";
 
 // ===============================
 //  INITIALISATION ASYNCHRONE
@@ -257,38 +258,17 @@ async function initializeApp() {
       console.log('[APP] Données complètes chargées');
     });
     
+    // Initialiser le système audio (offline-safe)
+    initAudio().then(() => {
+      console.log('[APP] Audio prêt (offline-safe)');
+    });
+    
     console.log('[APP] Roue initialisée avec', ENTRIES.length, 'entrées');
   } catch (e) {
     console.error('[APP] Erreur initialisation:', e);
     ENTRIES = ['Erreur de chargement', 'Veuillez rafraîchir la page'];
     buildStaticWheel();
   }
-}
-
-// Créer un pool d'objets Audio pour le son de rotation
-const spinSoundPool = [];
-const poolSize = 1;
-
-// Créer un contexte audio
-const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-
-// Charger les fichiers audio
-let spinSoundBuffer = null;
-let coinSoundBuffer = null;
-
-Promise.all([
-    fetch('audio/wheel-spin2.mp3').then(response => response.arrayBuffer()).then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer)),
-    fetch('audio/coin4.mp3').then(response => response.arrayBuffer()).then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
-]).then(([spinBuffer, coinBuffer]) => {
-    spinSoundBuffer = spinBuffer;
-    coinSoundBuffer = coinBuffer;
-}).catch(e => console.error("Erreur lors du chargement des sons : ", e));
-
-for (let i = 0; i < poolSize; i++) {
-    const sound = new Audio('audio/wheel-spin2.mp3');
-    sound.volume = 0.7;
-    sound.preload = "auto";
-    spinSoundPool.push(sound);
 }
 
 // Démarrer l'initialisation
@@ -302,9 +282,6 @@ const wheelArea = document.getElementById('wheelArea');
 const btn = document.getElementById('spinBtn');
 const overlay = document.getElementById('overlay'), overlayText = document.getElementById('overlayText');
 const overlayClose = document.getElementById('overlayClose'), copyBtn = document.getElementById('copyText');
-
-const spinSoundSrc = 'audio/wheel-spin2.mp3'; // short click sound used per-sector
-const coinSound = new Audio('audio/coin4.mp3'); coinSound.volume = 0.95; coinSound.preload = "auto";
 
 /* Tuning */
 const rotationFactor = 1.4;
@@ -456,46 +433,11 @@ btn.addEventListener('click', boostWheel);
    SON PAR PASSAGE DE SECTEUR
    ======================= */
 
-function playSound(audioElement) {
-    audioElement.currentTime = 0; // Réinitialise le son au début
-    const playPromise = audioElement.play();
-
-    if (playPromise !== undefined) {
-        playPromise.catch(error => {
-            console.error("Erreur lors de la lecture du son :", error);
-        });
-    }
-}
-  
 animate && (animate.prevIndex = -1); // sécurité
 
 function playSectorClick() {
-    try {
-        const absVel = Math.abs(angularVelocity);
-        const rate = Math.min(2.5, Math.max(0.5, absVel * 80 + 0.5));
-
-        if (spinSoundBuffer) {
-            // Utiliser l'API Web Audio pour un contrôle plus fin
-            const source = audioContext.createBufferSource();
-            source.buffer = spinSoundBuffer;
-            source.playbackRate.value = 1.0;
-            source.connect(audioContext.destination);
-            source.start();
-        } else {
-            // Utiliser un objet du pool si l'API Web Audio n'est pas disponible
-            for (let i = 0; i < spinSoundPool.length; i++) {
-                const sound = spinSoundPool[i];
-                if (sound.paused || sound.ended) {
-                    sound.playbackRate = rate;
-                    sound.currentTime = 0;
-                    sound.play().catch(e => console.error("Erreur dans playSectorClick : ", e));
-                    break;
-                }
-            }
-        }
-    } catch(e) {
-        console.error("Erreur dans playSectorClick : ", e);
-    }
+    // Utiliser le module audio (offline-safe)
+    playSpinClick(Math.abs(angularVelocity));
 }
 
 /* =======================
@@ -676,23 +618,9 @@ function animate(){
       showedResult = true;
       const idx = getSelectedIndex(angle);
       if (idx >= 0 && ENTRIES[idx] !== undefined) {
-//        try { coinSound.play().catch(()=>{}); } catch(e){}
-          try {
-            if (coinSoundBuffer) {
-              // Utiliser l'API Web Audio pour un contrôle plus fin
-              const source = audioContext.createBufferSource();
-              source.buffer = coinSoundBuffer;
-              source.connect(audioContext.destination);
-              source.start();
-            } else {
-              // Utiliser l'objet Audio si l'API Web Audio n'est pas disponible
-              coinSound.currentTime = 0;
-              coinSound.play().catch(e => console.error("Erreur dans playCoinSound : ", e));
-            }
-          } catch(e) {
-            console.error("Erreur dans playCoinSound : ", e);
-          }
-        
+        // Jouer le son de victoire (module audio offline-safe)
+        playWinSound();
+
         // Afficher l'overlay avec les détails complets (async)
         showOverlay(idx);
         
@@ -734,7 +662,7 @@ document.addEventListener("visibilitychange", () => {
 
       if (Math.abs(angularVelocity) <= 0.001 && Math.abs(targetVelocity) <= 0.001 && hasBeenSpun && !showedResult) {
         angularVelocity = 0; targetVelocity = 0;
-        try { coinSound.play().catch(()=>{}); } catch(e){}
+        playWinSound(); // Module audio offline-safe
         showedResult = true;
         const idx = getSelectedIndex(angle);
         if (idx >= 0 && ENTRIES[idx] !== undefined) {

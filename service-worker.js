@@ -18,6 +18,11 @@ const urlsToCache = [
   `${BASE}/bills.css`,
   `${BASE}/js/entries.js`,
   
+  // 🎵 Sons (critique pour offline)
+  `${BASE}/audio/wheel-spin2.mp3`,
+  `${BASE}/audio/coin4.mp3`,
+  `${BASE}/audio/frottement-papier2.mp3`,
+  
   // 📱 Icônes pour PWA
   `${BASE}/icons/icon-192x192.png`,
   `${BASE}/icons/icon-512x512.png`,
