@@ -2,38 +2,67 @@
 // Usage: spawnBills(eventOrCoords, count)
 // eventOrCoords can be an Event (mousedown/touchstart) or {x:.., y:..}
 
+// Import du module audio pour le son offline-first
+let playBillAudio = null;
+
+// Fonction d'initialisation (appelée par index.html)
+export function initBills() {
+  // Import dynamique du module audio
+  import('./audio.js').then(({ playBillSound }) => {
+    playBillAudio = playBillSound;
+    console.log('[BILLS] Module audio chargé pour les sons de billets');
+  }).catch(e => {
+    console.warn('[BILLS] Module audio non disponible, fallback vers Audio()');
+    // Fallback vers l'ancienne méthode
+    const fallbackSound = new Audio('/larouedelaservitude/audio/frottement-papier2.mp3');
+    fallbackSound.volume = 1;
+    fallbackSound.preload = 'auto';
+    
+    playBillAudio = (delay) => {
+      setTimeout(() => {
+        const snd = fallbackSound.cloneNode(true);
+        snd.playbackRate = 1.35 + Math.random() * 0.20;
+        snd.play().catch(() => {});
+      }, delay);
+    };
+  });
+}
+
 (() => {
   const MAX_BILLS = 64;        // max éléments en DOM
-  const GRAVITY = 12;         // gravité
+  const GRAVITY = 12;          // gravité
   const AIR = 0.980;           // damping
-  const LIFETIME = 10000;       // durée avant fade
+  const LIFETIME = 10000;      // durée avant fade
   const SIZE_BASE = 24;        // taille de base emoji
   const OUTER_FORCE = 9.5;     // force initiale d'éjection
   const ROT_RANGE = 360;       // degrés max de rotation initiale
 
-  // son joué pour chaque billet
-  const billSoundBuffer = new Audio("audio/frottement-papier2.mp3");
-  billSoundBuffer.volume = 1;
-
-    let recentSounds = 0;
+  let recentSounds = 0;
   const MAX_SOUNDS_PER_SEC = 10;
 
-  setInterval(() => { 
-    recentSounds = 0; 
+  setInterval(() => {
+    recentSounds = 0;
   }, 1000);
 
-function playBillSound(i) {
-  if (recentSounds >= MAX_SOUNDS_PER_SEC) return;
-  recentSounds++;
+  function playBillSound(i) {
+    if (recentSounds >= MAX_SOUNDS_PER_SEC) return;
+    recentSounds++;
 
-  const snd = billSoundBuffer.cloneNode(true);
-
-  // 🎵 Variation subtile du pitch
-  snd.playbackRate = 1.35 + Math.random() * 0.20;
-
-  const delay = i * 40; 
-  setTimeout(() => snd.play().catch(() => {}), delay);
-}
+    const delay = i * 40;
+    
+    // Utiliser le module audio si disponible, sinon fallback
+    if (playBillAudio) {
+      playBillAudio(delay);
+    } else {
+      // Fallback immédiat si pas encore initialisé
+      setTimeout(() => {
+        const snd = new Audio('/larouedelaservitude/audio/frottement-papier2.mp3');
+        snd.volume = 0.5;
+        snd.playbackRate = 1.35 + Math.random() * 0.20;
+        snd.play().catch(() => {});
+      }, delay);
+    }
+  }
 
   /* ======================================================= */
 
@@ -43,7 +72,7 @@ function playBillSound(i) {
   const root = doc.body;
 
   // crée le pool
-  for (let i=0;i<MAX_BILLS;i++){
+  for (let i = 0; i < MAX_BILLS; i++) {
     const el = doc.createElement('div');
     el.className = 'bill';
     el.textContent = '💶';
@@ -52,59 +81,68 @@ function playBillSound(i) {
     el.style.opacity = '0';
     root.appendChild(el);
     pool.push({
-      el, inUse:false, x:-9999, y:-9999, vx:0, vy:0, rot:0, vrot:0, born:0, ttl:0
+      el, inUse: false, x: -9999, y: -9999, vx: 0, vy: 0, rot: 0, vrot: 0, born: 0, ttl: 0
     });
   }
 
-  function getOne(){
-    for (let i=0;i<pool.length;i++) if (!pool[i].inUse) return pool[i];
+  function getOne() {
+    for (let i = 0; i < pool.length; i++) {
+      if (!pool[i].inUse) return pool[i];
+    }
     return null;
   }
 
   // spawn en cercle autour du point (option C: ejection circulaire)
   window.spawnBills = function(ev, count = 12) {
-    let x = window.innerWidth/2, y = window.innerHeight/2;
+    let x = window.innerWidth / 2, y = window.innerHeight / 2;
 
     if (ev) {
-      if (ev.touches && ev.touches[0]) { x = ev.touches[0].clientX; y = ev.touches[0].clientY; }
-      else if (ev.clientX !== undefined) { x = ev.clientX; y = ev.clientY; }
-      else if (ev.x !== undefined && ev.y !== undefined) { x = ev.x; y = ev.y; }
+      if (ev.touches && ev.touches[0]) {
+        x = ev.touches[0].clientX;
+        y = ev.touches[0].clientY;
+      } else if (ev.clientX !== undefined) {
+        x = ev.clientX;
+        y = ev.clientY;
+      } else if (ev.x !== undefined && ev.y !== undefined) {
+        x = ev.x;
+        y = ev.y;
+      }
     }
 
-    const angleStep = (Math.PI*2) / Math.max(1, count);
+    const angleStep = (Math.PI * 2) / Math.max(1, count);
     const now = performance.now();
 
-    for (let i=0;i<count;i++){
+    for (let i = 0; i < count; i++) {
       const node = getOne();
       if (!node) break;
       node.inUse = true;
       node.el.style.opacity = '1';
 
       // place un peu décalé pour ne pas coller
-      const ox = Math.cos(i*angleStep) * (6 + Math.random()*20);
-      const oy = Math.sin(i*angleStep) * (6 + Math.random()*10);
+      const ox = Math.cos(i * angleStep) * (6 + Math.random() * 20);
+      const oy = Math.sin(i * angleStep) * (6 + Math.random() * 10);
       node.x = x + ox;
       node.y = y + oy;
       node.el.style.left = (node.x) + 'px';
       node.el.style.top = (node.y) + 'px';
 
       // taille aléatoire
-      const scale = 0.8 + Math.random()*1.6;
+      const scale = 0.8 + Math.random() * 1.6;
       node.el.style.fontSize = Math.round(SIZE_BASE * scale) + 'px';
 
       // vecteur initial : éjection en cercle + légère impulsion vers le haut
-      const dir = i*angleStep + (Math.random()-0.5)*(angleStep*0.4);
-      const spread = 0.6 + Math.random()*0.9;
-      const speed = OUTER_FORCE * (0.6 + Math.random()*0.9) * spread;
-      node.vx = Math.cos(dir) * speed + (Math.random()-0.5)*1.2;
-      node.vy = Math.sin(dir) * speed * 0.45 - (3 + Math.random()*2.5); // upward toss
+      const dir = i * angleStep + (Math.random() - 0.5) * (angleStep * 0.4);
+      const spread = 0.6 + Math.random() * 0.9;
+      const speed = OUTER_FORCE * (0.6 + Math.random() * 0.9) * spread;
+      node.vx = Math.cos(dir) * speed + (Math.random() - 0.5) * 1.2;
+      node.vy = Math.sin(dir) * speed * 0.45 - (3 + Math.random() * 2.5); // upward toss
 
       // rotation
-      node.rot = (Math.random()-0.5)*30;
-      node.vrot = (Math.random()-0.5) * (ROT_RANGE * 0.0025);
+      node.rot = (Math.random() - 0.5) * 30;
+      node.vrot = (Math.random() - 0.5) * (ROT_RANGE * 0.0025);
 
       node.born = now;
-      node.ttl = LIFETIME + Math.random()*900;
+      node.ttl = LIFETIME + Math.random() * 900;
       active.add(node);
 
       /* 🎵 SON POUR CE BILLET */
@@ -115,11 +153,11 @@ function playBillSound(i) {
 
   // animation loop
   let raf = null;
-  function step(now){
+  function step(now) {
     for (const node of Array.from(active)) {
       const dt = Math.min(40, now - node.born) / 16.67; // approx frames
       // physics
-      node.vy += GRAVITY * (Math.min(40, performance.now()-node.born)/1000) * 0.7; // small scaling
+      node.vy += GRAVITY * (Math.min(40, performance.now() - node.born) / 1000) * 0.7; // small scaling
       node.vx *= AIR;
       node.vy *= AIR;
 
@@ -149,11 +187,11 @@ function playBillSound(i) {
     }
   }
 
-  function startLoop(){
+  function startLoop() {
     if (!raf) raf = requestAnimationFrame(step);
   }
 
-  function release(node){
+  function release(node) {
     node.inUse = false;
     node.el.style.left = '-9999px';
     node.el.style.top = '-9999px';
@@ -164,13 +202,16 @@ function playBillSound(i) {
   }
 
   // optional API to clear everything
-  window.clearBills = function(){
+  window.clearBills = function() {
     for (const node of pool) release(node);
     active.clear();
   };
 
   // pause/resume (for visibility change)
-  window.pauseBills = function(){ /* no-op for now */ };
-  window.resumeBills = function(){ /* no-op for now */ };
+  window.pauseBills = function() { /* no-op for now */ };
+  window.resumeBills = function() { /* no-op for now */ };
 
 })();
+
+// Export de la fonction d'initialisation
+export { initBills };

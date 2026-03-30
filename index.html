@@ -1009,10 +1009,15 @@ function sendFeedbackToGitHub(resultText, userMessage, type) {
     });
   }
 
+  // Initialiser les billets (module ES6)
+  import('/larouedelaservitude/bills.js').then(({ initBills }) => {
+    if (initBills) {
+      initBills();
+      console.log('[APP] Bills initialisés');
+    }
+  });
 
-  
 </script>
-<script src="/larouedelaservitude/bills.js" defer></script>
 
 
 </body>
