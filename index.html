@@ -29,9 +29,6 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="/larouedelaservitude/icons/op-image.png">
 
-<!-- html2canvas pour la capture -->
-<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-
 <link rel="stylesheet" href="/larouedelaservitude/bills.css">
 <link rel="stylesheet" href="/larouedelaservitude/menu.css">
 
@@ -269,75 +266,21 @@ body {
 <script type="module">
   import { initWheel, loadFullData, getEntryDetails, formatEntryForDisplay } from "/larouedelaservitude/js/entries.js";
   import { initAudio, playSpinClick, playWinSound } from "/larouedelaservitude/js/audio.js";
-  import { initMenu, recordSpin, isInfiniteMode, isSoundEnabled } from "/larouedelaservitude/js/menu.js";
+  import { initMenu, loadHistory, loadSettings, recordSpin, isInfiniteMode } from "/larouedelaservitude/js/menu.js";
 
-// ===============================
-//  INITIALISATION ASYNCHRONE
-// ===============================
-let ENTRIES = [];        // Noms courts pour la roue
-let ENTRY_COLORS = [];   // Couleurs associées
-let entriesData = [];    // Données complètes avec id, nom, recette, annee
-
-// Initialiser la roue avec les données légères
-async function initializeApp() {
-  try {
-    // Initialiser le menu (historique + réglages)
-    initMenu();
-
-    // Charger les données légères (noms courts)
-    const lightData = await initWheel();
-    ENTRIES = lightData.map(e => e.nom);
-    entriesData = lightData;
-
-    // Initialiser les couleurs
-    buildColors();
-
-    // Construire la roue
-    buildStaticWheel();
-
-    // Mettre à jour le compteur
-    updateCountInfo();
-
-    // Dessiner la roue initiale
-    drawWheel(angle);
-
-    // Lancer l'animation
-    lastTime = performance.now();
-    window._animFrame = requestAnimationFrame(animate);
-
-    // Attacher les écouteurs d'événements
-    attachWheelListeners();
-
-    // Charger les données complètes en arrière-plan
-    loadFullData().then(() => {
-      console.log('[APP] Données complètes chargées');
-    });
-
-    // Initialiser le système audio (offline-safe)
-    initAudio().then(() => {
-      console.log('[APP] Audio prêt (offline-safe)');
-    });
-
-    console.log('[APP] Roue initialisée avec', ENTRIES.length, 'entrées');
-  } catch (e) {
-    console.error('[APP] Erreur initialisation:', e);
-    ENTRIES = ['Erreur de chargement', 'Veuillez rafraîchir la page'];
-    buildStaticWheel();
-  }
-}
-
-// Démarrer l'initialisation
-initializeApp();
-
-
-  
-const canvas = document.getElementById('wheel'), ctx = canvas.getContext('2d');
-const W = canvas.width, H = canvas.height, CX = W/2, CY = H/2, R = Math.min(W,H) * 0.48;
+const canvas = document.getElementById('wheel');
+const ctx = canvas.getContext('2d');
 const wheelArea = document.getElementById('wheelArea');
 const btn = document.getElementById('spinBtn');
 const countInfo = document.getElementById('countInfo');
-const overlay = document.getElementById('overlay'), overlayText = document.getElementById('overlayText');
-const overlayClose = document.getElementById('overlayClose'), copyBtn = document.getElementById('copyText');
+const overlay = document.getElementById('overlay');
+const overlayText = document.getElementById('overlayText');
+const overlayClose = document.getElementById('overlayClose');
+const copyBtn = document.getElementById('copyText');
+const sectorLayer = document.createElement('canvas');
+const sectorCtx = sectorLayer.getContext('2d');
+const labelLayer = document.createElement('canvas');
+const labelCtx = labelLayer.getContext('2d');
 
 /* Tuning */
 const rotationFactor = 1.4;
@@ -345,135 +288,450 @@ const MAX_VEL = 0.45 * rotationFactor;
 const BOOST = 0.05 * rotationFactor;
 const BASE_DAMPING = 0.9945 + (rotationFactor - 1) * 0.0015;
 const LERP = 0.10;
+const INTRO_DURATION_MS = 650;
+const LABEL_MIN_ARC_PX = 20;
+const HTML2CANVAS_SRC = 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
 
 /* STATE */
-let angle = -Math.PI/2;
+let ENTRIES = [];
+let ENTRY_COLORS = [];
+let angle = -Math.PI / 2;
 let angularVelocity = 0;
 let targetVelocity = 0;
-let frictionTimer = 0, frictionDuration = 0, frictionActive = false;
-let showedResult = false, hasBeenSpun = false;
+let frictionTimer = 0;
+let frictionDuration = 0;
+let frictionActive = false;
+let showedResult = false;
+let hasBeenSpun = false;
+let lastTime = 0;
+let canvasSize = 0;
+let deviceScale = 1;
+let W = 0;
+let H = 0;
+let CX = 0;
+let CY = 0;
+let R = 0;
+let labelRadius = 0;
+let audioReady = false;
+let audioInitPromise = null;
+let html2canvasPromise = null;
+let menuInitialized = false;
+let fullDataLoadScheduled = false;
 
-/* OFFSCREEN LAYER */
-const off = document.createElement('canvas'); off.width = W; off.height = H; const offctx = off.getContext('2d');
+const introState = {
+  active: false,
+  startTime: 0,
+  duration: INTRO_DURATION_MS
+};
 
 /* COLORS PERSISTANTES */
-const COLOR_PALETTE = ["#f87171","#60a5fa","#34d399","#fbbf24","#a78bfa","#fb923c","#2dd4bf","#c084fc"];
+const COLOR_PALETTE = ["#f87171", "#60a5fa", "#34d399", "#fbbf24", "#a78bfa", "#fb923c", "#2dd4bf", "#c084fc"];
 
-function buildColors(){
+/* IMAGE CENTRALE */
+const centerImg = new Image();
+centerImg.decoding = 'async';
+centerImg.src = 'images/center3.avif';
+let centerLoaded = false;
+centerImg.onload = () => {
+  centerLoaded = true;
+  drawWheel(angle);
+};
+
+function easeOutCubic(t) {
+  return 1 - Math.pow(1 - t, 3);
+}
+
+function scheduleAnimationFrame() {
+  if (window._animFrame) return;
+  window._animFrame = requestAnimationFrame(animate);
+}
+
+function stopAnimationFrame() {
+  if (!window._animFrame) return;
+  cancelAnimationFrame(window._animFrame);
+  window._animFrame = null;
+}
+
+function resetContext(targetCtx) {
+  targetCtx.setTransform(deviceScale, 0, 0, deviceScale, 0, 0);
+  targetCtx.imageSmoothingEnabled = true;
+  targetCtx.imageSmoothingQuality = 'high';
+}
+
+function resizeLayer(targetCanvas, targetCtx, size) {
+  const pixelSize = Math.max(1, Math.round(size * deviceScale));
+  targetCanvas.width = pixelSize;
+  targetCanvas.height = pixelSize;
+  resetContext(targetCtx);
+}
+
+function syncCanvasSize(forceRebuild = false) {
+  const rect = canvas.getBoundingClientRect();
+  const nextSize = Math.max(1, Math.round(rect.width || Math.min(window.innerWidth * 0.8, 540)));
+  const nextScale = Math.min(window.devicePixelRatio || 1, 2);
+  const changed = nextSize !== canvasSize || nextScale !== deviceScale;
+
+  if (!changed && !forceRebuild) {
+    return false;
+  }
+
+  canvasSize = nextSize;
+  deviceScale = nextScale;
+  W = canvasSize;
+  H = canvasSize;
+  CX = W / 2;
+  CY = H / 2;
+  R = Math.min(W, H) * 0.48;
+  labelRadius = R * 0.76;
+
+  resizeLayer(canvas, ctx, canvasSize);
+  resizeLayer(sectorLayer, sectorCtx, canvasSize);
+  resizeLayer(labelLayer, labelCtx, canvasSize);
+
+  if (ENTRIES.length > 0) {
+    buildWheelLayers();
+  }
+
+  drawWheel(angle);
+  return true;
+}
+
+function buildColors() {
   if (ENTRY_COLORS.length === 0) {
     for (let i = 0; i < ENTRIES.length; i++) {
       ENTRY_COLORS.push(COLOR_PALETTE[i % COLOR_PALETTE.length]);
     }
   }
+
   while (ENTRY_COLORS.length < ENTRIES.length) {
     ENTRY_COLORS.push(COLOR_PALETTE[ENTRY_COLORS.length % COLOR_PALETTE.length]);
   }
+
   return ENTRY_COLORS;
 }
 
-function updateCountInfo(){
+function getSliceArcPx(entryCount = ENTRIES.length) {
+  if (!entryCount || !labelRadius) return 0;
+  return (Math.PI * 2 * labelRadius) / entryCount;
+}
+
+function shouldShowLabels(entryCount = ENTRIES.length) {
+  return getSliceArcPx(entryCount) >= LABEL_MIN_ARC_PX;
+}
+
+function updateCountInfo() {
   if (!countInfo) return;
   const suffix = isInfiniteMode() ? " · mode sans fin" : "";
   countInfo.textContent = ENTRIES.length + " éléments restants" + suffix;
 }
 
-/* IMAGE CENTRALE */
-const centerImg = new Image(); centerImg.src = 'images/center3.avif'; let centerLoaded = false;
-centerImg.onload = () => { centerLoaded = true; };
+function buildSectorLayer() {
+  resetContext(sectorCtx);
+  sectorCtx.clearRect(0, 0, W, H);
 
-/* =======================
-   DESSIN ROUE
-   ======================= */
-function buildStaticWheel(){
   const n = ENTRIES.length;
-  const colors = buildColors();
-  offctx.clearRect(0,0,W,H);
-  offctx.save(); offctx.translate(CX,CY);
-  const step = (Math.PI*2)/n;
+  if (!n) return;
 
-  // secteurs colorés
-  for (let i=0;i<n;i++){
-    offctx.beginPath();
-    offctx.moveTo(0,0);
-    offctx.arc(0,0,R,i*step,(i+1)*step);
-    offctx.closePath();
-    offctx.fillStyle = colors[i];
-    offctx.fill();
+  const colors = buildColors();
+  const step = (Math.PI * 2) / n;
+
+  sectorCtx.save();
+  sectorCtx.translate(CX, CY);
+
+  for (let i = 0; i < n; i++) {
+    sectorCtx.beginPath();
+    sectorCtx.moveTo(0, 0);
+    sectorCtx.arc(0, 0, R, i * step, (i + 1) * step);
+    sectorCtx.closePath();
+    sectorCtx.fillStyle = colors[i];
+    sectorCtx.fill();
   }
 
-  // texte radial, réduit pour ne pas dépasser la zone colorée
-  offctx.fillStyle = "#111";
-  offctx.textAlign = "center";
-  offctx.textBaseline = "middle";
-  const labelR = R * 0.76;
-  const maxWidthBase = R * 0.45;
+  sectorCtx.restore();
+}
 
-  for (let i=0;i<n;i++){
-    let text = String(ENTRIES[i] || "");
+function buildLabelLayer() {
+  resetContext(labelCtx);
+  labelCtx.clearRect(0, 0, W, H);
+
+  const n = ENTRIES.length;
+  if (!n || !shouldShowLabels(n)) return;
+
+  const step = (Math.PI * 2) / n;
+  const sliceArcPx = getSliceArcPx(n);
+  const maxWidthBase = Math.min(R * 0.44, sliceArcPx * 0.9);
+
+  labelCtx.save();
+  labelCtx.translate(CX, CY);
+  labelCtx.fillStyle = "#111";
+  labelCtx.textAlign = "center";
+  labelCtx.textBaseline = "middle";
+
+  for (let i = 0; i < n; i++) {
+    const text = String(ENTRIES[i] || "");
     const mid = (i + 0.5) * step;
-    const x = Math.cos(mid) * labelR;
-    const y = Math.sin(mid) * labelR;
+    const x = Math.cos(mid) * labelRadius;
+    const y = Math.sin(mid) * labelRadius;
+    let fontSize = Math.min(18, Math.max(10, sliceArcPx * 0.58, 16 - text.length / 18));
 
-    offctx.save();
-    offctx.translate(x,y);
-    offctx.rotate(mid);
+    labelCtx.save();
+    labelCtx.translate(x, y);
+    labelCtx.rotate(mid);
+    labelCtx.font = `${fontSize}px system-ui, -apple-system, "Segoe UI", sans-serif`;
 
-    let fontSize = Math.max(10, 18 - text.length / 15);
-    offctx.font = `${fontSize}px Poppins, sans-serif`;
-    const maxWidth = maxWidthBase;
-
-    while (offctx.measureText(text).width > maxWidth && fontSize > 8) {
+    while (labelCtx.measureText(text).width > maxWidthBase && fontSize > 8) {
       fontSize -= 1;
-      offctx.font = `${fontSize}px Poppins, sans-serif`;
+      labelCtx.font = `${fontSize}px system-ui, -apple-system, "Segoe UI", sans-serif`;
     }
 
     let truncated = text;
-    while (offctx.measureText(truncated).width > maxWidth && truncated.length > 3) {
+    while (labelCtx.measureText(truncated).width > maxWidthBase && truncated.length > 3) {
       truncated = truncated.slice(0, -1);
     }
-    if (truncated.length < text.length) truncated = truncated.trim() + "…";
+    if (truncated.length < text.length) {
+      truncated = truncated.trim() + "…";
+    }
 
-    offctx.fillText(truncated, 0, 0);
-    offctx.restore();
+    labelCtx.fillText(truncated, 0, 0);
+    labelCtx.restore();
   }
 
-  offctx.restore();
+  labelCtx.restore();
 }
 
-function drawWheel(a){
-  ctx.clearRect(0,0,W,H);
-  ctx.save();
-  ctx.translate(CX,CY);
-  ctx.rotate(a);
-  ctx.drawImage(off, -CX, -CY);
+function buildWheelLayers() {
+  buildSectorLayer();
+  buildLabelLayer();
+}
 
-  if (centerLoaded){
-    const imgSize = R * 1.05;
+function drawBuiltSectors(progress = 1) {
+  if (progress >= 1 || ENTRIES.length === 0) {
+    ctx.drawImage(sectorLayer, -CX, -CY, W, H);
+    return;
+  }
+
+  const n = ENTRIES.length;
+  const step = (Math.PI * 2) / n;
+  const scaledProgress = progress * n;
+  const fullSlices = Math.floor(scaledProgress);
+  const partialProgress = scaledProgress - fullSlices;
+
+  if (fullSlices > 0) {
     ctx.save();
-    ctx.rotate(Math.PI / 2);
     ctx.beginPath();
-    ctx.arc(0,0,imgSize/2,0,Math.PI*2);
+    ctx.moveTo(0, 0);
+    ctx.arc(0, 0, R, 0, fullSlices * step);
     ctx.closePath();
     ctx.clip();
-    // image dessinnée dans le contexte tourné -> elle tourne avec la roue
-    ctx.drawImage(centerImg, -imgSize/2, -imgSize/2, imgSize, imgSize);
+    ctx.drawImage(sectorLayer, -CX, -CY, W, H);
     ctx.restore();
   }
 
+  if (partialProgress > 0 && fullSlices < n) {
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.arc(0, 0, R, fullSlices * step, fullSlices * step + step * easeOutCubic(partialProgress));
+    ctx.closePath();
+    ctx.clip();
+    ctx.drawImage(sectorLayer, -CX, -CY, W, H);
+    ctx.restore();
+  }
+}
+
+function drawCenterLayer() {
+  if (!centerLoaded) return;
+
+  const imgSize = R * 1.05;
+  ctx.save();
+  ctx.rotate(Math.PI / 2);
+  ctx.beginPath();
+  ctx.arc(0, 0, imgSize / 2, 0, Math.PI * 2);
+  ctx.closePath();
+  ctx.clip();
+  ctx.drawImage(centerImg, -imgSize / 2, -imgSize / 2, imgSize, imgSize);
   ctx.restore();
+}
+
+function getIntroProgress(now = performance.now()) {
+  if (!introState.active) {
+    return 1;
+  }
+
+  const rawProgress = Math.min(1, Math.max(0, (now - introState.startTime) / introState.duration));
+
+  if (rawProgress >= 1) {
+    introState.active = false;
+    return 1;
+  }
+
+  return easeOutCubic(rawProgress);
+}
+
+function finishIntroBuild() {
+  if (!introState.active) return;
+  introState.active = false;
+  drawWheel(angle);
+}
+
+function runIntroBuild() {
+  introState.active = true;
+  introState.startTime = performance.now();
+  introState.duration = INTRO_DURATION_MS;
+  lastTime = introState.startTime;
+  scheduleAnimationFrame();
+}
+
+function drawWheel(a, now = performance.now()) {
+  if (!W || !H) return;
+
+  resetContext(ctx);
+  ctx.clearRect(0, 0, W, H);
+  ctx.save();
+  ctx.translate(CX, CY);
+  ctx.rotate(a);
+
+  const introProgress = getIntroProgress(now);
+  drawBuiltSectors(introProgress);
+
+  if (introProgress >= 1 && shouldShowLabels()) {
+    ctx.drawImage(labelLayer, -CX, -CY, W, H);
+  }
+
+  drawCenterLayer();
+  ctx.restore();
+}
+
+function ensureAudioInitialized() {
+  if (audioReady) return Promise.resolve();
+  if (audioInitPromise) return audioInitPromise;
+
+  audioInitPromise = initAudio()
+    .then(() => {
+      audioReady = true;
+      console.log('[APP] Audio prêt après interaction');
+    })
+    .catch((error) => {
+      audioInitPromise = null;
+      console.error('[APP] Erreur initialisation audio:', error);
+    });
+
+  return audioInitPromise;
+}
+
+function ensureHtml2Canvas() {
+  if (window.html2canvas) {
+    return Promise.resolve(window.html2canvas);
+  }
+
+  if (html2canvasPromise) {
+    return html2canvasPromise;
+  }
+
+  html2canvasPromise = new Promise((resolve, reject) => {
+    const existingScript = document.querySelector('script[data-html2canvas-loader="true"]');
+    if (existingScript) {
+      existingScript.addEventListener('load', () => resolve(window.html2canvas), { once: true });
+      existingScript.addEventListener('error', () => reject(new Error('Impossible de charger le module de partage.')), { once: true });
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.src = HTML2CANVAS_SRC;
+    script.async = true;
+    script.dataset.html2canvasLoader = 'true';
+    script.onload = () => {
+      if (window.html2canvas) {
+        resolve(window.html2canvas);
+      } else {
+        reject(new Error('Le module de capture est indisponible.'));
+      }
+    };
+    script.onerror = () => reject(new Error('Impossible de charger le module de partage.'));
+    document.head.appendChild(script);
+  }).catch((error) => {
+    html2canvasPromise = null;
+    throw error;
+  });
+
+  return html2canvasPromise;
+}
+
+function scheduleFullDataLoad() {
+  if (fullDataLoadScheduled) return;
+  fullDataLoadScheduled = true;
+
+  const load = () => {
+    loadFullData().then(() => {
+      console.log('[APP] Données complètes chargées');
+    }).catch((error) => {
+      console.error('[APP] Erreur chargement données complètes:', error);
+    });
+  };
+
+  if ('requestIdleCallback' in window) {
+    window.requestIdleCallback(load, { timeout: 1200 });
+  } else {
+    setTimeout(load, 0);
+  }
+}
+
+function scheduleDeferredInit() {
+  requestAnimationFrame(() => {
+    if (!menuInitialized) {
+      menuInitialized = true;
+      initMenu();
+      updateCountInfo();
+    }
+    scheduleFullDataLoad();
+  });
+}
+
+function shouldAnimate() {
+  return introState.active || Math.abs(angularVelocity) > 0.001 || Math.abs(targetVelocity) > 0.001;
+}
+
+async function initializeApp() {
+  try {
+    loadHistory();
+    loadSettings();
+
+    syncCanvasSize();
+
+    const lightData = await initWheel();
+    ENTRIES = lightData.map(entry => entry.nom);
+
+    buildColors();
+    buildWheelLayers();
+    updateCountInfo();
+    drawWheel(angle);
+    runIntroBuild();
+    attachWheelListeners();
+    scheduleDeferredInit();
+
+    console.log('[APP] Roue initialisée avec', ENTRIES.length, 'entrées');
+  } catch (e) {
+    console.error('[APP] Erreur initialisation:', e);
+    ENTRIES = ['Erreur de chargement', 'Veuillez rafraîchir la page'];
+    syncCanvasSize(true);
+    buildWheelLayers();
+    drawWheel(angle);
+  }
 }
 
 /* =======================
    INTERACTION / BOOST
    ======================= */
-function boostWheel(e){
+function boostWheel(e) {
   console.log('[BOOST] boostWheel appelé, ENTRIES.length =', ENTRIES.length);
-  
+
   if (ENTRIES.length === 0) {
     console.warn('[BOOST] ENTRIES est vide !');
     return;
   }
-  
+
+  finishIntroBuild();
+  ensureAudioInitialized();
   hasBeenSpun = true;
 
   if (typeof window.spawnBills === 'function') {
@@ -489,23 +747,22 @@ function boostWheel(e){
     angularVelocity = Math.min(MAX_VEL, angularVelocity + BOOST * 0.6);
   }
 
-  // désactive brièvement la friction pour sentir le boost
-  frictionActive = false; frictionTimer = 0;
+  frictionActive = false;
+  frictionTimer = 0;
   clearTimeout(window._frictionResume);
-  window._frictionResume = setTimeout(()=>{ frictionActive = true; }, 600);
+  window._frictionResume = setTimeout(() => {
+    frictionActive = true;
+  }, 600);
 
   showedResult = false;
+  lastTime = performance.now();
+  scheduleAnimationFrame();
   console.log('[BOOST] angularVelocity:', angularVelocity, 'targetVelocity:', targetVelocity);
 }
 
-// Les écouteurs seront attachés après initialisation
 function attachWheelListeners() {
-  const canvas = document.getElementById('wheel');
-  const btn = document.getElementById('spinBtn');
-  
   if (canvas && btn) {
-    canvas.addEventListener('mousedown', boostWheel);
-    canvas.addEventListener('touchstart', boostWheel, {passive:true});
+    canvas.addEventListener('pointerdown', boostWheel);
     btn.addEventListener('click', boostWheel);
     console.log('[BOOST] Écouteurs attachés');
   } else {
@@ -517,11 +774,11 @@ function attachWheelListeners() {
    SON PAR PASSAGE DE SECTEUR
    ======================= */
 
-animate && (animate.prevIndex = -1); // sécurité
+animate && (animate.prevIndex = -1);
 
 function playSectorClick() {
-    // Utiliser le module audio (offline-safe)
-    playSpinClick(Math.abs(angularVelocity));
+  if (!audioReady) return;
+  playSpinClick(Math.abs(angularVelocity));
 }
 
 /* =======================
@@ -649,39 +906,70 @@ copyBtn && copyBtn.addEventListener('click', async ()=>{
 /* =======================
    ANIMATION
    ======================= */
-let lastTime = performance.now();
-function animate(){
-  const now = performance.now();
-  const deltaTime = Math.min(10, (now - lastTime) / 16.67);
+function finalizeSpinResult(idx) {
+  getEntryDetails(idx).then(entry => {
+    if (entry) {
+      recordSpin(entry);
+    }
+
+    showOverlay(idx);
+
+    if (!isInfiniteMode()) {
+      ENTRIES.splice(idx, 1);
+      ENTRY_COLORS.splice(idx, 1);
+      buildWheelLayers();
+      updateCountInfo();
+      animate.prevIndex = -1;
+    }
+
+    drawWheel(angle);
+    setTimeout(() => { hasBeenSpun = false; }, 300);
+  });
+}
+
+function completeSpinIfNeeded() {
+  if (!hasBeenSpun || showedResult) return false;
+
+  const idx = getSelectedIndex(angle);
+  if (idx < 0 || ENTRIES[idx] === undefined) return false;
+
+  showedResult = true;
+  if (audioReady) {
+    playWinSound();
+  }
+  finalizeSpinResult(idx);
+  return true;
+}
+
+function animate(now) {
+  window._animFrame = null;
+
+  const previousTime = lastTime || now;
+  const deltaTime = Math.min(10, (now - previousTime) / 16.67);
   lastTime = now;
 
-  // lerp vers targetVelocity
   angularVelocity += (targetVelocity - angularVelocity) * (LERP * deltaTime);
   angle += angularVelocity * deltaTime;
 
-  // draw
-  drawWheel(angle);
-
-  // son : detecte passage d'un secteur (pointer fixed at -PI/2)
+  const isMoving = Math.abs(angularVelocity) > 0.001 || Math.abs(targetVelocity) > 0.001;
   const n = ENTRIES.length;
-  if (n > 0) {
-    const step = (Math.PI*2)/n;
-    let pointerAngle = (-Math.PI/2 - angle) % (Math.PI*2);
-    if (pointerAngle < 0) pointerAngle += Math.PI*2;
+
+  if (isMoving && n > 0) {
+    const step = (Math.PI * 2) / n;
+    let pointerAngle = (-Math.PI / 2 - angle) % (Math.PI * 2);
+    if (pointerAngle < 0) pointerAngle += Math.PI * 2;
     const currentIndex = Math.floor(pointerAngle / step);
     if (currentIndex !== (animate.prevIndex ?? -1)) {
       animate.prevIndex = currentIndex;
-      // play short click
       playSectorClick();
     }
   }
 
-  // friction / slowdown applied to targetVelocity
   if (targetVelocity > 0.001) {
     if (!frictionActive) {
       frictionActive = true;
       frictionTimer = 0;
-      frictionDuration = 180 + Math.random()*120;
+      frictionDuration = 180 + Math.random() * 120;
     }
     const t = frictionTimer / frictionDuration;
     if (t < 1) {
@@ -695,99 +983,55 @@ function animate(){
     frictionTimer = 0;
   }
 
-  // arrêt logique et affichage du résultat
   if (Math.abs(angularVelocity) <= 0.001 && Math.abs(targetVelocity) <= 0.001) {
-    angularVelocity = 0; targetVelocity = 0;
-    if (hasBeenSpun && !showedResult) {
-      showedResult = true;
-      const idx = getSelectedIndex(angle);
-      if (idx >= 0 && ENTRIES[idx] !== undefined) {
-        // Jouer le son de victoire (module audio offline-safe)
-        playWinSound();
-
-        // Récupérer les détails complets pour l'historique
-        getEntryDetails(idx).then(entry => {
-          // Enregistrer dans l'historique
-          if (entry) {
-            recordSpin(entry);
-          }
-
-          // Afficher l'overlay
-          showOverlay(idx);
-
-          // Mode infini : ne pas retirer la taxe
-          if (!isInfiniteMode()) {
-            ENTRIES.splice(idx, 1);
-            ENTRY_COLORS.splice(idx, 1);
-            buildStaticWheel();
-            updateCountInfo();
-          }
-
-          setTimeout(()=>{ hasBeenSpun = false; }, 300);
-        });
-      }
-    }
+    angularVelocity = 0;
+    targetVelocity = 0;
+    completeSpinIfNeeded();
   }
 
-  window._animFrame = requestAnimationFrame(animate);
+  drawWheel(angle, now);
+
+  if (shouldAnimate()) {
+    scheduleAnimationFrame();
+  }
 }
 
 /* =======================
    VISIBILITY / ONGLET
    ======================= */
 let hiddenAt = null;
-let wasSpinning = false;
+let wasAnimating = false;
 
 document.addEventListener("visibilitychange", () => {
   if (document.hidden) {
     hiddenAt = performance.now();
-    wasSpinning = Math.abs(angularVelocity) > 0.001 || Math.abs(targetVelocity) > 0.001;
-    // pause any playing short sounds (can't control separate instances reliably), nothing to do
-    cancelAnimationFrame(window._animFrame);
+    wasAnimating = shouldAnimate();
+    stopAnimationFrame();
   } else {
     const now = performance.now();
     const elapsed = hiddenAt ? now - hiddenAt : 0;
     hiddenAt = null;
 
-    if (wasSpinning) {
+    if (Math.abs(angularVelocity) > 0.001 || Math.abs(targetVelocity) > 0.001) {
       const decay = Math.exp(-elapsed / 3000);
       angularVelocity *= decay;
       targetVelocity *= decay;
 
-      if (Math.abs(angularVelocity) <= 0.001 && Math.abs(targetVelocity) <= 0.001 && hasBeenSpun && !showedResult) {
-        angularVelocity = 0; targetVelocity = 0;
-        playWinSound(); // Module audio offline-safe
-        showedResult = true;
-        const idx = getSelectedIndex(angle);
-        if (idx >= 0 && ENTRIES[idx] !== undefined) {
-          // Récupérer les détails complets pour l'historique
-          getEntryDetails(idx).then(entry => {
-            // Enregistrer dans l'historique
-            recordSpin(entry);
-            
-            // Afficher l'overlay
-            showOverlay(idx);
-            
-            // Mode infini : ne pas retirer la taxe
-            if (!isInfiniteMode()) {
-              ENTRIES.splice(idx, 1);
-              ENTRY_COLORS.splice(idx, 1);
-              buildStaticWheel();
-              updateCountInfo();
-            }
-            
-            setTimeout(()=>{ hasBeenSpun = false; }, 300);
-          });
-        }
-      } else {
-        lastTime = performance.now();
-        window._animFrame = requestAnimationFrame(animate);
+      if (Math.abs(angularVelocity) <= 0.001 && Math.abs(targetVelocity) <= 0.001) {
+        angularVelocity = 0;
+        targetVelocity = 0;
+        completeSpinIfNeeded();
       }
-    } else {
-      lastTime = performance.now();
-      window._animFrame = requestAnimationFrame(animate);
     }
-    wasSpinning = false;
+
+    drawWheel(angle, now);
+    lastTime = now;
+
+    if (wasAnimating && shouldAnimate()) {
+      scheduleAnimationFrame();
+    }
+
+    wasAnimating = false;
   }
 });
 
@@ -825,6 +1069,31 @@ async function optimizeImageWebP(base64, maxWidth = 1200, quality = 0.8) {
   });
 }
 
+async function captureWheelArea() {
+  const html2canvas = await ensureHtml2Canvas();
+  const shareBar = document.getElementById('shareBar');
+  const previousDisplay = shareBar.style.display;
+
+  shareBar.style.display = 'none';
+
+  try {
+    await new Promise(resolve => setTimeout(resolve, 100));
+    const rect = wheelArea.getBoundingClientRect();
+    return await html2canvas(document.body, {
+      x: rect.left,
+      y: rect.top,
+      width: rect.width,
+      height: rect.height,
+      scale: 2,
+      useCORS: true,
+      backgroundColor: '#f7f7f7',
+      logging: false
+    });
+  } finally {
+    shareBar.style.display = previousDisplay;
+  }
+}
+
 
 
   
@@ -835,28 +1104,12 @@ document.querySelectorAll('.share-btn[data-platform]').forEach(btn => {
   btn.addEventListener('click', async () => {
     const platform = btn.dataset.platform;
     const text = overlayText.innerText;
+    const originalText = btn.textContent;
 
     // CAS SPÉCIAUX : Téléchargement direct (Instagram, TikTok, Snapchat)
     if (['instagram', 'tiktok', 'snapchat'].includes(platform)) {
       try {
-        const shareBar = document.getElementById('shareBar');
-        const prevDisplay = shareBar.style.display;
-        shareBar.style.display = 'none';
-        await new Promise(resolve => setTimeout(resolve, 100));
-
-        const rect = wheelArea.getBoundingClientRect();
-        const canvasCap = await html2canvas(document.body, {
-          x: rect.left,
-          y: rect.top,
-          width: rect.width,
-          height: rect.height,
-          scale: 2,
-          useCORS: true,
-          backgroundColor: '#f7f7f7',
-          logging: false
-        });
-
-        shareBar.style.display = prevDisplay;
+        const canvasCap = await captureWheelArea();
 
         const rawBase64 = canvasCap.toDataURL("image/png");
 
@@ -887,28 +1140,10 @@ document.querySelectorAll('.share-btn[data-platform]').forEach(btn => {
     try {
       btn.disabled = true;
       btn.style.opacity = '0.5';
-      const originalText = btn.textContent;
       btn.textContent = '⏳';
 
-      const shareBar = document.getElementById('shareBar');
-      const prevDisplay = shareBar.style.display;
-      shareBar.style.display = 'none';
-      await new Promise(resolve => setTimeout(resolve, 100));
-
       console.log("📸 Capture en cours...");
-      const rect = wheelArea.getBoundingClientRect();
-      const canvasCap = await html2canvas(document.body, {
-        x: rect.left,
-        y: rect.top,
-        width: rect.width,
-        height: rect.height,
-        scale: 2,
-        useCORS: true,
-        backgroundColor: '#f7f7f7',
-        logging: false
-      });
-
-      shareBar.style.display = prevDisplay;
+      const canvasCap = await captureWheelArea();
 
       console.log("🔄 Optimisation de l'image...");
       const rawBase64 = canvasCap.toDataURL("image/png");
@@ -987,11 +1222,7 @@ document.querySelectorAll('.share-btn[data-platform]').forEach(btn => {
       alert(`❌ Erreur : ${error.message}`);
       btn.disabled = false;
       btn.style.opacity = '1';
-      const emojis = {
-        'facebook': '📘', 'x': '🐦', 'linkedin': '💼',
-        'pinterest': '📌', 'whatsapp': '💬', 'telegram': '📨'
-      };
-      btn.textContent = emojis[platform] || '🔗';
+      btn.textContent = originalText;
     }
   });
 });
@@ -1005,8 +1236,20 @@ function updateBg(){
   const base = Math.max(36, Math.min(Math.round(innerWidth/12), 160));
   document.documentElement.style.setProperty('--emoji-size', `${base}px`);
 }
-addEventListener('resize', updateBg);
+
+function handleResize() {
+  updateBg();
+  const resized = syncCanvasSize();
+  if (resized && shouldAnimate()) {
+    lastTime = performance.now();
+    scheduleAnimationFrame();
+  }
+}
+
+addEventListener('resize', handleResize);
 updateBg();
+syncCanvasSize();
+initializeApp();
 
 // ✅ Gère la touche Espace uniquement quand aucune fenêtre n'est ouverte
 document.addEventListener('keydown',(e)=>{
