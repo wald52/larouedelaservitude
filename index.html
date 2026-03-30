@@ -265,6 +265,9 @@ async function initializeApp() {
     lastTime = performance.now();
     window._animFrame = requestAnimationFrame(animate);
 
+    // Attacher les écouteurs d'événements
+    attachWheelListeners();
+
     // Charger les données complètes en arrière-plan
     loadFullData().then(() => {
       console.log('[APP] Données complètes chargées');
@@ -417,6 +420,13 @@ function drawWheel(a){
    INTERACTION / BOOST
    ======================= */
 function boostWheel(e){
+  console.log('[BOOST] boostWheel appelé, ENTRIES.length =', ENTRIES.length);
+  
+  if (ENTRIES.length === 0) {
+    console.warn('[BOOST] ENTRIES est vide !');
+    return;
+  }
+  
   hasBeenSpun = true;
 
   spawnBills(e, 8);
@@ -436,10 +446,23 @@ function boostWheel(e){
   window._frictionResume = setTimeout(()=>{ frictionActive = true; }, 600);
 
   showedResult = false;
+  console.log('[BOOST] angularVelocity:', angularVelocity, 'targetVelocity:', targetVelocity);
 }
-canvas.addEventListener('mousedown', boostWheel);
-canvas.addEventListener('touchstart', boostWheel, {passive:true});
-btn.addEventListener('click', boostWheel);
+
+// Les écouteurs seront attachés après initialisation
+function attachWheelListeners() {
+  const canvas = document.getElementById('wheel');
+  const btn = document.getElementById('spinBtn');
+  
+  if (canvas && btn) {
+    canvas.addEventListener('mousedown', boostWheel);
+    canvas.addEventListener('touchstart', boostWheel, {passive:true});
+    btn.addEventListener('click', boostWheel);
+    console.log('[BOOST] Écouteurs attachés');
+  } else {
+    console.error('[BOOST] canvas ou btn non trouvé !');
+  }
+}
 
 /* =======================
    SON PAR PASSAGE DE SECTEUR
