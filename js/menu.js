@@ -270,7 +270,7 @@ function createMenuHTML() {
     </div>
   `;
   document.body.appendChild(settingsPanel);
-  
+
   // Mettre à jour le badge
   updateHistoryBadge();
 }

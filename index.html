@@ -626,16 +626,26 @@ function animate(){
         // Jouer le son de victoire (module audio offline-safe)
         playWinSound();
 
-        // Afficher l'overlay avec les détails complets (async)
-        showOverlay(idx);
-        
-        // Supprimer l'entrée de la roue
-        ENTRIES.splice(idx, 1);
-        ENTRY_COLORS.splice(idx, 1);
-        buildStaticWheel();
-        document.getElementById('countInfo').textContent = ENTRIES.length + " éléments restants";
-        
-        setTimeout(()=>{ hasBeenSpun = false; }, 300);
+        // Récupérer les détails complets pour l'historique
+        getEntryDetails(idx).then(entry => {
+          // Enregistrer dans l'historique
+          if (entry) {
+            recordSpin(entry);
+          }
+
+          // Afficher l'overlay
+          showOverlay(idx);
+
+          // Mode infini : ne pas retirer la taxe
+          if (!isInfiniteMode()) {
+            ENTRIES.splice(idx, 1);
+            ENTRY_COLORS.splice(idx, 1);
+            buildStaticWheel();
+            document.getElementById('countInfo').textContent = ENTRIES.length + " éléments restants";
+          }
+
+          setTimeout(()=>{ hasBeenSpun = false; }, 300);
+        });
       }
     }
   }
