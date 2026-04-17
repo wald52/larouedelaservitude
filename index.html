@@ -5,16 +5,20 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <meta name="description" content="La roue de la servitude - Découvrez les 371 taxes et prélèvements obligatoires français de manière ludique. Une application web progressive (PWA) utilisable hors ligne." />
 <title>La roue de la servitude</title>
+
+<!-- 🚀 Préchargement ultra-agressif des ressources critiques -->
+<link rel="preload" href="data/entries-light.json" as="fetch" type="application/json" crossorigin="anonymous">
+<link rel="preload" href="images/center3.avif" as="image" type="image/avif">
   
 <!-- Favicons (nouveaux fichiers dans le dossier /icons) -->
-<link rel="icon" href="/larouedelaservitude/icons/favicon.ico" type="image/x-icon">
+<link rel="icon" href="icons/favicon.ico" type="image/x-icon">
 
 <!-- Apple Touch Icons -->
-<link rel="apple-touch-icon" sizes="180x180" href="/larouedelaservitude/icons/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
 
 <!-- Icônes pour PWA (Progressive Web Apps) -->
-<link rel="icon" type="image/png" sizes="192x192" href="/larouedelaservitude/icons/icon-192x192.png">
-<link rel="icon" type="image/png" sizes="512x512" href="/larouedelaservitude/icons/icon-512x512.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192x192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512x512.png">
 
 <!-- Apple PWA support -->
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -22,15 +26,20 @@
 <meta name="apple-mobile-web-app-title" content="La roue de la servitude">
 
 <!-- Manifest PWA -->
-<link rel="manifest" href="/larouedelaservitude/site.webmanifest">
+<link rel="manifest" href="site.webmanifest">
 
 <!-- Meta pour les réseaux sociaux (Open Graph / Twitter) -->
-<meta property="og:image" content="/larouedelaservitude/icons/op-image.png">
+<meta property="og:image" content="icons/op-image.png">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="/larouedelaservitude/icons/op-image.png">
+<meta name="twitter:image" content="icons/op-image.png">
 
-<link rel="stylesheet" href="/larouedelaservitude/bills.css">
-<link rel="stylesheet" href="/larouedelaservitude/menu.css">
+<!-- Styles critiques (priorité haute) -->
+<link rel="stylesheet" href="bills.css" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="menu.css" media="print" onload="this.media='all'">
+<noscript>
+  <link rel="stylesheet" href="bills.css">
+  <link rel="stylesheet" href="menu.css">
+</noscript>
 
 <style>
 :root{
@@ -373,9 +382,9 @@ body {
 </div>
 
 <script type="module">
-  import { initWheel, loadFullData, getEntryDetails, formatEntryForDisplay } from "/larouedelaservitude/js/entries.js";
-  import { initAudio, playSpinClick, playWinSound } from "/larouedelaservitude/js/audio.js";
-  import { initMenu, loadHistory, loadSettings, recordSpin, isInfiniteMode } from "/larouedelaservitude/js/menu.js";
+  import { initWheel, loadFullData, getEntryDetails, formatEntryForDisplay } from "./js/entries.js";
+  import { initAudio, unlockAudio, playSpinClick, playWinSound } from "./js/audio.js";
+  import { initMenu, loadHistory, loadSettings, recordSpin, isInfiniteMode } from "./js/menu.js";
 
 const canvas = document.getElementById('wheel');
 const ctx = canvas.getContext('2d');
@@ -978,14 +987,23 @@ function scheduleFullDataLoad() {
 }
 
 function scheduleDeferredInit() {
-  requestAnimationFrame(() => {
+  const launch = () => {
     if (!menuInitialized) {
       menuInitialized = true;
       initMenu();
       updateCountInfo();
+      console.log('[APP] Menu initialisé (lazy)');
     }
     scheduleFullDataLoad();
-  });
+  };
+
+  if ('requestIdleCallback' in window) {
+    // On attend que le navigateur soit au repos, avec un délai max de 3s
+    requestIdleCallback(launch, { timeout: 3000 });
+  } else {
+    // Fallback : on attend 2 secondes après le rendu initial
+    setTimeout(launch, 2000);
+  }
 }
 
 function shouldAnimate() {
@@ -1009,6 +1027,24 @@ async function initializeApp() {
     runIntroBuild();
     attachWheelListeners();
     scheduleDeferredInit();
+
+    // 🔊 Chargement audio différé (Priorité au rendu visuel)
+    const startAudio = () => {
+      initAudio();
+      const unlock = () => {
+        unlockAudio();
+        window.removeEventListener('click', unlock);
+        window.removeEventListener('touchstart', unlock);
+      };
+      window.addEventListener('click', unlock);
+      window.addEventListener('touchstart', unlock);
+    };
+
+    if ('requestIdleCallback' in window) {
+      requestIdleCallback(startAudio);
+    } else {
+      setTimeout(startAudio, 1500);
+    }
 
     console.log('[APP] Roue initialisée avec', ENTRIES.length, 'entrées');
   } catch (e) {
@@ -1124,28 +1160,27 @@ async function showOverlay(entryIndex){
 
   overlay.style.display = 'flex';
   overlay.setAttribute('aria-hidden','false');
-
-  // 🧩 branche les deux boutons à ton formulaire Netlify
-  const infoBtn = document.getElementById("btn-info");
-  const errorBtn = document.getElementById("btn-error");
-  
-  // Stocker le texte complet pour le feedback
-  const feedbackText = entry ? `${entry.nom_complet}${entry.recette ? ' - Recette: ' + entry.recette : ''}${entry.annee ? ' - Année: ' + entry.annee : ''}` : ENTRIES[entryIndex];
-
-  if (infoBtn && errorBtn) {
-    infoBtn.addEventListener("click", (e) => {
-      e.preventDefault();
-      const userMsg = prompt("💬 Ajoutez votre complément d'information :");
-      if (userMsg) sendFeedbackToGitHub(feedbackText, userMsg, "info");
-    });
-
-    errorBtn.addEventListener("click", (e) => {
-      e.preventDefault();
-      const userMsg = prompt("⚠️ Décrivez l'erreur que vous avez trouvée :");
-      if (userMsg) sendFeedbackToGitHub(feedbackText, userMsg, "error");
-    });
-  }
 }
+
+// 🧩 Attache les écouteurs de feedback UNE SEULE FOIS au démarrage
+document.addEventListener('click', (e) => {
+  const infoBtn = e.target.closest('#btn-info');
+  const errorBtn = e.target.closest('#btn-error');
+  
+  if (!infoBtn && !errorBtn) return;
+  e.preventDefault();
+
+  // On récupère le texte du résultat actuel dans l'overlay
+  const feedbackText = overlayText.innerText.split('\n\n')[1] || overlayText.innerText;
+
+  if (infoBtn) {
+    const userMsg = prompt("💬 Ajoutez votre complément d'information :");
+    if (userMsg) sendFeedbackToGitHub(feedbackText, userMsg, "info");
+  } else if (errorBtn) {
+    const userMsg = prompt("⚠️ Décrivez l'erreur que vous avez trouvée :");
+    if (userMsg) sendFeedbackToGitHub(feedbackText, userMsg, "error");
+  }
+});
 
 // handlers for the feedback modal (adapt to your showOverlay call)
 const openBtn = document.getElementById('openFeedbackForm');
@@ -1551,7 +1586,6 @@ function handleResize() {
 
 addEventListener('resize', handleResize);
 updateBg();
-syncCanvasSize();
 initializeApp();
 
 // ✅ Gère la touche Espace uniquement quand aucune fenêtre n'est ouverte
@@ -1651,7 +1685,7 @@ function sendFeedbackToGitHub(resultText, userMessage, type) {
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/larouedelaservitude/service-worker.js')
+      navigator.serviceWorker.register('service-worker.js')
         .then((registration) => {
           console.log('ServiceWorker enregistré avec succès : ', registration.scope);
           
@@ -1685,7 +1719,7 @@ function sendFeedbackToGitHub(resultText, userMessage, type) {
   }
 
   // Initialiser les billets (module ES6)
-  import('/larouedelaservitude/bills.js').then(({ initBills }) => {
+  import('./bills.js').then(({ initBills }) => {
     if (initBills) {
       initBills();
       console.log('[APP] Bills initialisés');

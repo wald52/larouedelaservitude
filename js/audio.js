@@ -6,7 +6,10 @@
 // 2. Décodés et stockés dans IndexedDB
 // 3. Disponibles immédiatement, même hors ligne
 
-const BASE_PATH = '/larouedelaservitude';
+const BASE_PATH = window.location.pathname.endsWith('/') 
+  ? window.location.pathname.slice(0, -1) 
+  : window.location.pathname.replace(/\/index\.html$/, '');
+
 const AUDIO_DB_NAME = 'LaRoueAudio';
 const AUDIO_DB_VERSION = 1;
 const AUDIO_STORE_NAME = 'sounds';
@@ -139,51 +142,57 @@ export async function initAudio() {
 
   runtimeSoundEnabled = readStoredSoundSetting();
   
-  // Créer le contexte audio
-  audioContext = new (window.AudioContext || window.webkitAudioContext)();
-  masterGainNode = audioContext.createGain();
-  masterGainNode.connect(audioContext.destination);
-  syncMasterGain();
+  // Créer le contexte audio s'il n'existe pas
+  if (!audioContext) {
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    masterGainNode = audioContext.createGain();
+    masterGainNode.connect(audioContext.destination);
+    syncMasterGain();
+  }
   
-  // Charger et décoder tous les sons
+  // Charger et décoder tous les sons en arrière-plan (non-bloquant)
   const loadPromises = Object.entries(SOUNDS).map(async ([name, url]) => {
-    // 1. Vérifier si déjà décodé en mémoire
-    if (decodedBuffers[name]) return;
-    
-    // 2. Vérifier IndexedDB
-    const cachedBuffer = await getCachedSound(name);
-    if (cachedBuffer) {
-      try {
-        decodedBuffers[name] = await audioContext.decodeAudioData(cachedBuffer.slice(0));
-        console.log(`[AUDIO] ${name} chargé depuis IndexedDB`);
-        return;
-      } catch (e) {
-        console.warn(`[AUDIO] Buffer corrompu pour ${name}, rechargement...`);
-      }
-    }
-    
-    // 3. Fetch depuis le cache SW ou réseau
     try {
-      const response = await fetch(`${BASE_PATH}/${url}`);
+      if (decodedBuffers[name]) return;
+      
+      const cachedBuffer = await getCachedSound(name);
+      if (cachedBuffer) {
+        decodedBuffers[name] = await audioContext.decodeAudioData(cachedBuffer.slice(0));
+        return;
+      }
+      
+      // Nettoyage de l'URL pour éviter les doubles slashes
+      const fullUrl = `${BASE_PATH}/${url}`.replace(/\/+/g, '/');
+      const response = await fetch(fullUrl);
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       
       const arrayBuffer = await response.arrayBuffer();
-      
-      // 4. Décoder
       decodedBuffers[name] = await audioContext.decodeAudioData(arrayBuffer.slice(0));
-      
-      // 5. Sauvegarder dans IndexedDB pour prochaines visites
       await cacheSound(name, arrayBuffer);
-      
-      console.log(`[AUDIO] ${name} chargé depuis réseau et caché`);
     } catch (e) {
       console.error(`[AUDIO] Échec chargement ${name}:`, e);
     }
   });
   
-  await Promise.all(loadPromises);
-  isInitialized = true;
-  console.log('[AUDIO] Système audio initialisé et prêt (offline-safe)');
+  // On marque comme initialisé quand tout est prêt, mais on ne fait pas 'await' ici
+  Promise.all(loadPromises).then(() => {
+    isInitialized = true;
+    console.log('[AUDIO] Système audio prêt (background load terminé)');
+  });
+}
+
+/**
+ * Déverrouille le contexte audio (nécessaire suite à une interaction utilisateur)
+ */
+export async function unlockAudio() {
+  if (audioContext && audioContext.state === 'suspended') {
+    try {
+      await audioContext.resume();
+      console.log('[AUDIO] AudioContext déverrouillé');
+    } catch (e) {
+      console.error('[AUDIO] Échec déverrouillage:', e);
+    }
+  }
 }
 
 /**

@@ -5,7 +5,9 @@
 // 2. Chargement background : données complètes (recette, année) pour l'overlay
 // 3. Cache IndexedDB pour fonctionnement offline
 
-const BASE_PATH = '/larouedelaservitude';
+const BASE_PATH = window.location.pathname.endsWith('/') 
+  ? window.location.pathname.slice(0, -1) 
+  : window.location.pathname.replace(/\/index\.html$/, '');
 const DB_NAME = 'LaRoueDeLaServitude';
 const DB_VERSION = 1;
 const STORE_NAME = 'cache';

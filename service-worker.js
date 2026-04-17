@@ -28,7 +28,7 @@ const CACHE_NAME = `larouedelaservitude-${CACHE_VERSION}`;
    (system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial)
 */
 
-const BASE = '/larouedelaservitude';
+const BASE = self.location.pathname.replace(/\/[^\/]*$/, '');
 
 // Liste des fichiers à pré-cacher (CRITIQUE pour offline)
 const urlsToCache = [
