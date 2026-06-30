@@ -244,10 +244,23 @@ function resizeLayer(targetCanvas, targetCtx, size) {
   resetContext(targetCtx);
 }
 
+function getCanvasScale(viewportWidth = window.innerWidth) {
+  const pixelRatio = Math.max(1, window.devicePixelRatio || 1);
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const deviceMemory = Number(navigator.deviceMemory) || Infinity;
+  const isSmallViewport = viewportWidth <= 768;
+  const isTouchViewport = window.matchMedia('(hover: none), (pointer: coarse)').matches;
+  const isConstrainedDevice = deviceMemory <= 4 || prefersReducedMotion;
+  const scaleCap = isSmallViewport || isTouchViewport || isConstrainedDevice ? 1.5 : 2;
+
+  return Math.min(pixelRatio, scaleCap);
+}
+
 function syncCanvasSize(forceRebuild = false) {
   const rect = canvas.getBoundingClientRect();
-  const nextSize = Math.max(1, Math.round(rect.width || Math.min(window.innerWidth * 0.8, 540)));
-  const nextScale = Math.min(window.devicePixelRatio || 1, 2);
+  const viewportWidth = window.innerWidth || document.documentElement.clientWidth || 0;
+  const nextSize = Math.max(1, Math.round(rect.width || Math.min(viewportWidth * 0.8, 540)));
+  const nextScale = getCanvasScale(viewportWidth);
   const changed = nextSize !== canvasSize || nextScale !== deviceScale;
 
   if (!changed && !forceRebuild) {
