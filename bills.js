@@ -102,7 +102,7 @@ export function initBills() {
     el.style.opacity = '0';
     root.appendChild(el);
     pool.push({
-      el, inUse: false, x: -9999, y: -9999, vx: 0, vy: 0, rot: 0, vrot: 0, born: 0, ttl: 0
+      el, inUse: false, x: -9999, y: -9999, vx: 0, vy: 0, rot: 0, vrot: 0, born: 0, ttl: 0, lastFrame: 0
     });
   }
 
@@ -163,6 +163,7 @@ export function initBills() {
       node.vrot = (Math.random() - 0.5) * (ROT_RANGE * 0.0025);
 
       node.born = now;
+      node.lastFrame = now;
       node.ttl = LIFETIME + Math.random() * 900;
       active.add(node);
 
@@ -176,22 +177,25 @@ export function initBills() {
   let raf = null;
   function step(now) {
     for (const node of Array.from(active)) {
-      const dt = Math.min(40, now - node.born) / 16.67; // approx frames
-      // physics
-      node.vy += GRAVITY * (Math.min(40, performance.now() - node.born) / 1000) * 0.7; // small scaling
-      node.vx *= AIR;
-      node.vy *= AIR;
+      const previousFrameTime = node.lastFrame || now;
+      const dt = Math.min(40, now - previousFrameTime) / 16.67; // approx frames
+      node.lastFrame = now;
 
-      node.x += node.vx;
-      node.y += node.vy;
-      node.rot += node.vrot;
+      // physics
+      node.vy += GRAVITY * 0.7 * dt;
+      node.vx *= Math.pow(AIR, dt);
+      node.vy *= Math.pow(AIR, dt);
+
+      node.x += node.vx * dt;
+      node.y += node.vy * dt;
+      node.rot += node.vrot * dt;
 
       node.el.style.left = node.x + 'px';
       node.el.style.top = node.y + 'px';
       node.el.style.transform = `translate3d(0,0,0) rotate(${node.rot}deg)`;
 
       // fade out conditions
-      const age = performance.now() - node.born;
+      const age = now - node.born;
       const offscreen = node.y > (window.innerHeight + 200) || node.x < -200 || node.x > window.innerWidth + 200;
       if (age > node.ttl || offscreen) {
         node.el.style.opacity = '0';
@@ -220,6 +224,7 @@ export function initBills() {
     node.el.style.opacity = '0';
     node.vx = node.vy = node.vrot = 0;
     node.x = node.y = -9999;
+    node.lastFrame = 0;
   }
 
   // optional API to clear everything
