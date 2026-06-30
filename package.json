@@ -1,0 +1,5 @@
+{
+  "scripts": {
+    "check:imports": "node scripts/check-imports.mjs"
+  }
+}
