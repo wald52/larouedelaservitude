@@ -57,6 +57,10 @@ function setRuntimeSoundEnabled(enabled) {
   syncMasterGain();
 }
 
+export function isSoundEnabled() {
+  return readStoredSoundSetting();
+}
+
 // ===============================
 //  IndexedDB Helpers
 // ===============================
@@ -134,13 +138,18 @@ async function cacheSound(name, arrayBuffer) {
 
 /**
  * Initialise le système audio
- * Doit être appelé au chargement de la page (pas besoin d'interaction)
- * @returns {Promise<void>}
+ * Doit être appelé uniquement quand le son est nécessaire.
+ * @returns {Promise<boolean>} true si l'initialisation démarre, false si le son est désactivé
  */
 export async function initAudio() {
-  if (isInitialized) return;
-
   runtimeSoundEnabled = readStoredSoundSetting();
+
+  if (!runtimeSoundEnabled) {
+    console.log('[AUDIO] Son désactivé, initialisation ignorée');
+    return false;
+  }
+
+  if (isInitialized) return true;
   
   // Créer le contexte audio s'il n'existe pas
   if (!audioContext) {
@@ -179,6 +188,8 @@ export async function initAudio() {
     isInitialized = true;
     console.log('[AUDIO] Système audio prêt (background load terminé)');
   });
+
+  return true;
 }
 
 /**

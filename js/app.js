@@ -1,5 +1,5 @@
 import { initWheel, loadFullData, getEntryDetails, formatEntryForDisplay } from "./entries.js";
-import { initAudio, unlockAudio, playSpinClick, playWinSound } from "./audio.js";
+import { initAudio, unlockAudio, isSoundEnabled, playSpinClick, playWinSound } from "./audio.js";
 import { initMenu, loadHistory, loadSettings, recordSpin, isInfiniteMode } from "./menu.js";
 
 function requireElement(id) {
@@ -541,13 +541,21 @@ function drawWheel(a, now = performance.now()) {
 }
 
 function ensureAudioInitialized() {
-  if (audioReady) return Promise.resolve();
+  if (!isSoundEnabled()) {
+    audioInitPromise = null;
+    return Promise.resolve(false);
+  }
+
+  if (audioReady) return Promise.resolve(true);
   if (audioInitPromise) return audioInitPromise;
 
   audioInitPromise = initAudio()
-    .then(() => {
-      audioReady = true;
-      console.log('[APP] Audio prêt après interaction');
+    .then((initialized) => {
+      audioReady = initialized === true;
+      if (audioReady) {
+        console.log('[APP] Audio prêt après interaction');
+      }
+      return audioReady;
     })
     .catch((error) => {
       audioInitPromise = null;
@@ -656,23 +664,14 @@ async function initializeApp() {
     attachWheelListeners();
     scheduleDeferredInit();
 
-    // 🔊 Chargement audio différé (Priorité au rendu visuel)
-    const startAudio = () => {
-      initAudio();
-      const unlock = () => {
-        unlockAudio();
-        window.removeEventListener('click', unlock);
-        window.removeEventListener('touchstart', unlock);
-      };
-      window.addEventListener('click', unlock);
-      window.addEventListener('touchstart', unlock);
+    // 🔊 Préserve le déverrouillage audio mobile sans charger/décoder les sons.
+    const unlock = () => {
+      unlockAudio();
+      window.removeEventListener('click', unlock);
+      window.removeEventListener('touchstart', unlock);
     };
-
-    if ('requestIdleCallback' in window) {
-      requestIdleCallback(startAudio);
-    } else {
-      setTimeout(startAudio, 1500);
-    }
+    window.addEventListener('click', unlock);
+    window.addEventListener('touchstart', unlock);
 
     console.log('[APP] Roue initialisée avec', ENTRIES.length, 'entrées');
   } catch (e) {
