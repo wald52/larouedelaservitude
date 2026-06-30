@@ -1,5 +1,5 @@
 // Version du cache - À INCRÉMENTER à chaque déploiement
-const CACHE_VERSION = 'v17';
+const CACHE_VERSION = 'v18';
 const CACHE_NAME = `larouedelaservitude-${CACHE_VERSION}`;
 
 /*
@@ -14,15 +14,11 @@ const CACHE_NAME = `larouedelaservitude-${CACHE_VERSION}`;
    - Tous les fichiers critiques sont pré-cachés à l'installation
    - Fonctionne sans connexion après première visite
 
-   📊 STRATÉGIES (100% Network First) :
-   - HTML : Network First (toujours le dernier)
-   - JS/CSS : Network First (MAJ auto + offline)
-   - JSON : Network First (entries.json toujours à jour)
-   - Images : Network First (icônes, centre roue, etc.)
-   - Audio : Network First (pré-cachés mais vérifiés)
-   - Tout autre fichier : Network First (fallback global)
-   
-   💯 TOUS les fichiers sont vérifiés sur le réseau en premier !
+   📊 STRATÉGIES :
+   - index.html : Network First (dernière version + fallback offline)
+   - JS/CSS/manifest/données : Stale-While-Revalidate
+   - Images, icônes et audio : Cache First
+   - API et pages dynamiques : hors du Service Worker
    
    ℹ️ FONTS : Aucun - utilisation de fonts système uniquement
    (system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial)
@@ -36,6 +32,7 @@ const urlsToCache = [
   `${BASE}/index.html`,
 
   // 📜 Scripts (critique)
+  `${BASE}/js/app.js`,
   `${BASE}/js/entries.js`,
   `${BASE}/js/audio.js`,
   `${BASE}/js/menu.js`,
@@ -58,8 +55,11 @@ const urlsToCache = [
   `${BASE}/audio/frottement-papier2.mp3`,
 
   // 📱 Icônes PWA
+  `${BASE}/icons/favicon.ico`,
+  `${BASE}/icons/apple-touch-icon.png`,
   `${BASE}/icons/icon-192x192.png`,
   `${BASE}/icons/icon-512x512.png`,
+  `${BASE}/icons/og-image.png`,
   `${BASE}/site.webmanifest`,
 ];
 
@@ -133,8 +133,68 @@ self.addEventListener("activate", (event) => {
 /* =====================================================
    FETCH : Stratégies adaptées par type de fichier
    ===================================================== */
+const INDEX_PATHS = new Set([`${BASE}/`, `${BASE}/index.html`]);
+const DATA_PATHS = new Set([
+  `${BASE}/data/entries-light.json`,
+  `${BASE}/data/entries-full.json`,
+]);
+const STATIC_ASSET_REGEX = /\.(?:js|css|png|jpg|jpeg|gif|svg|webp|ico|avif|mp3|wav|ogg|m4a)$/i;
+
+function isCacheableResponse(response) {
+  return response && response.status === 200;
+}
+
+function putInCache(request, response) {
+  if (!isCacheableResponse(response)) return Promise.resolve();
+
+  return caches.open(CACHE_NAME).then((cache) => cache.put(request, response.clone()));
+}
+
+function networkFirst(request) {
+  return fetch(request)
+    .then((response) => {
+      putInCache(request, response);
+      return response;
+    })
+    .catch(() => caches.match(request));
+}
+
+function cacheFirst(request) {
+  return caches.match(request).then((cachedResponse) => {
+    if (cachedResponse) return cachedResponse;
+
+    return fetch(request).then((response) => {
+      putInCache(request, response);
+      return response;
+    });
+  });
+}
+
+function staleWhileRevalidate(request) {
+  return caches.match(request).then((cachedResponse) => {
+    const networkResponse = fetch(request)
+      .then((response) => {
+        putInCache(request, response);
+        return response;
+      })
+      .catch(() => cachedResponse);
+
+    return cachedResponse || networkResponse;
+  });
+}
+
 self.addEventListener("fetch", (event) => {
-  const url = new URL(event.request.url);
+  const request = event.request;
+
+  if (request.method !== 'GET') {
+    return;
+  }
+
+  const url = new URL(request.url);
+
+  if (url.origin !== self.location.origin) {
+    return;
+  }
   
   // ⚠️ API Netlify : Hors du SW (jamais en cache)
   if (url.pathname.includes("/.netlify/functions/")) {
@@ -145,112 +205,33 @@ self.addEventListener("fetch", (event) => {
   if (url.pathname.endsWith("buttons.html")) {
     return;
   }
-  
-  const request = event.request;
-  
-  // 📝 HTML → Network First avec fallback cache
-  // Toujours essayer de récupérer la dernière version
-  if (request.headers.get("accept")?.includes("text/html")) {
-    return event.respondWith(
-      fetch(request)
-        .then((res) => {
-          const clone = res.clone();
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(request, clone);
-          });
-          return res;
-        })
-        .catch(() => {
-          console.log('[SW] HTML: fallback sur cache (offline)');
-          return caches.match(request);
-        })
-    );
+
+  // 📝 Page principale → Network First
+  // Objectif : obtenir rapidement la dernière version d'index.html avec fallback offline.
+  if (INDEX_PATHS.has(url.pathname)) {
+    return event.respondWith(networkFirst(request));
   }
-  
-  // 📜 JS et CSS → Network First avec fallback cache
-  // Vérifie le réseau en premier, utilise le cache si offline
+
+  // 📊 Données métier → Stale-While-Revalidate
+  // Les entrées peuvent être légèrement anciennes pendant quelques secondes.
+  if (DATA_PATHS.has(url.pathname)) {
+    return event.respondWith(staleWhileRevalidate(request));
+  }
+
+  // 📱 Manifest → Stale-While-Revalidate
+  if (url.pathname === `${BASE}/site.webmanifest`) {
+    return event.respondWith(staleWhileRevalidate(request));
+  }
+
+  // 📜 JS/CSS → Stale-While-Revalidate pour un rendu rapide + mise à jour en arrière-plan.
   if (url.pathname.endsWith('.js') || url.pathname.endsWith('.css')) {
-    return event.respondWith(
-      fetch(request)
-        .then((res) => {
-          if (!res || res.status !== 200) return res;
-
-          const clone = res.clone();
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(request, clone);
-            console.log('[SW] JS/CSS: cache mis à jour:', url.pathname);
-          });
-          return res;
-        })
-        .catch(() => {
-          console.log('[SW] JS/CSS: fallback sur cache (offline):', url.pathname);
-          return caches.match(request);
-        })
-    );
+    return event.respondWith(staleWhileRevalidate(request));
   }
 
-  // 📊 TOUS les JSON → Network First avec fallback cache
-  // entries.json, site.webmanifest, etc. toujours à jour
-  if (url.pathname.endsWith('.json')) {
-    return event.respondWith(
-      fetch(request)
-        .then((res) => {
-          if (!res || res.status !== 200) return res;
-          
-          const clone = res.clone();
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(request, clone);
-            console.log('[SW] JSON: cache mis à jour:', url.pathname);
-          });
-          return res;
-        })
-        .catch(() => {
-          console.log('[SW] JSON: fallback sur cache (offline):', url.pathname);
-          return caches.match(request);
-        })
-    );
+  // 🖼️ Images, icônes et audio → Cache First : fichiers versionnés/peu changeants.
+  if (STATIC_ASSET_REGEX.test(url.pathname)) {
+    return event.respondWith(cacheFirst(request));
   }
-
-  // 🖼️ Images → Network First avec fallback cache
-  // Même les images sont vérifiées à chaque fois (MAJ auto)
-  if (url.pathname.match(/\.(png|jpg|jpeg|gif|svg|webp|ico|avif)$/i)) {
-    return event.respondWith(
-      fetch(request)
-        .then((res) => {
-          if (!res || res.status !== 200) return res;
-          
-          const clone = res.clone();
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(request, clone);
-            console.log('[SW] Image: cache mis à jour:', url.pathname);
-          });
-          return res;
-        })
-        .catch(() => {
-          console.log('[SW] Image: fallback sur cache (offline):', url.pathname);
-          return caches.match(request);
-        })
-    );
-  }
-
-  // 🕳️ FALLBACK : Network First pour tout le reste
-  // Attrape tous les fichiers non listés ci-dessus
-  return event.respondWith(
-    fetch(request)
-      .then((res) => {
-        if (!res || res.status !== 200) return res;
-        
-        const clone = res.clone();
-        caches.open(CACHE_NAME).then((cache) => {
-          cache.put(request, clone);
-        });
-        return res;
-      })
-      .catch(() => {
-        console.log('[SW] Fallback: récupération depuis le cache:', url.pathname);
-        return caches.match(request);
-      })
-  );
 });
 
 /* =====================================================
