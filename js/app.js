@@ -595,23 +595,16 @@ function ensureHtml2Canvas() {
   return html2canvasPromise;
 }
 
-function scheduleFullDataLoad() {
+function scheduleFullDataLoad(reason = 'interaction') {
   if (fullDataLoadScheduled) return;
   fullDataLoadScheduled = true;
 
-  const load = () => {
-    loadFullData().then(() => {
-      console.log('[APP] Données complètes chargées');
-    }).catch((error) => {
-      console.error('[APP] Erreur chargement données complètes:', error);
-    });
-  };
-
-  if ('requestIdleCallback' in window) {
-    window.requestIdleCallback(load, { timeout: 1200 });
-  } else {
-    setTimeout(load, 0);
-  }
+  loadFullData().then(() => {
+    console.log(`[APP] Données complètes chargées (${reason})`);
+  }).catch((error) => {
+    fullDataLoadScheduled = false;
+    console.error('[APP] Erreur chargement données complètes:', error);
+  });
 }
 
 function scheduleDeferredInit() {
@@ -622,7 +615,6 @@ function scheduleDeferredInit() {
       updateCountInfo();
       console.log('[APP] Menu initialisé (lazy)');
     }
-    scheduleFullDataLoad();
   };
 
   if ('requestIdleCallback' in window) {
@@ -698,6 +690,7 @@ function boostWheel(e) {
   finishIntroBuild();
   completeCenterIntro();
   ensureAudioInitialized();
+  scheduleFullDataLoad('premier boost');
   hasBeenSpun = true;
 
   if (typeof window.spawnBills === 'function') {
@@ -943,6 +936,7 @@ function animate(now) {
       frictionActive = true;
       frictionTimer = 0;
       frictionDuration = 180 + Math.random() * 120;
+      scheduleFullDataLoad('ralentissement');
     }
     const t = frictionTimer / frictionDuration;
     if (t < 1) {
