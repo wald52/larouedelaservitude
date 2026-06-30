@@ -1,5 +1,31 @@
 // netlify/functions/shareImage.js
 
+function escapeHtml(value) {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function validateImgBbHttpsUrl(value) {
+  let parsedUrl;
+
+  try {
+    parsedUrl = new URL(value);
+  } catch (err) {
+    throw new Error("Invalid ImgBB image URL");
+  }
+
+  const allowedImgBbHosts = new Set(["i.ibb.co", "ibb.co"]);
+  if (parsedUrl.protocol !== "https:" || !allowedImgBbHosts.has(parsedUrl.hostname)) {
+    throw new Error("Invalid ImgBB image URL");
+  }
+
+  return parsedUrl.toString();
+}
+
 exports.handler = async (event, context) => {
 
   // -------------------------------------------------------
@@ -81,7 +107,7 @@ exports.handler = async (event, context) => {
         throw new Error(imgJson.error?.message || "Unknown ImgBB error");
       }
 
-      imageUrl = imgJson.data.url;
+      imageUrl = validateImgBbHttpsUrl(imgJson.data?.url);
       console.log("✅ Image uploaded:", imageUrl);
 
     } catch (err) {
@@ -103,21 +129,26 @@ exports.handler = async (event, context) => {
     const shareId = `share-${Date.now()}`;
     const siteUrl = `https://${GITHUB_OWNER}.github.io/${GITHUB_REPO}`;
 
-    const cleanTitle = text.split("\n")[0].substr(0, 100).replace(/"/g, "");
-    const cleanDesc = text.replace(/\n/g, " ").substr(0, 200).replace(/"/g, "");
+    const cleanTitle = text.split("\n")[0].substr(0, 100);
+    const cleanDesc = text.replace(/\n/g, " ").substr(0, 200);
+    const escapedTitle = escapeHtml(cleanTitle);
+    const escapedDesc = escapeHtml(cleanDesc);
+    const escapedImageUrl = escapeHtml(imageUrl);
+    const escapedSiteUrl = escapeHtml(siteUrl);
+    const redirectScriptUrl = JSON.stringify(siteUrl);
 
     const html = `<!DOCTYPE html><html lang="fr"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>${cleanTitle}</title>
-<meta property="og:title" content="${cleanTitle}">
-<meta property="og:description" content="${cleanDesc}">
-<meta property="og:image" content="${imageUrl}">
+<title>${escapedTitle}</title>
+<meta property="og:title" content="${escapedTitle}">
+<meta property="og:description" content="${escapedDesc}">
+<meta property="og:image" content="${escapedImageUrl}">
 <meta property="og:type" content="website">
-<meta property="og:url" content="${siteUrl}">
+<meta property="og:url" content="${escapedSiteUrl}">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="${imageUrl}">
-<meta http-equiv="refresh" content="0; url=${siteUrl}">
-</head><body><script>window.location.href="${siteUrl}";</script></body></html>`;
+<meta name="twitter:image" content="${escapedImageUrl}">
+<meta http-equiv="refresh" content="0; url=${escapedSiteUrl}">
+</head><body><script>window.location.href=${redirectScriptUrl};</script></body></html>`;
 
     const base64Html = Buffer.from(html, "utf8").toString("base64");
     const githubPath = `shares/${shareId}.html`;
