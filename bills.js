@@ -97,8 +97,8 @@ export function initBills() {
     const el = doc.createElement('div');
     el.className = 'bill';
     el.textContent = '💶';
-    el.style.left = '-9999px';
-    el.style.top = '-9999px';
+    el.style.left = '0';
+    el.style.top = '0';
     el.style.opacity = '0';
     root.appendChild(el);
     pool.push({
@@ -137,15 +137,12 @@ export function initBills() {
       const node = getOne();
       if (!node) break;
       node.inUse = true;
-      node.el.style.opacity = '1';
 
       // place un peu décalé pour ne pas coller
       const ox = Math.cos(i * angleStep) * (6 + Math.random() * 20);
       const oy = Math.sin(i * angleStep) * (6 + Math.random() * 10);
       node.x = x + ox;
       node.y = y + oy;
-      node.el.style.left = (node.x) + 'px';
-      node.el.style.top = (node.y) + 'px';
 
       // taille aléatoire
       const scale = 0.8 + Math.random() * 1.6;
@@ -161,6 +158,8 @@ export function initBills() {
       // rotation
       node.rot = (Math.random() - 0.5) * 30;
       node.vrot = (Math.random() - 0.5) * (ROT_RANGE * 0.0025);
+      node.el.style.transform = `translate3d(${node.x}px, ${node.y}px, 0) rotate(${node.rot}deg)`;
+      node.el.style.opacity = '1';
 
       node.born = now;
       node.ttl = LIFETIME + Math.random() * 900;
@@ -186,9 +185,7 @@ export function initBills() {
       node.y += node.vy;
       node.rot += node.vrot;
 
-      node.el.style.left = node.x + 'px';
-      node.el.style.top = node.y + 'px';
-      node.el.style.transform = `translate3d(0,0,0) rotate(${node.rot}deg)`;
+      node.el.style.transform = `translate3d(${node.x}px, ${node.y}px, 0) rotate(${node.rot}deg)`;
 
       // fade out conditions
       const age = performance.now() - node.born;
@@ -214,9 +211,7 @@ export function initBills() {
 
   function release(node) {
     node.inUse = false;
-    node.el.style.left = '-9999px';
-    node.el.style.top = '-9999px';
-    node.el.style.transform = 'translate3d(0,0,0) rotate(0deg)';
+    node.el.style.transform = 'translate3d(0, 0, 0) rotate(0deg)';
     node.el.style.opacity = '0';
     node.vx = node.vy = node.vrot = 0;
     node.x = node.y = -9999;
