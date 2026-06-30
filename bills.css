@@ -2,7 +2,9 @@
 .bill {
   position: fixed;
   pointer-events: none;
-  will-change: transform, opacity, left, top;
+  left: 0;
+  top: 0;
+  will-change: transform, opacity;
   font-size: 28px;
   transform-origin: center;
   user-select: none;
