@@ -14,6 +14,7 @@ const STORE_NAME = 'cache';
 
 let entriesLight = null;
 let entriesFull = null;
+let fullDataPromise = null;
 let dbInstance = null;
 
 // ===============================
@@ -143,24 +144,34 @@ export async function initWheel() {
  */
 export async function loadFullData() {
   if (entriesFull) return entriesFull;
-  
-  entriesFull = await getFromCache('entries-full');
-  
-  if (!entriesFull) {
-    try {
-      const res = await fetch(`${BASE_PATH}/data/entries-full.json`);
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      const data = await res.json();
-      entriesFull = Array.isArray(data) ? data : (data.entries || []);
-      await saveToCache('entries-full', entriesFull);
-    } catch (e) {
-      console.error('Échec chargement entries-full:', e);
-      // Fallback: données vides
-      entriesFull = [];
+  if (fullDataPromise) return fullDataPromise;
+
+  fullDataPromise = (async () => {
+    let fullData = await getFromCache('entries-full');
+
+    if (!fullData) {
+      try {
+        const res = await fetch(`${BASE_PATH}/data/entries-full.json`);
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const data = await res.json();
+        fullData = Array.isArray(data) ? data : (data.entries || []);
+        await saveToCache('entries-full', fullData);
+      } catch (e) {
+        console.error('Échec chargement entries-full:', e);
+        // Fallback: données vides
+        fullData = [];
+      }
     }
-  }
-  
-  return entriesFull;
+
+    entriesFull = fullData;
+    fullDataPromise = null;
+    return entriesFull;
+  })().catch((error) => {
+    fullDataPromise = null;
+    throw error;
+  });
+
+  return fullDataPromise;
 }
 
 function escapeHtml(value) {
@@ -238,6 +249,7 @@ export async function refreshData() {
   await clearCache();
   entriesLight = null;
   entriesFull = null;
+  fullDataPromise = null;
   await initWheel();
   await loadFullData();
 }
