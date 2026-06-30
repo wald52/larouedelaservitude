@@ -457,7 +457,7 @@
       "annee": 1998
     },
     {
-      "id": "redevance-relative-aux-controles-renforces-a-l-importation-d",
+      "id": "redevance-relative-aux-controles-renforces-a-l-importation-d-2",
       "nom": "Redevance relative…",
       "nom_complet": "Redevance relative aux contrôles renforcés à l'importation des denrées alimentaires d'origine non animale",
       "recette": "0 millions d'euros",
@@ -569,7 +569,7 @@
       "annee": 1997
     },
     {
-      "id": "participation-au-financement-de-la-formation-des-professions",
+      "id": "participation-au-financement-de-la-formation-des-professions-2",
       "nom": "Participation au financement…",
       "nom_complet": "Participation au financement de la formation des professions non salariées dans le domaine agricole",
       "recette": "49 millions d'euros",
@@ -800,7 +800,7 @@
       "annee": 1998
     },
     {
-      "id": "redevance-sanitaire-de-transformation-des-produits-de-la-pec",
+      "id": "redevance-sanitaire-de-transformation-des-produits-de-la-pec-2",
       "nom": "Redevance sanitaire…",
       "nom_complet": "Redevance sanitaire de transformation des produits de la pêche et de l'aquaculture",
       "recette": "0,1 millions d'euros",
@@ -1199,7 +1199,7 @@
       "annee": null
     },
     {
-      "id": "taxe-due-par-les-entreprises-de-transport-public-aerien-et-m",
+      "id": "taxe-due-par-les-entreprises-de-transport-public-aerien-et-m-2",
       "nom": "Taxe due par les entreprises…",
       "nom_complet": "Taxe due par les entreprises de transport public aérien et maritime (Corse)",
       "recette": "47,4 millions d'euros",
@@ -1493,7 +1493,7 @@
       "annee": 1956
     },
     {
-      "id": "redevance-due-par-les-titulaires-de-titres-d-exploitation-de",
+      "id": "redevance-due-par-les-titulaires-de-titres-d-exploitation-de-2",
       "nom": "Redevance due par les…",
       "nom_complet": "Redevance due par les titulaires de titres d'exploitation de mines d'hydrocarbures liquides ou gazeux au large de Saint-Pierre-et-Miquelon",
       "recette": null,
@@ -1521,7 +1521,7 @@
       "annee": 2000
     },
     {
-      "id": "redevance-relative-aux-controles-renforces-a-l-importation-d",
+      "id": "redevance-relative-aux-controles-renforces-a-l-importation-d-3",
       "nom": "Redevance relative…",
       "nom_complet": "Redevance relative aux contrôles renforcés à l'importation des denrées alimentaires d'origine non animale",
       "recette": "1,1 millions d'euros",
@@ -1542,7 +1542,7 @@
       "annee": 1935
     },
     {
-      "id": "participation-au-financement-de-la-formation-des-professions",
+      "id": "participation-au-financement-de-la-formation-des-professions-3",
       "nom": "Participation au financement…",
       "nom_complet": "Participation au financement de la formation des professions non salariées dans le domaine agricole",
       "recette": null,
@@ -1556,14 +1556,14 @@
       "annee": 2009
     },
     {
-      "id": "taxe-additionnelle-a-la-taxe-sur-les-installations-nucleaire",
+      "id": "taxe-additionnelle-a-la-taxe-sur-les-installations-nucleaire-2",
       "nom": "Taxe additionnelle…",
       "nom_complet": "Taxe additionnelle à la taxe sur les installations nucléaires de base - Diffusion technologique",
       "recette": "20 millions d'euros",
       "annee": 2006
     },
     {
-      "id": "taxe-additionnelle-a-la-taxe-sur-les-installations-nucleaire",
+      "id": "taxe-additionnelle-a-la-taxe-sur-les-installations-nucleaire-3",
       "nom": "Taxe additionnelle…",
       "nom_complet": "Taxe additionnelle à la taxe sur les installations nucléaires de base - Accompagnement",
       "recette": "39 millions d'euros",
@@ -1689,7 +1689,7 @@
       "annee": 1986
     },
     {
-      "id": "redevance-proportionnelle-sur-l-energie-hydraulique",
+      "id": "redevance-proportionnelle-sur-l-energie-hydraulique-2",
       "nom": "Redevance proportionnelle…",
       "nom_complet": "Redevance proportionnelle sur l'énergie hydraulique",
       "recette": null,
@@ -1766,7 +1766,7 @@
       "annee": null
     },
     {
-      "id": "cotisation-obligatoire",
+      "id": "cotisation-obligatoire-2",
       "nom": "Cotisation obligatoire",
       "nom_complet": "Cotisation obligatoire",
       "recette": null,
@@ -2081,7 +2081,7 @@
       "annee": null
     },
     {
-      "id": "cotisation-obligatoire",
+      "id": "cotisation-obligatoire-3",
       "nom": "Cotisation obligatoire",
       "nom_complet": "Cotisation obligatoire",
       "recette": null,
@@ -2249,14 +2249,14 @@
       "annee": null
     },
     {
-      "id": "taxe-speciale-d-equipement-au-profit-des-etablissements-publ",
+      "id": "taxe-speciale-d-equipement-au-profit-des-etablissements-publ-2",
       "nom": "Taxe spéciale d'équipement…",
       "nom_complet": "Taxe spéciale d'équipement au profit des établissements publics fonciers de l’État",
       "recette": null,
       "annee": null
     },
     {
-      "id": "taxe-speciale-d-equipement-au-profit-des-etablissements-publ",
+      "id": "taxe-speciale-d-equipement-au-profit-des-etablissements-publ-3",
       "nom": "Taxe spéciale d'équipement…",
       "nom_complet": "Taxe spéciale d'équipement au profit des établissements publics fonciers et d'aménagement de la Guyane et de Mayotte",
       "recette": null,
@@ -2270,7 +2270,7 @@
       "annee": null
     },
     {
-      "id": "taxe-speciale-d-equipement-au-profit-de-l-agence-pour-la-mis",
+      "id": "taxe-speciale-d-equipement-au-profit-de-l-agence-pour-la-mis-2",
       "nom": "Taxe spéciale d'équipement…",
       "nom_complet": "Taxe spéciale d'équipement au profit de l'agence pour la mise en valeur des espaces urbains de la zone dite des cinquante pas géométriques en Martinique.",
       "recette": null,
@@ -2284,7 +2284,7 @@
       "annee": null
     },
     {
-      "id": "taxe-speciale-d-equipement-au-profit-de-l-etablissement-publ",
+      "id": "taxe-speciale-d-equipement-au-profit-de-l-etablissement-publ-2",
       "nom": "Taxe spéciale d'équipement…",
       "nom_complet": "Taxe spéciale d'équipement au profit de l'établissement public local Société du Grand Projet du Sud-Ouest",
       "recette": null,
@@ -2347,14 +2347,14 @@
       "annee": 2017
     },
     {
-      "id": "cotisation-assise-sur-le-montant-total-des-honoraires-factur",
+      "id": "cotisation-assise-sur-le-montant-total-des-honoraires-factur-2",
       "nom": "Cotisation assise sur…",
       "nom_complet": "Cotisation assise sur le montant total des honoraires facturés par les organismes tiers indépendants lorsqu'ils certifient les informations en matière de durabilité",
       "recette": null,
       "annee": 2017
     },
     {
-      "id": "cotisation-additionnelle-assise-sur-le-montant-total-des-hon",
+      "id": "cotisation-additionnelle-assise-sur-le-montant-total-des-hon-2",
       "nom": "Cotisation additionnelle…",
       "nom_complet": "Cotisation additionnelle assise sur le montant total des honoraires facturés par les organismes tiers indépendants lorsqu'ils certifient les informations en matière de durabilité des entités d'intérêt public",
       "recette": null,
@@ -2501,7 +2501,7 @@
       "annee": null
     },
     {
-      "id": "retraite-complementaire-contribution-patronale-de-prevoyance",
+      "id": "retraite-complementaire-contribution-patronale-de-prevoyance-2",
       "nom": "Retraite complémentaire…",
       "nom_complet": "Retraite complémentaire Contribution patronale de prévoyance (forfait social) entreprises de 50 salariés et plus",
       "recette": null,
@@ -2564,7 +2564,7 @@
       "annee": null
     },
     {
-      "id": "taxe-d-apprentissage",
+      "id": "taxe-d-apprentissage-2",
       "nom": "Taxe d'apprentissage",
       "nom_complet": "Taxe d'apprentissage",
       "recette": null,

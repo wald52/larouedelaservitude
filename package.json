@@ -1,5 +1,7 @@
 {
   "scripts": {
-    "check:imports": "node scripts/check-imports.mjs"
+    "check:imports": "node scripts/check-imports.mjs",
+    "check:data": "node scripts/validate-data.mjs",
+    "check": "npm run check:imports && npm run check:data"
   }
 }

@@ -848,7 +848,14 @@ form.addEventListener('submit', async (e) => {
     if (json.ok) {
       status.textContent = 'Merci — votre message a été envoyé !';
       if (json.url) {
-        status.innerHTML += `<br><a href="${json.url}" target="_blank" rel="noopener">Voir le ticket sur GitHub</a>`;
+        const ticketUrl = new URL(json.url, window.location.origin);
+        const lineBreak = document.createElement('br');
+        const link = document.createElement('a');
+        link.href = ticketUrl.href;
+        link.target = '_blank';
+        link.rel = 'noopener';
+        link.textContent = 'Voir le ticket sur GitHub';
+        status.append(lineBreak, link);
       }
       setTimeout(()=> modal.style.display='none', 1500);
     } else {
