@@ -151,7 +151,7 @@ export async function loadFullData() {
       const res = await fetch(`${BASE_PATH}/data/entries-full.json`);
       if (!res.ok) throw new Error('HTTP ' + res.status);
       const data = await res.json();
-      entriesFull = data.entries || data;
+      entriesFull = Array.isArray(data) ? data : (data.entries || []);
       await saveToCache('entries-full', entriesFull);
     } catch (e) {
       console.error('Échec chargement entries-full:', e);
@@ -161,6 +161,15 @@ export async function loadFullData() {
   }
   
   return entriesFull;
+}
+
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
 }
 
 /**
@@ -207,16 +216,16 @@ export function formatEntryForDisplay(entry) {
   const parts = [];
   
   // Nom complet en premier
-  parts.push(`<strong>${entry.nom_complet}</strong>`);
+  parts.push(`<strong>${escapeHtml(entry.nom_complet)}</strong>`);
   
   // Recette si disponible
   if (entry.recette) {
-    parts.push(`<br>💰 Recette : ${entry.recette}`);
+    parts.push(`<br>💰 Recette : ${escapeHtml(entry.recette)}`);
   }
   
   // Année si disponible
   if (entry.annee) {
-    parts.push(`<br>📅 Date de création : ${entry.annee}`);
+    parts.push(`<br>📅 Date de création : ${escapeHtml(entry.annee)}`);
   }
   
   return parts.join('<br>');

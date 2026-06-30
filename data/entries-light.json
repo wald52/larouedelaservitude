@@ -260,7 +260,7 @@
     "nom": "Redevance relative…"
   },
   {
-    "id": "redevance-relative-aux-controles-renforces-a-l-importation-d",
+    "id": "redevance-relative-aux-controles-renforces-a-l-importation-d-2",
     "nom": "Redevance relative…"
   },
   {
@@ -324,7 +324,7 @@
     "nom": "Participation au financement…"
   },
   {
-    "id": "participation-au-financement-de-la-formation-des-professions",
+    "id": "participation-au-financement-de-la-formation-des-professions-2",
     "nom": "Participation au financement…"
   },
   {
@@ -456,7 +456,7 @@
     "nom": "Redevance sanitaire…"
   },
   {
-    "id": "redevance-sanitaire-de-transformation-des-produits-de-la-pec",
+    "id": "redevance-sanitaire-de-transformation-des-produits-de-la-pec-2",
     "nom": "Redevance sanitaire…"
   },
   {
@@ -684,7 +684,7 @@
     "nom": "Taxe régionale sur…"
   },
   {
-    "id": "taxe-due-par-les-entreprises-de-transport-public-aerien-et-m",
+    "id": "taxe-due-par-les-entreprises-de-transport-public-aerien-et-m-2",
     "nom": "Taxe due par les entreprises…"
   },
   {
@@ -852,7 +852,7 @@
     "nom": "Redevance due par les…"
   },
   {
-    "id": "redevance-due-par-les-titulaires-de-titres-d-exploitation-de",
+    "id": "redevance-due-par-les-titulaires-de-titres-d-exploitation-de-2",
     "nom": "Redevance due par les…"
   },
   {
@@ -868,7 +868,7 @@
     "nom": "Redevance pour contrôle…"
   },
   {
-    "id": "redevance-relative-aux-controles-renforces-a-l-importation-d",
+    "id": "redevance-relative-aux-controles-renforces-a-l-importation-d-3",
     "nom": "Redevance relative…"
   },
   {
@@ -880,7 +880,7 @@
     "nom": "Droit sur les produits…"
   },
   {
-    "id": "participation-au-financement-de-la-formation-des-professions",
+    "id": "participation-au-financement-de-la-formation-des-professions-3",
     "nom": "Participation au financement…"
   },
   {
@@ -888,11 +888,11 @@
     "nom": "Taxe additionnelle…"
   },
   {
-    "id": "taxe-additionnelle-a-la-taxe-sur-les-installations-nucleaire",
+    "id": "taxe-additionnelle-a-la-taxe-sur-les-installations-nucleaire-2",
     "nom": "Taxe additionnelle…"
   },
   {
-    "id": "taxe-additionnelle-a-la-taxe-sur-les-installations-nucleaire",
+    "id": "taxe-additionnelle-a-la-taxe-sur-les-installations-nucleaire-3",
     "nom": "Taxe additionnelle…"
   },
   {
@@ -964,7 +964,7 @@
     "nom": "Participation des concessionnaires…"
   },
   {
-    "id": "redevance-proportionnelle-sur-l-energie-hydraulique",
+    "id": "redevance-proportionnelle-sur-l-energie-hydraulique-2",
     "nom": "Redevance proportionnelle…"
   },
   {
@@ -1008,7 +1008,7 @@
     "nom": "Cotisation obligatoire"
   },
   {
-    "id": "cotisation-obligatoire",
+    "id": "cotisation-obligatoire-2",
     "nom": "Cotisation obligatoire"
   },
   {
@@ -1188,7 +1188,7 @@
     "nom": "Prélèvement sur la…"
   },
   {
-    "id": "cotisation-obligatoire",
+    "id": "cotisation-obligatoire-3",
     "nom": "Cotisation obligatoire"
   },
   {
@@ -1284,15 +1284,11 @@
     "nom": "Taxe spéciale d'équipement…"
   },
   {
-    "id": "taxe-speciale-d-equipement-au-profit-des-etablissements-publ",
+    "id": "taxe-speciale-d-equipement-au-profit-des-etablissements-publ-2",
     "nom": "Taxe spéciale d'équipement…"
   },
   {
-    "id": "taxe-speciale-d-equipement-au-profit-des-etablissements-publ",
-    "nom": "Taxe spéciale d'équipement…"
-  },
-  {
-    "id": "taxe-speciale-d-equipement-au-profit-de-l-agence-pour-la-mis",
+    "id": "taxe-speciale-d-equipement-au-profit-des-etablissements-publ-3",
     "nom": "Taxe spéciale d'équipement…"
   },
   {
@@ -1300,11 +1296,15 @@
     "nom": "Taxe spéciale d'équipement…"
   },
   {
-    "id": "taxe-speciale-d-equipement-au-profit-de-l-etablissement-publ",
+    "id": "taxe-speciale-d-equipement-au-profit-de-l-agence-pour-la-mis-2",
     "nom": "Taxe spéciale d'équipement…"
   },
   {
     "id": "taxe-speciale-d-equipement-au-profit-de-l-etablissement-publ",
+    "nom": "Taxe spéciale d'équipement…"
+  },
+  {
+    "id": "taxe-speciale-d-equipement-au-profit-de-l-etablissement-publ-2",
     "nom": "Taxe spéciale d'équipement…"
   },
   {
@@ -1340,11 +1340,11 @@
     "nom": "Contribution forfaitaire…"
   },
   {
-    "id": "cotisation-assise-sur-le-montant-total-des-honoraires-factur",
+    "id": "cotisation-assise-sur-le-montant-total-des-honoraires-factur-2",
     "nom": "Cotisation assise sur…"
   },
   {
-    "id": "cotisation-additionnelle-assise-sur-le-montant-total-des-hon",
+    "id": "cotisation-additionnelle-assise-sur-le-montant-total-des-hon-2",
     "nom": "Cotisation additionnelle…"
   },
   {
@@ -1428,7 +1428,7 @@
     "nom": "Retraite complémentaire…"
   },
   {
-    "id": "retraite-complementaire-contribution-patronale-de-prevoyance",
+    "id": "retraite-complementaire-contribution-patronale-de-prevoyance-2",
     "nom": "Retraite complémentaire…"
   },
   {
@@ -1464,7 +1464,7 @@
     "nom": "Contribution formation…"
   },
   {
-    "id": "taxe-d-apprentissage",
+    "id": "taxe-d-apprentissage-2",
     "nom": "Taxe d'apprentissage"
   },
   {

@@ -1,5 +1,5 @@
 // Version du cache - À INCRÉMENTER à chaque déploiement
-const CACHE_VERSION = 'v16';
+const CACHE_VERSION = 'v17';
 const CACHE_NAME = `larouedelaservitude-${CACHE_VERSION}`;
 
 /*
