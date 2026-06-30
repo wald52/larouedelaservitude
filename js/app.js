@@ -1219,7 +1219,20 @@ function handleResize() {
   }
 }
 
-addEventListener('resize', handleResize);
+let resizePending = false;
+
+function scheduleResizeRecalculation() {
+  if (resizePending) return;
+  resizePending = true;
+
+  requestAnimationFrame(() => {
+    resizePending = false;
+    handleResize();
+  });
+}
+
+addEventListener('resize', scheduleResizeRecalculation);
+addEventListener('orientationchange', scheduleResizeRecalculation);
 updateBg();
 initializeApp();
 
