@@ -10,7 +10,8 @@ Application web ludique et installable (PWA) qui présente les taxes et prélèv
 - `js/menu.js` : module de gestion du menu latéral, des panneaux de navigation, de l'historique, des paramètres et des interactions associées.
 - `service-worker.js` : service worker PWA. Il précache les ressources critiques, applique une stratégie Network First avec fallback cache et ignore les fonctions Netlify pour éviter de mettre en cache les appels dynamiques.
 - `netlify/functions/` : fonctions serverless Netlify.
-  - `shareImage.js` téléverse une image sur ImgBB, génère une page de partage dans `shares/` et la commit via l'API GitHub.
+  - `shareImage.js` téléverse une image sur ImgBB et renvoie une URL de partage dynamique servie par Netlify.
+  - `sharePage.js` génère à la volée la page HTML Open Graph/Twitter Card à partir des paramètres fournis par le flux de partage.
   - `sendFeedback.js` crée une discussion GitHub à partir des retours envoyés par les utilisateurs.
 
 ## Prérequis de déploiement Netlify
@@ -20,14 +21,12 @@ Application web ludique et installable (PWA) qui présente les taxes et prélèv
 3. Le dossier des fonctions Netlify doit rester configuré sur `netlify/functions`.
 4. Les en-têtes CORS pour `/.netlify/functions/*` doivent être conservés afin que l'application puisse appeler les fonctions depuis le domaine public.
 5. Les variables d'environnement listées ci-dessous doivent être configurées dans Netlify avant de tester le partage et les retours utilisateur.
-6. Pour les pages de partage, le token GitHub utilisé doit avoir les droits nécessaires pour écrire sur la branche cible configurée dans `netlify/functions/shareImage.js`.
+6. Les pages de partage ne nécessitent plus de droit d'écriture GitHub : elles sont servies par une route dynamique Netlify (`/.netlify/functions/sharePage`).
 
 ## Variables d'environnement nécessaires
 
-- `GITHUB_TOKEN` : token GitHub utilisé par les fonctions Netlify.
-  - Dans `shareImage.js`, il sert à créer un commit ajoutant une page HTML dans `shares/`.
-  - Dans `sendFeedback.js`, il sert à créer une discussion GitHub via GraphQL.
-- `IMGBB_API_KEY` : clé API ImgBB utilisée par `shareImage.js` pour héberger l'image générée avant de créer la page de partage.
+- `GITHUB_TOKEN` : token GitHub utilisé par `sendFeedback.js` pour créer une discussion GitHub via GraphQL. Il n'est plus utilisé par le partage d'image.
+- `IMGBB_API_KEY` : clé API ImgBB utilisée par `shareImage.js` pour héberger l'image générée avant de créer l'URL de partage dynamique.
 
 ## Mettre à jour les données
 
@@ -53,8 +52,21 @@ Procédure recommandée :
 
 > Note : `scripts/convert-entries.js` peut servir de base d'automatisation si un fichier source compatible est maintenu, mais la source actuelle de vérité pour l'application est le duo `data/entries-light.json` / `data/entries-full.json`.
 
+## Stratégie de stockage des partages
+
+Les fichiers `shares/share-*.html` sont des artefacts générés par les utilisateurs. Ils ne doivent pas rester dans Git : ils grossissent l'historique, déclenchent des écritures concurrentes sur la branche principale et lient une action utilisateur à un redéploiement du site. Les anciens exemples versionnés ont donc été supprimés et `.gitignore` exclut désormais `shares/share-*.html`.
+
+Le flux actuel évite la création de commits GitHub :
+
+1. `netlify/functions/shareImage.js` reçoit l'image encodée et le texte de partage.
+2. L'image est téléversée sur ImgBB, qui reste le stockage objet de l'image finale.
+3. La fonction renvoie une URL `/.netlify/functions/sharePage?...` contenant l'URL ImgBB et les métadonnées courtes nécessaires aux aperçus sociaux.
+4. `netlify/functions/sharePage.js` génère dynamiquement le HTML Open Graph/Twitter Card, puis redirige le visiteur vers la page d'accueil.
+
+Cette approche correspond à une route dynamique Netlify sans persistance HTML côté dépôt. Elle évite donc toute politique de nettoyage GitHub pour les nouveaux partages. Si un stockage persistant de métadonnées devient nécessaire, Netlify Blobs serait le choix privilégié avant GitHub Gist, une base légère ou des commits GitHub, car il reste proche du runtime Netlify et évite de modifier le dépôt à chaque partage.
+
 ## Limites connues
 
-- Pages de partage générées : chaque partage peut créer une page HTML statique dans `shares/` via un commit GitHub. Cela peut augmenter le nombre de fichiers générés et dépend des quotas/API GitHub et ImgBB.
+- Pages de partage dynamiques : l'URL de partage contient les métadonnées courtes de l'aperçu et l'URL ImgBB. Les images restent dépendantes des quotas/API et de la disponibilité d'ImgBB.
 - Cache service worker : malgré une stratégie Network First, les utilisateurs peuvent conserver des ressources anciennes si le service worker, le cache navigateur ou IndexedDB n'ont pas encore été rafraîchis. Incrémenter `CACHE_VERSION` et tester les scénarios offline/online après chaque changement important.
 - Données fiscales à vérifier : les montants de recette, dates de création et intitulés fiscaux doivent être contrôlés avant publication. Le projet ne garantit pas à lui seul l'exactitude ou l'actualité des données fiscales.

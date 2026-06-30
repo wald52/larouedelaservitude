@@ -5,7 +5,7 @@ function escapeHtml(value) {
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
+    .replace(/\"/g, "&quot;")
     .replace(/'/g, "&#39;");
 }
 
@@ -26,11 +26,29 @@ function validateImgBbHttpsUrl(value) {
   return parsedUrl.toString();
 }
 
-exports.handler = async (event, context) => {
+function getPublicSiteUrl(event) {
+  const configuredUrl = process.env.URL || process.env.DEPLOY_PRIME_URL;
+  if (configuredUrl) {
+    return configuredUrl.replace(/\/$/, "");
+  }
 
-  // -------------------------------------------------------
-  // 1) CORS
-  // -------------------------------------------------------
+  const host = event.headers.host || event.headers.Host;
+  if (!host) {
+    throw new Error("Missing request host");
+  }
+
+  const protocol = host.includes("localhost") || host.startsWith("127.0.0.1") ? "http" : "https";
+  return `${protocol}://${host}`;
+}
+
+function getShareMetadata(text) {
+  return {
+    title: text.split("\n")[0].substring(0, 100),
+    description: text.replace(/\n/g, " ").substring(0, 200)
+  };
+}
+
+exports.handler = async (event) => {
   const corsHeaders = {
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Headers": "Content-Type",
@@ -50,9 +68,6 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    // -------------------------------------------------------
-    // 2) Parse Body
-    // -------------------------------------------------------
     let body;
     try {
       body = JSON.parse(event.body);
@@ -69,14 +84,10 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // -------------------------------------------------------
-    // 3) Env Vars
-    // -------------------------------------------------------
     const IMGBB_API_KEY = process.env.IMGBB_API_KEY;
-    const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 
-    if (!IMGBB_API_KEY || !GITHUB_TOKEN) {
-      console.error("Missing env vars");
+    if (!IMGBB_API_KEY) {
+      console.error("Missing IMGBB_API_KEY env var");
       return {
         statusCode: 500,
         headers: corsHeaders,
@@ -84,9 +95,6 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // -------------------------------------------------------
-    // 4) Upload ImgBB
-    // -------------------------------------------------------
     const base64Image = imageData.replace(/^data:image\/\w+;base64,/, "");
     const formData = new URLSearchParams();
     formData.append("image", base64Image);
@@ -109,8 +117,8 @@ exports.handler = async (event, context) => {
 
       imageUrl = validateImgBbHttpsUrl(imgJson.data?.url);
       console.log("✅ Image uploaded:", imageUrl);
-
     } catch (err) {
+      clearTimeout(timeout);
       console.error("ImgBB Upload failed:", err);
       return {
         statusCode: 502,
@@ -119,128 +127,25 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // -------------------------------------------------------
-    // 5) Préparation GitHub
-    // -------------------------------------------------------
-    const GITHUB_OWNER = "wald52";
-    const GITHUB_REPO = "larouedelaservitude";
-    const GITHUB_BRANCH = "main";
-
-    const shareId = `share-${Date.now()}`;
-    const siteUrl = `https://${GITHUB_OWNER}.github.io/${GITHUB_REPO}`;
-
-    const cleanTitle = text.split("\n")[0].substr(0, 100);
-    const cleanDesc = text.replace(/\n/g, " ").substr(0, 200);
-    const escapedTitle = escapeHtml(cleanTitle);
-    const escapedDesc = escapeHtml(cleanDesc);
-    const escapedImageUrl = escapeHtml(imageUrl);
-    const escapedSiteUrl = escapeHtml(siteUrl);
-    const redirectScriptUrl = JSON.stringify(siteUrl);
-
-    const html = `<!DOCTYPE html><html lang="fr"><head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>${escapedTitle}</title>
-<meta property="og:title" content="${escapedTitle}">
-<meta property="og:description" content="${escapedDesc}">
-<meta property="og:image" content="${escapedImageUrl}">
-<meta property="og:type" content="website">
-<meta property="og:url" content="${escapedSiteUrl}">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="${escapedImageUrl}">
-<meta http-equiv="refresh" content="0; url=${escapedSiteUrl}">
-</head><body><script>window.location.href=${redirectScriptUrl};</script></body></html>`;
-
-    const base64Html = Buffer.from(html, "utf8").toString("base64");
-    const githubPath = `shares/${shareId}.html`;
-
-    // -------------------------------------------------------
-    // 6) 🔥 RÉCUPÉRATION CORRECTE DU HEAD OID
-    // -------------------------------------------------------
-    const headQuery = `
-      query($owner: String!, $repo: String!, $branch: String!) {
-        repository(owner: $owner, name: $repo) {
-          ref(qualifiedName: $branch) {
-            target {
-              ... on Commit { oid }
-            }
-          }
-        }
-      }
-    `;
-
-    const headResp = await fetch("https://api.github.com/graphql", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${GITHUB_TOKEN}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        query: headQuery,
-        variables: {
-          owner: GITHUB_OWNER,
-          repo: GITHUB_REPO,
-          branch: `refs/heads/${GITHUB_BRANCH}`
-        }
-      })
+    const siteUrl = getPublicSiteUrl(event);
+    const { title, description } = getShareMetadata(text);
+    const shareParams = new URLSearchParams({
+      image: imageUrl,
+      title,
+      description,
+      redirect: siteUrl
     });
+    const sharePageUrl = `${siteUrl}/.netlify/functions/sharePage?${shareParams.toString()}`;
 
-    const headJson = await headResp.json();
-    const headOid = headJson.data?.repository?.ref?.target?.oid;
-
-    if (!headOid) throw new Error("Impossible de récupérer le HEAD OID GitHub");
-
-
-    // -------------------------------------------------------
-    // 7) Mutation GitHub stable
-    // -------------------------------------------------------
-    const commitMutation = `
-      mutation($input: CreateCommitOnBranchInput!) {
-        createCommitOnBranch(input: $input) {
-          commit { url }
-        }
-      }
-    `;
-
-    const commitResp = await fetch("https://api.github.com/graphql", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${GITHUB_TOKEN}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        query: commitMutation,
-        variables: {
-          input: {
-            branch: {
-              repositoryNameWithOwner: `${GITHUB_OWNER}/${GITHUB_REPO}`,
-              branchName: GITHUB_BRANCH
-            },
-            message: { headline: `Add share ${shareId}` },
-            fileChanges: {
-              additions: [{ path: githubPath, contents: base64Html }]
-            },
-            expectedHeadOid: headOid
-          }
-        }
-      })
-    });
-
-    const commitJson = await commitResp.json();
-    if (commitJson.errors) throw new Error(JSON.stringify(commitJson.errors));
-
-    // -------------------------------------------------------
-    // 8) Retour OK
-    // -------------------------------------------------------
     return {
       statusCode: 200,
       headers: corsHeaders,
       body: JSON.stringify({
         success: true,
         imageUrl,
-        sharePageUrl: `${siteUrl}/shares/${shareId}.html`
+        sharePageUrl
       })
     };
-
   } catch (err) {
     console.error("Fatal Error shareImage:", err);
     return {
@@ -250,3 +155,6 @@ exports.handler = async (event, context) => {
     };
   }
 };
+
+exports.escapeHtml = escapeHtml;
+exports.validateImgBbHttpsUrl = validateImgBbHttpsUrl;
