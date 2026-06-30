@@ -1,5 +1,5 @@
 // Version du cache - À INCRÉMENTER à chaque déploiement
-const CACHE_VERSION = 'v15';
+const CACHE_VERSION = 'v16';
 const CACHE_NAME = `larouedelaservitude-${CACHE_VERSION}`;
 
 /*
@@ -44,6 +44,13 @@ const urlsToCache = [
   // 🎨 Styles
   `${BASE}/bills.css`,
   `${BASE}/menu.css`,
+
+  // 📊 Données JSON (critique pour offline)
+  `${BASE}/data/entries-light.json`,
+  `${BASE}/data/entries-full.json`,
+
+  // 🖼️ Images (critique pour offline)
+  `${BASE}/images/center3.avif`,
 
   // 🎵 Sons (critique pour offline)
   `${BASE}/audio/wheel-spin2.mp3`,
