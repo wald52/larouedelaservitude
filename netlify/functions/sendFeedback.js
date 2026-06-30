@@ -49,15 +49,24 @@ exports.handler = async (event) => {
 
     // === 🔧 Configuration GitHub ===
     const token = process.env.GITHUB_TOKEN;
+    if (!token) {
+      console.error("Missing GITHUB_TOKEN");
+      return {
+        statusCode: 500,
+        headers: corsHeaders,
+        body: JSON.stringify({ error: "Erreur serveur" })
+      };
+    }
 
+    // IDs GitHub issus du repository wald52/larouedelaservitude et de ses catégories de discussions.
+    // Les vérifier avec l'API GraphQL GitHub si le dépôt ou les catégories sont recréés.
     const categoryIds = {
       info: "DIC_kwDOQOpIP84Cxpx_",
       error: "DIC_kwDOQOpIP84CxpyG"
     };
     const categoryId = categoryIds[type] || categoryIds.info;
 
-    // ⚠️ ID du repository, PAS son nom
-    const repositoryId = "R_kgDOQOpIPw"; // <-- remplace par ton vrai repoId si différent
+    const repositoryId = "R_kgDOQOpIPw";
 
     // === 📝 Construction du titre + corps ===
     const safeResult = escapeGraphQL(resultText);
