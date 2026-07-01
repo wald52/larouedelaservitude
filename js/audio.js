@@ -28,6 +28,8 @@ let dbInstance = null;
 let decodedBuffers = {};
 let isInitialized = false;
 let runtimeSoundEnabled = true;
+let soundLoadPromises = {};
+let secondarySoundsScheduled = false;
 
 function readStoredSoundSetting() {
   try {
@@ -150,46 +152,77 @@ export async function initAudio() {
   }
 
   if (isInitialized) return true;
-  
-  // Créer le contexte audio s'il n'existe pas
-  if (!audioContext) {
-    audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    masterGainNode = audioContext.createGain();
-    masterGainNode.connect(audioContext.destination);
-    syncMasterGain();
-  }
-  
-  // Charger et décoder tous les sons en arrière-plan (non-bloquant)
-  const loadPromises = Object.entries(SOUNDS).map(async ([name, url]) => {
-    try {
-      if (decodedBuffers[name]) return;
-      
-      const cachedBuffer = await getCachedSound(name);
-      if (cachedBuffer) {
-        decodedBuffers[name] = await audioContext.decodeAudioData(cachedBuffer.slice(0));
-        return;
-      }
-      
-      // Nettoyage de l'URL pour éviter les doubles slashes
-      const fullUrl = `${BASE_PATH}/${url}`.replace(/\/+/g, '/');
-      const response = await fetch(fullUrl);
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      
-      const arrayBuffer = await response.arrayBuffer();
-      decodedBuffers[name] = await audioContext.decodeAudioData(arrayBuffer.slice(0));
-      await cacheSound(name, arrayBuffer);
-    } catch (e) {
-      console.error(`[AUDIO] Échec chargement ${name}:`, e);
-    }
-  });
-  
-  // On marque comme initialisé quand tout est prêt, mais on ne fait pas 'await' ici
-  Promise.all(loadPromises).then(() => {
-    isInitialized = true;
-    console.log('[AUDIO] Système audio prêt (background load terminé)');
-  });
+
+  ensureAudioContext();
+
+  // Le son de rotation est le seul son critique au premier geste.
+  // Les sons plus lourds/moins urgents sont préparés quand le navigateur est au repos
+  // afin d'éviter un pic CPU/réseau pendant l'animation de la roue sur mobile.
+  await loadSound('spin');
+  isInitialized = true;
+  scheduleSecondarySoundsLoad();
 
   return true;
+}
+
+function ensureAudioContext() {
+  if (audioContext) return;
+
+  audioContext = new (window.AudioContext || window.webkitAudioContext)();
+  masterGainNode = audioContext.createGain();
+  masterGainNode.connect(audioContext.destination);
+  syncMasterGain();
+}
+
+async function loadSound(name) {
+  if (decodedBuffers[name]) return decodedBuffers[name];
+  if (soundLoadPromises[name]) return soundLoadPromises[name];
+
+  soundLoadPromises[name] = (async () => {
+    ensureAudioContext();
+
+    const cachedBuffer = await getCachedSound(name);
+    if (cachedBuffer) {
+      decodedBuffers[name] = await audioContext.decodeAudioData(cachedBuffer.slice(0));
+      return decodedBuffers[name];
+    }
+
+    const url = SOUNDS[name];
+    const fullUrl = `${BASE_PATH}/${url}`.replace(/\/+/g, '/');
+    const response = await fetch(fullUrl);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+    const arrayBuffer = await response.arrayBuffer();
+    decodedBuffers[name] = await audioContext.decodeAudioData(arrayBuffer.slice(0));
+    await cacheSound(name, arrayBuffer);
+    return decodedBuffers[name];
+  })()
+    .catch((error) => {
+      console.error(`[AUDIO] Échec chargement ${name}:`, error);
+      return null;
+    })
+    .finally(() => {
+      soundLoadPromises[name] = null;
+    });
+
+  return soundLoadPromises[name];
+}
+
+function scheduleSecondarySoundsLoad() {
+  if (secondarySoundsScheduled) return;
+  secondarySoundsScheduled = true;
+
+  const loadSecondarySounds = () => {
+    Promise.all(['coin', 'bill'].map(loadSound)).then(() => {
+      console.log('[AUDIO] Sons secondaires prêts');
+    });
+  };
+
+  if ('requestIdleCallback' in window) {
+    requestIdleCallback(loadSecondarySounds, { timeout: 4000 });
+  } else {
+    setTimeout(loadSecondarySounds, 1200);
+  }
 }
 
 /**
@@ -217,8 +250,10 @@ export function playSound(name, volume = 1, playbackRate = 1) {
     return;
   }
 
-  if (!isInitialized || !decodedBuffers[name] || !masterGainNode) {
-    console.warn(`[AUDIO] Son "${name}" non disponible`);
+  if (!decodedBuffers[name] || !masterGainNode) {
+    if (isInitialized && SOUNDS[name]) {
+      loadSound(name);
+    }
     return;
   }
   
@@ -300,6 +335,8 @@ export function areAllSoundsReady() {
 export async function refreshSounds() {
   isInitialized = false;
   decodedBuffers = {};
+  soundLoadPromises = {};
+  secondarySoundsScheduled = false;
   
   // Vider IndexedDB
   if (dbInstance) {
