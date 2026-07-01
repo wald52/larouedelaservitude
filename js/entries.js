@@ -14,6 +14,7 @@ const STORE_NAME = 'cache';
 
 let entriesLight = null;
 let entriesFull = null;
+let entriesFullById = null;
 let fullDataPromise = null;
 let dbInstance = null;
 
@@ -164,6 +165,7 @@ export async function loadFullData() {
     }
 
     entriesFull = fullData;
+    entriesFullById = new Map(entriesFull.map(entry => [entry.id, entry]));
     fullDataPromise = null;
     return entriesFull;
   })().catch((error) => {
@@ -194,8 +196,8 @@ export async function getEntryDetails(index) {
   }
   
   const lightEntry = entriesLight[index];
-  const full = await loadFullData();
-  const fullEntry = full.find(e => e.id === lightEntry.id);
+  await loadFullData();
+  const fullEntry = entriesFullById?.get(lightEntry.id);
   
   return fullEntry || {
     id: lightEntry.id,
@@ -212,8 +214,8 @@ export async function getEntryDetails(index) {
  * @returns {Promise<{id: string, nom: string, nom_complet: string, recette: string|null, annee: number|null}|null>}
  */
 export async function getEntryById(id) {
-  const full = await loadFullData();
-  return full.find(e => e.id === id) || null;
+  await loadFullData();
+  return entriesFullById?.get(id) || null;
 }
 
 /**
@@ -249,6 +251,7 @@ export async function refreshData() {
   await clearCache();
   entriesLight = null;
   entriesFull = null;
+  entriesFullById = null;
   fullDataPromise = null;
   await initWheel();
   await loadFullData();

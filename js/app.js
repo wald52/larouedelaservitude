@@ -72,6 +72,7 @@ let deferredInstallPrompt = null;
 let completedSpinCount = 0;
 let installPromptDismissed = false;
 let installPromptPendingAfterOverlay = false;
+let billsInitPromise = null;
 
 const introState = {
   active: false,
@@ -691,6 +692,35 @@ async function initializeApp() {
 /* =======================
    INTERACTION / BOOST
    ======================= */
+
+function spawnBillsWhenReady(event, count) {
+  if (typeof window.spawnBills === 'function') {
+    window.spawnBills(event, count);
+    return;
+  }
+
+  if (!billsInitPromise) {
+    billsInitPromise = import('../bills.js')
+      .then(({ initBills }) => {
+        if (initBills) {
+          initBills();
+        }
+        return true;
+      })
+      .catch((error) => {
+        billsInitPromise = null;
+        console.warn('[APP] Effet billets indisponible:', error);
+        return false;
+      });
+  }
+
+  billsInitPromise.then((ready) => {
+    if (ready && typeof window.spawnBills === 'function') {
+      window.spawnBills(event, count);
+    }
+  });
+}
+
 function boostWheel(e) {
   console.log('[BOOST] boostWheel appelé, ENTRIES.length =', ENTRIES.length);
 
@@ -705,9 +735,7 @@ function boostWheel(e) {
   scheduleFullDataLoad('premier boost');
   hasBeenSpun = true;
 
-  if (typeof window.spawnBills === 'function') {
-    window.spawnBills(e, 8);
-  }
+  spawnBillsWhenReady(e, 8);
 
   if (Math.abs(angularVelocity) < 0.01) {
     targetVelocity = Math.min(MAX_VEL, targetVelocity + BOOST * 3.0);
@@ -1372,10 +1400,4 @@ function sendFeedbackToGitHub(resultText, userMessage, type) {
     });
   }
 
-  // Initialiser les billets (module ES6)
-  import('../bills.js').then(({ initBills }) => {
-    if (initBills) {
-      initBills();
-      console.log('[APP] Bills initialisés');
-    }
-  });
+  // L'effet billets est chargé à la première utilisation pour alléger le démarrage.
