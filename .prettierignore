@@ -1,0 +1,4 @@
+node_modules/
+shares/
+data/
+package-lock.json

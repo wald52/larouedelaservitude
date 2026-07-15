@@ -921,7 +921,7 @@ overlay.addEventListener('click', e => { if (e.target === overlay) { hideResultO
 overlay.querySelector('.bubble').addEventListener('click', e => e.stopPropagation());
 copyBtn && copyBtn.addEventListener('click', async ()=>{
   try { await navigator.clipboard.writeText(overlayText.innerText); copyBtn.textContent = '✅'; setTimeout(()=>copyBtn.textContent='📋',800); }
-  catch(e){ alert('Impossible de copier'); }
+  catch { alert('Impossible de copier'); }
 });
 
 /* =======================

@@ -95,7 +95,7 @@ function openAudioDB() {
 async function getCachedSound(name) {
   try {
     const db = await openAudioDB();
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       const tx = db.transaction(AUDIO_STORE_NAME, 'readonly');
       const store = tx.objectStore(AUDIO_STORE_NAME);
       const request = store.get(name);
@@ -116,7 +116,7 @@ async function getCachedSound(name) {
 async function cacheSound(name, arrayBuffer) {
   try {
     const db = await openAudioDB();
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       const tx = db.transaction(AUDIO_STORE_NAME, 'readwrite');
       const store = tx.objectStore(AUDIO_STORE_NAME);
       

@@ -10,7 +10,7 @@ function escapeHtml(value) {
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
-    .replace(/\"/g, "&quot;")
+    .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
 }
 
@@ -19,7 +19,7 @@ function validateImgBbHttpsUrl(value) {
 
   try {
     parsedUrl = new URL(value);
-  } catch (err) {
+  } catch {
     throw new Error("Invalid ImgBB image URL");
   }
 
@@ -72,7 +72,7 @@ exports.handler = async (event) => {
     let body;
     try {
       body = JSON.parse(event.body);
-    } catch (e) {
+    } catch {
       return { statusCode: 400, headers: corsHeaders, body: JSON.stringify({ error: "Invalid JSON" }) };
     }
 

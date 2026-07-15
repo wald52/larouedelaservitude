@@ -29,7 +29,7 @@ export function initBills() {
   import('./js/audio.js').then(({ playBillSound }) => {
     playBillAudio = playBillSound;
     console.log('[BILLS] Module audio chargé pour les sons de billets');
-  }).catch(e => {
+  }).catch(() => {
     console.warn('[BILLS] Module audio non disponible, fallback vers Audio()');
     // Fallback vers l'ancienne méthode
     const fallbackSound = new Audio('/larouedelaservitude/audio/frottement-papier2.mp3');
