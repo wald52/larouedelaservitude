@@ -518,7 +518,3 @@ export function recordSpin(entry) {
 export function isInfiniteMode() {
   return getSetting('infiniteMode');
 }
-
-export function isSoundEnabled() {
-  return getSetting('soundEnabled');
-}

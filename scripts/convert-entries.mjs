@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Script de conversion des entrées vers format JSON light + full
- * Usage: node scripts/convert-entries.js
+ * Usage: node scripts/convert-entries.mjs
  */
 
 import { readFileSync, writeFileSync } from 'fs';

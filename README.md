@@ -50,7 +50,7 @@ Procédure recommandée :
 6. Tester l'application localement ou via un deploy preview Netlify.
 7. Si le service worker a déjà été publié, incrémenter `CACHE_VERSION` dans `service-worker.js` lorsque la mise à jour doit invalider les anciens caches PWA.
 
-> Note : `scripts/convert-entries.js` peut servir de base d'automatisation si un fichier source compatible est maintenu, mais la source actuelle de vérité pour l'application est le duo `data/entries-light.json` / `data/entries-full.json`.
+> Note : `scripts/convert-entries.mjs` peut servir de base d'automatisation si un fichier source compatible est maintenu, mais la source actuelle de vérité pour l'application est le duo `data/entries-light.json` / `data/entries-full.json`.
 
 ## Stratégie de stockage des partages
 

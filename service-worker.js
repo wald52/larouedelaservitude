@@ -200,11 +200,6 @@ self.addEventListener("fetch", (event) => {
   if (url.pathname.includes("/.netlify/functions/")) {
     return;
   }
-  
-  // ⚠️ buttons.html : Jamais en cache (dynamique)
-  if (url.pathname.endsWith("buttons.html")) {
-    return;
-  }
 
   // 📝 Page principale → Network First
   // Objectif : obtenir rapidement la dernière version d'index.html avec fallback offline.

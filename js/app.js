@@ -722,8 +722,6 @@ function spawnBillsWhenReady(event, count) {
 }
 
 function boostWheel(e) {
-  console.log('[BOOST] boostWheel appelé, ENTRIES.length =', ENTRIES.length);
-
   if (ENTRIES.length === 0) {
     console.warn('[BOOST] ENTRIES est vide !');
     return;
@@ -756,14 +754,12 @@ function boostWheel(e) {
   showedResult = false;
   lastTime = performance.now();
   scheduleAnimationFrame();
-  console.log('[BOOST] angularVelocity:', angularVelocity, 'targetVelocity:', targetVelocity);
 }
 
 function attachWheelListeners() {
   if (canvas && btn) {
     canvas.addEventListener('pointerdown', boostWheel);
     btn.addEventListener('click', boostWheel);
-    console.log('[BOOST] Écouteurs attachés');
   } else {
     console.error('[BOOST] canvas ou btn non trouvé !');
   }
@@ -823,77 +819,97 @@ async function showOverlay(entryIndex){
   overlay.setAttribute('aria-hidden','false');
 }
 
-// 🧩 Attache les écouteurs de feedback UNE SEULE FOIS au démarrage
-document.addEventListener('click', (e) => {
+// 🧩 Attache les écouteurs de feedback UNE SEULE FOIS au démarrage.
+// Délégué sur #overlayText (et non document) car .bubble stoppe la propagation des clics.
+overlayText.addEventListener('click', (e) => {
   const infoBtn = e.target.closest('#btn-info');
   const errorBtn = e.target.closest('#btn-error');
-  
+
   if (!infoBtn && !errorBtn) return;
   e.preventDefault();
 
   // On récupère le texte du résultat actuel dans l'overlay
   const feedbackText = overlayText.innerText.split('\n\n')[1] || overlayText.innerText;
 
-  if (infoBtn) {
-    const userMsg = prompt("💬 Ajoutez votre complément d'information :");
-    if (userMsg) sendFeedbackToGitHub(feedbackText, userMsg, "info");
-  } else if (errorBtn) {
-    const userMsg = prompt("⚠️ Décrivez l'erreur que vous avez trouvée :");
-    if (userMsg) sendFeedbackToGitHub(feedbackText, userMsg, "error");
-  }
+  openFeedback(feedbackText, infoBtn ? "info" : "error");
 });
 
-// handlers for the feedback modal (adapt to your showOverlay call)
-const openBtn = requireElement('openFeedbackForm');
+// === Feedback modal ===
+// Si le site n'est pas sur Netlify (ex. GitHub Pages), on cible directement le domaine
+// Netlify du projet qui héberge la fonction serverless.
+const isNetlifyHost = window.location.hostname.includes("netlify.app");
+const FEEDBACK_ENDPOINT = isNetlifyHost
+  ? "/.netlify/functions/sendFeedback"
+  : "https://larouedelaservitude.netlify.app/.netlify/functions/sendFeedback";
+
 const modal = requireElement('feedbackModal');
 const form = requireElement('feedbackForm');
 const closeBtn = requireElement('closeFeedback');
 const status = requireElement('feedbackStatus');
 
-function openFeedback(resultText){
+// Limite anti-abus côté client : 1 envoi par minute max
+let lastFeedbackTime = 0;
+
+function openFeedback(resultText, type = 'info'){
   requireElement('formResult').value = resultText;
+  requireElement('formType').value = type;
   requireElement('formMessage').value = '';
-  requireElement('formEmail').value = '';
   requireElement('honeypot').value = '';
   status.style.display = 'none';
   modal.style.display = 'flex';
+  requireElement('formMessage').focus();
 }
 
 closeBtn.addEventListener('click', ()=> modal.style.display='none');
 modal.addEventListener('click', (e)=> { if (e.target === modal) modal.style.display='none'; });
+document.addEventListener('keydown', (e)=> {
+  if (e.key === 'Escape' && modal.style.display === 'flex') modal.style.display = 'none';
+});
 
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
+
+  const now = Date.now();
+  if (now - lastFeedbackTime < 60000) {
+    status.style.display = 'block';
+    status.textContent = 'Merci d’attendre une minute avant d’envoyer un nouveau message.';
+    return;
+  }
+
   status.style.display = 'block'; status.textContent = 'Envoi en cours…';
   const payload = {
     resultText: requireElement('formResult').value,
     userMessage: requireElement('formMessage').value,
-    userEmail: requireElement('formEmail').value,
+    type: requireElement('formType').value || 'info',
     honeypot: requireElement('honeypot').value || ''
   };
   try {
-    const resp = await fetch('/.netlify/functions/sendFeedback', {
+    const resp = await fetch(FEEDBACK_ENDPOINT, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     });
-    const json = await resp.json();
-    if (json.ok) {
-      status.textContent = 'Merci — votre message a été envoyé !';
-      if (json.url) {
-        const ticketUrl = new URL(json.url, window.location.origin);
-        const lineBreak = document.createElement('br');
-        const link = document.createElement('a');
-        link.href = ticketUrl.href;
-        link.target = '_blank';
-        link.rel = 'noopener';
-        link.textContent = 'Voir le ticket sur GitHub';
-        status.append(lineBreak, link);
-      }
-      setTimeout(()=> modal.style.display='none', 1500);
-    } else {
-      status.textContent = 'Erreur lors de l’envoi : ' + (json.error || 'unknown');
+
+    if (!resp.ok) {
+      const text = await resp.text();
+      status.textContent = 'Erreur lors de l’envoi : ' + (text || resp.status);
+      return;
     }
+
+    lastFeedbackTime = now;
+    const json = await resp.json().catch(() => ({}));
+    status.textContent = 'Merci — votre message a été envoyé !';
+    if (json.url) {
+      const ticketUrl = new URL(json.url, window.location.origin);
+      const lineBreak = document.createElement('br');
+      const link = document.createElement('a');
+      link.href = ticketUrl.href;
+      link.target = '_blank';
+      link.rel = 'noopener';
+      link.textContent = 'Voir le ticket sur GitHub';
+      status.append(lineBreak, link);
+    }
+    setTimeout(()=> modal.style.display='none', 1500);
   } catch (err) {
     console.error(err);
     status.textContent = 'Erreur réseau lors de l’envoi.';
@@ -1124,9 +1140,6 @@ shareButtons.forEach(btn => {
         // Cela peut diviser le poids du fichier par 4 ou 5.
         const optimizedBase64 = await optimizeImageWebP(rawBase64, 800, 0.60);
 
-        // Log pour vérifier la taille dans la console avant envoi
-        console.log("Taille approximative de l'image (ko):", Math.round(optimizedBase64.length / 1024));
-        
         const imageData = "data:image/webp;base64," + optimizedBase64;
         const a = document.createElement('a');
         a.href = imageData;
@@ -1149,14 +1162,10 @@ shareButtons.forEach(btn => {
       btn.style.opacity = '0.5';
       btn.textContent = '⏳';
 
-      console.log("📸 Capture en cours...");
       const canvasCap = await captureWheelArea();
 
-      console.log("🔄 Optimisation de l'image...");
       const rawBase64 = canvasCap.toDataURL("image/png");
       const optimizedBase64 = await optimizeImageWebP(rawBase64, 1200, 0.85);
-
-      console.log("☁️ Upload sécurisé vers Netlify Function...");
 
       const SHARE_IMAGE_URL = window.location.hostname.includes("netlify.app")
         ? "/.netlify/functions/shareImage"
@@ -1184,7 +1193,6 @@ shareButtons.forEach(btn => {
       }
 
       const { imageUrl, sharePageUrl } = result;
-      console.log("✅ Upload réussi:", sharePageUrl);
 
       const msg = encodeURIComponent(text);
       const siteUrl = window.location.origin + window.location.pathname;
@@ -1217,7 +1225,6 @@ shareButtons.forEach(btn => {
           return;
       }
 
-      console.log("🚀 Ouverture du partage...");
       window.open(shareUrl, '_blank', 'noopener,noreferrer');
 
       btn.disabled = false;
@@ -1278,7 +1285,7 @@ document.addEventListener('keydown',(e)=>{
     // Vérifie si une fenêtre (overlay) est visible
     const anyModalOpen =
       document.getElementById('overlay')?.style.display === 'flex' ||
-      document.getElementById('feedbackForm')?.style.display === 'flex' ||
+      document.getElementById('feedbackModal')?.style.display === 'flex' ||
       document.getElementById('menuSidebar')?.classList.contains('active') ||
       document.querySelector('.menu-panel.active');
 
@@ -1292,78 +1299,6 @@ document.addEventListener('keydown',(e)=>{
 window.addEventListener('infiniteModeChange', () => {
   updateCountInfo();
 });
-
-// === Détection automatique de l'environnement (Netlify ou autre) ===
-const isNetlifyHost = window.location.hostname.includes("netlify.app");
-
-// Si le site n'est pas sur Netlify, on cible directement le domaine Netlify du projet
-const NETLIFY_FUNCTION_URL = isNetlifyHost
-  ? "/.netlify/functions/sendFeedback"
-  : "https://larouedelaservitude.netlify.app/.netlify/functions/sendFeedback";
-
-// 🧩 Limite anti-abus côté client : 1 envoi par minute max
-let lastFeedbackTime = 0;
-  
-// === 🧩 Fonction d’envoi vers GitHub Discussions via Netlify ===
-function sendFeedbackToGitHub(resultText, userMessage, type) {
-  const now = Date.now();
-
-  // Vérifie s'il y a eu un envoi récent
-  if (now - lastFeedbackTime < 60000) { // 60 000 ms = 1 minute
-    alert("Merci d’attendre une minute avant d’envoyer un nouveau message.");
-    return;
-  }
-
-  // Met à jour la dernière heure d'envoi
-  lastFeedbackTime = now;
-
-  // Envoi normal
-  console.log("📡 Envoi du feedback vers :", NETLIFY_FUNCTION_URL);
-  
-  fetch(NETLIFY_FUNCTION_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ resultText, userMessage, type })
-  })
-  .then(async res => {
-    const contentType = res.headers.get("content-type") || "";
-    const text = await res.text();  // lit toujours la réponse, même si ce n’est pas du JSON
-
-  // si JSON → on parse
-    if (contentType.includes("application/json")) {
-      try {
-        const data = JSON.parse(text);
-        if (!res.ok) throw data;
-        return data;
-      } catch (e) {
-        throw {
-          ok: false,
-          error: "Réponse JSON invalide",
-          raw: text
-        };
-      }
-    }
-
-  // si texte brut → c’est sûrement un message d’erreur humain du serveur
-    if (!res.ok) {
-      throw {
-        ok: false,
-        error: text   // c’est ici que "Message trop court..." remontera proprement
-      };
-    }
-
-    return { ok: true, text };
-  })
-  .then(data => {
-  // succès : message envoyé
-    alert("Merci pour votre retour !");
-  })
-  .catch(err => {
-  // ici, on affiche l’erreur lisible
-    alert(err.error || "Erreur inconnue");
-  });
-
-}
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
