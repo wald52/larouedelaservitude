@@ -1,5 +1,10 @@
 // netlify/functions/shareImage.js
 
+const { corsHeaders: buildCorsHeaders } = require("./_shared/cors");
+
+// Taille maximale du base64 accepté (~6 Mo décodé pour ~8 Mo base64).
+const MAX_IMAGE_BASE64_LENGTH = 8 * 1024 * 1024;
+
 function escapeHtml(value) {
   return String(value)
     .replace(/&/g, "&amp;")
@@ -49,11 +54,7 @@ function getShareMetadata(text) {
 }
 
 exports.handler = async (event) => {
-  const corsHeaders = {
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Headers": "Content-Type",
-    "Access-Control-Allow-Methods": "POST, OPTIONS"
-  };
+  const corsHeaders = buildCorsHeaders(event);
 
   if (event.httpMethod === "OPTIONS") {
     return { statusCode: 200, headers: corsHeaders, body: "OK" };
@@ -76,11 +77,29 @@ exports.handler = async (event) => {
     }
 
     const { imageData, text } = body;
-    if (!imageData || !text) {
+    if (!imageData || !text || typeof imageData !== "string" || typeof text !== "string") {
       return {
         statusCode: 400,
         headers: corsHeaders,
         body: JSON.stringify({ error: "Missing imageData or text" })
+      };
+    }
+
+    if (imageData.length > MAX_IMAGE_BASE64_LENGTH) {
+      return {
+        statusCode: 413,
+        headers: corsHeaders,
+        body: JSON.stringify({ error: "Image too large" })
+      };
+    }
+
+    // On accepte un data-URI image ou du base64 brut, mais rien d'autre.
+    const base64Image = imageData.replace(/^data:image\/\w+;base64,/, "");
+    if (!/^[A-Za-z0-9+/]+={0,2}$/.test(base64Image)) {
+      return {
+        statusCode: 400,
+        headers: corsHeaders,
+        body: JSON.stringify({ error: "Invalid image data" })
       };
     }
 
@@ -95,8 +114,8 @@ exports.handler = async (event) => {
       };
     }
 
-    const base64Image = imageData.replace(/^data:image\/\w+;base64,/, "");
     const formData = new URLSearchParams();
+    formData.append("key", IMGBB_API_KEY);
     formData.append("image", base64Image);
 
     const controller = new AbortController();
@@ -105,7 +124,7 @@ exports.handler = async (event) => {
     let imageUrl;
     try {
       const imgResp = await fetch(
-        `https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`,
+        "https://api.imgbb.com/1/upload",
         { method: "POST", body: formData, signal: controller.signal }
       );
       clearTimeout(timeout);
@@ -116,14 +135,13 @@ exports.handler = async (event) => {
       }
 
       imageUrl = validateImgBbHttpsUrl(imgJson.data?.url);
-      console.log("✅ Image uploaded:", imageUrl);
     } catch (err) {
       clearTimeout(timeout);
       console.error("ImgBB Upload failed:", err);
       return {
         statusCode: 502,
         headers: corsHeaders,
-        body: JSON.stringify({ error: "Failed to upload to ImgBB", details: err.message })
+        body: JSON.stringify({ error: "Failed to upload to ImgBB" })
       };
     }
 
@@ -151,7 +169,7 @@ exports.handler = async (event) => {
     return {
       statusCode: 500,
       headers: corsHeaders,
-      body: JSON.stringify({ error: "Internal server error", message: err.message })
+      body: JSON.stringify({ error: "Internal server error" })
     };
   }
 };

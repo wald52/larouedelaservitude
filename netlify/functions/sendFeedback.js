@@ -1,16 +1,8 @@
+const { corsHeaders: buildCorsHeaders } = require("./_shared/cors");
+
 exports.handler = async (event) => {
   // === 💡 Gestion des CORS ===
-  const allowedOrigins = [
-    "https://wald52.github.io",
-    "https://wald52.github.io/larouedelaservitude",
-    "https://larouedelaservitude.netlify.app"
-  ];
-  const origin = event.headers.origin;
-  const corsHeaders = {
-    "Access-Control-Allow-Origin": allowedOrigins.includes(origin) ? origin : "null",
-    "Access-Control-Allow-Headers": "Content-Type",
-    "Access-Control-Allow-Methods": "POST, OPTIONS",
-  };
+  const corsHeaders = buildCorsHeaders(event);
 
   if (event.httpMethod === "OPTIONS") {
     return { statusCode: 200, headers: corsHeaders, body: "OK" };
