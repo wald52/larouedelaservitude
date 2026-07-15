@@ -6,14 +6,12 @@
 // 2. Décodés et stockés dans IndexedDB
 // 3. Disponibles immédiatement, même hors ligne
 
-const BASE_PATH = window.location.pathname.endsWith('/') 
-  ? window.location.pathname.slice(0, -1) 
-  : window.location.pathname.replace(/\/index\.html$/, '');
+import { BASE_PATH } from "./constants.js";
+import { isSoundEnabled as readStoredSoundSetting } from "./settings.js";
 
 const AUDIO_DB_NAME = 'LaRoueAudio';
 const AUDIO_DB_VERSION = 1;
 const AUDIO_STORE_NAME = 'sounds';
-const SETTINGS_KEY = 'larouedelaservitude_settings';
 
 // Sons disponibles
 const SOUNDS = {
@@ -30,23 +28,6 @@ let isInitialized = false;
 let runtimeSoundEnabled = true;
 let soundLoadPromises = {};
 let secondarySoundsScheduled = false;
-
-function readStoredSoundSetting() {
-  try {
-    const attr = document.documentElement?.getAttribute('data-sound-enabled');
-    if (attr === 'true') return true;
-    if (attr === 'false') return false;
-
-    const stored = localStorage.getItem(SETTINGS_KEY);
-    if (!stored) return true;
-
-    const parsed = JSON.parse(stored);
-    return parsed.soundEnabled !== false;
-  } catch (e) {
-    console.warn('[AUDIO] Impossible de lire le réglage son:', e);
-    return true;
-  }
-}
 
 function syncMasterGain() {
   if (masterGainNode) {

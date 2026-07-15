@@ -3,25 +3,9 @@
 // eventOrCoords can be an Event (mousedown/touchstart) or {x:.., y:..}
 
 // Import du module audio pour le son offline-first
+import { isSoundEnabled } from "./js/settings.js";
+
 let playBillAudio = null;
-const SETTINGS_KEY = 'larouedelaservitude_settings';
-
-function isSoundEnabled() {
-  try {
-    const attr = document.documentElement?.getAttribute('data-sound-enabled');
-    if (attr === 'true') return true;
-    if (attr === 'false') return false;
-
-    const stored = localStorage.getItem(SETTINGS_KEY);
-    if (!stored) return true;
-
-    const parsed = JSON.parse(stored);
-    return parsed.soundEnabled !== false;
-  } catch (e) {
-    console.warn('[BILLS] Impossible de lire le réglage son:', e);
-    return true;
-  }
-}
 
 // Fonction d'initialisation (appelée par index.html)
 export function initBills() {

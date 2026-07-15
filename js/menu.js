@@ -2,8 +2,9 @@
 // menu.js — Gestion du menu, historique et réglages
 // ===============================
 
+import { SETTINGS_KEY } from "./constants.js";
+
 const HISTORY_KEY = 'larouedelaservitude_history';
-const SETTINGS_KEY = 'larouedelaservitude_settings';
 const DEFAULT_SETTINGS = {
   darkMode: false,
   infiniteMode: false,
