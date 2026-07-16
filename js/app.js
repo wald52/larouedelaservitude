@@ -73,6 +73,10 @@ let completedSpinCount = 0;
 let installPromptDismissed = false;
 let installPromptPendingAfterOverlay = false;
 let billsInitPromise = null;
+let billsModule = null;
+let animFrameId = null;
+let frictionResumeTimer = 0;
+let installPromptHideTimer = 0;
 
 const introState = {
   active: false,
@@ -131,8 +135,8 @@ function hideInstallPromptBanner() {
   if (!installPromptBanner) return;
   installPromptBanner.classList.remove('is-visible');
   installPromptBanner.setAttribute('aria-hidden', 'true');
-  clearTimeout(window._installPromptHideTimer);
-  window._installPromptHideTimer = setTimeout(() => {
+  clearTimeout(installPromptHideTimer);
+  installPromptHideTimer = setTimeout(() => {
     if (!installPromptBanner.classList.contains('is-visible')) {
       installPromptBanner.hidden = true;
     }
@@ -222,14 +226,14 @@ if (standaloneMediaQuery.addEventListener) {
 }
 
 function scheduleAnimationFrame() {
-  if (window._animFrame) return;
-  window._animFrame = requestAnimationFrame(animate);
+  if (animFrameId) return;
+  animFrameId = requestAnimationFrame(animate);
 }
 
 function stopAnimationFrame() {
-  if (!window._animFrame) return;
-  cancelAnimationFrame(window._animFrame);
-  window._animFrame = null;
+  if (!animFrameId) return;
+  cancelAnimationFrame(animFrameId);
+  animFrameId = null;
 }
 
 function resetContext(targetCtx) {
@@ -694,17 +698,18 @@ async function initializeApp() {
    ======================= */
 
 function spawnBillsWhenReady(event, count) {
-  if (typeof window.spawnBills === 'function') {
-    window.spawnBills(event, count);
+  if (billsModule && typeof billsModule.spawnBills === 'function') {
+    billsModule.spawnBills(event, count);
     return;
   }
 
   if (!billsInitPromise) {
     billsInitPromise = import('../bills.js')
-      .then(({ initBills }) => {
-        if (initBills) {
-          initBills();
+      .then((mod) => {
+        if (mod.initBills) {
+          mod.initBills();
         }
+        billsModule = mod;
         return true;
       })
       .catch((error) => {
@@ -715,8 +720,8 @@ function spawnBillsWhenReady(event, count) {
   }
 
   billsInitPromise.then((ready) => {
-    if (ready && typeof window.spawnBills === 'function') {
-      window.spawnBills(event, count);
+    if (ready && billsModule && typeof billsModule.spawnBills === 'function') {
+      billsModule.spawnBills(event, count);
     }
   });
 }
@@ -746,8 +751,8 @@ function boostWheel(e) {
 
   frictionActive = false;
   frictionTimer = 0;
-  clearTimeout(window._frictionResume);
-  window._frictionResume = setTimeout(() => {
+  clearTimeout(frictionResumeTimer);
+  frictionResumeTimer = setTimeout(() => {
     frictionActive = true;
   }, 600);
 
@@ -964,7 +969,7 @@ function completeSpinIfNeeded() {
 }
 
 function animate(now) {
-  window._animFrame = null;
+  animFrameId = null;
 
   const previousTime = lastTime || now;
   const deltaTime = Math.min(10, (now - previousTime) / 16.67);

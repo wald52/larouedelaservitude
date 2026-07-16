@@ -7,6 +7,10 @@ import { isSoundEnabled } from "./js/settings.js";
 
 let playBillAudio = null;
 
+// API de l'effet, assignée par l'IIFE ci-dessous et exposée via export ESM.
+export let spawnBills = null;
+export let clearBills = null;
+
 // Fonction d'initialisation (appelée par index.html)
 export function initBills() {
   // Import dynamique du module audio
@@ -98,7 +102,7 @@ export function initBills() {
   }
 
   // spawn en cercle autour du point (option C: ejection circulaire)
-  window.spawnBills = function(ev, count = 12) {
+  spawnBills = function(ev, count = 12) {
     let x = window.innerWidth / 2, y = window.innerHeight / 2;
 
     if (ev) {
@@ -207,13 +211,9 @@ export function initBills() {
   }
 
   // optional API to clear everything
-  window.clearBills = function() {
+  clearBills = function() {
     for (const node of pool) release(node);
     active.clear();
   };
-
-  // pause/resume (for visibility change)
-  window.pauseBills = function() { /* no-op for now */ };
-  window.resumeBills = function() { /* no-op for now */ };
 
 })();
