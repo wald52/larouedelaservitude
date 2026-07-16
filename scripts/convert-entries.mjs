@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Script de conversion des entrées vers format JSON light + full
- * Usage: node scripts/convert-entries.js
+ * Usage: node scripts/convert-entries.mjs
  */
 
 import { readFileSync, writeFileSync } from 'fs';
@@ -39,14 +39,13 @@ if (!entriesRaw) {
 function parseEntry(raw) {
   // Enlever les guillemets et échapper
   let text = raw.slice(1, -1).replace(/\\"/g, '"');
-  const originalText = text;
-  
+
   // Extraire recette (peut contenir "millions", "milliards", "euros", "€")
   let recette = null;
   const recettePatterns = [
-    /Recette\s*:\s*([\d\.\,]+\s*(?:millions?|milliards?|M|Md)\s*(?:d'?|\s*)?(?:euros?|€)?)/i,
-    /Recette\s*:\s*([\d\.\,]+\s*millions?)/i,
-    /Recette\s*:\s*([\d\.\,]+\s*milliards?)/i
+    /Recette\s*:\s*([\d.,]+\s*(?:millions?|milliards?|M|Md)\s*(?:d'?|\s*)?(?:euros?|€)?)/i,
+    /Recette\s*:\s*([\d.,]+\s*millions?)/i,
+    /Recette\s*:\s*([\d.,]+\s*milliards?)/i
   ];
   
   for (const pattern of recettePatterns) {

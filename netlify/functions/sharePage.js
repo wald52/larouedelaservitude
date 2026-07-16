@@ -20,7 +20,7 @@ function normalizeRedirectUrl(value, event) {
     if ((parsedUrl.protocol === "https:" || parsedUrl.protocol === "http:") && parsedUrl.host === host) {
       return parsedUrl.toString().replace(/\/$/, "");
     }
-  } catch (err) {
+  } catch {
     return fallbackUrl;
   }
 
@@ -40,14 +40,22 @@ exports.handler = async (event) => {
   let imageUrl;
   try {
     imageUrl = validateImgBbHttpsUrl(params.image);
-  } catch (err) {
+  } catch {
     return { statusCode: 400, body: "Invalid image URL" };
   }
 
   const title = normalizeText(params.title, 100) || "La roue de la servitude";
   const description = normalizeText(params.description, 200) || "Résultat partagé depuis La roue de la servitude.";
   const redirectUrl = normalizeRedirectUrl(params.redirect, event);
-  const sharePageUrl = `${redirectUrl}/.netlify/functions/sharePage?${new URLSearchParams(params).toString()}`;
+  // On ne réinjecte que des valeurs déjà assainies dans l'URL canonique / og:url,
+  // pour ne pas refléter des paramètres arbitraires fournis par l'appelant.
+  const sharePageParams = new URLSearchParams({
+    image: imageUrl,
+    title,
+    description,
+    redirect: redirectUrl
+  });
+  const sharePageUrl = `${redirectUrl}/.netlify/functions/sharePage?${sharePageParams.toString()}`;
 
   const escapedTitle = escapeHtml(title);
   const escapedDesc = escapeHtml(description);
@@ -79,3 +87,6 @@ exports.handler = async (event) => {
     body: event.httpMethod === "HEAD" ? "" : html
   };
 };
+
+exports.normalizeText = normalizeText;
+exports.normalizeRedirectUrl = normalizeRedirectUrl;

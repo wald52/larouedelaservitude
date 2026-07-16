@@ -1,7 +1,23 @@
 {
+  "name": "larouedelaservitude",
+  "version": "1.0.0",
+  "description": "PWA ludique présentant les taxes et prélèvements obligatoires français sous forme de roue à lancer.",
+  "license": "MIT",
   "scripts": {
     "check:imports": "node scripts/check-imports.mjs",
     "check:data": "node scripts/validate-data.mjs",
-    "check": "npm run check:imports && npm run check:data"
+    "check": "npm run check:imports && npm run check:data",
+    "lint": "eslint .",
+    "format": "prettier --check .",
+    "format:write": "prettier --write .",
+    "test": "node --test",
+    "ci": "npm run check && npm run lint && npm test"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.15.0",
+    "eslint": "^9.15.0",
+    "eslint-config-prettier": "^9.1.0",
+    "globals": "^15.12.0",
+    "prettier": "^3.3.3"
   }
 }

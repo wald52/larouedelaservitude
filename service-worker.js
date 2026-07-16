@@ -24,7 +24,7 @@ const CACHE_NAME = `larouedelaservitude-${CACHE_VERSION}`;
    (system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial)
 */
 
-const BASE = self.location.pathname.replace(/\/[^\/]*$/, '');
+const BASE = self.location.pathname.replace(/\/[^/]*$/, '');
 
 // Liste des fichiers à pré-cacher (CRITIQUE pour offline)
 const urlsToCache = [
@@ -198,11 +198,6 @@ self.addEventListener("fetch", (event) => {
   
   // ⚠️ API Netlify : Hors du SW (jamais en cache)
   if (url.pathname.includes("/.netlify/functions/")) {
-    return;
-  }
-  
-  // ⚠️ buttons.html : Jamais en cache (dynamique)
-  if (url.pathname.endsWith("buttons.html")) {
     return;
   }
 

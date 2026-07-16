@@ -5,11 +5,7 @@
 [build.environment]
   NODE_VERSION = "20"
 
-# 2. Forcer les en-têtes CORS au niveau du serveur (CDN)
-# Cela répond aux requêtes OPTIONS sans réveiller la fonction
-[[headers]]
-  for = "/.netlify/functions/*"
-  [headers.values]
-    Access-Control-Allow-Origin = "*"
-    Access-Control-Allow-Headers = "Content-Type, Authorization"
-    Access-Control-Allow-Methods = "GET, POST, OPTIONS"
+# Les en-têtes CORS ne sont plus forcés au niveau du CDN : chaque fonction
+# renvoie sa propre origine autorisée (allow-list dans _shared/cors.js) et
+# répond elle-même aux requêtes OPTIONS. Un wildcard "*" ici écraserait
+# l'allow-list applicative.

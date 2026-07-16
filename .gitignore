@@ -1,1 +1,15 @@
+# Artefacts de partage générés par les utilisateurs
 shares/share-*.html
+
+# Dépendances & secrets
+node_modules/
+.env
+.env.*
+!.env.example
+
+# Netlify
+.netlify/
+
+# OS
+.DS_Store
+Thumbs.db

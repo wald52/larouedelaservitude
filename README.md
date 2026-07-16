@@ -50,7 +50,7 @@ Procédure recommandée :
 6. Tester l'application localement ou via un deploy preview Netlify.
 7. Si le service worker a déjà été publié, incrémenter `CACHE_VERSION` dans `service-worker.js` lorsque la mise à jour doit invalider les anciens caches PWA.
 
-> Note : `scripts/convert-entries.js` peut servir de base d'automatisation si un fichier source compatible est maintenu, mais la source actuelle de vérité pour l'application est le duo `data/entries-light.json` / `data/entries-full.json`.
+> Note : `scripts/convert-entries.mjs` peut servir de base d'automatisation si un fichier source compatible est maintenu, mais la source actuelle de vérité pour l'application est le duo `data/entries-light.json` / `data/entries-full.json`.
 
 ## Stratégie de stockage des partages
 
@@ -70,3 +70,4 @@ Cette approche correspond à une route dynamique Netlify sans persistance HTML c
 - Pages de partage dynamiques : l'URL de partage contient les métadonnées courtes de l'aperçu et l'URL ImgBB. Les images restent dépendantes des quotas/API et de la disponibilité d'ImgBB.
 - Cache service worker : malgré une stratégie Network First, les utilisateurs peuvent conserver des ressources anciennes si le service worker, le cache navigateur ou IndexedDB n'ont pas encore été rafraîchis. Incrémenter `CACHE_VERSION` et tester les scénarios offline/online après chaque changement important.
 - Données fiscales à vérifier : les montants de recette, dates de création et intitulés fiscaux doivent être contrôlés avant publication. Le projet ne garantit pas à lui seul l'exactitude ou l'actualité des données fiscales.
+- Rate-limiting des fonctions : les endpoints `shareImage` et `sendFeedback` sont publics. Ils appliquent une allow-list CORS, une limite de taille d'upload et un anti-spam basique (honeypot, longueur minimale, throttling client), mais pas de vrai rate-limiting côté serveur (qui nécessiterait un état partagé type Netlify Blobs/edge). À renforcer si l'abus devient un problème.

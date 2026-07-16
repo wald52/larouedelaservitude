@@ -3,25 +3,13 @@
 // eventOrCoords can be an Event (mousedown/touchstart) or {x:.., y:..}
 
 // Import du module audio pour le son offline-first
+import { isSoundEnabled } from "./js/settings.js";
+
 let playBillAudio = null;
-const SETTINGS_KEY = 'larouedelaservitude_settings';
 
-function isSoundEnabled() {
-  try {
-    const attr = document.documentElement?.getAttribute('data-sound-enabled');
-    if (attr === 'true') return true;
-    if (attr === 'false') return false;
-
-    const stored = localStorage.getItem(SETTINGS_KEY);
-    if (!stored) return true;
-
-    const parsed = JSON.parse(stored);
-    return parsed.soundEnabled !== false;
-  } catch (e) {
-    console.warn('[BILLS] Impossible de lire le réglage son:', e);
-    return true;
-  }
-}
+// API de l'effet, assignée par l'IIFE ci-dessous et exposée via export ESM.
+export let spawnBills = null;
+export let clearBills = null;
 
 // Fonction d'initialisation (appelée par index.html)
 export function initBills() {
@@ -29,7 +17,7 @@ export function initBills() {
   import('./js/audio.js').then(({ playBillSound }) => {
     playBillAudio = playBillSound;
     console.log('[BILLS] Module audio chargé pour les sons de billets');
-  }).catch(e => {
+  }).catch(() => {
     console.warn('[BILLS] Module audio non disponible, fallback vers Audio()');
     // Fallback vers l'ancienne méthode
     const fallbackSound = new Audio('/larouedelaservitude/audio/frottement-papier2.mp3');
@@ -114,7 +102,7 @@ export function initBills() {
   }
 
   // spawn en cercle autour du point (option C: ejection circulaire)
-  window.spawnBills = function(ev, count = 12) {
+  spawnBills = function(ev, count = 12) {
     let x = window.innerWidth / 2, y = window.innerHeight / 2;
 
     if (ev) {
@@ -223,13 +211,9 @@ export function initBills() {
   }
 
   // optional API to clear everything
-  window.clearBills = function() {
+  clearBills = function() {
     for (const node of pool) release(node);
     active.clear();
   };
-
-  // pause/resume (for visibility change)
-  window.pauseBills = function() { /* no-op for now */ };
-  window.resumeBills = function() { /* no-op for now */ };
 
 })();

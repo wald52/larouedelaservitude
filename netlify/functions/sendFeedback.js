@@ -1,16 +1,8 @@
+const { corsHeaders: buildCorsHeaders } = require("./_shared/cors");
+
 exports.handler = async (event) => {
   // === 💡 Gestion des CORS ===
-  const allowedOrigins = [
-    "https://wald52.github.io",
-    "https://wald52.github.io/larouedelaservitude",
-    "https://larouedelaservitude.netlify.app"
-  ];
-  const origin = event.headers.origin;
-  const corsHeaders = {
-    "Access-Control-Allow-Origin": allowedOrigins.includes(origin) ? origin : "null",
-    "Access-Control-Allow-Headers": "Content-Type",
-    "Access-Control-Allow-Methods": "POST, OPTIONS",
-  };
+  const corsHeaders = buildCorsHeaders(event);
 
   if (event.httpMethod === "OPTIONS") {
     return { statusCode: 200, headers: corsHeaders, body: "OK" };
@@ -21,7 +13,18 @@ exports.handler = async (event) => {
   }
 
   try {
-    const { resultText, userMessage, type } = JSON.parse(event.body);
+    const { resultText, userMessage, type, honeypot } = JSON.parse(event.body);
+
+    // === 🛡️ Honeypot anti-bot ===
+    // Champ invisible pour les humains : s'il est rempli, c'est un bot.
+    // On renvoie un 200 silencieux pour ne pas signaler au bot que le piège a fonctionné.
+    if (honeypot) {
+      return {
+        statusCode: 200,
+        headers: corsHeaders,
+        body: JSON.stringify({ ok: true })
+      };
+    }
 
     // === 🛡️ Anti-spam ===
     if (!userMessage || userMessage.trim().length < 10) {
@@ -40,12 +43,6 @@ exports.handler = async (event) => {
         body: `🚫 Votre message contient ${linkCount} liens. Maximum 3 autorisés.`
       };
     }
-
-    // === 🔧 Utilitaires ===
-    const escapeGraphQL = (str) =>
-      str
-        .replace(/\\/g, "\\\\")
-        .replace(/"/g, '\\"');
 
     // === 🔧 Configuration GitHub ===
     const token = process.env.GITHUB_TOKEN;
@@ -69,15 +66,17 @@ exports.handler = async (event) => {
     const repositoryId = "R_kgDOQOpIPw";
 
     // === 📝 Construction du titre + corps ===
-    const safeResult = escapeGraphQL(resultText);
-    const safeMessage = escapeGraphQL(userMessage);
+    // Pas d'échappement manuel : la mutation passe ces valeurs via des variables GraphQL
+    // (paramétrées), donc GitHub les traite comme du texte brut sans risque d'injection.
+    const safeResult =
+      typeof resultText === "string" && resultText.trim() ? resultText : "(résultat non précisé)";
 
     const title =
       `${type === "error" ? "🛠️ Signalement" : "💡 Complément"} sur le résultat : ${safeResult}`;
 
     const body =
       `**Résultat :** ${safeResult}\n\n` +
-      `**Message de l'utilisateur :**\n${safeMessage}`;
+      `**Message de l'utilisateur :**\n${userMessage}`;
 
     // === 🧩 Mutation GraphQL ===
     const query = `
@@ -117,9 +116,9 @@ exports.handler = async (event) => {
     if (data.errors) {
       console.error("Erreur GraphQL :", data.errors);
       return {
-        statusCode: 500,
+        statusCode: 502,
         headers: corsHeaders,
-        body: JSON.stringify({ error: "Erreur GitHub GraphQL", details: data.errors })
+        body: JSON.stringify({ error: "Erreur lors de la création de la discussion" })
       };
     }
 
@@ -137,7 +136,7 @@ exports.handler = async (event) => {
     return {
       statusCode: 500,
       headers: corsHeaders,
-      body: JSON.stringify({ error: "Erreur serveur", details: err.message })
+      body: JSON.stringify({ error: "Erreur serveur" })
     };
   }
 };
