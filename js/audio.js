@@ -225,8 +225,11 @@ export async function unlockAudio() {
  * @param {string} name - 'spin', 'coin', ou 'bill'
  * @param {number} volume - Volume (0-1), par défaut 1
  * @param {number} playbackRate - Vitesse (0.5-2), par défaut 1
+ * @param {{maxDuration?: number, release?: number}} [options] - maxDuration coupe le son
+ *   au bout de N secondes (avec un fondu de `release` s) pour éviter que des sons
+ *   rapprochés ne s'empilent en bourdonnement.
  */
-export function playSound(name, volume = 1, playbackRate = 1) {
+export function playSound(name, volume = 1, playbackRate = 1, options = {}) {
   if (!runtimeSoundEnabled) {
     return;
   }
@@ -246,12 +249,23 @@ export function playSound(name, volume = 1, playbackRate = 1) {
     source.playbackRate.value = playbackRate;
     
     gainNode.gain.value = volume;
-    
+
     source.connect(gainNode);
     gainNode.connect(masterGainNode);
-    
+
     source.start(0);
-    
+
+    const { maxDuration = 0, release = 0.025 } = options;
+    if (maxDuration > 0) {
+      const startTime = audioContext.currentTime;
+      const stopTime = startTime + maxDuration;
+      const fadeStart = Math.max(startTime, stopTime - release);
+      // exponentialRamp exige une valeur de départ strictement positive.
+      gainNode.gain.setValueAtTime(Math.max(volume, 0.0001), fadeStart);
+      gainNode.gain.exponentialRampToValueAtTime(0.0001, stopTime);
+      source.stop(stopTime);
+    }
+
     // Nettoyage automatique
     source.onended = () => {
       source.disconnect();
@@ -265,12 +279,19 @@ export function playSound(name, volume = 1, playbackRate = 1) {
 }
 
 /**
- * Joue le son de rotation (clic secteur)
- * @param {number} velocity - Vitesse de rotation (pour le pitch)
+ * Joue un clic de rotation.
+ * La cadence et le dosage sont décidés par l'appelant (app.js), qui connaît la
+ * vitesse de la roue ; ici on se contente de jouer un clic court et net.
+ * @param {{volume?: number, rate?: number, maxDuration?: number}} [options]
  */
-export function playSpinClick(velocity = 1) {
-  const rate = Math.min(2.5, Math.max(0.5, Math.abs(velocity) * 80 + 0.5));
-  playSound('spin', 0.7, rate);
+export function playSpinClick(options = {}) {
+  const {
+    volume = 0.45,
+    rate = 1,
+    maxDuration = 0.1
+  } = options;
+
+  playSound('spin', volume, rate, { maxDuration });
 }
 
 /**
