@@ -757,6 +757,7 @@ function boostWheel(e) {
   }, 600);
 
   showedResult = false;
+  resetSectorClick();
   lastTime = performance.now();
   scheduleAnimationFrame();
 }
@@ -774,11 +775,75 @@ function attachWheelListeners() {
    SON PAR PASSAGE DE SECTEUR
    ======================= */
 
-animate && (animate.prevIndex = -1);
+// La roue compte plusieurs centaines de secteurs : à pleine vitesse elle en
+// traverse plus de 2000 par seconde. Un clic par secteur réel est donc
+// injouable (il sature en bourdonnement dès la première frame).
+// On pilote à la place une CADENCE de clics dérivée de la vitesse : dense
+// quand la roue est lancée, elle se raréfie d'elle-même jusqu'au dernier
+// « tic » quand la roue s'immobilise.
+//
+// Réglable à chaud depuis la console via window.__SPIN_CLICK__ pendant un spin.
+const SPIN_CLICK = {
+  maxRate: 18,       // clics/s à pleine vitesse (plafond anti-mitraillette)
+  minRate: 0.8,      // en dessous, on arrête de cliquer
+  curve: 0.5,        // <1 = garde des clics audibles à basse vitesse (0.5 = racine)
+  volumeMin: 0.30,   // volume du dernier clic (roue presque arrêtée)
+  volumeMax: 0.55,   // volume à pleine vitesse
+  pitchMin: 0.95,    // plage de hauteur VOLONTAIREMENT étroite :
+  pitchMax: 1.20,    // au-delà, on entend une sirène qui monte et descend
+  pitchJitter: 0.04, // variation aléatoire, évite l'effet « boucle » mécanique
+  clickDecay: 1.2    // longueur d'un clic = clickDecay / cadence (borné ci-dessous)
+                     // >1.5 : les clics se chevauchent et « bavent » ; <1 : très sec
+};
 
-function playSectorClick() {
-  if (!audioReady) return;
-  playSpinClick(Math.abs(angularVelocity));
+const SPIN_CLICK_MAX_DURATION = 0.12; // s — coupe la queue du sample
+const FRAME_SECONDS = 16.67 / 1000;
+
+// Fraction de clic accumulée ; atteint 1 → on joue un clic.
+let clickPhase = 0;
+
+/** Réarme la cadence pour que le prochain mouvement claque immédiatement. */
+function resetSectorClick() {
+  clickPhase = 1;
+}
+
+/**
+ * Fait avancer la cadence de clics.
+ * @param {number} deltaFrames - Temps écoulé, en frames de 16.67 ms.
+ */
+function updateSectorClick(deltaFrames) {
+  if (!audioReady || ENTRIES.length === 0) return;
+
+  const speedRatio = Math.min(1, Math.abs(angularVelocity) / MAX_VEL);
+  const eased = Math.pow(speedRatio, SPIN_CLICK.curve);
+  const clickRate = SPIN_CLICK.maxRate * eased;
+
+  if (clickRate < SPIN_CLICK.minRate) {
+    // Roue à l'arrêt (ou presque) : on réarme sans jouer.
+    clickPhase = Math.min(clickPhase, 1);
+    return;
+  }
+
+  clickPhase += clickRate * deltaFrames * FRAME_SECONDS;
+  if (clickPhase < 1) return;
+
+  // Pas de rattrapage : si plusieurs clics étaient « dus » (onglet en arrière-plan,
+  // frame longue), on n'en joue qu'un seul au lieu d'une rafale.
+  clickPhase = 0;
+  playSectorClick(eased, clickRate);
+}
+
+function playSectorClick(eased, clickRate) {
+  const volume = SPIN_CLICK.volumeMin + (SPIN_CLICK.volumeMax - SPIN_CLICK.volumeMin) * eased;
+  const jitter = 1 + (Math.random() * 2 - 1) * SPIN_CLICK.pitchJitter;
+  const rate = (SPIN_CLICK.pitchMin + (SPIN_CLICK.pitchMax - SPIN_CLICK.pitchMin) * eased) * jitter;
+  const maxDuration = Math.min(SPIN_CLICK_MAX_DURATION, SPIN_CLICK.clickDecay / clickRate);
+
+  playSpinClick({ volume, rate, maxDuration });
+}
+
+if (typeof window !== 'undefined') {
+  window.__SPIN_CLICK__ = SPIN_CLICK;
 }
 
 /* =======================
@@ -946,7 +1011,7 @@ function finalizeSpinResult(idx) {
       ENTRY_COLORS.splice(idx, 1);
       buildWheelLayers();
       updateCountInfo();
-      animate.prevIndex = -1;
+      resetSectorClick();
     }
 
     drawWheel(angle);
@@ -978,19 +1043,7 @@ function animate(now) {
   angularVelocity += (targetVelocity - angularVelocity) * (LERP * deltaTime);
   angle += angularVelocity * deltaTime;
 
-  const isMoving = Math.abs(angularVelocity) > 0.001 || Math.abs(targetVelocity) > 0.001;
-  const n = ENTRIES.length;
-
-  if (isMoving && n > 0) {
-    const step = (Math.PI * 2) / n;
-    let pointerAngle = (-Math.PI / 2 - angle) % (Math.PI * 2);
-    if (pointerAngle < 0) pointerAngle += Math.PI * 2;
-    const currentIndex = Math.floor(pointerAngle / step);
-    if (currentIndex !== (animate.prevIndex ?? -1)) {
-      animate.prevIndex = currentIndex;
-      playSectorClick();
-    }
-  }
+  updateSectorClick(deltaTime);
 
   if (targetVelocity > 0.001) {
     if (!frictionActive) {
@@ -1054,6 +1107,7 @@ document.addEventListener("visibilitychange", () => {
 
     drawWheel(angle, now);
     lastTime = now;
+    resetSectorClick();
 
     if (wasAnimating && shouldAnimate()) {
       scheduleAnimationFrame();
