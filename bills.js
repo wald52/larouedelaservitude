@@ -37,12 +37,18 @@ export function initBills() {
 
 (() => {
   const MAX_BILLS = 64;        // max éléments en DOM
-  const GRAVITY = 12;          // gravité
-  const AIR = 0.980;           // damping
+  const GRAVITY = 0.40;        // gravité en px/frame² (~1440 px/s² à 60fps)
+  const TERMINAL_VY = 5.2;     // vitesse de chute max en px/frame (le papier plane)
+  const TERMINAL_EASE = 0.08;  // douceur d'arrivée à la vitesse terminale
+  const AIR_X = 0.965;         // freinage horizontal (l'éjection s'amortit vite)
+  const AIR_Y = 0.995;         // freinage vertical (léger, la terminale fait le reste)
   const LIFETIME = 10000;      // durée avant fade
   const SIZE_BASE = 24;        // taille de base emoji
-  const OUTER_FORCE = 9.5;     // force initiale d'éjection
-  const ROT_RANGE = 360;       // degrés max de rotation initiale
+  const OUTER_FORCE = 7.5;     // force initiale d'éjection
+  const UP_FORCE = 8.5;        // impulsion vers le haut (base)
+  const UP_FORCE_VAR = 5;      // variation aléatoire de l'impulsion
+  const ROT_SPIN = 1.8;        // degrés/frame max de rotation propre
+  const ROT_SWAY = 1.6;        // degrés/frame d'oscillation liée au flottement
 
   let recentSounds = 0;
   const MAX_SOUNDS_PER_SEC = 10;
@@ -90,7 +96,8 @@ export function initBills() {
     el.style.opacity = '0';
     root.appendChild(el);
     pool.push({
-      el, inUse: false, x: -9999, y: -9999, vx: 0, vy: 0, rot: 0, vrot: 0, born: 0, ttl: 0, lastFrame: 0
+      el, inUse: false, x: -9999, y: -9999, vx: 0, vy: 0, rot: 0, vrot: 0, born: 0, ttl: 0, lastFrame: 0,
+      gravity: GRAVITY, terminal: TERMINAL_VY, swayAmp: 0, swayFreq: 0, swayPhase: 0
     });
   }
 
@@ -141,11 +148,20 @@ export function initBills() {
       const spread = 0.6 + Math.random() * 0.9;
       const speed = OUTER_FORCE * (0.6 + Math.random() * 0.9) * spread;
       node.vx = Math.cos(dir) * speed + (Math.random() - 0.5) * 1.2;
-      node.vy = Math.sin(dir) * speed * 0.45 - (3 + Math.random() * 2.5); // upward toss
+      node.vy = Math.sin(dir) * speed * 0.45 - (UP_FORCE + Math.random() * UP_FORCE_VAR); // upward toss
+
+      // variation par billet : chaque papier ne tombe pas exactement pareil
+      node.gravity = GRAVITY * (0.85 + Math.random() * 0.3);
+      node.terminal = TERMINAL_VY * (0.8 + Math.random() * 0.45);
+
+      // flottement latéral (feuille qui vacille dans l'air)
+      node.swayAmp = 0.3 + Math.random() * 0.75;
+      node.swayFreq = 0.003 + Math.random() * 0.004; // rad/ms
+      node.swayPhase = Math.random() * Math.PI * 2;
 
       // rotation
       node.rot = (Math.random() - 0.5) * 30;
-      node.vrot = (Math.random() - 0.5) * (ROT_RANGE * 0.0025);
+      node.vrot = (Math.random() - 0.5) * ROT_SPIN;
       node.el.style.transform = `translate3d(${node.x}px, ${node.y}px, 0) rotate(${node.rot}deg)`;
       node.el.style.opacity = '1';
 
@@ -169,13 +185,21 @@ export function initBills() {
       node.lastFrame = now;
 
       // physics
-      node.vy += GRAVITY * 0.7 * dt;
-      node.vx *= Math.pow(AIR, dt);
-      node.vy *= Math.pow(AIR, dt);
+      node.vy += node.gravity * dt;
+      node.vx *= Math.pow(AIR_X, dt);
+      node.vy *= Math.pow(AIR_Y, dt);
 
-      node.x += node.vx * dt;
+      // vitesse terminale : au-delà, l'air retient la feuille au lieu d'accélérer
+      if (node.vy > node.terminal) {
+        node.vy += (node.terminal - node.vy) * Math.min(1, TERMINAL_EASE * dt);
+      }
+
+      // oscillation latérale + roulis associé
+      const sway = Math.sin((now - node.born) * node.swayFreq + node.swayPhase);
+
+      node.x += (node.vx + sway * node.swayAmp) * dt;
       node.y += node.vy * dt;
-      node.rot += node.vrot * dt;
+      node.rot += (node.vrot + sway * ROT_SWAY) * dt;
 
       node.el.style.transform = `translate3d(${node.x}px, ${node.y}px, 0) rotate(${node.rot}deg)`;
 
