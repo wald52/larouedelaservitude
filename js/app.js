@@ -775,12 +775,16 @@ function attachWheelListeners() {
    SON PAR PASSAGE DE SECTEUR
    ======================= */
 
-// La roue compte plusieurs centaines de secteurs : à pleine vitesse elle en
-// traverse plus de 2000 par seconde. Un clic par secteur réel est donc
-// injouable (il sature en bourdonnement dès la première frame).
-// On pilote à la place une CADENCE de clics dérivée de la vitesse : dense
-// quand la roue est lancée, elle se raréfie d'elle-même jusqu'au dernier
-// « tic » quand la roue s'immobilise.
+// Avec plusieurs centaines de secteurs, la roue en traverse plus de 2000 par
+// seconde à pleine vitesse : un clic par secteur réel est injouable (il sature
+// en bourdonnement dès la première frame). On pilote donc une CADENCE de clics
+// dérivée de la vitesse : dense quand la roue est lancée, elle se raréfie
+// d'elle-même jusqu'au dernier « tic » quand la roue s'immobilise.
+//
+// Cette cadence est bornée par le nombre RÉEL de passages de secteur : on ne
+// joue jamais plus de clics qu'il n'y a de secteurs traversés. Le rendu reste
+// donc correct quel que soit le nombre d'entrées — y compris quand la roue se
+// vide en mode non-infini, ou sur la roue de secours à 2 entrées.
 //
 // Réglable à chaud depuis la console via window.__SPIN_CLICK__ pendant un spin.
 const SPIN_CLICK = {
@@ -792,8 +796,10 @@ const SPIN_CLICK = {
   pitchMin: 0.95,    // plage de hauteur VOLONTAIREMENT étroite :
   pitchMax: 1.20,    // au-delà, on entend une sirène qui monte et descend
   pitchJitter: 0.04, // variation aléatoire, évite l'effet « boucle » mécanique
-  clickDecay: 1.2    // longueur d'un clic = clickDecay / cadence (borné ci-dessous)
+  clickDecay: 1.2,   // longueur d'un clic = clickDecay / cadence (borné ci-dessous)
                      // >1.5 : les clics se chevauchent et « bavent » ; <1 : très sec
+  gapGuard: 0.6      // écart minimal entre 2 clics, en fraction de l'intervalle
+                     // attendu — absorbe le décalage au changement de mode
 };
 
 const SPIN_CLICK_MAX_DURATION = 0.12; // s — coupe la queue du sample
@@ -801,44 +807,84 @@ const FRAME_SECONDS = 16.67 / 1000;
 
 // Fraction de clic accumulée ; atteint 1 → on joue un clic.
 let clickPhase = 0;
+// Dernier secteur sous le repère, pour le mode « un clic par passage réel ».
+let lastClickSector = -1;
+// Horodatage du dernier clic joué, pour le garde-fou d'écart minimal.
+let lastClickAt = 0;
 
 /** Réarme la cadence pour que le prochain mouvement claque immédiatement. */
 function resetSectorClick() {
   clickPhase = 1;
+  lastClickSector = -1;
+  lastClickAt = 0;
 }
 
 /**
  * Fait avancer la cadence de clics.
  * @param {number} deltaFrames - Temps écoulé, en frames de 16.67 ms.
+ * @param {number} now - Horodatage de la frame (performance.now()).
  */
-function updateSectorClick(deltaFrames) {
-  if (!audioReady || ENTRIES.length === 0) return;
+function updateSectorClick(deltaFrames, now) {
+  const n = ENTRIES.length;
+  if (!audioReady || n === 0) return;
 
-  const speedRatio = Math.min(1, Math.abs(angularVelocity) / MAX_VEL);
+  const speed = Math.abs(angularVelocity);
+  const speedRatio = Math.min(1, speed / MAX_VEL);
   const eased = Math.pow(speedRatio, SPIN_CLICK.curve);
-  const clickRate = SPIN_CLICK.maxRate * eased;
+  const cadenceRate = SPIN_CLICK.maxRate * eased;
 
-  if (clickRate < SPIN_CLICK.minRate) {
+  // Passages de secteur réellement effectués, par seconde.
+  const sectorRate = speed / (((Math.PI * 2) / n) * FRAME_SECONDS);
+
+  if (sectorRate <= cadenceRate) {
+    // Peu de secteurs, ou roue lente : la cadence dépasserait le nombre de
+    // passages réels. On clique alors sur CHAQUE passage, calé sur la position
+    // exacte de la roue — donc jamais de tic sans secteur qui défile.
+    const sector = getSelectedIndex(angle);
+    if (sector !== lastClickSector) {
+      const known = lastClickSector >= 0;
+      lastClickSector = sector;
+      const rate = Math.max(sectorRate, SPIN_CLICK.minRate);
+      if (known && !tooSoonAfterLastClick(now, rate)) {
+        playSectorClick(eased, rate, now);
+      }
+    }
+    clickPhase = 1;
+    return;
+  }
+
+  // La roue défile plus vite que le plafond audible : on suit la cadence.
+  lastClickSector = getSelectedIndex(angle);
+
+  if (cadenceRate < SPIN_CLICK.minRate) {
     // Roue à l'arrêt (ou presque) : on réarme sans jouer.
     clickPhase = Math.min(clickPhase, 1);
     return;
   }
 
-  clickPhase += clickRate * deltaFrames * FRAME_SECONDS;
+  clickPhase += cadenceRate * deltaFrames * FRAME_SECONDS;
   if (clickPhase < 1) return;
 
   // Pas de rattrapage : si plusieurs clics étaient « dus » (onglet en arrière-plan,
   // frame longue), on n'en joue qu'un seul au lieu d'une rafale.
   clickPhase = 0;
-  playSectorClick(eased, clickRate);
+  if (tooSoonAfterLastClick(now, cadenceRate)) return;
+  playSectorClick(eased, cadenceRate, now);
 }
 
-function playSectorClick(eased, clickRate) {
+/** Empêche deux clics trop rapprochés (notamment au changement de mode). */
+function tooSoonAfterLastClick(now, clickRate) {
+  if (!lastClickAt) return false;
+  return now - lastClickAt < (1000 / clickRate) * SPIN_CLICK.gapGuard;
+}
+
+function playSectorClick(eased, clickRate, now) {
   const volume = SPIN_CLICK.volumeMin + (SPIN_CLICK.volumeMax - SPIN_CLICK.volumeMin) * eased;
   const jitter = 1 + (Math.random() * 2 - 1) * SPIN_CLICK.pitchJitter;
   const rate = (SPIN_CLICK.pitchMin + (SPIN_CLICK.pitchMax - SPIN_CLICK.pitchMin) * eased) * jitter;
   const maxDuration = Math.min(SPIN_CLICK_MAX_DURATION, SPIN_CLICK.clickDecay / clickRate);
 
+  lastClickAt = now;
   playSpinClick({ volume, rate, maxDuration });
 }
 
@@ -1043,7 +1089,7 @@ function animate(now) {
   angularVelocity += (targetVelocity - angularVelocity) * (LERP * deltaTime);
   angle += angularVelocity * deltaTime;
 
-  updateSectorClick(deltaTime);
+  updateSectorClick(deltaTime, now);
 
   if (targetVelocity > 0.001) {
     if (!frictionActive) {
