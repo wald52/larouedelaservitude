@@ -42,6 +42,17 @@ const CENTER_INTRO_DURATION_MS = 360;
 const LABEL_MIN_ARC_PX = 20;
 const HTML2CANVAS_SRC = 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
 const INSTALL_PROMPT_SPIN_THRESHOLD = 3;
+// Amortissement appliqué quand l'utilisateur demande moins d'animation : la
+// roue tourne une fraction de seconde puis livre son résultat.
+const REDUCED_MOTION_DAMPING = 0.93;
+
+// Préférence système « mouvement réduit ». Interrogée en direct (et non figée
+// au démarrage) pour suivre un changement de réglage sans rechargement.
+const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+function prefersReducedMotion() {
+  return reducedMotionQuery.matches;
+}
 
 /* STATE */
 let ENTRIES = [];
@@ -77,6 +88,8 @@ let billsModule = null;
 let animFrameId = null;
 let frictionResumeTimer = 0;
 let installPromptHideTimer = 0;
+// Mise à jour de données reçue pendant une rotation, appliquée à l'arrêt.
+let pendingEntriesRefresh = false;
 
 const introState = {
   active: false,
@@ -172,9 +185,78 @@ function registerCompletedSpin() {
   syncInstallPromptVisibility();
 }
 
+/* =======================
+   MODALES : FOCUS
+   ======================= */
+// Les deux modales (résultat et retour utilisateur) partagent le même
+// comportement : le focus entre dedans à l'ouverture, y reste tant qu'elles
+// sont ouvertes, et revient à son point de départ à la fermeture.
+
+const FOCUSABLE_SELECTOR = [
+  'a[href]',
+  'button:not([disabled])',
+  'textarea:not([disabled])',
+  'input:not([disabled]):not([type="hidden"])',
+  'select:not([disabled])',
+  '[tabindex]:not([tabindex="-1"])'
+].join(', ');
+
+let activeModal = null;
+let focusBeforeModal = null;
+
+function getFocusableElements(container) {
+  return Array.from(container.querySelectorAll(FOCUSABLE_SELECTOR)).filter(
+    (element) => element.offsetWidth > 0 || element.offsetHeight > 0
+  );
+}
+
+function openModal(container, initialFocus) {
+  focusBeforeModal = document.activeElement;
+  activeModal = container;
+
+  const target = initialFocus || getFocusableElements(container)[0] || container;
+  if (typeof target.focus === 'function') {
+    target.focus();
+  }
+}
+
+function closeModal(container) {
+  if (activeModal !== container) return;
+
+  activeModal = null;
+  const previous = focusBeforeModal;
+  focusBeforeModal = null;
+
+  if (previous && typeof previous.focus === 'function' && document.contains(previous)) {
+    previous.focus();
+  }
+}
+
+document.addEventListener('keydown', (event) => {
+  if (event.key !== 'Tab' || !activeModal) return;
+
+  const focusable = getFocusableElements(activeModal);
+  if (focusable.length === 0) return;
+
+  const first = focusable[0];
+  const last = focusable[focusable.length - 1];
+
+  if (!activeModal.contains(document.activeElement)) {
+    event.preventDefault();
+    first.focus();
+  } else if (event.shiftKey && document.activeElement === first) {
+    event.preventDefault();
+    last.focus();
+  } else if (!event.shiftKey && document.activeElement === last) {
+    event.preventDefault();
+    first.focus();
+  }
+});
+
 function hideResultOverlay() {
   overlay.style.display = 'none';
   overlay.setAttribute('aria-hidden', 'true');
+  closeModal(overlay);
 
   if (installPromptPendingAfterOverlay) {
     syncInstallPromptVisibility();
@@ -251,11 +333,10 @@ function resizeLayer(targetCanvas, targetCtx, size) {
 
 function getCanvasScale(viewportWidth = window.innerWidth) {
   const pixelRatio = Math.max(1, window.devicePixelRatio || 1);
-  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const deviceMemory = Number(navigator.deviceMemory) || Infinity;
   const isSmallViewport = viewportWidth <= 768;
   const isTouchViewport = window.matchMedia('(hover: none), (pointer: coarse)').matches;
-  const isConstrainedDevice = deviceMemory <= 4 || prefersReducedMotion;
+  const isConstrainedDevice = deviceMemory <= 4 || prefersReducedMotion();
   const scaleCap = isSmallViewport || isTouchViewport || isConstrainedDevice ? 1.5 : 2;
 
   return Math.min(pixelRatio, scaleCap);
@@ -319,7 +400,11 @@ function shouldShowLabels(entryCount = ENTRIES.length) {
 function updateCountInfo() {
   if (!countInfo) return;
   const suffix = isInfiniteMode() ? " · mode sans fin" : "";
-  countInfo.textContent = ENTRIES.length + " éléments restants" + suffix;
+  const summary = ENTRIES.length + " éléments restants" + suffix;
+  countInfo.textContent = summary;
+  // La roue est un canvas : sans nom accessible, un lecteur d'écran ne voit
+  // rien du tout à cet endroit de la page.
+  canvas.setAttribute('aria-label', `Roue des taxes et prélèvements français — ${summary}`);
 }
 
 function buildSectorLayer() {
@@ -694,6 +779,51 @@ async function initializeApp() {
 }
 
 /* =======================
+   MISE À JOUR DES DONNÉES
+   ======================= */
+// entries.js sert le cache puis revalide contre le réseau ; quand la version
+// des données a changé, il émet `entriesUpdated` et la roue se reconstruit.
+
+function applyEntriesUpdate() {
+  pendingEntriesRefresh = false;
+
+  // Hors mode sans fin, les entrées déjà tirées ont été retirées de la roue :
+  // tout reconstruire annulerait la partie en cours. La prochaine visite
+  // prendra la mise à jour.
+  if (completedSpinCount > 0 && !isInfiniteMode()) {
+    console.log('[APP] Données mises à jour, reconstruction reportée à la prochaine visite');
+    return;
+  }
+
+  initWheel()
+    .then((lightData) => {
+      ENTRIES = lightData.map(entry => entry.nom);
+      ENTRY_COLORS.length = 0;
+      buildColors();
+      buildWheelLayers();
+      updateCountInfo();
+      drawWheel(angle);
+      console.log('[APP] Roue reconstruite avec', ENTRIES.length, 'entrées');
+    })
+    .catch((error) => {
+      console.warn('[APP] Reconstruction de la roue impossible:', error);
+    });
+}
+
+window.addEventListener('entriesUpdated', (event) => {
+  if (event.detail?.scope !== 'light') return;
+
+  // Ne jamais changer le contenu des secteurs pendant que la roue tourne :
+  // le pointeur désignerait soudain autre chose.
+  if (shouldAnimate()) {
+    pendingEntriesRefresh = true;
+    return;
+  }
+
+  applyEntriesUpdate();
+});
+
+/* =======================
    INTERACTION / BOOST
    ======================= */
 
@@ -738,7 +868,11 @@ function boostWheel(e) {
   scheduleFullDataLoad('premier boost');
   hasBeenSpun = true;
 
-  spawnBillsWhenReady(e, 8);
+  // Les billets sont purement décoratifs : on ne les lance pas à qui demande
+  // moins d'animation.
+  if (!prefersReducedMotion()) {
+    spawnBillsWhenReady(e, 8);
+  }
 
   if (Math.abs(angularVelocity) < 0.01) {
     targetVelocity = Math.min(MAX_VEL, targetVelocity + BOOST * 3.0);
@@ -752,9 +886,11 @@ function boostWheel(e) {
   frictionActive = false;
   frictionTimer = 0;
   clearTimeout(frictionResumeTimer);
+  // En mouvement réduit, pas de sursis de 600 ms avant le freinage : la roue
+  // ralentit immédiatement.
   frictionResumeTimer = setTimeout(() => {
     frictionActive = true;
-  }, 600);
+  }, prefersReducedMotion() ? 0 : 600);
 
   showedResult = false;
   resetSectorClick();
@@ -887,6 +1023,9 @@ async function showOverlay(entryIndex){
 
   overlay.style.display = 'flex';
   overlay.setAttribute('aria-hidden','false');
+  // .bubble porte tabindex="-1" : y placer le focus fait annoncer le dialogue
+  // par les lecteurs d'écran et amorce le piège de focus.
+  openModal(overlay, overlay.querySelector('.bubble'));
 }
 
 // 🧩 Attache les écouteurs de feedback UNE SEULE FOIS au démarrage.
@@ -927,13 +1066,23 @@ function openFeedback(resultText, type = 'info'){
   requireElement('honeypot').value = '';
   status.style.display = 'none';
   modal.style.display = 'flex';
-  requireElement('formMessage').focus();
+  openModal(modal, requireElement('formMessage'));
 }
 
-closeBtn.addEventListener('click', ()=> modal.style.display='none');
-modal.addEventListener('click', (e)=> { if (e.target === modal) modal.style.display='none'; });
+function closeFeedback(){
+  modal.style.display = 'none';
+  closeModal(modal);
+}
+
+closeBtn.addEventListener('click', closeFeedback);
+modal.addEventListener('click', (e)=> { if (e.target === modal) closeFeedback(); });
 document.addEventListener('keydown', (e)=> {
-  if (e.key === 'Escape' && modal.style.display === 'flex') modal.style.display = 'none';
+  if (e.key !== 'Escape') return;
+  if (modal.style.display === 'flex') {
+    closeFeedback();
+  } else if (isOverlayOpen()) {
+    hideResultOverlay();
+  }
 });
 
 form.addEventListener('submit', async (e) => {
@@ -979,7 +1128,7 @@ form.addEventListener('submit', async (e) => {
       link.textContent = 'Voir le ticket sur GitHub';
       status.append(lineBreak, link);
     }
-    setTimeout(()=> modal.style.display='none', 1500);
+    setTimeout(closeFeedback, 1500);
   } catch (err) {
     console.error(err);
     status.textContent = 'Erreur réseau lors de l’envoi.';
@@ -1052,9 +1201,10 @@ function animate(now) {
       frictionDuration = 180 + Math.random() * 120;
       scheduleFullDataLoad('ralentissement');
     }
+    const damping = prefersReducedMotion() ? REDUCED_MOTION_DAMPING : BASE_DAMPING;
     const t = frictionTimer / frictionDuration;
     if (t < 1) {
-      targetVelocity *= Math.pow(BASE_DAMPING - t * 0.03, deltaTime);
+      targetVelocity *= Math.pow(damping - t * 0.03, deltaTime);
       frictionTimer += deltaTime;
     } else {
       targetVelocity *= Math.pow(0.9, deltaTime);
@@ -1068,6 +1218,10 @@ function animate(now) {
     angularVelocity = 0;
     targetVelocity = 0;
     completeSpinIfNeeded();
+
+    if (pendingEntriesRefresh) {
+      applyEntriesUpdate();
+    }
   }
 
   drawWheel(angle, now);

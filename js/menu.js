@@ -3,6 +3,7 @@
 // ===============================
 
 import { SETTINGS_KEY } from "./constants.js";
+import { formatRecette } from "./entries.js";
 
 const HISTORY_KEY = 'larouedelaservitude_history';
 const DEFAULT_SETTINGS = {
@@ -56,7 +57,10 @@ export function addToHistory(entry) {
   const historyEntry = {
     id: entry.id || Date.now(),
     nom: entry.nom_complet || entry.nom || entry,
+    // `recette` (chaîne) est conservée pour rester lisible par les versions
+    // antérieures ; `recette_meur` est ce que formatRecette utilise.
     recette: entry.recette || null,
+    recette_meur: entry.recette_meur ?? null,
     annee: entry.annee || null,
     date: new Date().toISOString()
   };
@@ -155,6 +159,8 @@ function createMenuHTML() {
   toggle.id = 'menuToggle';
   toggle.innerHTML = '<span></span><span></span><span></span>';
   toggle.setAttribute('aria-label', 'Ouvrir le menu');
+  toggle.setAttribute('aria-expanded', 'false');
+  toggle.setAttribute('aria-controls', 'menuSidebar');
   document.body.appendChild(toggle);
   
   // Overlay
@@ -372,6 +378,7 @@ function openMenu() {
   const toggle = document.getElementById('menuToggle');
   toggle.classList.add('active');
   toggle.setAttribute('aria-label', 'Fermer le menu');
+  toggle.setAttribute('aria-expanded', 'true');
   document.getElementById('menuOverlay').classList.add('active');
   document.getElementById('menuSidebar').classList.add('active');
   document.body.style.overflow = 'hidden';
@@ -381,6 +388,7 @@ function closeMenu() {
   const toggle = document.getElementById('menuToggle');
   toggle.classList.remove('active');
   toggle.setAttribute('aria-label', 'Ouvrir le menu');
+  toggle.setAttribute('aria-expanded', 'false');
   document.getElementById('menuOverlay').classList.remove('active');
   document.getElementById('menuSidebar').classList.remove('active');
   closeAllPanels();
@@ -448,8 +456,9 @@ function renderHistory() {
     });
     
     let metaHtml = `<span>📅 ${dateStr}</span>`;
-    if (item.recette) {
-      metaHtml += `<span>💰 ${item.recette}</span>`;
+    const recette = formatRecette(item);
+    if (recette) {
+      metaHtml += `<span>💰 ${recette}</span>`;
     }
     if (item.annee) {
       metaHtml += `<span>📆 Créée en ${item.annee}</span>`;
@@ -485,11 +494,12 @@ function exportHistory() {
   }
   
   // Export CSV
-  const headers = ['Date', 'Taxe', 'Recette', 'Année'];
+  const headers = ['Date', 'Taxe', 'Recette', 'Recette (M€)', 'Année'];
   const rows = historyData.map(item => [
     item.date,
     `"${item.nom}"`,
-    item.recette || '',
+    `"${formatRecette(item)}"`,
+    item.recette_meur ?? '',
     item.annee || ''
   ]);
   
