@@ -1,5 +1,5 @@
 // Version du cache - À INCRÉMENTER à chaque déploiement
-const CACHE_VERSION = 'v19';
+const CACHE_VERSION = 'v20';
 const CACHE_NAME = `larouedelaservitude-${CACHE_VERSION}`;
 
 /*
@@ -175,6 +175,14 @@ function cacheFirst(request) {
   });
 }
 
+// Une requête émise avec { cache: 'reload' } (ou 'no-store'/'no-cache') dit
+// explicitement « je veux la version du serveur ». C'est ce qu'utilise la
+// revalidation de js/entries.js : lui renvoyer la copie en cache la rendrait
+// inopérante, et le champ "version" des données ne servirait à rien.
+function wantsFreshCopy(request) {
+  return request.cache === 'reload' || request.cache === 'no-store' || request.cache === 'no-cache';
+}
+
 function staleWhileRevalidate(request) {
   return caches.match(request).then((cachedResponse) => {
     const networkResponse = fetch(request)
@@ -183,6 +191,11 @@ function staleWhileRevalidate(request) {
         return response;
       })
       .catch(() => cachedResponse);
+
+    if (wantsFreshCopy(request)) {
+      // Hors ligne, networkResponse retombe sur la copie en cache.
+      return networkResponse;
+    }
 
     return cachedResponse || networkResponse;
   });
@@ -203,6 +216,14 @@ self.addEventListener("fetch", (event) => {
   
   // ⚠️ API Netlify : Hors du SW (jamais en cache)
   if (url.pathname.includes("/.netlify/functions/")) {
+    return;
+  }
+
+  // 🔄 Revalidation des données par js/entries.js : elle veut la version
+  // publiée pour la comparer à celle qu'elle a en cache. On la laisse filer
+  // vers le réseau sans l'intercepter — et sans mettre son URL horodatée en
+  // cache, ce qui y créerait une entrée par revalidation.
+  if (url.searchParams.has('fresh')) {
     return;
   }
 

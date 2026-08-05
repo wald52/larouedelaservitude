@@ -109,6 +109,19 @@ exposes the tuning object for live tweaking from the console.
 `:root[data-theme="dark"]`. `menu.css` and `bills.css` consume those variables with fallbacks —
 never hardcode a colour in the CSS files.
 
+**Data freshness runs on `version`, not on time.** `js/entries.js` serves the IndexedDB copy
+immediately (fast first paint) and revalidates against the network in the background. When the
+fetched `version` differs from the cached one it swaps the data, rewrites the cache and dispatches
+`entriesUpdated` on `window`; `js/app.js` listens and rebuilds the wheel — deferred while the wheel
+is still spinning, and skipped outright once a spin has completed in normal mode (the drawn entries
+have been removed from `ENTRIES`, so rebuilding would undo the game). There is **no TTL**: bumping
+`version` in the two JSON files is the only thing that propagates a data fix.
+
+The revalidation fetch appends `?fresh=<timestamp>`. That is load-bearing: `index.html` preloads
+`data/entries-light.json`, and a fetch to that exact URL silently reuses the preloaded response
+without touching the network — `{cache: 'reload'}` alone does not defeat it. The service worker
+skips any request carrying `fresh` so those URLs never enter the cache.
+
 **Local storage keys** (`SETTINGS_KEY` in `js/constants.js`,
 `larouedelaservitude_history` in `js/menu.js`) and the two IndexedDB databases
 (`LaRoueDeLaServitude` for data, `LaRoueAudio` for decoded sounds) are user-facing state. Changing a
@@ -117,27 +130,72 @@ key or bumping a DB version orphans existing users' data.
 **`requireElement()` in `app.js` throws on a missing id.** If you rename an id in `index.html`, the
 app fails loudly at startup — update both sides.
 
+**Accessibility has load-bearing pieces — don't strip them.** The wheel is a `<canvas>`, so it
+carries `role="img"` plus an `aria-label` that `updateCountInfo()` rewrites on every change; without
+it a screen reader sees nothing there. The result (`#overlayText`), the counter (`#countInfo`) and
+the feedback status are `role="status" aria-live="polite"` regions — that is the only way a spin
+result gets announced. Both modals go through the shared `openModal()` / `closeModal()` helpers in
+`app.js`: they move focus in, trap `Tab` inside, and hand focus back on close; `.bubble` carries
+`tabindex="-1"` for that purpose. `prefers-reduced-motion` is honoured for real — the wheel damps
+much faster (`REDUCED_MOTION_DAMPING`) and `bills.js` is never invoked — on top of its older use as
+a "constrained device" hint in `getCanvasScale()`. The global `@media (prefers-reduced-motion)`
+block and the `:focus-visible` ring live in `index.html`'s inline CSS and cover `menu.css` and
+`bills.css` too, since it is all one document.
+
 ## 5. Data: `data/entries-light.json` + `data/entries-full.json`
 
-Two files, kept in lockstep. The light file (`[{id, nom}]`) loads first so the wheel can draw; the
-full file (`{version, entries: [{id, nom, nom_complet, recette, annee}]}`) loads later and feeds the
-result overlay.
+Two files, kept in lockstep, **both** shaped `{version, entries: [...]}`. The light file
+(`entries: [{id, nom}]`) loads first so the wheel can draw; the full file
+(`entries: [{id, nom, nom_complet, recette, recette_meur, annee}]`) loads later and feeds the
+result overlay. The two `version` strings must match — that value is what invalidates the
+IndexedDB cache (see §4), so **bumping it is what actually ships a data fix**.
+
+Two fields are **derived** and must not be hand-edited:
+
+- `recette_meur` (number | null) — the numeric value parsed out of the `recette` string, in
+  millions of euros. `recette` stays the editorial source; `recette_meur` is what the UI formats
+  via `formatRecette()` in `js/entries.js` (handles the singular — `1 million`, not
+  `1 millions` — and switches to billions past 1000).
+- `nom` in **both** files — the short wheel label, derived from `nom_complet`.
+
+Regenerate both with:
+
+```bash
+node scripts/rebuild-derived-data.mjs           # writes both files
+node scripts/rebuild-derived-data.mjs --check   # reports without writing
+```
+
+It is idempotent (re-running changes nothing) and never adds or removes an entry. It abbreviates
+common tax vocabulary, strips linking words, cuts on word boundaries, and disambiguates collisions
+by pulling in the rarest words of the full name — `Taxe spéciale d'équipement…` ×12 became
+`TSE EPF de Normandie`, `TSE agence Guadeloupe`, and so on.
 
 Invariants enforced by `npm run check:data` **and** `tests/data.test.mjs` — both must keep passing:
 
-- same number of entries in both files;
+- same number of entries in both files, and the same `version` string;
 - every `id` in one file exists in the other;
 - no duplicate `id` within a file;
 - `id`, `nom` non-empty strings in light; `id`, `nom`, `nom_complet` non-empty strings in full;
-- `recette` and `annee` keys present in every full entry (`null` is allowed).
+- the same `nom` in both files for a given `id`;
+- no duplicate `nom` in the light file, and none longer than 30 characters;
+- `recette`, `recette_meur` and `annee` keys present in every full entry (`null` is allowed);
+- `recette` and `recette_meur` are both null or both set.
 
-To edit data: change `data/entries-full.json` first, mirror the entry into
-`data/entries-light.json` with a short `nom` (~25 chars — it has to fit in a wheel slice), bump
-`version` in the full file, then run `npm run check:data && npm test`.
+To edit data: change `nom_complet` / `recette` / `annee` in `data/entries-full.json`, add the entry
+to `data/entries-light.json` with any placeholder `nom`, bump `version` in **both** files, then run
+`node scripts/rebuild-derived-data.mjs && npm run check:data && npm test`.
 
 `scripts/convert-entries.mjs` is legacy: it parses an `ENTRIES` array out of an older `js/entries.js`
 that no longer exists, and **running it would overwrite both data files**. Treat it as reference
-material, not tooling.
+material, not tooling. (`rebuild-derived-data.mjs` also writes both files, but derives everything
+from the files themselves, so it is safe to re-run.)
+
+### Known data gaps
+
+Not bugs, but worth knowing before trusting the numbers: 222 of 371 entries have no `recette` and
+200 have no `annee`; the year the `recette` figures refer to is not recorded anywhere; and a handful
+of entries share an identical `nom_complet` (`Cotisation obligatoire`, `CSG`,
+`Taxe d'apprentissage`…), which is why a few labels carry a numeric suffix.
 
 ## 6. Netlify functions
 
@@ -173,7 +231,7 @@ commit-based share flow.
 
 ## 7. Service worker — the rule you will forget
 
-**Bump `CACHE_VERSION` in `service-worker.js` (currently `v19`) whenever you change a precached
+**Bump `CACHE_VERSION` in `service-worker.js` (currently `v20`) whenever you change a precached
 asset.** Activation deletes every cache whose name doesn't match, so the bump is what actually ships
 your change to returning users.
 
@@ -184,11 +242,14 @@ first *online* load (via the `.js` stale-while-revalidate branch), so a cold fir
 fails on the missing import. `cache.addAll()` is atomic: one 404 aborts the whole precache, so a
 typo'd path silently costs you offline support entirely (the install handler catches and logs it).
 
-Strategies, by path: `/.netlify/functions/*` and cross-origin requests are skipped entirely;
-`index.html` is network-first; `data/*.json`, `site.webmanifest`, `.js` and `.css` are
-stale-while-revalidate; images/icons/audio are cache-first. The SW does `skipWaiting()` +
-`clients.claim()`, so a new version takes over immediately and posts `SW_UPDATED` to open clients.
-It also handles `SKIP_WAITING`, `CLEAR_CACHE` and `REFRESH_DATA` messages.
+Strategies, by path: `/.netlify/functions/*`, cross-origin requests and **any URL carrying a
+`fresh` query parameter** are skipped entirely; `index.html` is network-first; `data/*.json`,
+`site.webmanifest`, `.js` and `.css` are stale-while-revalidate; images/icons/audio are cache-first.
+A stale-while-revalidate request made with `cache: 'reload'`/`no-store`/`no-cache` skips the cached
+copy and waits for the network (`wantsFreshCopy`), falling back to cache when offline. The SW does
+`skipWaiting()` + `clients.claim()`, so a new version takes over immediately and posts `SW_UPDATED`
+to open clients. It also handles `SKIP_WAITING`, `CLEAR_CACHE` and `REFRESH_DATA` messages — note
+that **no client ever posts those three**, they are dead code kept for future use.
 
 ## 8. Tests and linting
 

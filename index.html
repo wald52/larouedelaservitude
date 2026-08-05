@@ -53,6 +53,8 @@
   --install-title:#111; --install-close:#4b5563; --install-close-hover:rgba(17,17,17,0.08);
   --install-button:#c00; --install-button-hover:#900;
   --emoji-size:80px; --bg-size:200vw;
+  /* Ambre : lisible aussi bien sur les fonds clairs que sur la bulle sombre */
+  --focus:#f59e0b;
 }
 
 :root[data-theme="dark"]{
@@ -65,6 +67,37 @@
   --install-surface:#151922; --install-border:rgba(243,244,246,0.12); --install-shadow:0 18px 40px rgba(0,0,0,0.42);
   --install-title:#f3f4f6; --install-close:#cbd5e1; --install-close-hover:rgba(243,244,246,0.1);
   --install-button:#c00; --install-button-hover:#a30000;
+  --focus:#f59e0b;
+}
+
+/* ===============================
+   ACCESSIBILITÉ
+   =============================== */
+
+/* Aucun style de focus n'existait : la navigation au clavier était invisible.
+   :focus-visible ne se déclenche qu'au clavier, la souris reste inchangée. */
+:focus-visible{
+  outline:3px solid var(--focus);
+  outline-offset:2px;
+}
+
+/* .bubble reçoit le focus par programme à l'ouverture du dialogue (openModal
+   dans js/app.js) : pas de contour à afficher pour autant. */
+.bubble:focus,
+.bubble:focus-visible{
+  outline:none;
+}
+
+/* Respect de la préférence système « mouvement réduit ». Couvre aussi
+   menu.css et bills.css, chargés dans ce même document. La rotation de la
+   roue et l'effet billets, pilotés en JS, sont traités dans js/app.js. */
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{
+    animation-duration:0.01ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:0.01ms !important;
+    scroll-behavior:auto !important;
+  }
 }
   
 /* 1️⃣ Tout hérite de la police principale */
@@ -332,11 +365,16 @@ body {
     <div class="board">
       <div class="wheel-area" id="wheelArea">
         <div class="pointer"></div>
-        <canvas id="wheelCanvas" width="800" height="800"></canvas>
+        <!-- aria-label est réactualisé par updateCountInfo() (js/app.js) -->
+        <canvas id="wheelCanvas" width="800" height="800" role="img"
+                aria-label="Roue des taxes et prélèvements français">
+          La roue des taxes et prélèvements obligatoires français. Utilisez le
+          bouton « Tourner la roue » pour tirer une entrée au sort.
+        </canvas>
       </div>
       <div class="controls">
-        <button id="spinBtn" class="primary">Tourner la roue</button>
-        <div class="legend" id="countInfo"></div>
+        <button id="spinBtn" class="primary" type="button">Tourner la roue</button>
+        <div class="legend" id="countInfo" role="status" aria-live="polite"></div>
       </div>
     </div>
   </div>
@@ -351,20 +389,21 @@ body {
 </div>
 
 <div id="overlay" class="overlay" aria-hidden="true">
-  <div class="bubble" role="dialog" aria-modal="true">
-    <div id="overlayText"></div>
+  <!-- tabindex="-1" : js/app.js y place le focus à l'ouverture (openModal) -->
+  <div class="bubble" role="dialog" aria-modal="true" aria-labelledby="overlayText" tabindex="-1">
+    <div id="overlayText" role="status" aria-live="polite"></div>
     <div class="share-bar" id="shareBar">
-      <button class="share-btn" data-platform="facebook" title="Partager sur Facebook">📘</button>
-      <button class="share-btn" data-platform="x" title="Partager sur X / Twitter">🐦</button>
-      <button class="share-btn" data-platform="instagram" title="Partager sur Instagram">📸</button>
-      <button class="share-btn" data-platform="linkedin" title="Partager sur LinkedIn">💼</button>
-      <button class="share-btn" data-platform="snapchat" title="Partager sur Snapchat">👻</button>
-      <button class="share-btn" data-platform="tiktok" title="Partager sur TikTok">🎵</button>
-      <button class="share-btn" data-platform="whatsapp" title="Partager sur WhatsApp">💬</button>
-      <button class="share-btn" data-platform="telegram" title="Partager sur Telegram">📨</button>
-      <button class="share-btn" id="copyText" title="Copier le texte">📋</button>
+      <button class="share-btn" type="button" data-platform="facebook" aria-label="Partager sur Facebook" title="Partager sur Facebook">📘</button>
+      <button class="share-btn" type="button" data-platform="x" aria-label="Partager sur X / Twitter" title="Partager sur X / Twitter">🐦</button>
+      <button class="share-btn" type="button" data-platform="instagram" aria-label="Partager sur Instagram" title="Partager sur Instagram">📸</button>
+      <button class="share-btn" type="button" data-platform="linkedin" aria-label="Partager sur LinkedIn" title="Partager sur LinkedIn">💼</button>
+      <button class="share-btn" type="button" data-platform="snapchat" aria-label="Partager sur Snapchat" title="Partager sur Snapchat">👻</button>
+      <button class="share-btn" type="button" data-platform="tiktok" aria-label="Partager sur TikTok" title="Partager sur TikTok">🎵</button>
+      <button class="share-btn" type="button" data-platform="whatsapp" aria-label="Partager sur WhatsApp" title="Partager sur WhatsApp">💬</button>
+      <button class="share-btn" type="button" data-platform="telegram" aria-label="Partager sur Telegram" title="Partager sur Telegram">📨</button>
+      <button class="share-btn" type="button" id="copyText" aria-label="Copier le texte du résultat" title="Copier le texte">📋</button>
     </div>
-    <button id="overlayClose" class="close" aria-label="Fermer">✕</button>
+    <button id="overlayClose" class="close" type="button" aria-label="Fermer">✕</button>
   </div>
 </div>
 
@@ -383,7 +422,7 @@ body {
       <button type="button" id="closeFeedback">Annuler</button>
       <button type="submit">Envoyer</button>
     </div>
-    <div id="feedbackStatus" class="feedback-status"></div>
+    <div id="feedbackStatus" class="feedback-status" role="status" aria-live="polite"></div>
   </form>
 </div>
 
