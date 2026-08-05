@@ -9,3 +9,31 @@
 # renvoie sa propre origine autorisée (allow-list dans _shared/cors.js) et
 # répond elle-même aux requêtes OPTIONS. Un wildcard "*" ici écraserait
 # l'allow-list applicative.
+
+# 2. Fraîcheur des mises à jour
+# Le script du service worker est le point d'entrée de toute mise à jour : s'il
+# est resservi depuis un cache, la nouvelle version n'arrive jamais. Il doit
+# être revalidé à chaque vérification.
+[[headers]]
+  for = "/service-worker.js"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+
+# index.html est servi depuis le cache du service worker ; cet en-tête ne
+# concerne que le tout premier chargement (et les navigateurs sans SW).
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    Cache-Control = "no-cache"
+
+[[headers]]
+  for = "/"
+  [headers.values]
+    Cache-Control = "no-cache"
+
+# Les données sont revalidées par js/entries.js (paramètre ?fresh=) : un cache
+# CDN long les figerait entre deux publications.
+[[headers]]
+  for = "/data/*"
+  [headers.values]
+    Cache-Control = "no-cache"

@@ -1,6 +1,7 @@
 import { initWheel, loadFullData, getEntryDetails, formatEntryForDisplay } from "./entries.js";
 import { initAudio, unlockAudio, isSoundEnabled, playSpinClick, playWinSound } from "./audio.js";
 import { initMenu, loadHistory, loadSettings, recordSpin, isInfiniteMode } from "./menu.js";
+import { initServiceWorker, applyPendingUpdate } from "./sw-update.js";
 
 function requireElement(id) {
   const element = document.getElementById(id);
@@ -261,6 +262,10 @@ function hideResultOverlay() {
   if (installPromptPendingAfterOverlay) {
     syncInstallPromptVisibility();
   }
+
+  // Moment calme : si une mise à jour attendait que l'utilisateur soit
+  // disponible, c'est ici qu'elle s'applique.
+  applyPendingUpdate();
 }
 
 window.addEventListener('beforeinstallprompt', (event) => {
@@ -1513,39 +1518,29 @@ window.addEventListener('infiniteModeChange', () => {
   updateCountInfo();
 });
 
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('service-worker.js')
-        .then((registration) => {
-          console.log('ServiceWorker enregistré avec succès : ', registration.scope);
-          
-          // 🔄 Détecter les mises à jour du Service Worker
-          registration.addEventListener('updatefound', () => {
-            const newWorker = registration.installing;
-            console.log('[SW] Nouvelle version en installation...');
-            
-            newWorker.addEventListener('statechange', () => {
-              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                // Nouveau SW installé, prêt à activer
-                console.log('[SW] Nouvelle version prête. Activation immédiate...');
-                // Le nouveau SW va prendre le contrôle automatiquement grâce à skipWaiting() + claim()
-              }
-            });
-          });
-        })
-        .catch((error) => {
-          console.log('Échec de l\'enregistrement du ServiceWorker : ', error);
-        });
-      
-      // 📨 Écouter les messages du Service Worker
-      navigator.serviceWorker.addEventListener('message', (event) => {
-        if (event.data && event.data.type === 'SW_UPDATED') {
-          console.log('[SW] Mise à jour détectée:', event.data.cache);
-          // Optionnel : Afficher une notification ou refresh auto
-          // window.location.reload(); // Décommenter pour refresh automatique
-        }
-      });
-    });
-  }
+/* =======================
+   SERVICE WORKER
+   ======================= */
+
+// Un rechargement automatique ne doit jamais interrompre l'utilisateur : ni
+// pendant une rotation, ni fenêtre ouverte, ni une fois la partie commencée
+// (hors mode sans fin, les entrées tirées ont été retirées de la roue et
+// seraient restaurées par le rechargement). Tant que cette fonction renvoie
+// false, l'ancienne version continue d'être servie *entièrement* : aucun
+// mélange de générations n'est possible pendant l'attente.
+function canReloadForUpdate() {
+  if (shouldAnimate()) return false;
+  if (activeModal || isOverlayOpen()) return false;
+  if (completedSpinCount > 0 && !isInfiniteMode()) return false;
+  if (document.getElementById('menuSidebar')?.classList.contains('active')) return false;
+  if (document.querySelector('.menu-panel.active')) return false;
+  return true;
+}
+
+// Enregistrement après `load` pour ne pas disputer la bande passante au premier
+// affichage : le pré-cache complet de la PWA démarre juste après.
+window.addEventListener('load', () => {
+  initServiceWorker({ canReload: canReloadForUpdate });
+});
 
   // L'effet billets est chargé à la première utilisation pour alléger le démarrage.

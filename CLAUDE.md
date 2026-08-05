@@ -25,15 +25,16 @@ PWA that presents the 371 French taxes and mandatory levies as a spinnable wheel
 ## 2. Commands
 
 ```bash
-npm ci                 # install tooling (first time)
+npm ci                  # install tooling (first time)
 
-npm run check          # check:imports + check:data — the cheap, fast gate
-npm run check:imports  # scripts/check-imports.mjs: every relative import/script src resolves
-npm run check:data     # scripts/validate-data.mjs: light/full JSON invariants
-npm run lint           # eslint .
-npm test               # node --test (runs tests/*.test.mjs)
+npm run check           # check:imports + check:data + check:precache — the cheap, fast gate
+npm run check:imports   # scripts/check-imports.mjs: every relative import/script src resolves
+npm run check:data      # scripts/validate-data.mjs: light/full JSON invariants
+npm run check:precache  # scripts/check-precache.mjs: offline coverage + version sync (see §7)
+npm run lint            # eslint .
+npm test                # node --test (runs tests/*.test.mjs)
 
-npm run ci             # check + lint + test — mirrors .github/workflows/ci.yml exactly
+npm run ci              # check + lint + test — mirrors .github/workflows/ci.yml exactly
 ```
 
 Run `npm run ci` before committing. CI (`.github/workflows/ci.yml`, Node 20) runs on every push to
@@ -56,10 +57,11 @@ js/entries.js           Two-tier data loading (light → full) + IndexedDB cache
 js/audio.js             WebAudio, offline-first sound decoding + IndexedDB cache
 js/menu.js              Sidebar, panels, history, settings; builds its own DOM at runtime
 js/settings.js          Reads the sound setting (data-attribute first, localStorage fallback)
-js/constants.js         SETTINGS_KEY and BASE_PATH — shared by front-end modules
+js/sw-update.js         SW registration + version switchover (see §7)
+js/constants.js         SETTINGS_KEY, BASE_PATH and APP_VERSION — shared by front-end modules
 bills.js                Banknote particle effect (repo root, lazy-imported by app.js)
 bills.css / menu.css    Styles for those two features (all other CSS is inline in index.html)
-service-worker.js       PWA precache + per-type fetch strategies
+service-worker.js       PWA atomic precache + cache-first app shell (see §7)
 data/entries-*.json     The data (see §5)
 netlify/functions/      Serverless endpoints (see §6)
 scripts/                Validation + one-off data conversion tooling
@@ -69,8 +71,8 @@ shares/                 Runtime artifacts only; share-*.html is gitignored
 
 ### Module graph
 
-`index.html` → `js/app.js` → `js/entries.js`, `js/audio.js`, `js/menu.js`
-`js/audio.js` → `js/settings.js` → `js/constants.js`
+`index.html` → `js/app.js` → `js/entries.js`, `js/audio.js`, `js/menu.js`, `js/sw-update.js`
+`js/audio.js` → `js/settings.js` → `js/constants.js` ← `js/sw-update.js`, `js/entries.js`
 `js/app.js` → `import('../bills.js')` (dynamic, on first spin) → `js/settings.js`, and
 `bills.js` → `import('./js/audio.js')` (dynamic, inside `initBills()`)
 
@@ -229,31 +231,66 @@ Shares are **not** committed. `shares/share-*.html` is gitignored; the flow is I
 `sharePage` route, deliberately avoiding commits to the repo on user action. Do not reintroduce a
 commit-based share flow.
 
-## 7. Service worker — the rule you will forget
+## 7. Service worker — one generation at a time
 
-**Bump `CACHE_VERSION` in `service-worker.js` (currently `v20`) whenever you change a precached
-asset.** Activation deletes every cache whose name doesn't match, so the bump is what actually ships
-your change to returning users.
+Three guarantees, and everything in `service-worker.js` + `js/sw-update.js` exists to hold them:
+**(1)** one load with zero interaction is enough to work fully offline, **(2)** a visitor gets the
+latest published version without waiting 24 h or reloading twice, **(3)** a page never mixes files
+from two versions.
 
-**Add every new module and asset to `urlsToCache`.** The list currently covers all six `js/`
-modules, `bills.js`, both stylesheets, both data files, the centre image, the three sounds, the
-icons and the manifest — keep it that way. A module missing from the list is only cached after a
-first *online* load (via the `.js` stale-while-revalidate branch), so a cold first launch offline
-fails on the missing import. `cache.addAll()` is atomic: one 404 aborts the whole precache, so a
-typo'd path silently costs you offline support entirely (the install handler catches and logs it).
+**Bump the version in *two* files whenever you change any precached asset:** `CACHE_VERSION` in
+`service-worker.js` (currently `v21`) and `APP_VERSION` in `js/constants.js`. They must be equal —
+`npm run check:precache` fails otherwise. That pair *is* the release: nothing reaches returning
+visitors without it.
 
-Strategies, by path: `/.netlify/functions/*`, cross-origin requests and **any URL carrying a
-`fresh` query parameter** are skipped entirely; `index.html` is network-first; `data/*.json`,
-`site.webmanifest`, `.js` and `.css` are stale-while-revalidate; images/icons/audio are cache-first.
-A stale-while-revalidate request made with `cache: 'reload'`/`no-store`/`no-cache` skips the cached
-copy and waits for the network (`wantsFreshCopy`), falling back to cache when offline. The SW does
-`skipWaiting()` + `clients.claim()`, so a new version takes over immediately and posts `SW_UPDATED`
-to open clients. It also handles `SKIP_WAITING`, `CLEAR_CACHE` and `REFRESH_DATA` messages — note
-that **no client ever posts those three**, they are dead code kept for future use.
+**Add every new module and asset to `urlsToCache`.** `npm run check:precache` (and
+`tests/precache.test.mjs`) walks `index.html`, `site.webmanifest`, every `js/` module, `bills.js`
+and both stylesheets, and fails on any local file they reference that is missing from the list — a
+missing entry is the classic "first launch offline is broken" bug.
+
+**Install is atomic.** Each URL is fetched with `?v=<CACHE_VERSION>` and `cache: 'reload'` (the
+query string is what really defeats the HTTP cache and the CDN; the response is rebuilt before
+`cache.put` so the stored URL stays clean), retried twice, and **one failure aborts the whole
+install** and deletes the half-filled cache. A typo'd path therefore costs you the update, not
+offline support: the previous generation keeps serving, intact, and the browser retries later.
+
+**Fetch is cache-first for the entire shell** — `index.html` included, and navigations with query
+strings map onto it. Freshness does *not* come from per-file network requests: a fresh `index.html`
+combined with cached JS is exactly the version mix that breaks the site. It comes from the update
+cycle below. Skipped entirely: `/.netlify/functions/*`, cross-origin, and any URL carrying `fresh`
+(the data revalidation in `js/entries.js`). Anything not precached goes straight to the network.
+
+**Version switchover is a handshake, not a race** (`js/sw-update.js`):
+
+1. Registration uses `updateViaCache: 'none'` and calls `registration.update()` on load, on tab
+   focus and on `online` — the SW script is never read from the HTTP cache, so there is no 24 h
+   window. `netlify.toml` also sends `no-cache` for `/service-worker.js`.
+2. A new SW precaches its whole generation and then **waits**. While it waits the old one keeps
+   serving *its* complete generation — that is what makes mixing impossible.
+3. The page decides when to switch: `canReloadForUpdate()` in `js/app.js` (nothing spinning, no
+   modal or panel open, no spin completed outside infinite mode) → `SKIP_WAITING` → `controllerchange`
+   → one silent `location.reload()`, guarded against loops by a 10 s `sessionStorage` marker. If the
+   user is busy, the update is held and re-applied on the next idle moment (`applyPendingUpdate()`,
+   called when the result overlay closes and on tab focus) or at the next launch, in a single load.
+4. Belt and braces: the page asks the controlling SW for its version (`GET_VERSION`) and compares it
+   to `APP_VERSION`. A mismatch means the code and the cache are from different generations — it
+   re-checks for an update and realigns.
+
+Pages from **v20 or earlier** don't know the handshake, so a v21+ install that finds only older
+cache names takes over immediately and reloads them itself via `client.navigate()` (fired without
+`await` — awaiting it inside `activate` deadlocks the activation the navigation is waiting for).
+
+`SKIP_WAITING` and `GET_VERSION` are live protocol; `CLEAR_CACHE` is kept for manual troubleshooting
+and no client sends it.
+
+Verify a change in a browser over HTTP: load once without touching anything, kill the server, reload
+(the app must be complete), then publish a version bump and confirm the open tab lands on it by
+itself with a single cache left in `caches.keys()`.
 
 ## 8. Tests and linting
 
-`npm test` runs Node's built-in test runner over `tests/*.test.mjs`: the data invariants, plus the
+`npm test` runs Node's built-in test runner over `tests/*.test.mjs`: the data invariants, the
+precache/version invariants (`tests/precache.test.mjs`, which just runs the §7 checker), plus the
 three Netlify handlers exercised directly via `createRequire` (CORS behaviour, status codes,
 HTML escaping, redirect normalization). **There are no browser/DOM tests** — front-end changes in
 `js/` and `bills.js` must be verified manually in a browser.
@@ -287,9 +324,11 @@ this project has — moving or renaming a module will be caught here.
 ## 10. Checklist before you finish
 
 1. `npm run ci` passes.
-2. Bumped `CACHE_VERSION` if a precached asset changed; added new assets to `urlsToCache`.
+2. Changed a precached asset? Bumped **both** `CACHE_VERSION` (`service-worker.js`) and
+   `APP_VERSION` (`js/constants.js`), and added any new asset to `urlsToCache`.
 3. Data edits touched both JSON files and bumped `version`.
 4. No repo-wide Prettier reformat in the diff.
 5. New/renamed modules resolve under `npm run check:imports` and are covered by an
    `eslint.config.js` block.
-6. Front-end changes were exercised in a browser over HTTP, including one offline reload.
+6. Front-end changes were exercised in a browser over HTTP, including one offline reload from a
+   cold start and one version bump applied to an already-open tab (§7).
