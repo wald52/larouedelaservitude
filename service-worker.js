@@ -1,46 +1,63 @@
-// Version du cache - À INCRÉMENTER à chaque déploiement
-const CACHE_VERSION = 'v20';
+// Version de l'application - À INCRÉMENTER à chaque déploiement.
+// ⚠️ Doit rester identique à APP_VERSION dans js/constants.js
+// (égalité vérifiée par `npm run check:precache`).
+const CACHE_VERSION = 'v21';
 const CACHE_NAME = `larouedelaservitude-${CACHE_VERSION}`;
 
 /*
-   Service Worker PWA offline-first avec MAJ immédiate
-   ================================================
+   Service Worker PWA offline-first, une seule version à la fois
+   =============================================================
 
-   🔄 MISE À JOUR IMMÉDIATE :
-   - skipWaiting() + clients.claim() = activation instantanée
-   - Tous les onglets sont mis à jour automatiquement
+   📦 UNE GÉNÉRATION = UN CACHE :
+   - L'installation télécharge TOUS les fichiers de la nouvelle version dans un
+     cache neuf, en contournant le cache HTTP (paramètre ?v= + cache: 'reload').
+   - Si un seul fichier manque, l'installation échoue : on ne crée jamais un
+     cache à moitié rempli. L'ancienne version continue de servir, intacte.
+   - Tant que le nouveau SW n'est pas activé, l'ancien sert l'intégralité de son
+     cache. Aucun mélange ancien/nouveau n'est donc possible.
 
-   📦 CACHE OFFLINE :
-   - Tous les fichiers critiques sont pré-cachés à l'installation
-   - Fonctionne sans connexion après première visite
+   🔄 MISE À JOUR :
+   - Première installation : skipWaiting() immédiat, la visite en cours est déjà
+     complètement hors ligne sans aucune action de l'utilisateur.
+   - Mise à jour : le nouveau SW attend que la page dise « je suis prête »
+     (message SKIP_WAITING envoyé par js/sw-update.js), puis la page se
+     recharge. C'est ce qui garantit qu'un onglet ne mélange jamais du HTML,
+     du JS et des données de deux générations différentes.
 
-   📊 STRATÉGIES :
-   - index.html : Network First (dernière version + fallback offline)
-   - JS/CSS/manifest/données : Stale-While-Revalidate
-   - Images, icônes et audio : Cache First
-   - API et pages dynamiques : hors du Service Worker
-   
-   ℹ️ FONTS : Aucun - utilisation de fonts système uniquement
+   📊 STRATÉGIES : Cache First sur toute la coquille applicative (HTML, JS, CSS,
+   JSON, images, sons). La fraîcheur ne vient pas d'une requête réseau par
+   fichier — qui ramènerait des fichiers de générations différentes — mais du
+   cycle de mise à jour du service worker lui-même.
+
+   Exceptions (jamais interceptées) : les fonctions Netlify, les requêtes
+   cross-origin et les URL portant un paramètre `fresh` (revalidation des
+   données par js/entries.js).
+
+   ℹ️ FONTS : Aucune - utilisation de fonts système uniquement
    (system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial)
 */
 
 const BASE = self.location.pathname.replace(/\/[^/]*$/, '');
 
+// Nombre de nouvelles tentatives par fichier avant de faire échouer
+// l'installation (réseau instable sur mobile).
+const PRECACHE_RETRIES = 2;
+
 // Liste des fichiers à pré-cacher (CRITIQUE pour offline)
 const urlsToCache = [
-  `${BASE}/`,
   `${BASE}/index.html`,
 
   // 📜 Scripts (critique)
   // ⚠️ Tout module importé par app.js (même indirectement) doit figurer ici :
-  // sans cela il n'est mis en cache qu'après un premier chargement en ligne,
-  // et un tout premier lancement hors ligne échoue sur un import manquant.
+  // sans cela un tout premier lancement hors ligne échoue sur un import
+  // manquant. `npm run check:precache` vérifie cette liste automatiquement.
   `${BASE}/js/app.js`,
   `${BASE}/js/entries.js`,
   `${BASE}/js/audio.js`,
   `${BASE}/js/menu.js`,
   `${BASE}/js/constants.js`,
   `${BASE}/js/settings.js`,
+  `${BASE}/js/sw-update.js`,
   `${BASE}/bills.js`,
 
   // 🎨 Styles
@@ -68,27 +85,121 @@ const urlsToCache = [
   `${BASE}/site.webmanifest`,
 ];
 
+const PRECACHED_PATHS = new Set(urlsToCache);
+
+// `${BASE}/` et `${BASE}/index.html` désignent la même page : une seule entrée
+// de cache pour les deux, donc une seule coquille possible.
+const INDEX_KEY = `${BASE}/index.html`;
+const INDEX_PATHS = new Set([`${BASE}/`, INDEX_KEY]);
+
 /* =====================================================
-   INSTALLATION : Pré-cache de TOUS les fichiers critiques
+   INSTALLATION : pré-cache atomique de la génération
    ===================================================== */
-self.addEventListener("install", (event) => {
+
+// Le paramètre ?v= et cache: 'reload' garantissent que les octets pré-cachés
+// viennent bien du serveur : sans eux, le cache HTTP du navigateur (ou le CDN)
+// pourrait resservir les fichiers de la version précédente, et la « nouvelle »
+// génération serait un mélange.
+function precacheRequest(url) {
+  const separator = url.includes('?') ? '&' : '?';
+  return new Request(`${url}${separator}v=${CACHE_VERSION}`, {
+    cache: 'reload',
+    credentials: 'same-origin'
+  });
+}
+
+async function precacheOne(cache, url, attempt = 0) {
+  try {
+    const response = await fetch(precacheRequest(url));
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+    // Stocké sous l'URL propre : le paramètre ?v= ne sert qu'au téléchargement.
+    // La réponse est reconstruite pour ne pas transporter l'URL horodatée, qui
+    // deviendrait sinon l'URL de base des modules ES servis depuis ce cache.
+    const body = await response.blob();
+    await cache.put(
+      url,
+      new Response(body, {
+        status: 200,
+        statusText: response.statusText,
+        headers: response.headers
+      })
+    );
+  } catch (error) {
+    if (attempt < PRECACHE_RETRIES) {
+      return precacheOne(cache, url, attempt + 1);
+    }
+    throw new Error(`${url} (${error.message})`);
+  }
+}
+
+async function precacheAll() {
+  const cache = await caches.open(CACHE_NAME);
+  const results = await Promise.allSettled(urlsToCache.map((url) => precacheOne(cache, url)));
+  const failures = results.filter((result) => result.status === 'rejected');
+
+  if (failures.length) {
+    // Cache incomplet = hors ligne cassé : on préfère échouer et laisser
+    // l'ancienne version en place. Le navigateur retentera à la prochaine
+    // vérification de mise à jour.
+    await caches.delete(CACHE_NAME);
+    throw new Error(
+      `Pré-cache incomplet : ${failures.map((f) => f.reason.message).join(', ')}`
+    );
+  }
+}
+
+// Les versions antérieures à v21 ne savaient pas envoyer SKIP_WAITING : une
+// page qui en vient n'aurait aucun moyen de déclencher la bascule, et le
+// nouveau SW attendrait indéfiniment. On la reconnaît au nom de son cache —
+// d'où la convention « v » + nombre pour CACHE_VERSION. Un nom illisible est
+// traité comme ancien : bascule forcée, ce qui reste sûr (les pages concernées
+// sont rechargées).
+const HANDSHAKE_MIN_VERSION = 21;
+
+async function predecessorKnowsHandshake() {
+  const versions = (await caches.keys())
+    .map((name) => /^larouedelaservitude-v(\d+)$/.exec(name))
+    .filter(Boolean)
+    .map((match) => Number(match[1]))
+    .filter((version) => version !== Number(CACHE_VERSION.slice(1)));
+
+  return versions.length > 0 && versions.every((version) => version >= HANDSHAKE_MIN_VERSION);
+}
+
+// Vrai quand on remplace une génération trop ancienne pour la poignée de main :
+// l'activation ne peut pas attendre son feu vert, on rechargera ses pages.
+let legacyTakeover = false;
+
+self.addEventListener('install', (event) => {
   console.log(`[SW] Installation de ${CACHE_NAME}`);
-  
-  // Force l'activation immédiate (skip waiting)
-  self.skipWaiting();
 
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => {
-        console.log('[SW] Pré-cache des ressources critiques...');
-        return cache.addAll(urlsToCache);
+    precacheAll()
+      .then(async () => {
+        console.log('[SW] ✅ Pré-cache complet - prêt pour offline');
+
+        legacyTakeover = Boolean(self.registration.active) && !(await predecessorKnowsHandshake());
+
+        // Première installation : aucun SW actif, donc aucune page ne tourne
+        // avec du code d'une autre génération. On prend le contrôle tout de
+        // suite pour que la visite en cours soit déjà utilisable hors ligne.
+        if (!self.registration.active) {
+          await self.skipWaiting();
+        } else if (legacyTakeover) {
+          console.log('[SW] Génération précédente sans poignée de main : bascule forcée');
+          await self.skipWaiting();
+        } else {
+          // Mise à jour : on reste en attente. C'est la page (js/sw-update.js)
+          // qui déclenche la bascule quand elle peut se recharger sans gêner
+          // l'utilisateur — sinon elle mélangerait deux générations.
+          console.log('[SW] Nouvelle version prête, en attente du feu vert de la page');
+        }
       })
-      .then(() => {
-        console.log('[SW] ✅ Pré-cache terminé - prêt pour offline');
-      })
-      .catch((err) => {
-        console.error("[SW] ❌ Erreur pré-cache :", err);
-        // Certains fichiers peuvent échouer (ex: audio), ce n'est pas bloquant
+      .catch((error) => {
+        console.error('[SW] ❌ Installation abandonnée :', error.message);
+        // Propagé : l'installation échoue, l'ancienne version reste seule maître.
+        throw error;
       })
   );
 });
@@ -96,13 +207,14 @@ self.addEventListener("install", (event) => {
 /* =====================================================
    ACTIVATION : Nettoyage des anciens caches + claim
    ===================================================== */
-self.addEventListener("activate", (event) => {
+self.addEventListener('activate', (event) => {
   console.log(`[SW] Activation de ${CACHE_NAME}`);
-  
+
   event.waitUntil(
-    // 1. Supprimer TOUS les anciens caches
-    caches.keys().then((names) => {
-      return Promise.all(
+    (async () => {
+      // 1. Supprimer TOUS les anciens caches : une seule génération survit.
+      const names = await caches.keys();
+      await Promise.all(
         names
           .filter((name) => name !== CACHE_NAME)
           .map((name) => {
@@ -110,98 +222,62 @@ self.addEventListener("activate", (event) => {
             return caches.delete(name);
           })
       );
-    })
-    .then(() => {
-      console.log('[SW] ✅ Anciens caches supprimés');
-      // 2. Prendre le contrôle IMMÉDIAT de tous les onglets
-      return self.clients.claim();
-    })
-    .then(() => {
-      console.log('[SW] ✅ Claim effectué - tous les onglets sont à jour');
-      // 3. Notifier tous les clients pour refresh si nécessaire
-      return self.clients.matchAll({ type: 'window' }).then((clients) => {
-        clients.forEach((client) => {
-          // Optionnel : recharger automatiquement
-          // client.navigate(client.url);
-          
-          // Ou envoyer un message pour afficher un bouton "Mettre à jour"
-          client.postMessage({
-            type: 'SW_UPDATED',
-            cache: CACHE_NAME
-          });
+
+      // 2. Prendre le contrôle immédiat de tous les onglets.
+      await self.clients.claim();
+
+      // 3. Prévenir les pages : elles se rechargent pour aligner leur code sur
+      //    cette génération (voir js/sw-update.js).
+      const clients = await self.clients.matchAll({ type: 'window' });
+      for (const client of clients) {
+        client.postMessage({
+          type: 'SW_UPDATED',
+          version: CACHE_VERSION,
+          cache: CACHE_NAME
         });
-      });
-    })
+
+        // Une page d'une génération sans poignée de main ne sait pas se
+        // recharger toute seule : elle resterait avec son ancien code face à
+        // ce nouveau cache. On la recharge nous-mêmes.
+        //
+        // ⚠️ Sans `await` : la navigation a besoin d'un SW *activé* pour être
+        // servie, l'attendre ici bloquerait l'activation qu'elle attend.
+        if (legacyTakeover) {
+          client.navigate(client.url).catch((error) => {
+            console.warn('[SW] Rechargement de la page impossible :', error);
+          });
+        }
+      }
+    })()
   );
 });
 
 /* =====================================================
-   FETCH : Stratégies adaptées par type de fichier
+   FETCH : Cache First sur la génération installée
    ===================================================== */
-const INDEX_PATHS = new Set([`${BASE}/`, `${BASE}/index.html`]);
-const DATA_PATHS = new Set([
-  `${BASE}/data/entries-light.json`,
-  `${BASE}/data/entries-full.json`,
-]);
-const STATIC_ASSET_REGEX = /\.(?:js|css|png|jpg|jpeg|gif|svg|webp|ico|avif|mp3|wav|ogg|m4a)$/i;
 
 function isCacheableResponse(response) {
-  return response && response.status === 200;
+  return response && response.status === 200 && response.type === 'basic';
 }
 
-function putInCache(request, response) {
-  if (!isCacheableResponse(response)) return Promise.resolve();
-
-  return caches.open(CACHE_NAME).then((cache) => cache.put(request, response.clone()));
-}
-
-function networkFirst(request) {
-  return fetch(request)
-    .then((response) => {
-      putInCache(request, response);
-      return response;
-    })
-    .catch(() => caches.match(request));
-}
-
-function cacheFirst(request) {
-  return caches.match(request).then((cachedResponse) => {
+// Cache First : la réponse vient toujours de la génération installée. Le réseau
+// n'est sollicité que pour ce qui n'a pas été pré-caché (ou si le cache a été
+// vidé par le navigateur).
+function cacheFirst(request, cacheKey = request) {
+  return caches.match(cacheKey).then((cachedResponse) => {
     if (cachedResponse) return cachedResponse;
 
     return fetch(request).then((response) => {
-      putInCache(request, response);
+      if (isCacheableResponse(response)) {
+        const copy = response.clone();
+        caches.open(CACHE_NAME).then((cache) => cache.put(cacheKey, copy));
+      }
       return response;
     });
   });
 }
 
-// Une requête émise avec { cache: 'reload' } (ou 'no-store'/'no-cache') dit
-// explicitement « je veux la version du serveur ». C'est ce qu'utilise la
-// revalidation de js/entries.js : lui renvoyer la copie en cache la rendrait
-// inopérante, et le champ "version" des données ne servirait à rien.
-function wantsFreshCopy(request) {
-  return request.cache === 'reload' || request.cache === 'no-store' || request.cache === 'no-cache';
-}
-
-function staleWhileRevalidate(request) {
-  return caches.match(request).then((cachedResponse) => {
-    const networkResponse = fetch(request)
-      .then((response) => {
-        putInCache(request, response);
-        return response;
-      })
-      .catch(() => cachedResponse);
-
-    if (wantsFreshCopy(request)) {
-      // Hors ligne, networkResponse retombe sur la copie en cache.
-      return networkResponse;
-    }
-
-    return cachedResponse || networkResponse;
-  });
-}
-
-self.addEventListener("fetch", (event) => {
+self.addEventListener('fetch', (event) => {
   const request = event.request;
 
   if (request.method !== 'GET') {
@@ -213,9 +289,9 @@ self.addEventListener("fetch", (event) => {
   if (url.origin !== self.location.origin) {
     return;
   }
-  
+
   // ⚠️ API Netlify : Hors du SW (jamais en cache)
-  if (url.pathname.includes("/.netlify/functions/")) {
+  if (url.pathname.includes('/.netlify/functions/')) {
     return;
   }
 
@@ -227,65 +303,58 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // 📝 Page principale → Network First
-  // Objectif : obtenir rapidement la dernière version d'index.html avec fallback offline.
+  // 📝 Page principale (y compris avec des paramètres de partage) → la
+  // coquille de la génération installée. Sa fraîcheur est assurée par le cycle
+  // de mise à jour du SW, pas par une requête réseau : servir un index.html
+  // plus récent que les modules JS en cache casserait l'application.
   if (INDEX_PATHS.has(url.pathname)) {
-    return event.respondWith(networkFirst(request));
+    return event.respondWith(cacheFirst(request, INDEX_KEY));
   }
 
-  // 📊 Données métier → Stale-While-Revalidate
-  // Les entrées peuvent être légèrement anciennes pendant quelques secondes.
-  if (DATA_PATHS.has(url.pathname)) {
-    return event.respondWith(staleWhileRevalidate(request));
+  // 📦 Reste de la coquille (JS, CSS, JSON, images, sons, manifeste).
+  if (PRECACHED_PATHS.has(url.pathname)) {
+    return event.respondWith(cacheFirst(request, url.pathname));
   }
 
-  // 📱 Manifest → Stale-While-Revalidate
-  if (url.pathname === `${BASE}/site.webmanifest`) {
-    return event.respondWith(staleWhileRevalidate(request));
-  }
-
-  // 📜 JS/CSS → Stale-While-Revalidate pour un rendu rapide + mise à jour en arrière-plan.
-  if (url.pathname.endsWith('.js') || url.pathname.endsWith('.css')) {
-    return event.respondWith(staleWhileRevalidate(request));
-  }
-
-  // 🖼️ Images, icônes et audio → Cache First : fichiers versionnés/peu changeants.
-  if (STATIC_ASSET_REGEX.test(url.pathname)) {
-    return event.respondWith(cacheFirst(request));
-  }
+  // Tout le reste (pages de partage, ressources ajoutées à chaud) : réseau.
 });
 
 /* =====================================================
    MESSAGES : Communication avec les clients
    ===================================================== */
 self.addEventListener('message', (event) => {
-  // Message pour forcer l'activation
-  if (event.data && event.data.type === 'SKIP_WAITING') {
+  const data = event.data;
+  if (!data || !data.type) return;
+
+  // Envoyé par js/sw-update.js quand la page peut se recharger sans gêner
+  // l'utilisateur : c'est le déclencheur de la bascule de version.
+  if (data.type === 'SKIP_WAITING') {
     self.skipWaiting();
+    return;
   }
-  
-  // Message pour vider le cache (refresh forcé)
-  if (event.data && event.data.type === 'CLEAR_CACHE') {
+
+  // Permet à la page de vérifier que son code appartient bien à la génération
+  // servie par ce SW (voir la détection de décalage dans js/sw-update.js).
+  if (data.type === 'GET_VERSION') {
+    const port = event.ports && event.ports[0];
+    const payload = { type: 'VERSION', version: CACHE_VERSION };
+    if (port) port.postMessage(payload);
+    else if (event.source) event.source.postMessage(payload);
+    return;
+  }
+
+  // Vidage complet (dépannage) : les onglets se rechargent sur une génération
+  // fraîchement téléchargée.
+  if (data.type === 'CLEAR_CACHE') {
     console.log('[SW] Clear cache demandé');
     event.waitUntil(
-      caches.keys().then((names) => {
-        return Promise.all(names.map((name) => caches.delete(name)));
-      }).then(() => {
-        return self.clients.matchAll({ type: 'window' }).then((clients) => {
-          clients.forEach((client) => {
-            client.navigate(client.url);
-          });
-        });
-      })
+      caches
+        .keys()
+        .then((names) => Promise.all(names.map((name) => caches.delete(name))))
+        .then(() => self.clients.matchAll({ type: 'window' }))
+        .then((clients) => {
+          clients.forEach((client) => client.navigate(client.url));
+        })
     );
-  }
-  
-  // Message pour refresh des données JSON seulement
-  if (event.data && event.data.type === 'REFRESH_DATA') {
-    console.log('[SW] Refresh des données JSON demandé');
-    caches.open(CACHE_NAME).then((cache) => {
-      cache.delete(`${BASE}/data/entries-light.json`);
-      cache.delete(`${BASE}/data/entries-full.json`);
-    });
   }
 });

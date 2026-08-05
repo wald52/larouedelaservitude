@@ -6,7 +6,8 @@
   "scripts": {
     "check:imports": "node scripts/check-imports.mjs",
     "check:data": "node scripts/validate-data.mjs",
-    "check": "npm run check:imports && npm run check:data",
+    "check:precache": "node scripts/check-precache.mjs",
+    "check": "npm run check:imports && npm run check:data && npm run check:precache",
     "lint": "eslint .",
     "format": "prettier --check .",
     "format:write": "prettier --write .",
