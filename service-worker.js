@@ -1,5 +1,5 @@
 // Version du cache - À INCRÉMENTER à chaque déploiement
-const CACHE_VERSION = 'v18';
+const CACHE_VERSION = 'v19';
 const CACHE_NAME = `larouedelaservitude-${CACHE_VERSION}`;
 
 /*
@@ -32,10 +32,15 @@ const urlsToCache = [
   `${BASE}/index.html`,
 
   // 📜 Scripts (critique)
+  // ⚠️ Tout module importé par app.js (même indirectement) doit figurer ici :
+  // sans cela il n'est mis en cache qu'après un premier chargement en ligne,
+  // et un tout premier lancement hors ligne échoue sur un import manquant.
   `${BASE}/js/app.js`,
   `${BASE}/js/entries.js`,
   `${BASE}/js/audio.js`,
   `${BASE}/js/menu.js`,
+  `${BASE}/js/constants.js`,
+  `${BASE}/js/settings.js`,
   `${BASE}/bills.js`,
 
   // 🎨 Styles

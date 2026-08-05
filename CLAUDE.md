@@ -173,14 +173,16 @@ commit-based share flow.
 
 ## 7. Service worker — the rule you will forget
 
-**Bump `CACHE_VERSION` in `service-worker.js` (currently `v18`) whenever you change a precached
+**Bump `CACHE_VERSION` in `service-worker.js` (currently `v19`) whenever you change a precached
 asset.** Activation deletes every cache whose name doesn't match, so the bump is what actually ships
 your change to returning users.
 
-**Add any new precached file to `urlsToCache`.** Note the current list does not include
-`js/constants.js` or `js/settings.js`; they still work offline because the `.js`
-stale-while-revalidate branch caches them after first fetch, but they are not guaranteed present
-after install. Add new modules to the list explicitly.
+**Add every new module and asset to `urlsToCache`.** The list currently covers all six `js/`
+modules, `bills.js`, both stylesheets, both data files, the centre image, the three sounds, the
+icons and the manifest — keep it that way. A module missing from the list is only cached after a
+first *online* load (via the `.js` stale-while-revalidate branch), so a cold first launch offline
+fails on the missing import. `cache.addAll()` is atomic: one 404 aborts the whole precache, so a
+typo'd path silently costs you offline support entirely (the install handler catches and logs it).
 
 Strategies, by path: `/.netlify/functions/*` and cross-origin requests are skipped entirely;
 `index.html` is network-first; `data/*.json`, `site.webmanifest`, `.js` and `.css` are
