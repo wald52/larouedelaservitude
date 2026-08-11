@@ -9,7 +9,12 @@ const HISTORY_KEY = 'larouedelaservitude_history';
 const DEFAULT_SETTINGS = {
   darkMode: false,
   infiniteMode: false,
-  soundEnabled: true
+  soundEnabled: true,
+  // Mode avancé : donne accès à la page « Données & analyse » (donnees.html).
+  // Désactivé par défaut, et c'est volontaire — qui vient jouer avec la roue ne
+  // doit pas tomber sur un tableur. Qui cherche les chiffres le trouve dans les
+  // réglages, et l'entrée de menu apparaît alors.
+  advancedMode: false
 };
 
 // État global
@@ -27,7 +32,17 @@ function applySettingsToDocument() {
 
   root.setAttribute('data-sound-enabled', settings.soundEnabled ? 'true' : 'false');
   root.setAttribute('data-infinite-mode', settings.infiniteMode ? 'true' : 'false');
+  root.setAttribute('data-advanced-mode', settings.advancedMode ? 'true' : 'false');
   window.__MENU_SETTINGS__ = { ...settings };
+}
+
+// L'entrée « Données & analyse » n'existe dans le menu que si le mode avancé
+// est actif. La page reste atteignable par son adresse : on cache un raccourci,
+// on ne verrouille rien.
+function syncAdvancedLink() {
+  const link = document.getElementById('advancedLink');
+  if (!link) return;
+  link.hidden = !settings.advancedMode;
 }
 
 // ===============================
@@ -187,6 +202,10 @@ function createMenuHTML() {
         <span class="icon">⚙️</span>
         <span class="label">Réglages</span>
       </button>
+      <a class="menu-item" id="advancedLink" href="donnees.html" hidden>
+        <span class="icon">📊</span>
+        <span class="label">Données &amp; analyse</span>
+      </a>
     </div>
     <div class="menu-footer">
       <a href="https://github.com/wald52/larouedelaservitude" target="_blank" rel="noopener">
@@ -266,6 +285,22 @@ function createMenuHTML() {
       </div>
       
       <div class="settings-group">
+        <h3>Pour aller plus loin</h3>
+        <div class="setting-item">
+          <div>
+            <div class="setting-label">Mode avancé</div>
+            <span class="setting-desc">
+              Ajoute au menu la page « Données &amp; analyse » : la liste complète des 371
+              prélèvements, avec filtres, tri multi-critères, statistiques et export.
+            </span>
+          </div>
+          <div class="toggle" id="advancedModeToggle">
+            <div class="toggle-knob"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-group">
         <h3>Données</h3>
         <div class="setting-item">
           <div>
@@ -281,12 +316,15 @@ function createMenuHTML() {
 
   // Mettre à jour le badge
   updateHistoryBadge();
+  syncAdvancedLink();
 }
 
 function attachMenuEvents() {
   const toggle = document.getElementById('menuToggle');
   const overlay = document.getElementById('menuOverlay');
-  const menuItems = document.querySelectorAll('.menu-item');
+  // Seuls les boutons ouvrant un panneau : le lien vers la page d'analyse est
+  // une navigation ordinaire.
+  const menuItems = document.querySelectorAll('.menu-item[data-panel]');
   
   // Ouvrir / fermer le menu
   toggle.addEventListener('click', () => {
@@ -348,6 +386,12 @@ function attachMenuEvents() {
     const isActive = this.classList.toggle('active');
     updateSetting('soundEnabled', isActive);
     window.dispatchEvent(new CustomEvent('soundModeChange', { detail: isActive }));
+  });
+
+  document.getElementById('advancedModeToggle').addEventListener('click', function() {
+    const isActive = this.classList.toggle('active');
+    updateSetting('advancedMode', isActive);
+    syncAdvancedLink();
   });
   
   // Reset app
@@ -483,6 +527,8 @@ function renderSettings() {
   document.getElementById('darkModeToggle').classList.toggle('active', s.darkMode);
   document.getElementById('infiniteModeToggle').classList.toggle('active', s.infiniteMode);
   document.getElementById('soundToggle').classList.toggle('active', s.soundEnabled);
+  document.getElementById('advancedModeToggle').classList.toggle('active', s.advancedMode);
+  syncAdvancedLink();
 }
 
 function exportHistory() {

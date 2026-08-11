@@ -334,6 +334,17 @@ export async function getEntryById(id) {
   return entriesFullById?.get(id) || null;
 }
 
+/**
+ * Version du jeu de données actuellement en mémoire (celle du fichier complet
+ * s'il est chargé, sinon celle du fichier léger). C'est la valeur qui décide
+ * de la fraîcheur du cache : la page d'analyse l'affiche pour que la donnée
+ * exportée soit datable.
+ * @returns {string|null} null tant qu'aucune donnée n'est chargée
+ */
+export function getDataVersion() {
+  return fullVersion ?? lightVersion;
+}
+
 const NUMBER_FORMAT = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 });
 
 /**

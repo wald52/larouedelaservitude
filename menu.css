@@ -147,6 +147,18 @@
   background: var(--menu-item-hover);
 }
 
+/* L'entrée « Données & analyse » est un lien, pas un bouton ouvrant un panneau. */
+a.menu-item {
+  box-sizing: border-box;
+  text-decoration: none;
+}
+
+/* display:flex ci-dessus l'emporterait sur l'attribut hidden : sans cette
+   règle, l'entrée du mode avancé resterait visible une fois masquée. */
+.menu-item[hidden] {
+  display: none;
+}
+
 .menu-item .icon {
   font-size: 20px;
   width: 24px;

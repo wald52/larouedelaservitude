@@ -11,6 +11,9 @@ PWA that presents the 371 French taxes and mandatory levies as a spinnable wheel
 - **Static site, no build step.** `index.html` is served as-is and loads `./js/app.js` as a native
   ES module. There is no bundler, no transpiler, no framework, no TypeScript. What you write is
   what the browser runs.
+- **Two pages.** `index.html` is the wheel (the game); `donnees.html` is the « Données & analyse »
+  page of the advanced mode (§4), same data, same service worker, no game. Anything that "the app"
+  does now has to hold for both.
 - **No dev server script.** Serve the repo root over HTTP to test (`python3 -m http.server 8000`
   or `npx serve .`). Opening `index.html` via `file://` breaks ES modules, `fetch` and the service
   worker.
@@ -51,7 +54,8 @@ task.
 ## 3. Layout
 
 ```
-index.html              Single page: PWA/social meta, all app-shell CSS inline, DOM, loads js/app.js
+index.html              Wheel page: PWA/social meta, all app-shell CSS inline, DOM, loads js/app.js
+donnees.html            « Données & analyse » page (advanced mode), loads js/data-explorer.js
 js/app.js               Wheel rendering, physics, spin sound cadence, overlay, sharing, SW registration
 js/entries.js           Two-tier data loading (light → full) + IndexedDB cache
 js/audio.js             WebAudio, offline-first sound decoding + IndexedDB cache
@@ -59,22 +63,33 @@ js/menu.js              Sidebar, panels, history, settings; builds its own DOM a
 js/settings.js          Reads the sound setting (data-attribute first, localStorage fallback)
 js/sw-update.js         SW registration + version switchover (see §7)
 js/constants.js         SETTINGS_KEY, BASE_PATH and APP_VERSION — shared by front-end modules
+js/data-explorer.js     Table, filters, multi-key sort, export, URL state for donnees.html
+js/stats.js             Pure descriptive statistics (no DOM) — the only unit-tested front-end module
+js/charts.js            Hand-written SVG charts, themed through CSS variables, no dependency
 bills.js                Banknote particle effect (repo root, lazy-imported by app.js)
-bills.css / menu.css    Styles for those two features (all other CSS is inline in index.html)
+bills.css / menu.css    Styles for those two features (all other index.html CSS is inline)
+donnees.css             Styles + theme tokens for donnees.html (a separate document)
 service-worker.js       PWA atomic precache + cache-first app shell (see §7)
 data/entries-*.json     The data (see §5)
 netlify/functions/      Serverless endpoints (see §6)
 scripts/                Validation + one-off data conversion tooling
-tests/                  node:test suites (Netlify function handlers + data invariants)
+tests/                  node:test suites (Netlify handlers, data, precache and stats invariants)
 shares/                 Runtime artifacts only; share-*.html is gitignored
 ```
 
 ### Module graph
 
 `index.html` → `js/app.js` → `js/entries.js`, `js/audio.js`, `js/menu.js`, `js/sw-update.js`
+`donnees.html` → `js/data-explorer.js` → `js/entries.js`, `js/menu.js`, `js/sw-update.js`,
+`js/stats.js`, `js/charts.js`
 `js/audio.js` → `js/settings.js` → `js/constants.js` ← `js/sw-update.js`, `js/entries.js`
 `js/app.js` → `import('../bills.js')` (dynamic, on first spin) → `js/settings.js`, and
 `bills.js` → `import('./js/audio.js')` (dynamic, inside `initBills()`)
+
+Two documents, one shell. `donnees.html` reuses `js/menu.js` only for the settings API (never
+`initMenu()`), which keeps `localStorage` writes in a single place. `BASE_PATH` is derived from
+`import.meta.url` in `js/constants.js` precisely because there is now more than one page — deriving
+it from `location.pathname` would resolve `/donnees.html/data/…`.
 
 `bills.js` lives at the repo root but imports from `./js/`. Keep it there — `service-worker.js`,
 `eslint.config.js` and the dynamic import in `app.js` all reference that path.
@@ -123,6 +138,20 @@ The revalidation fetch appends `?fresh=<timestamp>`. That is load-bearing: `inde
 `data/entries-light.json`, and a fetch to that exact URL silently reuses the preloaded response
 without touching the network — `{cache: 'reload'}` alone does not defeat it. The service worker
 skips any request carrying `fresh` so those URLs never enter the cache.
+
+**The advanced mode is opt-in, not gated.** `advancedMode` (default `false`, in `js/menu.js`) is
+what adds the « Données & analyse » entry to the sidebar and sets `data-advanced-mode` on `<html>`.
+`donnees.html` itself never checks the setting — it stays reachable by URL. The point is to keep a
+spreadsheet out of the way of someone who came to spin a wheel, not to lock anything. Note the
+`.menu-item[hidden]` rule in `menu.css`: `.menu-item` is `display:flex`, which would otherwise
+defeat the `hidden` attribute.
+
+**The data page computes nothing on its own.** Every figure it displays comes from `js/stats.js`,
+which has no DOM access and is covered by `tests/stats.test.mjs` — that is the whole reason it is a
+separate module. Watch out for missing values: 222 of 371 entries have no `recette`, and
+`Number(null)` is `0`, so any new aggregate must go through `finiteNumbers()` rather than a bare
+`Number()` cast. Sorting keeps unknown values last in both directions (`compareValues` applies the
+direction only between present values).
 
 **Local storage keys** (`SETTINGS_KEY` in `js/constants.js`,
 `larouedelaservitude_history` in `js/menu.js`) and the two IndexedDB databases
@@ -239,14 +268,21 @@ latest published version without waiting 24 h or reloading twice, **(3)** a page
 from two versions.
 
 **Bump the version in *two* files whenever you change any precached asset:** `CACHE_VERSION` in
-`service-worker.js` (currently `v21`) and `APP_VERSION` in `js/constants.js`. They must be equal —
+`service-worker.js` (currently `v22`) and `APP_VERSION` in `js/constants.js`. They must be equal —
 `npm run check:precache` fails otherwise. That pair *is* the release: nothing reaches returning
 visitors without it.
 
 **Add every new module and asset to `urlsToCache`.** `npm run check:precache` (and
-`tests/precache.test.mjs`) walks `index.html`, `site.webmanifest`, every `js/` module, `bills.js`
-and both stylesheets, and fails on any local file they reference that is missing from the list — a
-missing entry is the classic "first launch offline is broken" bug.
+`tests/precache.test.mjs`) walks both HTML pages, `site.webmanifest`, every `js/` module, `bills.js`
+and every stylesheet, and fails on any local file they reference that is missing from the list — a
+missing entry is the classic "first launch offline is broken" bug. A new page or module must also
+be added to `SCANNED_PAGES` / `SCANNED_SCRIPTS` / `SCANNED_STYLES` in `scripts/check-precache.mjs`
+and to the page list in `scripts/check-imports.mjs`, otherwise nothing checks it.
+
+**One cache entry per page.** `PAGE_KEYS_BY_PATH` maps every URL form of a page (`/`, `/index`,
+`/index.html`, `/donnees`, `/donnees.html`) onto a single cache key, so the same page can never
+exist twice in two generations depending on the URL taken. Query strings (share parameters, the
+data page's filters) map onto the same key.
 
 **Install is atomic.** Each URL is fetched with `?v=<CACHE_VERSION>` and `cache: 'reload'` (the
 query string is what really defeats the HTTP cache and the CDN; the response is rebuilt before
@@ -290,10 +326,12 @@ itself with a single cache left in `caches.keys()`.
 ## 8. Tests and linting
 
 `npm test` runs Node's built-in test runner over `tests/*.test.mjs`: the data invariants, the
-precache/version invariants (`tests/precache.test.mjs`, which just runs the §7 checker), plus the
-three Netlify handlers exercised directly via `createRequire` (CORS behaviour, status codes,
-HTML escaping, redirect normalization). **There are no browser/DOM tests** — front-end changes in
-`js/` and `bills.js` must be verified manually in a browser.
+precache/version invariants (`tests/precache.test.mjs`, which just runs the §7 checker), the
+statistics engine (`tests/stats.test.mjs` — pure functions plus a coherence pass over the real
+dataset), plus the three Netlify handlers exercised directly via `createRequire` (CORS behaviour,
+status codes, HTML escaping, redirect normalization). **There are no browser/DOM tests** —
+front-end changes in `js/` and `bills.js` must be verified manually in a browser. `js/stats.js` is
+the exception and should stay that way: keep new calculations there, DOM-free and tested.
 
 When adding a Netlify function or changing a handler's contract, add cases to the matching
 `tests/*.test.mjs`. Export the pure helpers you want to test (`shareImage.js` exports `escapeHtml`
@@ -331,4 +369,4 @@ this project has — moving or renaming a module will be caught here.
 5. New/renamed modules resolve under `npm run check:imports` and are covered by an
    `eslint.config.js` block.
 6. Front-end changes were exercised in a browser over HTTP, including one offline reload from a
-   cold start and one version bump applied to an already-open tab (§7).
+   cold start and one version bump applied to an already-open tab (§7) — on **both** pages.
