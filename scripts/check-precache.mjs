@@ -22,6 +22,8 @@ const NEVER_PRECACHED = new Set([
 ]);
 
 // Fichiers dont on analyse les références.
+const SCANNED_PAGES = ['index.html', 'donnees.html'];
+
 const SCANNED_SCRIPTS = [
   'js/app.js',
   'js/entries.js',
@@ -30,10 +32,13 @@ const SCANNED_SCRIPTS = [
   'js/constants.js',
   'js/settings.js',
   'js/sw-update.js',
+  'js/data-explorer.js',
+  'js/stats.js',
+  'js/charts.js',
   'bills.js'
 ];
 
-const SCANNED_STYLES = ['bills.css', 'menu.css'];
+const SCANNED_STYLES = ['bills.css', 'menu.css', 'donnees.css'];
 
 function read(relativePath) {
   return readFileSync(path.join(root, relativePath), 'utf8');
@@ -194,7 +199,7 @@ export function collectPrecacheIssues() {
     }
   };
 
-  addAll('index.html', collectHtmlReferences('index.html'));
+  for (const page of SCANNED_PAGES) addAll(page, collectHtmlReferences(page));
   addAll('site.webmanifest', collectManifestReferences());
   for (const file of SCANNED_SCRIPTS) addAll(file, collectScriptReferences(file));
   for (const file of SCANNED_STYLES) addAll(file, collectStyleReferences(file));

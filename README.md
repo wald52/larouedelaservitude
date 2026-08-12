@@ -5,6 +5,8 @@ Application web ludique et installable (PWA) qui présente les taxes et prélèv
 ## Structure des fichiers importants
 
 - `index.html` : page principale de l'application. Elle déclare les métadonnées PWA/sociales, charge les feuilles de style, les scripts de la roue et le service worker, puis contient l'interface utilisateur.
+- `donnees.html` / `donnees.css` : page « Données & analyse » (mode avancé), décrite plus bas.
+- `js/data-explorer.js` : moteur de cette page (filtres, tri multi-critères, export, état dans l'URL). Il s'appuie sur `js/stats.js` (statistiques descriptives, sans dépendance au DOM, testé par `tests/stats.test.mjs`) et `js/charts.js` (graphiques SVG, sans bibliothèque externe).
 - `js/entries.js` : module de chargement des données. Il récupère d'abord `data/entries-light.json` pour afficher rapidement la roue, puis charge `data/entries-full.json` pour les détails. Il utilise IndexedDB comme cache local.
 - `js/audio.js` : module audio offline-first. Il prépare les sons de rotation/résultat, les met en cache IndexedDB et respecte le réglage utilisateur d'activation du son.
 - `js/menu.js` : module de gestion du menu latéral, des panneaux de navigation, de l'historique, des paramètres et des interactions associées.
@@ -13,6 +15,36 @@ Application web ludique et installable (PWA) qui présente les taxes et prélèv
   - `shareImage.js` téléverse une image sur ImgBB et renvoie une URL de partage dynamique servie par Netlify.
   - `sharePage.js` génère à la volée la page HTML Open Graph/Twitter Card à partir des paramètres fournis par le flux de partage.
   - `sendFeedback.js` crée une discussion GitHub à partir des retours envoyés par les utilisateurs.
+
+## Mode avancé : la page « Données & analyse »
+
+La roue reste un jeu. Les visiteurs qui veulent les chiffres disposent d'une page dédiée,
+`donnees.html`, volontairement absente du parcours par défaut : elle s'active dans
+**Menu → Réglages → Pour aller plus loin → Mode avancé**, ce qui ajoute l'entrée
+« Données & analyse » au menu. La page reste accessible directement par son adresse — le réglage
+masque un raccourci, il ne verrouille rien.
+
+Elle contient :
+
+- la liste intégrale des 371 prélèvements (nom court, intitulé complet, recette, part du total,
+  année de création, identifiant) ;
+- des filtres combinables : recherche insensible aux accents, présence ou absence de recette et
+  d'année, bornes min/max sur la recette et sur la période de création ;
+- un **tri multi-critères** : clic sur un en-tête pour trier, `Maj`+clic pour ajouter un critère
+  secondaire, plus une liste de tris rapides. Les critères actifs sont affichés et retirables un à
+  un, et les valeurs inconnues restent toujours en fin de liste ;
+- des statistiques recalculées sur la sélection courante : total, moyenne, médiane, quartiles,
+  écart-type, indice de Gini, part du top 10, taux de couverture des champs ;
+- cinq graphiques SVG (créations par période, courbe de Lorenz, répartition par ordre de grandeur,
+  recette selon l'année, classement des plus gros contributeurs) ;
+- l'export de la sélection en CSV (séparateur `;` et BOM UTF-8, pour Excel en français) ou en JSON,
+  ainsi que la fiche détaillée d'un prélèvement avec son JSON brut ;
+- un état de vue entièrement contenu dans l'URL (`?q=…&recette=with&rmin=1000&tri=annee:desc,…`) :
+  une sélection se partage ou se met en favori telle quelle.
+
+La page consomme les mêmes fichiers de données que la roue, via `js/entries.js` : elle est donc
+pré-cachée, utilisable hors ligne et mise à jour automatiquement quand la `version` des données
+change.
 
 ## Prérequis de déploiement Netlify
 

@@ -48,9 +48,11 @@ function scanHtml(file) {
   while ((match = moduleScriptRe.exec(source))) scanJavaScript(file, match[1]);
 }
 
+const htmlPages = ['index.html', 'donnees.html'];
+
 walk(root);
 for (const file of jsFiles) scanJavaScript(file, readFileSync(file, 'utf8'));
-scanHtml(path.join(root, 'index.html'));
+for (const page of htmlPages) scanHtml(path.join(root, page));
 
 if (failures.length) {
   console.error('Import consistency check failed:');
@@ -58,4 +60,6 @@ if (failures.length) {
   process.exit(1);
 }
 
-console.log(`Import consistency check passed (${jsFiles.length} JavaScript files + index.html).`);
+console.log(
+  `Import consistency check passed (${jsFiles.length} JavaScript files + ${htmlPages.join(', ')}).`
+);

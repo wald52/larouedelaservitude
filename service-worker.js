@@ -1,7 +1,7 @@
 // Version de l'application - À INCRÉMENTER à chaque déploiement.
 // ⚠️ Doit rester identique à APP_VERSION dans js/constants.js
 // (égalité vérifiée par `npm run check:precache`).
-const CACHE_VERSION = 'v21';
+const CACHE_VERSION = 'v22';
 const CACHE_NAME = `larouedelaservitude-${CACHE_VERSION}`;
 
 /*
@@ -47,10 +47,15 @@ const PRECACHE_RETRIES = 2;
 const urlsToCache = [
   `${BASE}/index.html`,
 
+  // 📊 Page « Données & analyse » (mode avancé) : pré-cachée au même titre que
+  // la roue, elle doit rester consultable hors ligne.
+  `${BASE}/donnees.html`,
+
   // 📜 Scripts (critique)
-  // ⚠️ Tout module importé par app.js (même indirectement) doit figurer ici :
-  // sans cela un tout premier lancement hors ligne échoue sur un import
-  // manquant. `npm run check:precache` vérifie cette liste automatiquement.
+  // ⚠️ Tout module importé par app.js ou data-explorer.js (même indirectement)
+  // doit figurer ici : sans cela un tout premier lancement hors ligne échoue
+  // sur un import manquant. `npm run check:precache` vérifie cette liste
+  // automatiquement.
   `${BASE}/js/app.js`,
   `${BASE}/js/entries.js`,
   `${BASE}/js/audio.js`,
@@ -58,11 +63,15 @@ const urlsToCache = [
   `${BASE}/js/constants.js`,
   `${BASE}/js/settings.js`,
   `${BASE}/js/sw-update.js`,
+  `${BASE}/js/data-explorer.js`,
+  `${BASE}/js/stats.js`,
+  `${BASE}/js/charts.js`,
   `${BASE}/bills.js`,
 
   // 🎨 Styles
   `${BASE}/bills.css`,
   `${BASE}/menu.css`,
+  `${BASE}/donnees.css`,
 
   // 📊 Données JSON (critique pour offline)
   `${BASE}/data/entries-light.json`,
@@ -87,10 +96,20 @@ const urlsToCache = [
 
 const PRECACHED_PATHS = new Set(urlsToCache);
 
-// `${BASE}/` et `${BASE}/index.html` désignent la même page : une seule entrée
-// de cache pour les deux, donc une seule coquille possible.
+// Une page, une entrée de cache : `${BASE}/`, `${BASE}/index.html` et
+// `${BASE}/index` désignent la même coquille, tout comme `${BASE}/donnees` et
+// `${BASE}/donnees.html` (certains hébergeurs servent les pages sans leur
+// extension). Sans cette table, la même page pourrait exister en deux copies
+// de générations différentes selon l'URL empruntée.
 const INDEX_KEY = `${BASE}/index.html`;
-const INDEX_PATHS = new Set([`${BASE}/`, INDEX_KEY]);
+const DONNEES_KEY = `${BASE}/donnees.html`;
+const PAGE_KEYS_BY_PATH = new Map([
+  [`${BASE}/`, INDEX_KEY],
+  [`${BASE}/index`, INDEX_KEY],
+  [INDEX_KEY, INDEX_KEY],
+  [`${BASE}/donnees`, DONNEES_KEY],
+  [DONNEES_KEY, DONNEES_KEY]
+]);
 
 /* =====================================================
    INSTALLATION : pré-cache atomique de la génération
@@ -303,12 +322,13 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // 📝 Page principale (y compris avec des paramètres de partage) → la
-  // coquille de la génération installée. Sa fraîcheur est assurée par le cycle
-  // de mise à jour du SW, pas par une requête réseau : servir un index.html
-  // plus récent que les modules JS en cache casserait l'application.
-  if (INDEX_PATHS.has(url.pathname)) {
-    return event.respondWith(cacheFirst(request, INDEX_KEY));
+  // 📝 Pages HTML (y compris avec des paramètres de partage ou de filtres) → la
+  // coquille de la génération installée. Leur fraîcheur est assurée par le
+  // cycle de mise à jour du SW, pas par une requête réseau : servir un
+  // index.html plus récent que les modules JS en cache casserait l'application.
+  const pageKey = PAGE_KEYS_BY_PATH.get(url.pathname);
+  if (pageKey) {
+    return event.respondWith(cacheFirst(request, pageKey));
   }
 
   // 📦 Reste de la coquille (JS, CSS, JSON, images, sons, manifeste).
