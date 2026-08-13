@@ -36,13 +36,15 @@ function applySettingsToDocument() {
   window.__MENU_SETTINGS__ = { ...settings };
 }
 
-// L'entrée « Données & analyse » n'existe dans le menu que si le mode avancé
-// est actif. La page reste atteignable par son adresse : on cache un raccourci,
-// on ne verrouille rien.
+// Les deux accès à « Données & analyse » n'existent que si le mode avancé est
+// actif : l'entrée du menu latéral, et le raccourci affiché juste sous
+// l'interrupteur qui vient de l'activer. La page reste atteignable par son
+// adresse : on cache des raccourcis, on ne verrouille rien.
 function syncAdvancedLink() {
-  const link = document.getElementById('advancedLink');
-  if (!link) return;
-  link.hidden = !settings.advancedMode;
+  for (const id of ['advancedLink', 'advancedOpenLink']) {
+    const link = document.getElementById(id);
+    if (link) link.hidden = !settings.advancedMode;
+  }
 }
 
 // ===============================
@@ -290,14 +292,18 @@ function createMenuHTML() {
           <div>
             <div class="setting-label">Mode avancé</div>
             <span class="setting-desc">
-              Ajoute au menu la page « Données &amp; analyse » : la liste complète des 371
-              prélèvements, avec filtres, tri multi-critères, statistiques et export.
+              Liste complète des 371 prélèvements, filtres, tri et statistiques
             </span>
           </div>
           <div class="toggle" id="advancedModeToggle">
             <div class="toggle-knob"></div>
           </div>
         </div>
+        <!-- Sans ce raccourci, activer le mode avancé ne mène nulle part : la
+             nouvelle entrée de menu est cachée derrière ce panneau. -->
+        <a class="btn btn-primary settings-link" id="advancedOpenLink" href="donnees.html" hidden>
+          Ouvrir « Données &amp; analyse » →
+        </a>
       </div>
 
       <div class="settings-group">

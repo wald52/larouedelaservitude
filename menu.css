@@ -356,6 +356,9 @@ a.menu-item {
   position: relative;
   width: 50px;
   height: 28px;
+  /* .setting-item est un flex : sans cela, un libellé un peu long comprime
+     l'interrupteur jusqu'à le faire déborder du panneau. */
+  flex-shrink: 0;
   background: #444;
   border-radius: 14px;
   cursor: pointer;
@@ -380,6 +383,18 @@ a.menu-item {
 
 .toggle.active .toggle-knob {
   transform: translateX(22px);
+}
+
+/* Raccourci affiché sous un réglage une fois celui-ci activé. */
+.settings-link {
+  display: block;
+  margin-top: 12px;
+  text-align: center;
+  text-decoration: none;
+}
+
+.settings-link[hidden] {
+  display: none;
 }
 
 /* Boutons */

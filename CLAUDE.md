@@ -268,7 +268,7 @@ latest published version without waiting 24 h or reloading twice, **(3)** a page
 from two versions.
 
 **Bump the version in *two* files whenever you change any precached asset:** `CACHE_VERSION` in
-`service-worker.js` (currently `v22`) and `APP_VERSION` in `js/constants.js`. They must be equal —
+`service-worker.js` (currently `v23`) and `APP_VERSION` in `js/constants.js`. They must be equal —
 `npm run check:precache` fails otherwise. That pair *is* the release: nothing reaches returning
 visitors without it.
 
