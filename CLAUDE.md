@@ -77,6 +77,7 @@ js/data-explorer.js     Table, filters, multi-key sort, export, URL state for do
 js/stats.js             Pure descriptive statistics (no DOM) — the only unit-tested front-end module
 js/charts.js            Hand-written SVG charts, themed through CSS variables, no dependency
 bills.js                Banknote particle effect (repo root, lazy-imported by app.js)
+buttons.css             Shared button/switch system — the only place buttons are styled (both pages)
 bills.css / menu.css    Styles for those two features (all other index.html CSS is inline)
 donnees.css             Styles + theme tokens for donnees.html (a separate document)
 service-worker.js       PWA atomic precache + cache-first app shell (see §7)
@@ -135,6 +136,28 @@ exposes the tuning object for live tweaking from the console.
 **Theming is CSS-variable only.** Light tokens live in `:root` inside `index.html`, dark ones in
 `:root[data-theme="dark"]`. `menu.css` and `bills.css` consume those variables with fallbacks —
 never hardcode a colour in the CSS files.
+
+**Buttons live in exactly one file.** `buttons.css` is loaded by *both* pages and is the only place
+a button is styled. Never restyle a button in `index.html`'s inline CSS, `menu.css` or `donnees.css`
+— that is precisely what produced two incompatible `.btn` / `.btn-secondary` definitions (one per
+page) before it existed. Compose the existing classes instead: a base `.btn`, a variant
+(`.btn-accent` for the page's main action, `.btn-primary`, `.btn-secondary`, `.btn-ghost`,
+`.btn-quiet`, `.btn-inverse` for anything sitting on the result bubble), then modifiers
+(`.btn-sm` / `.btn-lg`, `.btn-pill`, `.btn-icon`, `.btn-block`, `.btn-tip` for an icon-only button
+whose `aria-label` doubles as its tooltip). Layout-only rules (position, margin) stay with the
+feature; `.btn-row` covers the common "row of buttons" case. Its `--btn-*` tokens are self-contained
+so the file works in both documents; they fall back to the theme tokens the two pages share.
+
+**Settings switches are `<button role="switch">`**, built from the `SETTING_SWITCHES` table in
+`js/menu.js` — the markup, the click handler and the redraw all derive from that one array, so
+adding a setting means adding an entry. State lives only in `aria-checked` (read by the CSS *and*
+by screen readers); do not mirror it into a class. They used to be `<div>`s, unreachable by
+keyboard.
+
+**Anything global that swallows a key must let focused controls through.** The `Space` handler in
+`js/app.js` boosts the wheel, so it returns early when the event target is a button, link or field
+— otherwise its `preventDefault()` cancels the browser's native activation and every control on the
+page stops responding to `Space`.
 
 **Data freshness runs on `version`, not on time.** `js/entries.js` serves the IndexedDB copy
 immediately (fast first paint) and revalidates against the network in the background. When the

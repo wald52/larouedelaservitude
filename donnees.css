@@ -352,40 +352,8 @@ kbd {
   color: var(--fg);
 }
 
-/* ===============================
-   Boutons
-   =============================== */
-
-.btn {
-  padding: 9px 14px;
-  border: 1px solid transparent;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  background: var(--button-bg);
-  color: var(--button-fg);
-}
-
-.btn-secondary {
-  background: var(--surface-alt);
-  color: var(--fg);
-  border-color: var(--ring);
-}
-
-.btn-secondary:hover {
-  background: var(--surface-inset);
-}
-
-.btn-ghost {
-  background: transparent;
-  color: var(--fg);
-  border-color: var(--ring);
-}
-
-.btn-ghost:hover {
-  background: var(--surface-inset);
-}
+/* Les boutons (.btn et ses variantes) viennent de buttons.css, partagé avec la
+   page de la roue : une seule définition pour les deux documents. */
 
 /* ===============================
    Statistiques

@@ -12,6 +12,36 @@ const DEFAULT_SETTINGS = {
   soundEnabled: true
 };
 
+// Les trois interrupteurs du panneau Réglages, décrits une seule fois : le
+// balisage, l'écoute du clic et la synchronisation à l'ouverture en découlent.
+// `event` est le nom de l'événement diffusé sur window pour les modules qui
+// n'importent pas menu.js (audio.js, bills.js, app.js).
+const SETTING_SWITCHES = [
+  {
+    id: 'darkModeToggle',
+    key: 'darkMode',
+    group: 'Apparence',
+    label: 'Mode sombre',
+    description: 'Basculer entre thème clair et sombre'
+  },
+  {
+    id: 'infiniteModeToggle',
+    key: 'infiniteMode',
+    event: 'infiniteModeChange',
+    group: 'Jeu',
+    label: 'Mode sans fin',
+    description: 'Ne pas retirer les taxes après chaque tour'
+  },
+  {
+    id: 'soundToggle',
+    key: 'soundEnabled',
+    event: 'soundModeChange',
+    group: 'Audio',
+    label: 'Sons',
+    description: 'Activer/désactiver les effets sonores'
+  }
+];
+
 // État global
 let history = [];
 let settings = { ...DEFAULT_SETTINGS };
@@ -207,14 +237,14 @@ function createMenuHTML() {
   historyPanel.id = 'panelHistorique';
   historyPanel.innerHTML = `
     <div class="panel-header">
-      <button class="panel-back" id="historyBack" aria-label="Retour">←</button>
+      <button class="btn btn-icon btn-quiet" id="historyBack" type="button" aria-label="Retour">←</button>
       <h3 class="panel-title">Historique</h3>
     </div>
     <div class="panel-content">
       <div id="historyListContainer"></div>
-      <div class="history-actions">
-        <button class="btn btn-secondary" id="clearHistory">Tout effacer</button>
-        <button class="btn btn-secondary" id="exportHistory">Exporter</button>
+      <div class="history-actions btn-row">
+        <button class="btn btn-secondary btn-sm" id="clearHistory" type="button">Tout effacer</button>
+        <button class="btn btn-secondary btn-sm" id="exportHistory" type="button">Exporter</button>
       </div>
     </div>
   `;
@@ -226,49 +256,12 @@ function createMenuHTML() {
   settingsPanel.id = 'panelReglages';
   settingsPanel.innerHTML = `
     <div class="panel-header">
-      <button class="panel-back" id="settingsBack" aria-label="Retour">←</button>
+      <button class="btn btn-icon btn-quiet" id="settingsBack" type="button" aria-label="Retour">←</button>
       <h3 class="panel-title">Réglages</h3>
     </div>
     <div class="panel-content">
-      <div class="settings-group">
-        <h3>Apparence</h3>
-        <div class="setting-item">
-          <div>
-            <div class="setting-label">Mode sombre</div>
-            <span class="setting-desc">Basculer entre thème clair et sombre</span>
-          </div>
-          <div class="toggle" id="darkModeToggle">
-            <div class="toggle-knob"></div>
-          </div>
-        </div>
-      </div>
-      
-      <div class="settings-group">
-        <h3>Jeu</h3>
-        <div class="setting-item">
-          <div>
-            <div class="setting-label">Mode sans fin</div>
-            <span class="setting-desc">Ne pas retirer les taxes après chaque tour</span>
-          </div>
-          <div class="toggle" id="infiniteModeToggle">
-            <div class="toggle-knob"></div>
-          </div>
-        </div>
-      </div>
-      
-      <div class="settings-group">
-        <h3>Audio</h3>
-        <div class="setting-item">
-          <div>
-            <div class="setting-label">Sons</div>
-            <span class="setting-desc">Activer/désactiver les effets sonores</span>
-          </div>
-          <div class="toggle" id="soundToggle">
-            <div class="toggle-knob"></div>
-          </div>
-        </div>
-      </div>
-      
+      ${SETTING_SWITCHES.map(renderSettingSwitch).join('')}
+
       <div class="settings-group">
         <h3>Données</h3>
         <div class="setting-item">
@@ -276,7 +269,7 @@ function createMenuHTML() {
             <div class="setting-label">Réinitialiser l'application</div>
             <span class="setting-desc">Efface historique et réglages</span>
           </div>
-          <button class="btn btn-secondary" id="resetApp">Réinitialiser</button>
+          <button class="btn btn-secondary btn-sm" id="resetApp" type="button">Réinitialiser</button>
         </div>
       </div>
     </div>
@@ -285,6 +278,30 @@ function createMenuHTML() {
 
   // Mettre à jour le badge
   updateHistoryBadge();
+}
+
+// Un vrai <button role="switch"> : focalisable et actionnable au clavier, ce que
+// n'était pas l'ancienne <div class="toggle">. L'état vit uniquement dans
+// `aria-checked`, lu aussi bien par le CSS que par les lecteurs d'écran.
+// `aria-labelledby` relie l'interrupteur à son libellé, sinon annoncé comme
+// « bouton » sans nom.
+function renderSettingSwitch({ id, group, label, description }) {
+  const labelId = `${id}Label`;
+  return `
+    <div class="settings-group">
+      <h3>${group}</h3>
+      <div class="setting-item">
+        <div>
+          <div class="setting-label" id="${labelId}">${label}</div>
+          <span class="setting-desc">${description}</span>
+        </div>
+        <button type="button" class="switch" id="${id}" role="switch"
+                aria-checked="false" aria-labelledby="${labelId}">
+          <span class="switch-knob"></span>
+        </button>
+      </div>
+    </div>
+  `;
 }
 
 function attachMenuEvents() {
@@ -337,23 +354,18 @@ function attachMenuEvents() {
   
   document.getElementById('exportHistory').addEventListener('click', exportHistory);
   
-  // Toggles réglages
-  document.getElementById('darkModeToggle').addEventListener('click', function() {
-    const isActive = this.classList.toggle('active');
-    updateSetting('darkMode', isActive);
-  });
-  
-  document.getElementById('infiniteModeToggle').addEventListener('click', function() {
-    const isActive = this.classList.toggle('active');
-    updateSetting('infiniteMode', isActive);
-    // Dispatch event pour que la roue puisse écouter
-    window.dispatchEvent(new CustomEvent('infiniteModeChange', { detail: isActive }));
-  });
-  
-  document.getElementById('soundToggle').addEventListener('click', function() {
-    const isActive = this.classList.toggle('active');
-    updateSetting('soundEnabled', isActive);
-    window.dispatchEvent(new CustomEvent('soundModeChange', { detail: isActive }));
+  // Interrupteurs des réglages
+  SETTING_SWITCHES.forEach(({ id, key, event }) => {
+    const control = document.getElementById(id);
+    control.addEventListener('click', () => {
+      const enabled = control.getAttribute('aria-checked') !== 'true';
+      control.setAttribute('aria-checked', String(enabled));
+      updateSetting(key, enabled);
+      // Diffusé pour les modules qui n'importent pas menu.js (voir §4 du guide).
+      if (event) {
+        window.dispatchEvent(new CustomEvent(event, { detail: enabled }));
+      }
+    });
   });
 
   // Reset app
@@ -483,12 +495,11 @@ function renderHistory() {
 }
 
 function renderSettings() {
-  const s = getSettings();
-  
-  // Mettre à jour les toggles
-  document.getElementById('darkModeToggle').classList.toggle('active', s.darkMode);
-  document.getElementById('infiniteModeToggle').classList.toggle('active', s.infiniteMode);
-  document.getElementById('soundToggle').classList.toggle('active', s.soundEnabled);
+  const current = getSettings();
+
+  SETTING_SWITCHES.forEach(({ id, key }) => {
+    document.getElementById(id).setAttribute('aria-checked', current[key] ? 'true' : 'false');
+  });
 }
 
 function exportHistory() {

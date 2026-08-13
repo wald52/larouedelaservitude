@@ -1,0 +1,359 @@
+/* ===============================
+   buttons.css — Système de boutons partagé
+   ===============================
+
+   Une seule définition de bouton pour les deux documents (index.html et
+   donnees.html). Avant ce fichier, `.btn` / `.btn-secondary` existaient en deux
+   versions incompatibles (menu.css et donnees.css) et chaque bouton d'index.html
+   avait sa propre règle sur mesure : le même nom de classe ne donnait pas le même
+   bouton selon la page.
+
+   Règles du fichier :
+   - toutes les couleurs passent par les jetons ci-dessous, jamais en dur ailleurs ;
+   - les jetons `--btn-*` sont autonomes (ils ne dépendent pas de tokens définis
+     seulement dans l'une des deux pages), avec repli sur les tokens de thème
+     communs aux deux documents (--button-bg, --ring, --fg…) ;
+   - une classe = un rôle. On compose : `.btn .btn-accent .btn-lg .btn-pill`.
+
+   Variantes : accent (action principale), primary (solide inversé), secondary
+   (surface encadrée), ghost (contour seul), quiet (sans fond), inverse (sur une
+   surface déjà inversée, comme la bulle de résultat).
+   Modificateurs : sm / lg (taille), pill (arrondi complet), icon (carré),
+   block (pleine largeur), is-busy (action en cours). */
+
+:root {
+  /* Géométrie */
+  --btn-radius: 12px;
+  --btn-radius-pill: 999px;
+  --btn-gap: 8px;
+  --btn-transition: 140ms cubic-bezier(0.2, 0.7, 0.3, 1);
+
+  /* Surfaces */
+  --btn-solid-bg: var(--button-bg, #111);
+  --btn-solid-fg: var(--button-fg, #fff);
+  --btn-accent-bg: #c00;
+  --btn-accent-hover: #a00000;
+  --btn-accent-fg: #fff;
+  --btn-soft-bg: var(--surface-alt, #fafafa);
+  --btn-soft-hover: var(--surface-inset, #f0f0f0);
+  --btn-soft-fg: var(--fg, #111);
+  --btn-border: var(--ring, #e5e7eb);
+
+  /* Surface inversée (bulle de résultat) : un gris translucide fonctionne
+     sur fond clair comme sur fond sombre, sans jeton par thème. */
+  --btn-inverse-bg: rgba(128, 128, 128, 0.2);
+  --btn-inverse-hover: rgba(128, 128, 128, 0.36);
+
+  /* Profondeur : deux ombres superposées, l'une serrée pour le contact,
+     l'autre diffuse pour l'élévation. */
+  --btn-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+  --btn-shadow-hover: 0 2px 4px rgba(0, 0, 0, 0.08), 0 8px 20px rgba(0, 0, 0, 0.12);
+
+  /* Interrupteurs */
+  --switch-off: #9aa0aa;
+  --switch-on: #16a34a;
+  --switch-knob: #fff;
+}
+
+:root[data-theme="dark"] {
+  --btn-accent-bg: #dc2626;
+  --btn-accent-hover: #ef4444;
+  --btn-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --btn-shadow-hover: 0 2px 4px rgba(0, 0, 0, 0.4), 0 8px 20px rgba(0, 0, 0, 0.5);
+  --switch-off: #4b5563;
+  --switch-on: #22c55e;
+}
+
+/* ===============================
+   Base
+   =============================== */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--btn-gap);
+  /* 40px de haut au minimum : cible tactile confortable sans paraître massif. */
+  min-height: 40px;
+  padding: 9px 16px;
+  border: 1px solid transparent;
+  border-radius: var(--btn-radius);
+  background: transparent;
+  color: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color var(--btn-transition),
+    border-color var(--btn-transition),
+    box-shadow var(--btn-transition),
+    transform var(--btn-transition),
+    opacity var(--btn-transition);
+}
+
+/* Le survol soulève, l'appui repose : c'est tout le vocabulaire d'interaction.
+   Restreint aux pointeurs fins pour éviter l'état « collé » après un tap. */
+@media (hover: hover) {
+  .btn:hover {
+    transform: translateY(-1px);
+  }
+}
+
+.btn:active {
+  transform: translateY(0) scale(0.97);
+}
+
+.btn:disabled,
+.btn[aria-disabled="true"] {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Le bloc global `prefers-reduced-motion` des pages neutralise les transitions,
+   pas les transformations : on les retire ici explicitement. */
+@media (prefers-reduced-motion: reduce) {
+  .btn:hover,
+  .btn:active {
+    transform: none;
+  }
+}
+
+/* ===============================
+   Variantes
+   =============================== */
+
+/* Action principale de la page (« Tourner la roue »). */
+.btn-accent {
+  background: var(--btn-accent-bg);
+  color: var(--btn-accent-fg);
+  box-shadow: var(--btn-shadow);
+}
+
+.btn-accent:hover:not(:disabled) {
+  background: var(--btn-accent-hover);
+  box-shadow: var(--btn-shadow-hover);
+}
+
+/* Solide inversé : noir sur fond clair, clair sur fond sombre. */
+.btn-primary {
+  background: var(--btn-solid-bg);
+  color: var(--btn-solid-fg);
+  box-shadow: var(--btn-shadow);
+}
+
+.btn-primary:hover:not(:disabled) {
+  box-shadow: var(--btn-shadow-hover);
+}
+
+/* Action secondaire : posée sur la surface, discrètement encadrée. */
+.btn-secondary {
+  background: var(--btn-soft-bg);
+  color: var(--btn-soft-fg);
+  border-color: var(--btn-border);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: var(--btn-soft-hover);
+  box-shadow: var(--btn-shadow);
+}
+
+/* Contour seul. */
+.btn-ghost {
+  color: var(--btn-soft-fg);
+  border-color: var(--btn-border);
+}
+
+.btn-ghost:hover:not(:disabled) {
+  background: var(--btn-soft-hover);
+}
+
+/* Sans fond ni contour : fermetures, retours, actions de second plan. */
+.btn-quiet {
+  color: inherit;
+}
+
+.btn-quiet:hover:not(:disabled) {
+  background: var(--btn-soft-hover);
+}
+
+/* Sur une surface déjà inversée (bulle de résultat) : la couleur du texte est
+   héritée du conteneur, seul le fond est translucide. */
+.btn-inverse {
+  background: var(--btn-inverse-bg);
+  color: inherit;
+}
+
+.btn-inverse:hover:not(:disabled) {
+  background: var(--btn-inverse-hover);
+}
+
+/* ===============================
+   Modificateurs
+   =============================== */
+
+.btn-sm {
+  min-height: 34px;
+  padding: 7px 12px;
+  font-size: 13px;
+  border-radius: 10px;
+}
+
+.btn-lg {
+  min-height: 52px;
+  padding: 14px 30px;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.btn-pill {
+  border-radius: var(--btn-radius-pill);
+}
+
+.btn-block {
+  width: 100%;
+}
+
+/* Bouton carré ne contenant qu'une icône ou un emoji. */
+.btn-icon {
+  width: 40px;
+  min-height: 40px;
+  padding: 0;
+  border-radius: var(--btn-radius-pill);
+  font-size: 17px;
+  flex-shrink: 0;
+}
+
+.btn-icon.btn-sm {
+  width: 34px;
+  min-height: 34px;
+  font-size: 15px;
+}
+
+/* Action en cours : le bouton reste en place, seul son contenu est neutralisé.
+   Remplace les styles inline (opacity) que posait js/app.js. */
+.btn.is-busy {
+  cursor: progress;
+  opacity: 0.6;
+  transform: none;
+}
+
+/* ===============================
+   Groupes
+   =============================== */
+
+.btn-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn-row--center {
+  justify-content: center;
+}
+
+.btn-row--end {
+  justify-content: flex-end;
+}
+
+/* ===============================
+   Info-bulle
+   ===============================
+
+   Pour les boutons réduits à une icône, dont l'intitulé n'est visible nulle
+   part. Le texte est lu dans `aria-label` : un seul attribut porte à la fois le
+   nom accessible et l'info-bulle, impossible de les désynchroniser.
+   S'affiche aussi au clavier (:focus-visible), ce que ne faisait pas la version
+   précédente, limitée au survol. */
+
+.btn-tip {
+  position: relative;
+}
+
+.btn-tip::after {
+  content: attr(aria-label);
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  z-index: 1;
+  padding: 5px 9px;
+  border-radius: 8px;
+  background: var(--tooltip-bg, #111);
+  color: var(--tooltip-fg, #fff);
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translate(-50%, -4px);
+  pointer-events: none;
+  transition:
+    opacity var(--btn-transition),
+    transform var(--btn-transition);
+}
+
+.btn-tip:hover::after,
+.btn-tip:focus-visible::after {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+/* ===============================
+   Interrupteur (role="switch")
+   ===============================
+
+   Un vrai <button role="switch"> : focalisable, actionnable au clavier, et dont
+   l'état vit dans `aria-checked` — une seule source de vérité, contrairement à
+   l'ancienne <div class="toggle active"> qui doublait l'état dans une classe. */
+
+.switch {
+  position: relative;
+  /* Dans un conteneur flex, un libellé long comprimait l'interrupteur jusqu'à
+     le faire déborder du panneau. */
+  flex-shrink: 0;
+  width: 50px;
+  height: 30px;
+  padding: 0;
+  border: none;
+  border-radius: var(--btn-radius-pill);
+  background: var(--switch-off);
+  cursor: pointer;
+  transition: background-color var(--btn-transition);
+}
+
+.switch[aria-checked="true"] {
+  background: var(--switch-on);
+}
+
+.switch-knob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--switch-knob);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  transition: transform var(--btn-transition);
+}
+
+.switch[aria-checked="true"] .switch-knob {
+  transform: translateX(20px);
+}
+
+/* Le curseur s'étire légèrement sous le doigt, comme sur iOS. En position
+   « activé » il faut reculer d'autant, sinon les 4 px gagnés débordent du rail. */
+.switch:active .switch-knob {
+  width: 28px;
+}
+
+.switch[aria-checked="true"]:active .switch-knob {
+  transform: translateX(16px);
+}

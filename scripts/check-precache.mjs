@@ -38,7 +38,7 @@ const SCANNED_SCRIPTS = [
   'bills.js'
 ];
 
-const SCANNED_STYLES = ['bills.css', 'menu.css', 'donnees.css'];
+const SCANNED_STYLES = ['buttons.css', 'bills.css', 'menu.css', 'donnees.css'];
 
 function read(relativePath) {
   return readFileSync(path.join(root, relativePath), 'utf8');

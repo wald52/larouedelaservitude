@@ -23,7 +23,7 @@ const overlay = requireElement('overlay');
 const overlayText = requireElement('overlayText');
 const overlayClose = requireElement('overlayClose');
 const copyBtn = requireElement('copyText');
-const shareButtons = document.querySelectorAll('.share-btn[data-platform]');
+const shareButtons = document.querySelectorAll('#shareBar button[data-platform]');
 if (shareButtons.length === 0) {
   throw new Error('[APP] Aucun bouton de partage trouvé.');
 }
@@ -1020,9 +1020,9 @@ async function showOverlay(entryIndex){
   // 💬 contenu principal du résultat
   overlayText.innerHTML = `
     ${intro}<br><br>${formatted}
-    <div class="feedback-buttons">
-      <a id="btn-info" class="feedback-btn" href="#">Donner un complément d'information</a>
-      <a id="btn-error" class="feedback-btn" href="#">Signaler une erreur</a>
+    <div class="feedback-buttons btn-row btn-row--center">
+      <button id="btn-info" type="button" class="btn btn-inverse btn-sm">Donner un complément d'information</button>
+      <button id="btn-error" type="button" class="btn btn-inverse btn-sm">Signaler une erreur</button>
     </div>
   `;
 
@@ -1040,7 +1040,6 @@ overlayText.addEventListener('click', (e) => {
   const errorBtn = e.target.closest('#btn-error');
 
   if (!infoBtn && !errorBtn) return;
-  e.preventDefault();
 
   // On récupère le texte du résultat actuel dans l'overlay
   const feedbackText = overlayText.innerText.split('\n\n')[1] || overlayText.innerText;
@@ -1341,11 +1340,29 @@ async function captureWheelArea() {
 /* =======================
    PARTAGE / CAPTURE amélioré
    ======================= */
+
+// L'attente est signalée par une classe (.is-busy, buttons.css) et non par un
+// style inline : l'apparence reste dans la feuille de style, et un seul appel
+// suffit à revenir à l'état initial — d'où le `finally` plus bas.
+function setShareButtonBusy(button) {
+  button.disabled = true;
+  button.classList.add('is-busy');
+  button.dataset.restoreLabel = button.textContent;
+  button.textContent = '⏳';
+}
+
+function clearShareButtonBusy(button) {
+  if (!('restoreLabel' in button.dataset)) return;
+  button.disabled = false;
+  button.classList.remove('is-busy');
+  button.textContent = button.dataset.restoreLabel;
+  delete button.dataset.restoreLabel;
+}
+
 shareButtons.forEach(btn => {
   btn.addEventListener('click', async () => {
     const platform = btn.dataset.platform;
     const text = overlayText.innerText;
-    const originalText = btn.textContent;
 
     // CAS SPÉCIAUX : Téléchargement direct (Instagram, TikTok, Snapchat)
     if (['instagram', 'tiktok', 'snapchat'].includes(platform)) {
@@ -1376,9 +1393,7 @@ shareButtons.forEach(btn => {
 
     // AUTRES PLATEFORMES : Netlify Function
     try {
-      btn.disabled = true;
-      btn.style.opacity = '0.5';
-      btn.textContent = '⏳';
+      setShareButtonBusy(btn);
 
       const canvasCap = await captureWheelArea();
 
@@ -1437,24 +1452,15 @@ shareButtons.forEach(btn => {
           break;
         default:
           alert('Plateforme non supportée');
-          btn.disabled = false;
-          btn.style.opacity = '1';
-          btn.textContent = originalText;
           return;
       }
 
       window.open(shareUrl, '_blank', 'noopener,noreferrer');
-
-      btn.disabled = false;
-      btn.style.opacity = '1';
-      btn.textContent = originalText;
-
     } catch (error) {
       console.error('❌ Erreur lors du partage:', error);
       alert(`❌ Erreur : ${error.message}`);
-      btn.disabled = false;
-      btn.style.opacity = '1';
-      btn.textContent = originalText;
+    } finally {
+      clearShareButtonBusy(btn);
     }
   });
 });
@@ -1495,22 +1501,32 @@ addEventListener('orientationchange', scheduleResizeRecalculation);
 updateBg();
 initializeApp();
 
+// Vrai dès qu'une surface recouvre la roue : résultat, formulaire, menu ou
+// panneau. Une seule définition pour la touche Espace et pour la bascule de
+// version (canReloadForUpdate), qui répétaient les mêmes sélecteurs.
+function isAnySurfaceOpen() {
+  if (activeModal || isOverlayOpen()) return true;
+  if (document.getElementById('menuSidebar')?.classList.contains('active')) return true;
+  return Boolean(document.querySelector('.menu-panel.active'));
+}
+
 // ✅ Gère la touche Espace uniquement quand aucune fenêtre n'est ouverte
-document.addEventListener('keydown',(e)=>{
-  if (e.code === 'Space') {
-    e.preventDefault();
+document.addEventListener('keydown', (e) => {
+  if (e.code !== 'Space') return;
 
-    // Vérifie si une fenêtre (overlay) est visible
-    const anyModalOpen =
-      document.getElementById('overlay')?.style.display === 'flex' ||
-      document.getElementById('feedbackModal')?.style.display === 'flex' ||
-      document.getElementById('menuSidebar')?.classList.contains('active') ||
-      document.querySelector('.menu-panel.active');
+  // Espace appartient d'abord au contrôle qui a le focus : il doit l'activer
+  // normalement (bouton, interrupteur des réglages, champ de saisie). Sans cette
+  // sortie, le preventDefault ci-dessous annulait cette activation native et les
+  // contrôles devenaient inutilisables au clavier.
+  if (e.target instanceof Element && e.target.closest('button, a, input, textarea, select')) {
+    return;
+  }
 
-    // Si aucune fenêtre ouverte -> autorise la rotation
-    if (!anyModalOpen) {
-      boostWheel();
-    }
+  // La roue n'est pilotée qu'ici : on neutralise le défilement par Espace.
+  e.preventDefault();
+
+  if (!isAnySurfaceOpen()) {
+    boostWheel();
   }
 });
 
@@ -1530,10 +1546,8 @@ window.addEventListener('infiniteModeChange', () => {
 // mélange de générations n'est possible pendant l'attente.
 function canReloadForUpdate() {
   if (shouldAnimate()) return false;
-  if (activeModal || isOverlayOpen()) return false;
+  if (isAnySurfaceOpen()) return false;
   if (completedSpinCount > 0 && !isInfiniteMode()) return false;
-  if (document.getElementById('menuSidebar')?.classList.contains('active')) return false;
-  if (document.querySelector('.menu-panel.active')) return false;
   return true;
 }
 

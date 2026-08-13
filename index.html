@@ -34,6 +34,10 @@
 <meta name="twitter:image" content="icons/og-image.png">
 
 <!-- Styles critiques (priorité haute) -->
+<!-- buttons.css est bloquant, contrairement aux deux suivants : il habille le
+     bouton « Tourner la roue », visible d'emblée. Chargé en différé, ce bouton
+     apparaîtrait d'abord nu. -->
+<link rel="stylesheet" href="buttons.css">
 <link rel="stylesheet" href="bills.css" media="print" onload="this.media='all'">
 <link rel="stylesheet" href="menu.css" media="print" onload="this.media='all'">
 <noscript>
@@ -46,12 +50,11 @@
   --bg:#f7f7f7; --fg:#111; --ring:#e5e7eb;
   --surface:#fff; --surface-alt:#fafafa; --surface-inset:#f0f0f0;
   --button-bg:#111; --button-fg:#fff; --legend:#666; --pointer:#111;
-  --bubble-bg:#111; --bubble-fg:#fff; --close-bg:rgba(255,255,255,0.12); --close-hover:rgba(255,255,255,0.22);
-  --share-bg:#fff; --share-fg:#111; --tooltip-bg:#111; --tooltip-fg:#fff;
+  --bubble-bg:#111; --bubble-fg:#fff;
+  --tooltip-bg:#111; --tooltip-fg:#fff;
   --modal-surface:#fff; --modal-text:#111; --modal-muted:#333;
   --install-surface:#fff; --install-border:rgba(17,17,17,0.12); --install-shadow:0 18px 40px rgba(0,0,0,0.18);
-  --install-title:#111; --install-close:#4b5563; --install-close-hover:rgba(17,17,17,0.08);
-  --install-button:#c00; --install-button-hover:#900;
+  --install-title:#111;
   --emoji-size:80px; --bg-size:200vw;
   /* Ambre : lisible aussi bien sur les fonds clairs que sur la bulle sombre */
   --focus:#f59e0b;
@@ -61,12 +64,11 @@
   --bg:#0f1115; --fg:#f3f4f6; --ring:#2a2f3a;
   --surface:#151922; --surface-alt:#10151d; --surface-inset:#242b38;
   --button-bg:#f3f4f6; --button-fg:#101317; --legend:#a1a1aa; --pointer:#f3f4f6;
-  --bubble-bg:#f3f4f6; --bubble-fg:#101317; --close-bg:rgba(0,0,0,0.08); --close-hover:rgba(0,0,0,0.16);
-  --share-bg:#101317; --share-fg:#f3f4f6; --tooltip-bg:#f3f4f6; --tooltip-fg:#101317;
+  --bubble-bg:#f3f4f6; --bubble-fg:#101317;
+  --tooltip-bg:#f3f4f6; --tooltip-fg:#101317;
   --modal-surface:#151922; --modal-text:#f3f4f6; --modal-muted:#cbd5e1;
   --install-surface:#151922; --install-border:rgba(243,244,246,0.12); --install-shadow:0 18px 40px rgba(0,0,0,0.42);
-  --install-title:#f3f4f6; --install-close:#cbd5e1; --install-close-hover:rgba(243,244,246,0.1);
-  --install-button:#c00; --install-button-hover:#a30000;
+  --install-title:#f3f4f6;
   --focus:#f59e0b;
 }
 
@@ -145,18 +147,14 @@ h1 .highlight{background:#c00;color:#fff;padding:4px 10px;border-radius:6px;}
 .pointer{position:absolute;top:0;left:50%;transform:translateX(-50%);width:0;height:0;z-index:6;
 --w:14px;--h:22px;border-left:var(--w) solid transparent;border-right:var(--w) solid transparent;border-top:var(--h) solid var(--pointer);}
 canvas{width:clamp(250px,80vw,540px);aspect-ratio:1/1;display:block;border-radius:50%;background:var(--surface-alt);box-shadow:inset 0 0 0 5px var(--surface-inset);}
-.controls{display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;}
-button.primary{background:var(--button-bg);color:var(--button-fg);border:none;border-radius:8px;padding:8px 12px;font-size:13px;font-weight:700;cursor:pointer;}
+.controls{display:grid;gap:10px;justify-items:center;padding-block:6px;}
 .legend{font-size:12px;color:var(--legend);}
 .overlay{position:fixed;top:0;left:0;right:0;bottom:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.35);z-index:9999;}
 .bubble{position:relative;max-width:92%;padding:20px 48px 20px 20px;border-radius:14px;background:var(--bubble-bg);color:var(--bubble-fg);
 box-shadow:0 8px 24px rgba(0,0,0,0.25);font-size:clamp(14px,2.4vw,20px);font-weight:600;text-align:center;line-height:1.35;}
-.close{position:absolute;top:10px;right:10px;width:34px;height:34px;border-radius:50%;border:none;background:var(--close-bg);color:var(--bubble-fg);
-display:flex;align-items:center;justify-content:center;cursor:pointer;}
-.close:hover{background:var(--close-hover);}
-.share-bar{margin-top:14px;display:flex;gap:8px;flex-wrap:wrap;justify-content:center;position:relative;}
-.share-btn{width:36px;height:36px;border-radius:50%;border:none;background:var(--share-bg);color:var(--share-fg);font-size:18px;cursor:pointer;position:relative;}
-.share-btn[title]:hover::after{content:attr(title);position:absolute;bottom:-28px;left:50%;transform:translateX(-50%);background:var(--tooltip-bg);color:var(--tooltip-fg);padding:4px 8px;border-radius:6px;font-size:12px;white-space:nowrap;}
+/* Positionnement seul : l'apparence des boutons vient de buttons.css. */
+.close{position:absolute;top:10px;right:10px;}
+.share-bar{margin-top:16px;display:flex;gap:8px;flex-wrap:wrap;justify-content:center;}
 /* Ajustement du cadre de résultat sur mobile */
 @media (max-width: 600px) {
   .overlay {
@@ -180,33 +178,10 @@ display:flex;align-items:center;justify-content:center;cursor:pointer;}
   display: none !important;
 }
 
-  /* Boutons de retour utilisateur */
+  /* Boutons de retour utilisateur : posés sur la bulle, d'où la variante
+     .btn-inverse dans le balisage. Ici, uniquement leur placement. */
 .feedback-buttons {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  justify-content: center;
-  margin-top: 14px;
-}
-
-.feedback-btn {
-  background: #c00;
-  color: #fff;
-  padding: 10px 14px;
-  border-radius: 8px;
-  font-size: 15px;
-  text-decoration: none;
-  font-weight: 500;
-  transition: background 0.2s ease, transform 0.15s ease;
-}
-
-.feedback-btn:hover {
-  background: #900;
-  transform: scale(1.05);
-}
-
-.feedback-btn:active {
-  transform: scale(0.97);
+  margin-top: 16px;
 }
 
 /* Empêche un fond plus grand que l’écran */
@@ -230,14 +205,6 @@ body {
   border: 1px solid var(--ring);
   border-radius: 8px;
   box-sizing: border-box;
-}
-
-#feedbackForm button {
-  background: var(--button-bg);
-  color: var(--button-fg);
-  border: none;
-  border-radius: 8px;
-  padding: 8px 12px;
 }
 
 #feedbackStatus {
@@ -286,43 +253,6 @@ body {
   flex-shrink:0;
 }
 
-.install-banner__button{
-  border:none;
-  border-radius:999px;
-  background:var(--install-button);
-  color:#fff;
-  padding:8px 14px;
-  font-size:14px;
-  font-weight:700;
-  cursor:pointer;
-  transition:background 0.2s ease, transform 0.15s ease;
-}
-
-.install-banner__button:hover{
-  background:var(--install-button-hover);
-}
-
-.install-banner__button:active{
-  transform:scale(0.97);
-}
-
-.install-banner__close{
-  width:32px;
-  height:32px;
-  display:grid;
-  place-items:center;
-  border:none;
-  border-radius:50%;
-  background:transparent;
-  color:var(--install-close);
-  font-size:18px;
-  cursor:pointer;
-}
-
-.install-banner__close:hover{
-  background:var(--install-close-hover);
-}
-
 @media (max-width: 520px) {
   .install-banner{
     gap:10px;
@@ -331,11 +261,6 @@ body {
 
   .install-banner__title{
     font-size:14px;
-  }
-
-  .install-banner__button{
-    padding:8px 12px;
-    font-size:13px;
   }
 }
 
@@ -352,8 +277,8 @@ body {
 .feedback-form h3{margin:0 0 8px;}
 .feedback-honeypot{display:none;}
 .feedback-label{display:block;margin-top:8px;}
-.feedback-textarea{width:100%;height:120px;box-sizing:border-box;margin-top:4px;}
-.feedback-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:12px;}
+.feedback-textarea{width:100%;height:120px;box-sizing:border-box;margin-top:4px;padding:10px;font-size:14px;resize:vertical;}
+.feedback-actions{margin-top:14px;}
 .feedback-status{margin-top:10px;font-size:13px;color:var(--modal-muted,#333);display:none;}
 
 </style>
@@ -373,7 +298,7 @@ body {
         </canvas>
       </div>
       <div class="controls">
-        <button id="spinBtn" class="primary" type="button">Tourner la roue</button>
+        <button id="spinBtn" class="btn btn-accent btn-lg btn-pill" type="button">Tourner la roue</button>
         <div class="legend" id="countInfo" role="status" aria-live="polite"></div>
       </div>
     </div>
@@ -383,8 +308,8 @@ body {
 <div id="installPrompt" class="install-banner" hidden aria-hidden="true">
   <div class="install-banner__title">Installer l'application</div>
   <div class="install-banner__actions">
-    <button id="installPromptAction" class="install-banner__button" type="button">Installer</button>
-    <button id="installPromptClose" class="install-banner__close" type="button" aria-label="Fermer">✕</button>
+    <button id="installPromptAction" class="btn btn-accent btn-sm btn-pill" type="button">Installer</button>
+    <button id="installPromptClose" class="btn btn-icon btn-sm btn-quiet" type="button" aria-label="Fermer">✕</button>
   </div>
 </div>
 
@@ -392,18 +317,20 @@ body {
   <!-- tabindex="-1" : js/app.js y place le focus à l'ouverture (openModal) -->
   <div class="bubble" role="dialog" aria-modal="true" aria-labelledby="overlayText" tabindex="-1">
     <div id="overlayText" role="status" aria-live="polite"></div>
+    <!-- `aria-label` sert à la fois de nom accessible et d'info-bulle (.btn-tip,
+         buttons.css) : plus de `title` à garder synchronisé. -->
     <div class="share-bar" id="shareBar">
-      <button class="share-btn" type="button" data-platform="facebook" aria-label="Partager sur Facebook" title="Partager sur Facebook">📘</button>
-      <button class="share-btn" type="button" data-platform="x" aria-label="Partager sur X / Twitter" title="Partager sur X / Twitter">🐦</button>
-      <button class="share-btn" type="button" data-platform="instagram" aria-label="Partager sur Instagram" title="Partager sur Instagram">📸</button>
-      <button class="share-btn" type="button" data-platform="linkedin" aria-label="Partager sur LinkedIn" title="Partager sur LinkedIn">💼</button>
-      <button class="share-btn" type="button" data-platform="snapchat" aria-label="Partager sur Snapchat" title="Partager sur Snapchat">👻</button>
-      <button class="share-btn" type="button" data-platform="tiktok" aria-label="Partager sur TikTok" title="Partager sur TikTok">🎵</button>
-      <button class="share-btn" type="button" data-platform="whatsapp" aria-label="Partager sur WhatsApp" title="Partager sur WhatsApp">💬</button>
-      <button class="share-btn" type="button" data-platform="telegram" aria-label="Partager sur Telegram" title="Partager sur Telegram">📨</button>
-      <button class="share-btn" type="button" id="copyText" aria-label="Copier le texte du résultat" title="Copier le texte">📋</button>
+      <button class="btn btn-icon btn-inverse btn-tip" type="button" data-platform="facebook" aria-label="Partager sur Facebook">📘</button>
+      <button class="btn btn-icon btn-inverse btn-tip" type="button" data-platform="x" aria-label="Partager sur X / Twitter">🐦</button>
+      <button class="btn btn-icon btn-inverse btn-tip" type="button" data-platform="instagram" aria-label="Partager sur Instagram">📸</button>
+      <button class="btn btn-icon btn-inverse btn-tip" type="button" data-platform="linkedin" aria-label="Partager sur LinkedIn">💼</button>
+      <button class="btn btn-icon btn-inverse btn-tip" type="button" data-platform="snapchat" aria-label="Partager sur Snapchat">👻</button>
+      <button class="btn btn-icon btn-inverse btn-tip" type="button" data-platform="tiktok" aria-label="Partager sur TikTok">🎵</button>
+      <button class="btn btn-icon btn-inverse btn-tip" type="button" data-platform="whatsapp" aria-label="Partager sur WhatsApp">💬</button>
+      <button class="btn btn-icon btn-inverse btn-tip" type="button" data-platform="telegram" aria-label="Partager sur Telegram">📨</button>
+      <button class="btn btn-icon btn-inverse btn-tip" type="button" id="copyText" aria-label="Copier le texte">📋</button>
     </div>
-    <button id="overlayClose" class="close" type="button" aria-label="Fermer">✕</button>
+    <button id="overlayClose" class="close btn btn-icon btn-sm btn-inverse" type="button" aria-label="Fermer">✕</button>
   </div>
 </div>
 
@@ -418,9 +345,9 @@ body {
       Votre message
       <textarea id="formMessage" name="userMessage" required class="feedback-textarea"></textarea>
     </label>
-    <div class="feedback-actions">
-      <button type="button" id="closeFeedback">Annuler</button>
-      <button type="submit">Envoyer</button>
+    <div class="feedback-actions btn-row btn-row--end">
+      <button type="button" id="closeFeedback" class="btn btn-secondary">Annuler</button>
+      <button type="submit" class="btn btn-primary">Envoyer</button>
     </div>
     <div id="feedbackStatus" class="feedback-status" role="status" aria-live="polite"></div>
   </form>
