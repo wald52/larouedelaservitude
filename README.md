@@ -16,13 +16,12 @@ Application web ludique et installable (PWA) qui présente les taxes et prélèv
   - `sharePage.js` génère à la volée la page HTML Open Graph/Twitter Card à partir des paramètres fournis par le flux de partage.
   - `sendFeedback.js` crée une discussion GitHub à partir des retours envoyés par les utilisateurs.
 
-## Mode avancé : la page « Données & analyse »
+## La page « Données & analyse »
 
 La roue reste un jeu. Les visiteurs qui veulent les chiffres disposent d'une page dédiée,
-`donnees.html`, volontairement absente du parcours par défaut : elle s'active dans
-**Menu → Réglages → Pour aller plus loin → Mode avancé**, ce qui ajoute l'entrée
-« Données & analyse » au menu. La page reste accessible directement par son adresse — le réglage
-masque un raccourci, il ne verrouille rien.
+`donnees.html`, accessible depuis **Menu → Données & analyse**. Rien ne la conditionne : c'est le
+fait d'être une page séparée, et non un réglage, qui garde le tableur hors du chemin de qui vient
+seulement lancer la roue.
 
 Elle contient :
 

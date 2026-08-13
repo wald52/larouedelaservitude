@@ -149,12 +149,12 @@ The revalidation fetch appends `?fresh=<timestamp>`. That is load-bearing: `inde
 without touching the network — `{cache: 'reload'}` alone does not defeat it. The service worker
 skips any request carrying `fresh` so those URLs never enter the cache.
 
-**The advanced mode is opt-in, not gated.** `advancedMode` (default `false`, in `js/menu.js`) is
-what adds the « Données & analyse » entry to the sidebar and sets `data-advanced-mode` on `<html>`.
-`donnees.html` itself never checks the setting — it stays reachable by URL. The point is to keep a
-spreadsheet out of the way of someone who came to spin a wheel, not to lock anything. Note the
-`.menu-item[hidden]` rule in `menu.css`: `.menu-item` is `display:flex`, which would otherwise
-defeat the `hidden` attribute.
+**The data page is reached from the sidebar, and nothing gates it.** `js/menu.js` renders a plain
+« Données & analyse » link (`#advancedLink`, an `<a>` among the panel buttons — hence the
+`.menu-item[data-panel]` selector when wiring panel clicks, and the `a.menu-item` rule in
+`menu.css`). There is no setting behind it: an earlier version hid it behind an `advancedMode`
+toggle in Réglages, and that was removed because a feature nobody can find is a feature nobody
+uses. Keep the entry visible; the separation between game and data is the *page*, not a switch.
 
 **The data page computes nothing on its own.** Every figure it displays comes from `js/stats.js`,
 which has no DOM access and is covered by `tests/stats.test.mjs` — that is the whole reason it is a
@@ -278,7 +278,7 @@ latest published version without waiting 24 h or reloading twice, **(3)** a page
 from two versions.
 
 **Bump the version in *two* files whenever you change any precached asset:** `CACHE_VERSION` in
-`service-worker.js` (currently `v23`) and `APP_VERSION` in `js/constants.js`. They must be equal —
+`service-worker.js` (currently `v24`) and `APP_VERSION` in `js/constants.js`. They must be equal —
 `npm run check:precache` fails otherwise. That pair *is* the release: nothing reaches returning
 visitors without it.
 

@@ -1,9 +1,9 @@
 // ===============================
 //  data-explorer.js — Page « Données & analyse » (donnees.html)
 // ===============================
-// Mode avancé : la liste intégrale des 371 prélèvements obligatoires, avec les
-// outils qu'on attend d'un jeu de données — filtres combinables, tri
-// multi-critères, statistiques descriptives, graphiques et export.
+// La liste intégrale des 371 prélèvements obligatoires, avec les outils qu'on
+// attend d'un jeu de données — filtres combinables, tri multi-critères,
+// statistiques descriptives, graphiques et export.
 //
 // Principes repris de l'application principale :
 // - les données viennent de js/entries.js (cache IndexedDB puis revalidation

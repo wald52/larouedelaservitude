@@ -153,12 +153,6 @@ a.menu-item {
   text-decoration: none;
 }
 
-/* display:flex ci-dessus l'emporterait sur l'attribut hidden : sans cette
-   règle, l'entrée du mode avancé resterait visible une fois masquée. */
-.menu-item[hidden] {
-  display: none;
-}
-
 .menu-item .icon {
   font-size: 20px;
   width: 24px;
@@ -383,18 +377,6 @@ a.menu-item {
 
 .toggle.active .toggle-knob {
   transform: translateX(22px);
-}
-
-/* Raccourci affiché sous un réglage une fois celui-ci activé. */
-.settings-link {
-  display: block;
-  margin-top: 12px;
-  text-align: center;
-  text-decoration: none;
-}
-
-.settings-link[hidden] {
-  display: none;
 }
 
 /* Boutons */

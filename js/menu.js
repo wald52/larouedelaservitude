@@ -9,12 +9,7 @@ const HISTORY_KEY = 'larouedelaservitude_history';
 const DEFAULT_SETTINGS = {
   darkMode: false,
   infiniteMode: false,
-  soundEnabled: true,
-  // Mode avancé : donne accès à la page « Données & analyse » (donnees.html).
-  // Désactivé par défaut, et c'est volontaire — qui vient jouer avec la roue ne
-  // doit pas tomber sur un tableur. Qui cherche les chiffres le trouve dans les
-  // réglages, et l'entrée de menu apparaît alors.
-  advancedMode: false
+  soundEnabled: true
 };
 
 // État global
@@ -32,19 +27,7 @@ function applySettingsToDocument() {
 
   root.setAttribute('data-sound-enabled', settings.soundEnabled ? 'true' : 'false');
   root.setAttribute('data-infinite-mode', settings.infiniteMode ? 'true' : 'false');
-  root.setAttribute('data-advanced-mode', settings.advancedMode ? 'true' : 'false');
   window.__MENU_SETTINGS__ = { ...settings };
-}
-
-// Les deux accès à « Données & analyse » n'existent que si le mode avancé est
-// actif : l'entrée du menu latéral, et le raccourci affiché juste sous
-// l'interrupteur qui vient de l'activer. La page reste atteignable par son
-// adresse : on cache des raccourcis, on ne verrouille rien.
-function syncAdvancedLink() {
-  for (const id of ['advancedLink', 'advancedOpenLink']) {
-    const link = document.getElementById(id);
-    if (link) link.hidden = !settings.advancedMode;
-  }
 }
 
 // ===============================
@@ -204,7 +187,7 @@ function createMenuHTML() {
         <span class="icon">⚙️</span>
         <span class="label">Réglages</span>
       </button>
-      <a class="menu-item" id="advancedLink" href="donnees.html" hidden>
+      <a class="menu-item" id="advancedLink" href="donnees.html">
         <span class="icon">📊</span>
         <span class="label">Données &amp; analyse</span>
       </a>
@@ -287,26 +270,6 @@ function createMenuHTML() {
       </div>
       
       <div class="settings-group">
-        <h3>Pour aller plus loin</h3>
-        <div class="setting-item">
-          <div>
-            <div class="setting-label">Mode avancé</div>
-            <span class="setting-desc">
-              Liste complète des 371 prélèvements, filtres, tri et statistiques
-            </span>
-          </div>
-          <div class="toggle" id="advancedModeToggle">
-            <div class="toggle-knob"></div>
-          </div>
-        </div>
-        <!-- Sans ce raccourci, activer le mode avancé ne mène nulle part : la
-             nouvelle entrée de menu est cachée derrière ce panneau. -->
-        <a class="btn btn-primary settings-link" id="advancedOpenLink" href="donnees.html" hidden>
-          Ouvrir « Données &amp; analyse » →
-        </a>
-      </div>
-
-      <div class="settings-group">
         <h3>Données</h3>
         <div class="setting-item">
           <div>
@@ -322,7 +285,6 @@ function createMenuHTML() {
 
   // Mettre à jour le badge
   updateHistoryBadge();
-  syncAdvancedLink();
 }
 
 function attachMenuEvents() {
@@ -394,12 +356,6 @@ function attachMenuEvents() {
     window.dispatchEvent(new CustomEvent('soundModeChange', { detail: isActive }));
   });
 
-  document.getElementById('advancedModeToggle').addEventListener('click', function() {
-    const isActive = this.classList.toggle('active');
-    updateSetting('advancedMode', isActive);
-    syncAdvancedLink();
-  });
-  
   // Reset app
   document.getElementById('resetApp').addEventListener('click', () => {
     if (confirm('Attention : cela va effacer tout l\'historique et les réglages. Continuer ?')) {
@@ -533,8 +489,6 @@ function renderSettings() {
   document.getElementById('darkModeToggle').classList.toggle('active', s.darkMode);
   document.getElementById('infiniteModeToggle').classList.toggle('active', s.infiniteMode);
   document.getElementById('soundToggle').classList.toggle('active', s.soundEnabled);
-  document.getElementById('advancedModeToggle').classList.toggle('active', s.advancedMode);
-  syncAdvancedLink();
 }
 
 function exportHistory() {
