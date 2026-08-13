@@ -265,6 +265,51 @@
 }
 
 /* ===============================
+   Retour en arrière
+   ===============================
+
+   Un seul composant pour les deux retours du site — celui des panneaux du menu
+   et celui de la page d'analyse — qui avaient chacun leur version, l'une en
+   bouton-icône, l'autre en lien souligné.
+
+   Le chevron est dessiné en CSS (deux bordures pivotées à 45°) plutôt qu'écrit
+   en caractère « ← » : épaisseur de trait cohérente avec le reste de
+   l'interface, couleur héritée du texte, taille indexée sur celle du bouton, et
+   surtout un rendu identique quelle que soit la police système — le glyphe
+   flèche est l'un des plus inégaux d'une plateforme à l'autre.
+
+   Le libellé reste visible : un retour doit dire où il ramène. `aria-label`
+   peut préciser l'action à condition d'englober ce libellé (« Retour au menu »
+   contient « Menu »), sans quoi la commande vocale ne trouve plus le bouton. */
+
+.btn-back {
+  /* Le chevron colle à son libellé, il n'est pas un élément à part. */
+  gap: 6px;
+}
+
+.btn-back::before {
+  content: "";
+  width: 0.45em;
+  height: 0.45em;
+  border-left: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg);
+  transition: transform var(--btn-transition);
+}
+
+/* Le chevron recule au survol, en écho aux « › » du menu qui avancent :
+   même vocabulaire de mouvement dans les deux sens de navigation. */
+.btn-back:hover::before {
+  transform: translateX(-2px) rotate(45deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-back:hover::before {
+    transform: rotate(45deg);
+  }
+}
+
+/* ===============================
    Info-bulle
    ===============================
 

@@ -182,17 +182,12 @@ a {
   font-size: 14px;
 }
 
+/* Apparence dans buttons.css (.btn-back) : ici, seul le placement. La marge
+   négative compense le rembourrage du bouton, pour que son libellé s'aligne
+   verticalement sur le titre qui le suit. */
 .back-link {
-  display: inline-block;
-  font-size: 13px;
-  font-weight: 600;
+  margin-left: -12px;
   color: var(--muted);
-  text-decoration: none;
-}
-
-.back-link:hover {
-  color: var(--fg);
-  text-decoration: underline;
 }
 
 .page-header__actions {

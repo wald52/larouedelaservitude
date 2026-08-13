@@ -331,7 +331,8 @@ function createPanelElement({ id, label, content }) {
   panel.setAttribute('aria-labelledby', `${panelElementId(id)}-title`);
   panel.innerHTML = `
     <div class="panel-header">
-      <button class="btn btn-icon btn-quiet" data-close-panel="${id}" type="button" aria-label="Retour au menu">←</button>
+      <button class="btn btn-sm btn-quiet btn-back" data-close-panel="${id}" type="button"
+              aria-label="Retour au menu">Menu</button>
       <h3 class="panel-title" id="${panelElementId(id)}-title">${label}</h3>
     </div>
     <div class="panel-content">${content}</div>
