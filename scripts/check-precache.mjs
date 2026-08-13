@@ -32,6 +32,7 @@ const SCANNED_SCRIPTS = [
   'js/constants.js',
   'js/settings.js',
   'js/sw-update.js',
+  'js/focus-trap.js',
   'js/data-explorer.js',
   'js/stats.js',
   'js/charts.js',

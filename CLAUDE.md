@@ -72,6 +72,7 @@ js/audio.js             WebAudio, offline-first sound decoding + IndexedDB cache
 js/menu.js              Sidebar, panels, history, settings; builds its own DOM at runtime
 js/settings.js          Reads the sound setting (data-attribute first, localStorage fallback)
 js/sw-update.js         SW registration + version switchover (see §7)
+js/focus-trap.js        Focus stack shared by the modals (app.js) and the menu surfaces (menu.js)
 js/constants.js         SETTINGS_KEY, BASE_PATH and APP_VERSION — shared by front-end modules
 js/data-explorer.js     Table, filters, multi-key sort, export, URL state for donnees.html
 js/stats.js             Pure descriptive statistics (no DOM) — the only unit-tested front-end module
@@ -94,6 +95,7 @@ shares/                 Runtime artifacts only; share-*.html is gitignored
 `donnees.html` → `js/data-explorer.js` → `js/entries.js`, `js/menu.js`, `js/sw-update.js`,
 `js/stats.js`, `js/charts.js`
 `js/audio.js` → `js/settings.js` → `js/constants.js` ← `js/sw-update.js`, `js/entries.js`
+`js/app.js`, `js/menu.js` → `js/focus-trap.js` (piled surfaces: modals, drawer, panels)
 `js/app.js` → `import('../bills.js')` (dynamic, on first spin) → `js/settings.js`, and
 `bills.js` → `import('./js/audio.js')` (dynamic, inside `initBills()`)
 
@@ -148,6 +150,19 @@ whose `aria-label` doubles as its tooltip). Layout-only rules (position, margin)
 feature; `.btn-row` covers the common "row of buttons" case. Its `--btn-*` tokens are self-contained
 so the file works in both documents; they fall back to the theme tokens the two pages share.
 
+**The menu is two levels of sliding surfaces, and both obey the same three rules.** The drawer and
+the panels are built from the `MENU_PANELS` table in `js/menu.js` — one entry produces the nav
+button, the panel, its back button and the render call, so adding a section is adding a line.
+(1) Both slide in **from the left** via `transform`, never `left`/`right` — a panel arriving from
+the right while the drawer came from the left made "back" point the wrong way, and animating layout
+properties janked. (2) A closed surface is `visibility: hidden`, which is what keeps its controls
+out of the tab order; twelve menu controls used to stay reachable by `Tab` with the menu shut. The
+`visibility` transition must stay at duration `0s` (delayed on close, immediate on open) — a real
+transition on it leaves the surface still hidden when the focus trap fires, and `focus()` is then
+silently ignored. (3) Opening and closing go through `openSurface()` / `closeSurface()`, which push
+and pop `js/focus-trap.js`; `Escape` closes only the topmost surface. The hamburger opens and
+nothing else — it hides while the drawer is open, where the header's own close button takes over.
+
 **Settings switches are `<button role="switch">`**, built from the `SETTING_SWITCHES` table in
 `js/menu.js` — the markup, the click handler and the redraw all derive from that one array, so
 adding a setting means adding an entry. State lives only in `aria-checked` (read by the CSS *and*
@@ -198,9 +213,10 @@ app fails loudly at startup — update both sides.
 carries `role="img"` plus an `aria-label` that `updateCountInfo()` rewrites on every change; without
 it a screen reader sees nothing there. The result (`#overlayText`), the counter (`#countInfo`) and
 the feedback status are `role="status" aria-live="polite"` regions — that is the only way a spin
-result gets announced. Both modals go through the shared `openModal()` / `closeModal()` helpers in
-`app.js`: they move focus in, trap `Tab` inside, and hand focus back on close; `.bubble` carries
-`tabindex="-1"` for that purpose. `prefers-reduced-motion` is honoured for real — the wheel damps
+result gets announced. Every surface that covers the page — the two modals, the menu drawer, the
+menu panels — goes through `js/focus-trap.js`: it moves focus in, traps `Tab` inside, and hands
+focus back on close; `.bubble` carries `tabindex="-1"` for that purpose. `prefers-reduced-motion`
+is honoured for real — the wheel damps
 much faster (`REDUCED_MOTION_DAMPING`) and `bills.js` is never invoked — on top of its older use as
 a "constrained device" hint in `getCanvasScale()`. The global `@media (prefers-reduced-motion)`
 block and the `:focus-visible` ring live in `index.html`'s inline CSS and cover `menu.css` and

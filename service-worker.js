@@ -1,7 +1,7 @@
 // Version de l'application - À INCRÉMENTER à chaque déploiement.
 // ⚠️ Doit rester identique à APP_VERSION dans js/constants.js
 // (égalité vérifiée par `npm run check:precache`).
-const CACHE_VERSION = "v25";
+const CACHE_VERSION = "v26";
 const CACHE_NAME = `larouedelaservitude-${CACHE_VERSION}`;
 
 /*
@@ -63,6 +63,7 @@ const urlsToCache = [
   `${BASE}/js/constants.js`,
   `${BASE}/js/settings.js`,
   `${BASE}/js/sw-update.js`,
+  `${BASE}/js/focus-trap.js`,
   `${BASE}/js/data-explorer.js`,
   `${BASE}/js/stats.js`,
   `${BASE}/js/charts.js`,

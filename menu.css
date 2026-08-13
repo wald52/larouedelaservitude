@@ -14,7 +14,10 @@
   --menu-muted: var(--legend, #888);
 }
 
-/* Bouton hamburger */
+/* Bouton hamburger : il ouvre le tiroir, et rien d'autre. Il s'efface quand le
+   tiroir est ouvert — c'est le bouton de fermeture de l'en-tête qui prend le
+   relais. Avant, il restait posé par-dessus le tiroir, ce qui obligeait à lui
+   réserver 76 px de marge dans l'en-tête. */
 .menu-toggle {
   position: fixed;
   top: 16px;
@@ -34,7 +37,8 @@
   gap: 5px;
   transition:
     background-color 0.2s ease,
-    box-shadow 0.2s ease;
+    box-shadow 0.2s ease,
+    opacity 0.2s ease;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.14);
   pointer-events: auto;
   -webkit-tap-highlight-color: transparent;
@@ -45,44 +49,41 @@
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
 }
 
-/* Les barres pivotent autour du centre du bouton : la croix reste centrée quel
-   que soit l'écart entre les barres. */
 .menu-toggle span {
   display: block;
   width: 20px;
   height: 2px;
   border-radius: 2px;
   background: currentColor;
-  transition:
-    transform 0.3s ease,
-    opacity 0.2s ease;
 }
 
-/* Animation hamburger → X */
-.menu-toggle.active span:nth-child(1) {
-  transform: translateY(7px) rotate(45deg);
+/* Le fond ne défile plus derrière le tiroir. Remplace le
+   `document.body.style.overflow` que posait js/menu.js : l'état visuel reste
+   dans la feuille de style. */
+.menu-open,
+.menu-open body {
+  overflow: hidden;
 }
 
-.menu-toggle.active span:nth-child(2) {
+/* Tiroir ouvert : le hamburger disparaît, et cesse d'être cliquable comme
+   d'être atteignable au clavier. */
+.menu-open .menu-toggle {
   opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
 }
 
-.menu-toggle.active span:nth-child(3) {
-  transform: translateY(-7px) rotate(-45deg);
-}
-
-/* Overlay sombre - NE BLOQUE PAS LES CLICS QUAND INACTIF */
+/* Voile sombre. Ne bloque jamais les clics quand il est inactif. */
 .menu-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0,0,0,0.5);
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
   z-index: 9998;
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.3s ease, visibility 0.3s ease;
+  transition:
+    opacity 0.3s ease,
+    visibility 0.3s ease;
   pointer-events: none;
 }
 
@@ -92,105 +93,190 @@
   pointer-events: auto;
 }
 
-/* Menu latéral */
-.menu-sidebar {
+/* ===============================
+   Surfaces glissantes
+   ===============================
+
+   Le tiroir et les panneaux arrivent tous les deux par la gauche : « retour »
+   ramène donc bien vers la gauche. Un panneau qui entrait par la droite pendant
+   que le tiroir venait de la gauche rendait la hiérarchie illisible.
+
+   L'animation porte sur `transform` (composée par le GPU) et non sur `left` /
+   `right`, qui forçaient un recalcul de mise en page à chaque image.
+
+   `visibility: hidden` est la pièce maîtresse : sans elle, une surface fermée
+   reste dans l'ordre de tabulation. Douze contrôles du menu étaient encore
+   atteignables au clavier alors que le menu était fermé. */
+.menu-sidebar,
+.menu-panel {
   position: fixed;
   top: 0;
-  left: -300px;
-  width: 300px;
-  max-width: 85vw;
-  height: 100vh;
-  background: var(--menu-bg);
-  z-index: 9999;
-  transition: left 0.3s ease;
+  left: 0;
+  height: 100dvh;
   display: flex;
   flex-direction: column;
-  box-shadow: 2px 0 20px rgba(0,0,0,0.4);
+  background: var(--menu-bg);
+  visibility: hidden;
+  transform: translateX(-100%);
+  /* `visibility` bascule d'un coup (durée nulle), et non progressivement : à la
+     fermeture elle attend la fin du glissement, à l'ouverture elle s'applique
+     immédiatement. Une vraie transition sur `visibility` laissait la surface
+     encore « hidden » au moment où le focus devait y entrer, et focus() était
+     alors ignoré en silence. */
+  transition:
+    transform 0.3s cubic-bezier(0.2, 0.7, 0.3, 1),
+    visibility 0s linear 0.3s;
+  box-shadow: 2px 0 24px rgba(0, 0, 0, 0.28);
 }
 
-.menu-sidebar.active {
-  left: 0;
+.menu-sidebar.active,
+.menu-panel.active {
+  visibility: visible;
+  transform: translateX(0);
+  transition:
+    transform 0.3s cubic-bezier(0.2, 0.7, 0.3, 1),
+    visibility 0s linear 0s;
 }
 
-/* Header du menu */
-.menu-header {
-  padding: 20px 16px 20px 76px;
-  border-bottom: 1px solid var(--menu-border);
+.menu-sidebar {
+  width: 320px;
+  max-width: 85vw;
+  z-index: 9999;
+}
+
+/* Le panneau recouvre le tiroir : il est au-dessus et peut être plus large. */
+.menu-panel {
+  width: 400px;
+  max-width: 100vw;
+  z-index: 10001;
+  background: var(--menu-panel-bg);
+}
+
+/* ===============================
+   En-têtes
+   =============================== */
+
+.menu-header,
+.panel-header {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  min-height: 44px;
+  gap: 10px;
+  min-height: 68px;
+  padding: 12px 12px 12px 16px;
+  border-bottom: 1px solid var(--menu-border);
   box-sizing: border-box;
 }
 
-.menu-header h2 {
+.menu-title,
+.panel-title {
+  flex: 1;
   margin: 0;
   font-size: 18px;
   font-weight: 700;
   color: var(--menu-text);
 }
 
-/* Navigation du menu */
+/* ===============================
+   Navigation
+   =============================== */
+
 .menu-nav {
   flex: 1;
   overflow-y: auto;
-  padding: 8px 0;
+  padding: 10px 8px;
 }
 
 .menu-item {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 14px 16px;
+  width: 100%;
+  padding: 12px;
   border: none;
+  border-radius: 12px;
   background: transparent;
   color: var(--menu-text);
   font-size: 15px;
   font-weight: 500;
-  cursor: pointer;
-  transition: background 0.2s ease;
   text-align: left;
-  width: 100%;
+  text-decoration: none;
+  cursor: pointer;
+  box-sizing: border-box;
+  transition:
+    background-color 0.15s ease,
+    transform 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .menu-item:hover {
   background: var(--menu-item-hover);
 }
 
-/* L'entrée « Données & analyse » est un lien, pas un bouton ouvrant un panneau. */
-a.menu-item {
-  box-sizing: border-box;
-  text-decoration: none;
+.menu-item:active {
+  transform: scale(0.985);
 }
 
-.menu-item .icon {
-  font-size: 20px;
+@media (prefers-reduced-motion: reduce) {
+  .menu-item:active {
+    transform: none;
+  }
+}
+
+.menu-item__icon {
   width: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: 19px;
 }
 
-.menu-item .label {
+.menu-item__label {
   flex: 1;
 }
 
-.menu-item .badge {
+.menu-item__badge {
+  min-width: 22px;
+  padding: 2px 7px;
+  border-radius: 999px;
   background: var(--btn-accent-bg, #c00);
   color: #fff;
   font-size: 11px;
   font-weight: 700;
-  padding: 2px 8px;
-  border-radius: 10px;
+  text-align: center;
 }
 
-/* Footer du menu */
+/* Dit que l'entrée mène ailleurs : « › » pour un panneau, « ↗ » pour la page
+   d'analyse. Rien ne distinguait les deux auparavant. */
+.menu-item__chevron {
+  color: var(--menu-muted);
+  font-size: 18px;
+  line-height: 1;
+  transition: transform 0.15s ease;
+}
+
+.menu-item:hover .menu-item__chevron {
+  transform: translateX(2px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .menu-item:hover .menu-item__chevron {
+    transform: none;
+  }
+}
+
+/* ===============================
+   Pied du tiroir
+   =============================== */
+
 .menu-footer {
-  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 16px;
   border-top: 1px solid var(--menu-border);
   font-size: 12px;
   color: var(--menu-muted);
-  text-align: center;
 }
 
 .menu-footer a {
@@ -202,43 +288,11 @@ a.menu-item {
   text-decoration: underline;
 }
 
-/* ===============================
-   Panels (Historique, Réglages)
-   =============================== */
-
-.menu-panel {
-  position: fixed;
-  top: 0;
-  right: -100%;
-  width: 100%;
-  max-width: 400px;
-  height: 100vh;
-  background: var(--menu-panel-bg);
-  z-index: 10001;
-  transition: right 0.3s ease;
-  display: flex;
-  flex-direction: column;
-  box-shadow: -2px 0 20px rgba(0,0,0,0.4);
-}
-
-.menu-panel.active {
-  right: 0;
-}
-
-.panel-header {
-  padding: 20px 16px;
-  border-bottom: 1px solid var(--menu-border);
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.panel-title {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--menu-text);
-  flex: 1;
+.menu-footer__version {
+  padding: 2px 8px;
+  border: 1px solid var(--menu-border);
+  border-radius: 999px;
+  font-variant-numeric: tabular-nums;
 }
 
 .panel-content {
@@ -254,19 +308,17 @@ a.menu-item {
   margin: 0;
 }
 
+/* Le fond était un voile blanc à 3 %, pensé pour un menu toujours sombre :
+   invisible en thème clair. Il suit maintenant les tokens de thème. */
 .history-item {
   display: flex;
   flex-direction: column;
   gap: 6px;
   padding: 12px;
-  border-bottom: 1px solid var(--menu-border);
-  background: rgba(255,255,255,0.03);
-  border-radius: 8px;
+  border: 1px solid var(--menu-border);
+  border-radius: 12px;
+  background: var(--menu-bg);
   margin-bottom: 8px;
-}
-
-.history-item:last-child {
-  border-bottom: none;
 }
 
 .history-item .tax-name {

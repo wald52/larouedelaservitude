@@ -2,6 +2,7 @@ import { initWheel, loadFullData, getEntryDetails, formatEntryForDisplay } from 
 import { initAudio, unlockAudio, isSoundEnabled, playSpinClick, playWinSound } from "./audio.js";
 import { initMenu, loadHistory, loadSettings, recordSpin, isInfiniteMode } from "./menu.js";
 import { initServiceWorker, applyPendingUpdate } from "./sw-update.js";
+import { pushFocusTrap, popFocusTrap, hasFocusTrap } from "./focus-trap.js";
 
 function requireElement(id) {
   const element = document.getElementById(id);
@@ -193,66 +194,15 @@ function registerCompletedSpin() {
 // comportement : le focus entre dedans à l'ouverture, y reste tant qu'elles
 // sont ouvertes, et revient à son point de départ à la fermeture.
 
-const FOCUSABLE_SELECTOR = [
-  'a[href]',
-  'button:not([disabled])',
-  'textarea:not([disabled])',
-  'input:not([disabled]):not([type="hidden"])',
-  'select:not([disabled])',
-  '[tabindex]:not([tabindex="-1"])'
-].join(', ');
-
-let activeModal = null;
-let focusBeforeModal = null;
-
-function getFocusableElements(container) {
-  return Array.from(container.querySelectorAll(FOCUSABLE_SELECTOR)).filter(
-    (element) => element.offsetWidth > 0 || element.offsetHeight > 0
-  );
-}
-
+// La mécanique elle-même (pile de surfaces, capture du Tab, restitution du
+// focus) vit dans js/focus-trap.js, partagée avec le menu.
 function openModal(container, initialFocus) {
-  focusBeforeModal = document.activeElement;
-  activeModal = container;
-
-  const target = initialFocus || getFocusableElements(container)[0] || container;
-  if (typeof target.focus === 'function') {
-    target.focus();
-  }
+  pushFocusTrap(container, { initialFocus });
 }
 
 function closeModal(container) {
-  if (activeModal !== container) return;
-
-  activeModal = null;
-  const previous = focusBeforeModal;
-  focusBeforeModal = null;
-
-  if (previous && typeof previous.focus === 'function' && document.contains(previous)) {
-    previous.focus();
-  }
+  popFocusTrap(container);
 }
-
-document.addEventListener('keydown', (event) => {
-  if (event.key !== 'Tab' || !activeModal) return;
-
-  const focusable = getFocusableElements(activeModal);
-  if (focusable.length === 0) return;
-
-  const first = focusable[0];
-  const last = focusable[focusable.length - 1];
-
-  if (!activeModal.contains(document.activeElement)) {
-    event.preventDefault();
-    first.focus();
-  } else if (event.shiftKey && document.activeElement === first) {
-    event.preventDefault();
-    last.focus();
-  } else if (!event.shiftKey && document.activeElement === last) {
-    event.preventDefault();
-    first.focus();
-  }
-});
 
 function hideResultOverlay() {
   overlay.style.display = 'none';
@@ -1502,12 +1452,11 @@ updateBg();
 initializeApp();
 
 // Vrai dès qu'une surface recouvre la roue : résultat, formulaire, menu ou
-// panneau. Une seule définition pour la touche Espace et pour la bascule de
-// version (canReloadForUpdate), qui répétaient les mêmes sélecteurs.
+// panneau. Toutes passent par le piège à focus, donc une seule question suffit —
+// avant, la touche Espace et canReloadForUpdate répétaient chacune la liste des
+// sélecteurs du menu, et l'oubli d'un cas passait inaperçu.
 function isAnySurfaceOpen() {
-  if (activeModal || isOverlayOpen()) return true;
-  if (document.getElementById('menuSidebar')?.classList.contains('active')) return true;
-  return Boolean(document.querySelector('.menu-panel.active'));
+  return hasFocusTrap() || isOverlayOpen();
 }
 
 // ✅ Gère la touche Espace uniquement quand aucune fenêtre n'est ouverte

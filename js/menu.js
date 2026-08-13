@@ -2,7 +2,8 @@
 // menu.js — Gestion du menu, historique et réglages
 // ===============================
 
-import { SETTINGS_KEY } from "./constants.js";
+import { SETTINGS_KEY, APP_VERSION } from "./constants.js";
+import { pushFocusTrap, popFocusTrap, topFocusTrap } from "./focus-trap.js";
 import { formatRecette } from "./entries.js";
 
 const HISTORY_KEY = 'larouedelaservitude_history';
@@ -167,99 +168,40 @@ export function getSettings() {
 // ===============================
 // UI du Menu
 // ===============================
+//
+// Deux niveaux de navigation : le tiroir (la liste) et, par-dessus, un panneau
+// par entrée. Les deux glissent depuis la gauche — un panneau qui arrivait par
+// la droite pendant que le tiroir venait de la gauche rendait le bouton
+// « retour » incohérent.
+//
+// Les deux surfaces passent par openSurface / closeSurface : même animation,
+// même piège à focus, même touche Échap. Rien n'est atteignable au clavier
+// tant que la surface est fermée (visibility, menu.css).
 
-export function initMenu() {
-  // Charger données
-  loadHistory();
-  loadSettings();
-  
-  // Créer le HTML du menu
-  createMenuHTML();
-  
-  // Attacher les événements
-  attachMenuEvents();
-  
-  console.log('[MENU] Initialisé');
-}
-
-function createMenuHTML() {
-  // Bouton hamburger
-  const toggle = document.createElement('button');
-  toggle.className = 'menu-toggle';
-  toggle.id = 'menuToggle';
-  toggle.innerHTML = '<span></span><span></span><span></span>';
-  toggle.setAttribute('aria-label', 'Ouvrir le menu');
-  toggle.setAttribute('aria-expanded', 'false');
-  toggle.setAttribute('aria-controls', 'menuSidebar');
-  document.body.appendChild(toggle);
-  
-  // Overlay
-  const overlay = document.createElement('div');
-  overlay.className = 'menu-overlay';
-  overlay.id = 'menuOverlay';
-  document.body.appendChild(overlay);
-  
-  // Sidebar
-  const sidebar = document.createElement('nav');
-  sidebar.className = 'menu-sidebar';
-  sidebar.id = 'menuSidebar';
-  sidebar.innerHTML = `
-    <div class="menu-header">
-      <h2>Menu</h2>
-    </div>
-    <div class="menu-nav">
-      <button class="menu-item" data-panel="historique">
-        <span class="icon">📜</span>
-        <span class="label">Historique</span>
-        <span class="badge" id="historyBadge">0</span>
-      </button>
-      <button class="menu-item" data-panel="reglages">
-        <span class="icon">⚙️</span>
-        <span class="label">Réglages</span>
-      </button>
-      <a class="menu-item" id="advancedLink" href="donnees.html">
-        <span class="icon">📊</span>
-        <span class="label">Données &amp; analyse</span>
-      </a>
-    </div>
-    <div class="menu-footer">
-      <a href="https://github.com/wald52/larouedelaservitude" target="_blank" rel="noopener">
-        GitHub
-      </a>
-      • v1.0
-    </div>
-  `;
-  document.body.appendChild(sidebar);
-  
-  // Panel Historique
-  const historyPanel = document.createElement('div');
-  historyPanel.className = 'menu-panel';
-  historyPanel.id = 'panelHistorique';
-  historyPanel.innerHTML = `
-    <div class="panel-header">
-      <button class="btn btn-icon btn-quiet" id="historyBack" type="button" aria-label="Retour">←</button>
-      <h3 class="panel-title">Historique</h3>
-    </div>
-    <div class="panel-content">
+// Les entrées du menu qui ouvrent un panneau. Le bouton de navigation, le
+// panneau, son bouton retour et le rendu de son contenu en découlent tous :
+// ajouter une rubrique, c'est ajouter une ligne ici.
+const MENU_PANELS = [
+  {
+    id: 'historique',
+    icon: '📜',
+    label: 'Historique',
+    badgeId: 'historyBadge',
+    render: renderHistory,
+    content: `
       <div id="historyListContainer"></div>
       <div class="history-actions btn-row">
         <button class="btn btn-secondary btn-sm" id="clearHistory" type="button">Tout effacer</button>
         <button class="btn btn-secondary btn-sm" id="exportHistory" type="button">Exporter</button>
       </div>
-    </div>
-  `;
-  document.body.appendChild(historyPanel);
-  
-  // Panel Réglages
-  const settingsPanel = document.createElement('div');
-  settingsPanel.className = 'menu-panel';
-  settingsPanel.id = 'panelReglages';
-  settingsPanel.innerHTML = `
-    <div class="panel-header">
-      <button class="btn btn-icon btn-quiet" id="settingsBack" type="button" aria-label="Retour">←</button>
-      <h3 class="panel-title">Réglages</h3>
-    </div>
-    <div class="panel-content">
+    `
+  },
+  {
+    id: 'reglages',
+    icon: '⚙️',
+    label: 'Réglages',
+    render: renderSettings,
+    content: `
       ${SETTING_SWITCHES.map(renderSettingSwitch).join('')}
 
       <div class="settings-group">
@@ -272,12 +214,87 @@ function createMenuHTML() {
           <button class="btn btn-secondary btn-sm" id="resetApp" type="button">Réinitialiser</button>
         </div>
       </div>
+    `
+  }
+];
+
+export function initMenu() {
+  loadHistory();
+  loadSettings();
+  createMenuHTML();
+  attachMenuEvents();
+
+  console.log('[MENU] Initialisé');
+}
+
+function panelElementId(id) {
+  return `panel-${id}`;
+}
+
+function createMenuHTML() {
+  // Bouton hamburger : il ouvre, et rien d'autre. Il se retire quand le tiroir
+  // est ouvert, où un vrai bouton de fermeture prend le relais dans l'en-tête —
+  // l'ancienne version le laissait flotter par-dessus le tiroir, ce qui
+  // obligeait à réserver 76 px de marge dans l'en-tête.
+  const toggle = document.createElement('button');
+  toggle.className = 'menu-toggle';
+  toggle.id = 'menuToggle';
+  toggle.type = 'button';
+  toggle.innerHTML = '<span></span><span></span><span></span>';
+  toggle.setAttribute('aria-label', 'Ouvrir le menu');
+  toggle.setAttribute('aria-expanded', 'false');
+  toggle.setAttribute('aria-controls', 'menuSidebar');
+  document.body.appendChild(toggle);
+
+  const overlay = document.createElement('div');
+  overlay.className = 'menu-overlay';
+  overlay.id = 'menuOverlay';
+  document.body.appendChild(overlay);
+
+  const sidebar = document.createElement('nav');
+  sidebar.className = 'menu-sidebar';
+  sidebar.id = 'menuSidebar';
+  sidebar.setAttribute('aria-label', 'Menu principal');
+  sidebar.innerHTML = `
+    <div class="menu-header">
+      <h2 class="menu-title">Menu</h2>
+      <button class="btn btn-icon btn-quiet" id="menuClose" type="button" aria-label="Fermer le menu">✕</button>
+    </div>
+    <div class="menu-nav">
+      ${MENU_PANELS.map(renderMenuItem).join('')}
+      <a class="menu-item" id="advancedLink" href="donnees.html">
+        <span class="menu-item__icon" aria-hidden="true">📊</span>
+        <span class="menu-item__label">Données &amp; analyse</span>
+        <span class="menu-item__chevron" aria-hidden="true">↗</span>
+      </a>
+    </div>
+    <div class="menu-footer">
+      <a href="https://github.com/wald52/larouedelaservitude" target="_blank" rel="noopener">GitHub</a>
+      <span class="menu-footer__version">${APP_VERSION}</span>
     </div>
   `;
-  document.body.appendChild(settingsPanel);
+  document.body.appendChild(sidebar);
 
-  // Mettre à jour le badge
+  for (const panel of MENU_PANELS) {
+    document.body.appendChild(createPanelElement(panel));
+  }
+
   updateHistoryBadge();
+}
+
+// Une entrée de navigation : icône, libellé, badge éventuel, chevron. Le
+// chevron dit que l'entrée mène ailleurs — la version précédente ne
+// distinguait pas une entrée qui ouvre un panneau d'un simple lien.
+function renderMenuItem({ id, icon, label, badgeId }) {
+  const badge = badgeId ? `<span class="menu-item__badge" id="${badgeId}" hidden>0</span>` : '';
+  return `
+    <button class="menu-item" type="button" data-panel="${id}" aria-controls="${panelElementId(id)}">
+      <span class="menu-item__icon" aria-hidden="true">${icon}</span>
+      <span class="menu-item__label">${label}</span>
+      ${badge}
+      <span class="menu-item__chevron" aria-hidden="true">›</span>
+    </button>
+  `;
 }
 
 // Un vrai <button role="switch"> : focalisable et actionnable au clavier, ce que
@@ -304,45 +321,92 @@ function renderSettingSwitch({ id, group, label, description }) {
   `;
 }
 
-function attachMenuEvents() {
+function createPanelElement({ id, label, content }) {
+  const panel = document.createElement('div');
+  panel.className = 'menu-panel';
+  panel.id = panelElementId(id);
+  // Un panneau recouvre la page et retient le focus : c'est un dialogue.
+  panel.setAttribute('role', 'dialog');
+  panel.setAttribute('aria-modal', 'true');
+  panel.setAttribute('aria-labelledby', `${panelElementId(id)}-title`);
+  panel.innerHTML = `
+    <div class="panel-header">
+      <button class="btn btn-icon btn-quiet" data-close-panel="${id}" type="button" aria-label="Retour au menu">←</button>
+      <h3 class="panel-title" id="${panelElementId(id)}-title">${label}</h3>
+    </div>
+    <div class="panel-content">${content}</div>
+  `;
+  return panel;
+}
+
+// ===============================
+// Ouverture / fermeture des surfaces
+// ===============================
+
+function openSurface(element, initialFocus) {
+  element.classList.add('active');
+  pushFocusTrap(element, { initialFocus });
+}
+
+function closeSurface(element) {
+  element.classList.remove('active');
+  popFocusTrap(element);
+}
+
+function openMenu() {
   const toggle = document.getElementById('menuToggle');
-  const overlay = document.getElementById('menuOverlay');
+  toggle.setAttribute('aria-expanded', 'true');
+  document.getElementById('menuOverlay').classList.add('active');
+  document.documentElement.classList.add('menu-open');
+  openSurface(document.getElementById('menuSidebar'), document.getElementById('menuClose'));
+}
+
+function closeMenu() {
+  const sidebar = document.getElementById('menuSidebar');
+  if (!sidebar.classList.contains('active')) return;
+
+  closeAllPanels();
+  document.getElementById('menuToggle').setAttribute('aria-expanded', 'false');
+  document.getElementById('menuOverlay').classList.remove('active');
+  document.documentElement.classList.remove('menu-open');
+  closeSurface(sidebar);
+}
+
+function openPanel(panelId) {
+  const panel = MENU_PANELS.find((entry) => entry.id === panelId);
+  if (!panel) return;
+
+  const element = document.getElementById(panelElementId(panelId));
+  panel.render();
+  openSurface(element, element.querySelector('[data-close-panel]'));
+}
+
+function closePanel(panelId) {
+  const element = document.getElementById(panelElementId(panelId));
+  if (!element || !element.classList.contains('active')) return;
+
+  closeSurface(element);
+}
+
+function closeAllPanels() {
+  for (const panel of MENU_PANELS) closePanel(panel.id);
+}
+
+function attachMenuEvents() {
+  document.getElementById('menuToggle').addEventListener('click', openMenu);
+  document.getElementById('menuClose').addEventListener('click', closeMenu);
+  document.getElementById('menuOverlay').addEventListener('click', closeMenu);
+
   // Seuls les boutons ouvrant un panneau : le lien vers la page d'analyse est
   // une navigation ordinaire.
-  const menuItems = document.querySelectorAll('.menu-item[data-panel]');
-  
-  // Ouvrir / fermer le menu
-  toggle.addEventListener('click', () => {
-    if (document.getElementById('menuSidebar')?.classList.contains('active')) {
-      closeMenu();
-    } else {
-      openMenu();
-    }
+  document.querySelectorAll('.menu-item[data-panel]').forEach((item) => {
+    item.addEventListener('click', () => openPanel(item.dataset.panel));
   });
-  
-  overlay.addEventListener('click', () => {
-    closeMenu();
+
+  document.querySelectorAll('[data-close-panel]').forEach((button) => {
+    button.addEventListener('click', () => closePanel(button.dataset.closePanel));
   });
-  
-  // Ouvrir les panels
-  menuItems.forEach(item => {
-    item.addEventListener('click', () => {
-      const panelId = item.getAttribute('data-panel');
-      if (panelId) {
-        openPanel(panelId);
-      }
-    });
-  });
-  
-  // Boutons retour
-  document.getElementById('historyBack').addEventListener('click', () => {
-    closePanel('historique');
-  });
-  
-  document.getElementById('settingsBack').addEventListener('click', () => {
-    closePanel('reglages');
-  });
-  
+
   // Actions historique
   document.getElementById('clearHistory').addEventListener('click', () => {
     if (confirm('Voulez-vous vraiment effacer tout l\'historique ?')) {
@@ -351,9 +415,9 @@ function attachMenuEvents() {
       updateHistoryBadge();
     }
   });
-  
+
   document.getElementById('exportHistory').addEventListener('click', exportHistory);
-  
+
   // Interrupteurs des réglages
   SETTING_SWITCHES.forEach(({ id, key, event }) => {
     const control = document.getElementById(id);
@@ -376,103 +440,63 @@ function attachMenuEvents() {
       history = [];
       settings = { ...DEFAULT_SETTINGS };
       applySettingsToDocument();
-      updateHistoryBadge();
-      renderHistory();
-      renderSettings();
       closeMenu();
       window.location.reload();
     }
   });
-  
-  // Keyboard navigation
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
+
+  // Échap ne ferme que la surface du dessus : d'abord le panneau, puis le
+  // tiroir. On ne réagit pas si c'est une modale de la roue qui est au premier
+  // plan — app.js s'en charge.
+  document.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape') return;
+
+    const top = topFocusTrap();
+    if (!top) return;
+
+    if (top.classList.contains('menu-panel')) {
+      closePanel(top.id.replace('panel-', ''));
+    } else if (top.id === 'menuSidebar') {
       closeMenu();
     }
-  });
-}
-
-function openMenu() {
-  const toggle = document.getElementById('menuToggle');
-  toggle.classList.add('active');
-  toggle.setAttribute('aria-label', 'Fermer le menu');
-  toggle.setAttribute('aria-expanded', 'true');
-  document.getElementById('menuOverlay').classList.add('active');
-  document.getElementById('menuSidebar').classList.add('active');
-  document.body.style.overflow = 'hidden';
-}
-
-function closeMenu() {
-  const toggle = document.getElementById('menuToggle');
-  toggle.classList.remove('active');
-  toggle.setAttribute('aria-label', 'Ouvrir le menu');
-  toggle.setAttribute('aria-expanded', 'false');
-  document.getElementById('menuOverlay').classList.remove('active');
-  document.getElementById('menuSidebar').classList.remove('active');
-  closeAllPanels();
-  document.body.style.overflow = '';
-}
-
-function openPanel(panelId) {
-  const panel = document.getElementById(`panel${panelId.charAt(0).toUpperCase() + panelId.slice(1)}`);
-  if (panel) {
-    panel.classList.add('active');
-    if (panelId === 'historique') {
-      renderHistory();
-    } else if (panelId === 'reglages') {
-      renderSettings();
-    }
-  }
-}
-
-function closePanel(panelId) {
-  const panel = document.getElementById(`panel${panelId.charAt(0).toUpperCase() + panelId.slice(1)}`);
-  if (panel) {
-    panel.classList.remove('active');
-  }
-}
-
-function closeAllPanels() {
-  document.querySelectorAll('.menu-panel').forEach(panel => {
-    panel.classList.remove('active');
   });
 }
 
 function updateHistoryBadge() {
   const badge = document.getElementById('historyBadge');
-  if (badge) {
-    const count = getHistoryCount();
-    badge.textContent = count > 0 ? count.toString() : '';
-    badge.style.display = count > 0 ? 'inline-block' : 'none';
-  }
+  if (!badge) return;
+
+  const count = getHistoryCount();
+  badge.textContent = String(count);
+  badge.hidden = count === 0;
 }
 
 function renderHistory() {
   const container = document.getElementById('historyListContainer');
   if (!container) return;
-  
+
   const historyData = getHistory();
-  
+
   if (historyData.length === 0) {
     container.innerHTML = '<div class="history-empty">Aucun tour enregistré pour le moment</div>';
     return;
   }
-  
+
   const list = document.createElement('ul');
   list.className = 'history-list';
-  
+
   historyData.forEach(item => {
     const li = document.createElement('li');
     li.className = 'history-item';
-    
+
     const date = new Date(item.date);
-    const dateStr = date.toLocaleDateString('fr-FR', { 
-      day: 'numeric', 
+    const dateStr = date.toLocaleDateString('fr-FR', {
+      day: 'numeric',
       month: 'short',
       hour: '2-digit',
       minute: '2-digit'
     });
-    
+
     let metaHtml = `<span>📅 ${dateStr}</span>`;
     const recette = formatRecette(item);
     if (recette) {
@@ -481,15 +505,15 @@ function renderHistory() {
     if (item.annee) {
       metaHtml += `<span>📆 Créée en ${item.annee}</span>`;
     }
-    
+
     li.innerHTML = `
       <div class="tax-name">${item.nom}</div>
       <div class="tax-meta">${metaHtml}</div>
     `;
-    
+
     list.appendChild(li);
   });
-  
+
   container.innerHTML = '';
   container.appendChild(list);
 }
