@@ -67,112 +67,119 @@
 
       <!-- ============ Filtres ============ -->
       <section class="card" aria-labelledby="filtersTitle">
-        <div class="card-header">
-          <h2 id="filtersTitle">Filtres</h2>
+        <details id="filtersPanel" class="filters-panel">
+          <summary>
+            <h2 id="filtersTitle">Filtres</h2>
+          </summary>
           <p class="card-hint">
             Les filtres se combinent, et se reflètent dans l'adresse de la page : une sélection se
             partage ou se met en favori telle quelle.
           </p>
-        </div>
 
-        <div class="filters">
-          <div class="field field--wide">
-            <label for="search">Recherche</label>
-            <input
-              id="search"
-              type="search"
-              placeholder="Nom, intitulé ou identifiant…"
-              autocomplete="off"
-              spellcheck="false"
-            />
-            <span class="field-hint"
-              >Insensible aux accents. Plusieurs mots = tous exigés. Raccourci : <kbd>/</kbd></span
-            >
-          </div>
-
-          <div class="field">
-            <label for="filterRecette">Recette</label>
-            <select id="filterRecette">
-              <option value="all">Toutes</option>
-              <option value="with">Recette connue</option>
-              <option value="without">Recette inconnue</option>
-            </select>
-          </div>
-
-          <div class="field">
-            <label for="filterAnnee">Année de création</label>
-            <select id="filterAnnee">
-              <option value="all">Toutes</option>
-              <option value="with">Année connue</option>
-              <option value="without">Année inconnue</option>
-            </select>
-          </div>
-
-          <div class="field field--range">
-            <span class="field-label" id="recetteRangeLabel">Recette (M€)</span>
-            <div class="range-inputs">
+          <div class="filters">
+            <div class="field field--wide">
+              <label for="search">Recherche</label>
               <input
-                id="recetteMin"
-                type="number"
-                step="any"
-                inputmode="decimal"
-                placeholder="min"
-                aria-labelledby="recetteRangeLabel"
-                aria-label="Recette minimale en millions d'euros"
+                id="search"
+                type="search"
+                placeholder="Nom, intitulé ou identifiant…"
+                autocomplete="off"
+                spellcheck="false"
               />
-              <span aria-hidden="true">→</span>
-              <input
-                id="recetteMax"
-                type="number"
-                step="any"
-                inputmode="decimal"
-                placeholder="max"
-                aria-labelledby="recetteRangeLabel"
-                aria-label="Recette maximale en millions d'euros"
-              />
+              <span class="field-hint"
+                >Insensible aux accents. Plusieurs mots = tous exigés. Raccourci :
+                <kbd>/</kbd></span
+              >
+            </div>
+
+            <div class="field">
+              <label for="filterRecette">Recette</label>
+              <select id="filterRecette">
+                <option value="all">Toutes</option>
+                <option value="with">Recette connue</option>
+                <option value="without">Recette inconnue</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="filterAnnee">Année de création</label>
+              <select id="filterAnnee">
+                <option value="all">Toutes</option>
+                <option value="with">Année connue</option>
+                <option value="without">Année inconnue</option>
+              </select>
+            </div>
+
+            <div class="field field--range">
+              <span class="field-label" id="recetteRangeLabel">Recette (M€)</span>
+              <div class="range-inputs">
+                <input
+                  id="recetteMin"
+                  type="number"
+                  step="any"
+                  inputmode="decimal"
+                  placeholder="min"
+                  aria-labelledby="recetteRangeLabel"
+                  aria-label="Recette minimale en millions d'euros"
+                />
+                <span aria-hidden="true">→</span>
+                <input
+                  id="recetteMax"
+                  type="number"
+                  step="any"
+                  inputmode="decimal"
+                  placeholder="max"
+                  aria-labelledby="recetteRangeLabel"
+                  aria-label="Recette maximale en millions d'euros"
+                />
+              </div>
+            </div>
+
+            <div class="field field--range">
+              <span class="field-label" id="anneeRangeLabel">Période de création</span>
+              <div class="range-inputs">
+                <input
+                  id="anneeMin"
+                  type="number"
+                  step="1"
+                  inputmode="numeric"
+                  placeholder="1798"
+                  aria-labelledby="anneeRangeLabel"
+                  aria-label="Année de création minimale"
+                />
+                <span aria-hidden="true">→</span>
+                <input
+                  id="anneeMax"
+                  type="number"
+                  step="1"
+                  inputmode="numeric"
+                  placeholder="2025"
+                  aria-labelledby="anneeRangeLabel"
+                  aria-label="Année de création maximale"
+                />
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="sortPreset">Tri rapide</label>
+              <select id="sortPreset">
+                <option value="">Choisir un tri…</option>
+              </select>
+            </div>
+
+            <div class="field field--actions">
+              <button id="resetFilters" class="btn btn-secondary" type="button">
+                Réinitialiser
+              </button>
+              <button id="exportCsv" class="btn btn-secondary" type="button">
+                Exporter en CSV
+              </button>
+              <button id="exportJson" class="btn btn-secondary" type="button">
+                Exporter en JSON
+              </button>
             </div>
           </div>
-
-          <div class="field field--range">
-            <span class="field-label" id="anneeRangeLabel">Période de création</span>
-            <div class="range-inputs">
-              <input
-                id="anneeMin"
-                type="number"
-                step="1"
-                inputmode="numeric"
-                placeholder="1798"
-                aria-labelledby="anneeRangeLabel"
-                aria-label="Année de création minimale"
-              />
-              <span aria-hidden="true">→</span>
-              <input
-                id="anneeMax"
-                type="number"
-                step="1"
-                inputmode="numeric"
-                placeholder="2025"
-                aria-labelledby="anneeRangeLabel"
-                aria-label="Année de création maximale"
-              />
-            </div>
-          </div>
-
-          <div class="field">
-            <label for="sortPreset">Tri rapide</label>
-            <select id="sortPreset">
-              <option value="">Choisir un tri…</option>
-            </select>
-          </div>
-
-          <div class="field field--actions">
-            <button id="resetFilters" class="btn btn-secondary" type="button">Réinitialiser</button>
-            <button id="exportCsv" class="btn btn-secondary" type="button">Exporter en CSV</button>
-            <button id="exportJson" class="btn btn-secondary" type="button">
-              Exporter en JSON
-            </button>
-          </div>
-        </div>
+        </details>
       </section>
 
       <!-- ============ Statistiques ============ -->

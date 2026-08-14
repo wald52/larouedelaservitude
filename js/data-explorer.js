@@ -1081,6 +1081,14 @@ async function init() {
   elements.themeToggle = requireElement("themeToggle");
   elements.status = requireElement("loadingStatus");
   elements.dataVersion = requireElement("dataVersion");
+  elements.filtersPanel = requireElement("filtersPanel");
+
+  // Le volet des filtres s'ouvre d'emblée sur un écran large, et reste replié
+  // sur un téléphone où ses six champs déroulés repoussaient les données à plus
+  // d'un écran de défilement. Décidé une seule fois au démarrage : passé ce
+  // point, c'est l'utilisateur qui commande, et un redimensionnement ne vient
+  // pas défaire son choix.
+  elements.filtersPanel.open = window.matchMedia("(min-width: 760px)").matches;
 
   loadSettings();
   syncThemeToggle();

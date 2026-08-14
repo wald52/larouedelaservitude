@@ -291,7 +291,55 @@ a {
 
 /* ===============================
    Filtres
-   =============================== */
+   ===============================
+
+   Sur un téléphone, les six champs déroulés repoussaient les données à plus
+   d'un écran de défilement. Le volet se replie donc en dessous de 760 px —
+   js/data-explorer.js décide de l'état initial selon la largeur, puis laisse
+   l'utilisateur maître. <details> fournit le mécanisme, le clavier et
+   l'annonce aux lecteurs d'écran sans une ligne de script. */
+
+.filters-panel > summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  list-style: none;
+  border-radius: 8px;
+}
+
+.filters-panel > summary::-webkit-details-marker {
+  display: none;
+}
+
+/* Chevron tracé, comme partout ailleurs dans le site. */
+.filters-panel > summary::after {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid var(--muted);
+  border-bottom: 2px solid var(--muted);
+  transform: translateY(-2px) rotate(45deg);
+  transition: transform 0.15s ease;
+}
+
+.filters-panel[open] > summary::after {
+  transform: translateY(1px) rotate(-135deg);
+}
+
+.filters-panel > summary h2 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.filters-panel .card-hint {
+  margin-top: 6px;
+}
+
+.filters-panel .filters {
+  margin-top: 14px;
+}
 
 .filters {
   display: grid;
@@ -356,6 +404,35 @@ a {
 
 .card-controls select {
   width: auto;
+}
+
+/* Voir buttons.css : le confort tactile est réservé aux pointeurs grossiers.
+   Ici les champs de formulaire, les puces de tri et les liens de pied de page,
+   qui descendaient jusqu'à 15 px de haut. */
+@media (pointer: coarse) {
+  .field input,
+  .field select,
+  .card-controls select {
+    min-height: 44px;
+  }
+
+  .sort-chip {
+    min-height: 36px;
+    padding-inline: 12px;
+  }
+
+  .sort-button {
+    min-height: 44px;
+  }
+
+  /* Uniquement les liens nus : .back-link est déjà un .btn-sm, à qui la règle
+     de buttons.css donne ses 44 px. Lui imposer `display: inline-block` casse
+     le `inline-flex` du bouton, et son chevron — un pseudo-élément placé par
+     le flex — se retrouvait affiché comme une barre verticale. */
+  .page-footer a {
+    display: inline-block;
+    padding-block: 8px;
+  }
 }
 
 .range-inputs {

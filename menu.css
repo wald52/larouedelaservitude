@@ -312,6 +312,14 @@
   text-decoration: underline;
 }
 
+/* Voir buttons.css : au doigt, ce lien ne faisait que 14 px de haut. */
+@media (pointer: coarse) {
+  .menu-footer a {
+    display: inline-block;
+    padding-block: 13px;
+  }
+}
+
 /* Une ligne discrète. La version était encadrée d'une pastille, ce qui la
    faisait ressembler à une information de débogage. */
 .menu-footer span {
