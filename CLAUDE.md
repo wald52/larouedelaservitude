@@ -143,12 +143,27 @@ never hardcode a colour in the CSS files.
 a button is styled. Never restyle a button in `index.html`'s inline CSS, `menu.css` or `donnees.css`
 — that is precisely what produced two incompatible `.btn` / `.btn-secondary` definitions (one per
 page) before it existed. Compose the existing classes instead: a base `.btn`, a variant
-(`.btn-accent` for the page's main action, `.btn-primary`, `.btn-secondary`, `.btn-ghost`,
-`.btn-quiet`, `.btn-inverse` for anything sitting on the result bubble), then modifiers
-(`.btn-sm` / `.btn-lg`, `.btn-pill`, `.btn-icon`, `.btn-block`, `.btn-tip` for an icon-only button
-whose `aria-label` doubles as its tooltip). Layout-only rules (position, margin) stay with the
-feature; `.btn-row` covers the common "row of buttons" case. Its `--btn-*` tokens are self-contained
-so the file works in both documents; they fall back to the theme tokens the two pages share.
+(`.btn-accent` for the page's main action, `.btn-primary`, `.btn-secondary`, `.btn-quiet`,
+`.btn-inverse` for anything sitting on the result bubble), then modifiers (`.btn-sm` / `.btn-lg`,
+`.btn-pill`, `.btn-icon`, `.btn-block`, `.btn-tip` for an icon-only button whose `aria-label`
+doubles as its tooltip). Layout-only rules (position, margin) stay with the feature; `.btn-row`
+covers the common "row of buttons" case. Its `--btn-*` tokens are self-contained so the file works
+in both documents.
+
+**Buttons are signalled by a fill, never by a 1px outline.** `.btn-secondary` is a flat tint with no
+border, and it is the default for anything that has to read as a button. An outlined variant existed
+and was removed: it inherited `--ring`, the card-border token, which lands at 1.2:1 against the
+site's light surfaces — well under the 3:1 that WCAG 1.4.11 asks of an interactive component's
+boundary — so the buttons simply were not visible. `.btn-quiet` has no chrome at all *at rest* and
+only reveals itself on hover: reserve it for incidental controls inside an already-delimited frame,
+and never for a control that must look like a button (there is no hover on a touchscreen).
+
+**Icon buttons are rounded squares; the circle is opt-in.** `.btn-icon` keeps `.btn`'s radius,
+because the rounded square is the shape of the whole interface (hamburger, menu rows, buttons); add
+`.btn-pill` where a circle is actually wanted — the share dots on the result bubble. Two glyphs are
+drawn in CSS rather than typed as characters, `.btn-close` (the cross) and `.btn-back` (the
+chevron): `✕` and `←` render at wildly different weights across system fonts, and both were
+duplicated in several files. Those buttons carry no text — their name comes from `aria-label`.
 
 **The menu is two levels of sliding surfaces, and both obey the same three rules.** The drawer and
 the panels are built from the `MENU_PANELS` table in `js/menu.js` — one entry produces the nav
