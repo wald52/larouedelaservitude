@@ -37,7 +37,11 @@
   --btn-soft-bg: var(--surface-alt, #fafafa);
   --btn-soft-hover: var(--surface-inset, #f0f0f0);
   --btn-soft-fg: var(--fg, #111);
-  --btn-border: var(--ring, #e5e7eb);
+  /* Volontairement plus soutenu que --ring, qui borde les cartes. La limite
+     d'un composant interactif doit atteindre 3:1 (WCAG 1.4.11) pour se lire
+     comme un bouton ; --ring plafonne à 1,2:1 sur les fonds clairs du site,
+     et les boutons contournés passaient inaperçus. */
+  --btn-border: #8b919b;
 
   /* Surface inversée (bulle de résultat) : un gris translucide fonctionne
      sur fond clair comme sur fond sombre, sans jeton par thème. */
@@ -58,6 +62,7 @@
 :root[data-theme="dark"] {
   --btn-accent-bg: #dc2626;
   --btn-accent-hover: #ef4444;
+  --btn-border: #626b7a;
   --btn-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
   --btn-shadow-hover: 0 2px 4px rgba(0, 0, 0, 0.4), 0 8px 20px rgba(0, 0, 0, 0.5);
   --switch-off: #4b5563;
@@ -175,7 +180,11 @@
   background: var(--btn-soft-hover);
 }
 
-/* Sans fond ni contour : fermetures, retours, actions de second plan. */
+/* Sans fond ni contour au repos : rien ne se voit tant qu'on ne survole pas.
+   À réserver aux actions accessoires dont le pictogramme se suffit — une croix
+   de fermeture dans un cadre déjà délimité. Dès qu'un contrôle doit se lire
+   comme un bouton, prendre .btn-ghost : au survol seul, il reste invisible au
+   doigt comme au premier coup d'œil. */
 .btn-quiet {
   color: inherit;
 }

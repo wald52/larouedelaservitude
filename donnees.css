@@ -183,11 +183,10 @@ a {
 }
 
 /* Apparence dans buttons.css (.btn-back) : ici, seul le placement. La marge
-   négative compense le rembourrage du bouton, pour que son libellé s'aligne
-   verticalement sur le titre qui le suit. */
+   négative compense la bordure et le rembourrage du bouton, pour que son
+   libellé s'aligne verticalement sur le titre qui le suit. */
 .back-link {
-  margin-left: -12px;
-  color: var(--muted);
+  margin-left: -13px;
 }
 
 .page-header__actions {

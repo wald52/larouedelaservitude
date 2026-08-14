@@ -258,7 +258,7 @@ function createMenuHTML() {
   sidebar.innerHTML = `
     <div class="menu-header">
       <h2 class="menu-title">Menu</h2>
-      <button class="btn btn-icon btn-quiet" id="menuClose" type="button" aria-label="Fermer le menu">✕</button>
+      <button class="btn btn-icon btn-ghost" id="menuClose" type="button" aria-label="Fermer le menu">✕</button>
     </div>
     <div class="menu-nav">
       ${MENU_PANELS.map(renderMenuItem).join('')}
@@ -331,7 +331,7 @@ function createPanelElement({ id, label, content }) {
   panel.setAttribute('aria-labelledby', `${panelElementId(id)}-title`);
   panel.innerHTML = `
     <div class="panel-header">
-      <button class="btn btn-sm btn-quiet btn-back" data-close-panel="${id}" type="button"
+      <button class="btn btn-sm btn-ghost btn-back" data-close-panel="${id}" type="button"
               aria-label="Retour au menu">Menu</button>
       <h3 class="panel-title" id="${panelElementId(id)}-title">${label}</h3>
     </div>
