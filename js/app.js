@@ -42,7 +42,6 @@ const LERP = 0.10;
 const INTRO_DURATION_MS = 650;
 const CENTER_INTRO_DURATION_MS = 360;
 const LABEL_MIN_ARC_PX = 20;
-const HTML2CANVAS_SRC = 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
 const INSTALL_PROMPT_SPIN_THRESHOLD = 3;
 // Amortissement appliqué quand l'utilisateur demande moins d'animation : la
 // roue tourne une fraction de seconde puis livre son résultat.
@@ -78,7 +77,6 @@ let R = 0;
 let labelRadius = 0;
 let audioReady = false;
 let audioInitPromise = null;
-let html2canvasPromise = null;
 let menuInitialized = false;
 let fullDataLoadScheduled = false;
 let deferredInstallPrompt = null;
@@ -621,44 +619,6 @@ function ensureAudioInitialized() {
     });
 
   return audioInitPromise;
-}
-
-function ensureHtml2Canvas() {
-  if (window.html2canvas) {
-    return Promise.resolve(window.html2canvas);
-  }
-
-  if (html2canvasPromise) {
-    return html2canvasPromise;
-  }
-
-  html2canvasPromise = new Promise((resolve, reject) => {
-    const existingScript = document.querySelector('script[data-html2canvas-loader="true"]');
-    if (existingScript) {
-      existingScript.addEventListener('load', () => resolve(window.html2canvas), { once: true });
-      existingScript.addEventListener('error', () => reject(new Error('Impossible de charger le module de partage.')), { once: true });
-      return;
-    }
-
-    const script = document.createElement('script');
-    script.src = HTML2CANVAS_SRC;
-    script.async = true;
-    script.dataset.html2canvasLoader = 'true';
-    script.onload = () => {
-      if (window.html2canvas) {
-        resolve(window.html2canvas);
-      } else {
-        reject(new Error('Le module de capture est indisponible.'));
-      }
-    };
-    script.onerror = () => reject(new Error('Impossible de charger le module de partage.'));
-    document.head.appendChild(script);
-  }).catch((error) => {
-    html2canvasPromise = null;
-    throw error;
-  });
-
-  return html2canvasPromise;
 }
 
 function scheduleFullDataLoad(reason = 'interaction') {
@@ -1259,34 +1219,64 @@ async function optimizeImageWebP(base64, maxWidth = 1200, quality = 0.8) {
   });
 }
 
-async function captureWheelArea() {
-  const html2canvas = await ensureHtml2Canvas();
-  const shareBar = document.getElementById('shareBar');
-  const previousDisplay = shareBar.style.display;
+// Capture de la zone de roue, dessinée à la main.
+//
+// html2canvas était téléchargé depuis un CDN au premier partage : hors ligne —
+// c'est-à-dire dans le cas d'usage que cette PWA revendique — il ne se
+// chargeait pas et le partage échouait sans recours. Or la zone ne contient que
+// trois choses : un fond, le canvas de la roue et le triangle du curseur. Les
+// redessiner tient en quelques lignes, marche hors ligne, et supprime au
+// passage 200 ko de dépendance tierce.
+const CAPTURE_SCALE = 2;
 
-  shareBar.style.display = 'none';
+// .pointer est un triangle CSS fait de bordures : son rectangle englobant donne
+// directement la base et la hauteur à reproduire.
+function fillPointer(ctx, rect, area, scale) {
+  const left = (rect.left - area.left) * scale;
+  const top = (rect.top - area.top) * scale;
+  const width = rect.width * scale;
+  const height = rect.height * scale;
 
-  try {
-    await new Promise(resolve => setTimeout(resolve, 100));
-    const rect = wheelArea.getBoundingClientRect();
-    return await html2canvas(document.body, {
-      x: rect.left,
-      y: rect.top,
-      width: rect.width,
-      height: rect.height,
-      scale: 2,
-      useCORS: true,
-      backgroundColor: '#f7f7f7',
-      logging: false
-    });
-  } finally {
-    shareBar.style.display = previousDisplay;
-  }
+  ctx.beginPath();
+  ctx.moveTo(left, top);
+  ctx.lineTo(left + width, top);
+  ctx.lineTo(left + width / 2, top + height);
+  ctx.closePath();
+  ctx.fill();
 }
 
+async function captureWheelArea() {
+  const area = wheelArea.getBoundingClientRect();
+  const output = document.createElement('canvas');
+  output.width = Math.round(area.width * CAPTURE_SCALE);
+  output.height = Math.round(area.height * CAPTURE_SCALE);
 
+  const ctx = output.getContext('2d');
+  const board = document.querySelector('.board') || document.body;
 
-  
+  // Le fond suit le thème : la capture était figée en clair, et le partage d'un
+  // utilisateur en thème sombre sortait sur un fond qui n'était pas le sien.
+  ctx.fillStyle = getComputedStyle(board).backgroundColor;
+  ctx.fillRect(0, 0, output.width, output.height);
+
+  const wheel = canvas.getBoundingClientRect();
+  ctx.drawImage(
+    canvas,
+    (wheel.left - area.left) * CAPTURE_SCALE,
+    (wheel.top - area.top) * CAPTURE_SCALE,
+    wheel.width * CAPTURE_SCALE,
+    wheel.height * CAPTURE_SCALE
+  );
+
+  const pointer = wheelArea.querySelector('.pointer');
+  if (pointer) {
+    ctx.fillStyle = getComputedStyle(pointer).borderTopColor;
+    fillPointer(ctx, pointer.getBoundingClientRect(), area, CAPTURE_SCALE);
+  }
+
+  return output;
+}
+
 /* =======================
    PARTAGE / CAPTURE amélioré
    ======================= */

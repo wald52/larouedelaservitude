@@ -4,6 +4,13 @@
 
 // Import du module audio pour le son offline-first
 import { isSoundEnabled } from "./js/settings.js";
+import { BASE_PATH } from "./js/constants.js";
+
+// Chemin du son de repli. Il était écrit en dur avec le sous-dossier de GitHub
+// Pages (« /larouedelaservitude/audio/… ») : sur Netlify comme en local, chaque
+// tour de roue lançait huit requêtes en 404 et le son ne jouait pas. BASE_PATH
+// est déduit de l'emplacement réel des modules et vaut pour les deux cibles.
+const BILL_SOUND_URL = `${BASE_PATH}/audio/frottement-papier2.mp3`;
 
 let playBillAudio = null;
 
@@ -20,7 +27,7 @@ export function initBills() {
   }).catch(() => {
     console.warn('[BILLS] Module audio non disponible, fallback vers Audio()');
     // Fallback vers l'ancienne méthode
-    const fallbackSound = new Audio('/larouedelaservitude/audio/frottement-papier2.mp3');
+    const fallbackSound = new Audio(BILL_SOUND_URL);
     fallbackSound.volume = 1;
     fallbackSound.preload = 'auto';
     
@@ -71,7 +78,7 @@ export function initBills() {
       // Fallback immédiat si pas encore initialisé
       setTimeout(() => {
         if (!isSoundEnabled()) return;
-        const snd = new Audio('/larouedelaservitude/audio/frottement-papier2.mp3');
+        const snd = new Audio(BILL_SOUND_URL);
         snd.volume = 0.5;
         snd.playbackRate = 1.35 + Math.random() * 0.20;
         snd.play().catch(() => {});
