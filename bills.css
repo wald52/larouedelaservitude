@@ -8,7 +8,7 @@
   font-size: 28px;
   transform-origin: center;
   user-select: none;
-  text-shadow: 0 1px 0 rgba(0,0,0,0.08);
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.08);
   transition: opacity 0.35s linear;
   z-index: 12000;
   opacity: 0;

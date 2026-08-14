@@ -63,13 +63,15 @@ function reloadOnce(reason) {
 
   const now = Date.now();
   if (now - readReloadGuard() < RELOAD_COOLDOWN_MS) {
-    console.warn("[SW] Rechargement déjà tenté il y a moins de 10 s : on s'arrête pour éviter une boucle.");
+    console.warn(
+      "[SW] Rechargement déjà tenté il y a moins de 10 s : on s'arrête pour éviter une boucle."
+    );
     return;
   }
 
   reloadRequested = true;
   writeReloadGuard(now);
-  console.log('[SW] Rechargement pour appliquer la nouvelle version :', reason);
+  console.log("[SW] Rechargement pour appliquer la nouvelle version :", reason);
   window.location.reload();
 }
 
@@ -82,13 +84,13 @@ function activateWaitingWorker(worker) {
 
   if (!canReload()) {
     updatePending = true;
-    console.log('[SW] Nouvelle version prête : application différée (utilisation en cours)');
+    console.log("[SW] Nouvelle version prête : application différée (utilisation en cours)");
     return;
   }
 
   updatePending = false;
-  console.log('[SW] Nouvelle version prête : bascule immédiate');
-  worker.postMessage({ type: 'SKIP_WAITING' });
+  console.log("[SW] Nouvelle version prête : bascule immédiate");
+  worker.postMessage({ type: "SKIP_WAITING" });
 }
 
 /**
@@ -105,17 +107,17 @@ export function applyPendingUpdate() {
   // plus tôt et resté sans réponse.
   if (canReload()) {
     updatePending = false;
-    reloadOnce('mise à jour différée');
+    reloadOnce("mise à jour différée");
   }
 }
 
 function trackInstallingWorker(worker) {
   if (!worker) return;
 
-  worker.addEventListener('statechange', () => {
+  worker.addEventListener("statechange", () => {
     // `controller` non nul = il y avait déjà une version en place : c'est une
     // mise à jour, pas une première installation.
-    if (worker.state === 'installed' && navigator.serviceWorker.controller) {
+    if (worker.state === "installed" && navigator.serviceWorker.controller) {
       activateWaitingWorker(worker);
     }
   });
@@ -136,7 +138,7 @@ async function checkForUpdate(force = false) {
     await registrationRef.update();
   } catch (error) {
     // Hors ligne, typiquement : la version en cache reste parfaitement valable.
-    console.warn('[SW] Vérification de mise à jour impossible :', error);
+    console.warn("[SW] Vérification de mise à jour impossible :", error);
   }
 }
 
@@ -155,7 +157,7 @@ function askWorkerVersion(worker) {
     };
 
     try {
-      worker.postMessage({ type: 'GET_VERSION' }, [channel.port2]);
+      worker.postMessage({ type: "GET_VERSION" }, [channel.port2]);
     } catch {
       clearTimeout(timer);
       resolve(null);
@@ -183,7 +185,7 @@ async function verifyVersionMatch() {
   }
 
   if (canReload()) {
-    reloadOnce('code et cache désynchronisés');
+    reloadOnce("code et cache désynchronisés");
   } else {
     updatePending = true;
   }
@@ -200,36 +202,36 @@ async function verifyVersionMatch() {
  *   partie en cours, fenêtre ouverte).
  */
 export function initServiceWorker(options = {}) {
-  if (!('serviceWorker' in navigator)) return;
+  if (!("serviceWorker" in navigator)) return;
 
-  if (typeof options.canReload === 'function') {
+  if (typeof options.canReload === "function") {
     canReload = options.canReload;
   }
 
   hadControllerAtStartup = Boolean(navigator.serviceWorker.controller);
 
-  navigator.serviceWorker.addEventListener('controllerchange', () => {
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
     // Première installation : le SW prend le contrôle d'une page qui vient
     // d'être chargée depuis le réseau, tout est déjà cohérent.
     if (!hadControllerAtStartup) {
-      console.log('[SW] Prise de contrôle initiale (aucun rechargement nécessaire)');
+      console.log("[SW] Prise de contrôle initiale (aucun rechargement nécessaire)");
       hadControllerAtStartup = true;
       return;
     }
-    reloadOnce('nouveau service worker actif');
+    reloadOnce("nouveau service worker actif");
   });
 
-  navigator.serviceWorker.addEventListener('message', (event) => {
-    if (event.data?.type === 'SW_UPDATED') {
-      console.log('[SW] Version active :', event.data.version);
+  navigator.serviceWorker.addEventListener("message", (event) => {
+    if (event.data?.type === "SW_UPDATED") {
+      console.log("[SW] Version active :", event.data.version);
     }
   });
 
   navigator.serviceWorker
-    .register(SW_URL, { updateViaCache: 'none' })
+    .register(SW_URL, { updateViaCache: "none" })
     .then((registration) => {
       registrationRef = registration;
-      console.log('[SW] Enregistré :', registration.scope, '- version du code :', APP_VERSION);
+      console.log("[SW] Enregistré :", registration.scope, "- version du code :", APP_VERSION);
 
       // Une version peut déjà attendre depuis la visite précédente.
       if (registration.waiting && navigator.serviceWorker.controller) {
@@ -238,8 +240,8 @@ export function initServiceWorker(options = {}) {
 
       trackInstallingWorker(registration.installing);
 
-      registration.addEventListener('updatefound', () => {
-        console.log('[SW] Nouvelle version en installation...');
+      registration.addEventListener("updatefound", () => {
+        console.log("[SW] Nouvelle version en installation...");
         trackInstallingWorker(registration.installing);
       });
 
@@ -253,13 +255,13 @@ export function initServiceWorker(options = {}) {
     });
 
   // Retour sur l'onglet / retour du réseau : nouvelle chance d'être à jour.
-  document.addEventListener('visibilitychange', () => {
+  document.addEventListener("visibilitychange", () => {
     if (document.hidden) return;
     checkForUpdate();
     applyPendingUpdate();
   });
 
-  window.addEventListener('online', () => {
+  window.addEventListener("online", () => {
     checkForUpdate(true);
   });
 }

@@ -37,7 +37,7 @@ const CACHE_NAME = `larouedelaservitude-${CACHE_VERSION}`;
    (system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial)
 */
 
-const BASE = self.location.pathname.replace(/\/[^/]*$/, '');
+const BASE = self.location.pathname.replace(/\/[^/]*$/, "");
 
 // Nombre de nouvelles tentatives par fichier avant de faire échouer
 // l'installation (réseau instable sur mobile).
@@ -93,7 +93,7 @@ const urlsToCache = [
   `${BASE}/icons/icon-192x192.png`,
   `${BASE}/icons/icon-512x512.png`,
   `${BASE}/icons/og-image.png`,
-  `${BASE}/site.webmanifest`,
+  `${BASE}/site.webmanifest`
 ];
 
 const PRECACHED_PATHS = new Set(urlsToCache);
@@ -122,10 +122,10 @@ const PAGE_KEYS_BY_PATH = new Map([
 // pourrait resservir les fichiers de la version précédente, et la « nouvelle »
 // génération serait un mélange.
 function precacheRequest(url) {
-  const separator = url.includes('?') ? '&' : '?';
+  const separator = url.includes("?") ? "&" : "?";
   return new Request(`${url}${separator}v=${CACHE_VERSION}`, {
-    cache: 'reload',
-    credentials: 'same-origin'
+    cache: "reload",
+    credentials: "same-origin"
   });
 }
 
@@ -157,16 +157,14 @@ async function precacheOne(cache, url, attempt = 0) {
 async function precacheAll() {
   const cache = await caches.open(CACHE_NAME);
   const results = await Promise.allSettled(urlsToCache.map((url) => precacheOne(cache, url)));
-  const failures = results.filter((result) => result.status === 'rejected');
+  const failures = results.filter((result) => result.status === "rejected");
 
   if (failures.length) {
     // Cache incomplet = hors ligne cassé : on préfère échouer et laisser
     // l'ancienne version en place. Le navigateur retentera à la prochaine
     // vérification de mise à jour.
     await caches.delete(CACHE_NAME);
-    throw new Error(
-      `Pré-cache incomplet : ${failures.map((f) => f.reason.message).join(', ')}`
-    );
+    throw new Error(`Pré-cache incomplet : ${failures.map((f) => f.reason.message).join(", ")}`);
   }
 }
 
@@ -192,13 +190,13 @@ async function predecessorKnowsHandshake() {
 // l'activation ne peut pas attendre son feu vert, on rechargera ses pages.
 let legacyTakeover = false;
 
-self.addEventListener('install', (event) => {
+self.addEventListener("install", (event) => {
   console.log(`[SW] Installation de ${CACHE_NAME}`);
 
   event.waitUntil(
     precacheAll()
       .then(async () => {
-        console.log('[SW] ✅ Pré-cache complet - prêt pour offline');
+        console.log("[SW] ✅ Pré-cache complet - prêt pour offline");
 
         legacyTakeover = Boolean(self.registration.active) && !(await predecessorKnowsHandshake());
 
@@ -208,17 +206,17 @@ self.addEventListener('install', (event) => {
         if (!self.registration.active) {
           await self.skipWaiting();
         } else if (legacyTakeover) {
-          console.log('[SW] Génération précédente sans poignée de main : bascule forcée');
+          console.log("[SW] Génération précédente sans poignée de main : bascule forcée");
           await self.skipWaiting();
         } else {
           // Mise à jour : on reste en attente. C'est la page (js/sw-update.js)
           // qui déclenche la bascule quand elle peut se recharger sans gêner
           // l'utilisateur — sinon elle mélangerait deux générations.
-          console.log('[SW] Nouvelle version prête, en attente du feu vert de la page');
+          console.log("[SW] Nouvelle version prête, en attente du feu vert de la page");
         }
       })
       .catch((error) => {
-        console.error('[SW] ❌ Installation abandonnée :', error.message);
+        console.error("[SW] ❌ Installation abandonnée :", error.message);
         // Propagé : l'installation échoue, l'ancienne version reste seule maître.
         throw error;
       })
@@ -228,7 +226,7 @@ self.addEventListener('install', (event) => {
 /* =====================================================
    ACTIVATION : Nettoyage des anciens caches + claim
    ===================================================== */
-self.addEventListener('activate', (event) => {
+self.addEventListener("activate", (event) => {
   console.log(`[SW] Activation de ${CACHE_NAME}`);
 
   event.waitUntil(
@@ -239,7 +237,7 @@ self.addEventListener('activate', (event) => {
         names
           .filter((name) => name !== CACHE_NAME)
           .map((name) => {
-            console.log('[SW] 🗑️ Suppression ancien cache:', name);
+            console.log("[SW] 🗑️ Suppression ancien cache:", name);
             return caches.delete(name);
           })
       );
@@ -249,10 +247,10 @@ self.addEventListener('activate', (event) => {
 
       // 3. Prévenir les pages : elles se rechargent pour aligner leur code sur
       //    cette génération (voir js/sw-update.js).
-      const clients = await self.clients.matchAll({ type: 'window' });
+      const clients = await self.clients.matchAll({ type: "window" });
       for (const client of clients) {
         client.postMessage({
-          type: 'SW_UPDATED',
+          type: "SW_UPDATED",
           version: CACHE_VERSION,
           cache: CACHE_NAME
         });
@@ -265,7 +263,7 @@ self.addEventListener('activate', (event) => {
         // servie, l'attendre ici bloquerait l'activation qu'elle attend.
         if (legacyTakeover) {
           client.navigate(client.url).catch((error) => {
-            console.warn('[SW] Rechargement de la page impossible :', error);
+            console.warn("[SW] Rechargement de la page impossible :", error);
           });
         }
       }
@@ -278,7 +276,7 @@ self.addEventListener('activate', (event) => {
    ===================================================== */
 
 function isCacheableResponse(response) {
-  return response && response.status === 200 && response.type === 'basic';
+  return response && response.status === 200 && response.type === "basic";
 }
 
 // Cache First : la réponse vient toujours de la génération installée. Le réseau
@@ -298,10 +296,10 @@ function cacheFirst(request, cacheKey = request) {
   });
 }
 
-self.addEventListener('fetch', (event) => {
+self.addEventListener("fetch", (event) => {
   const request = event.request;
 
-  if (request.method !== 'GET') {
+  if (request.method !== "GET") {
     return;
   }
 
@@ -312,7 +310,7 @@ self.addEventListener('fetch', (event) => {
   }
 
   // ⚠️ API Netlify : Hors du SW (jamais en cache)
-  if (url.pathname.includes('/.netlify/functions/')) {
+  if (url.pathname.includes("/.netlify/functions/")) {
     return;
   }
 
@@ -320,7 +318,7 @@ self.addEventListener('fetch', (event) => {
   // publiée pour la comparer à celle qu'elle a en cache. On la laisse filer
   // vers le réseau sans l'intercepter — et sans mettre son URL horodatée en
   // cache, ce qui y créerait une entrée par revalidation.
-  if (url.searchParams.has('fresh')) {
+  if (url.searchParams.has("fresh")) {
     return;
   }
 
@@ -344,22 +342,22 @@ self.addEventListener('fetch', (event) => {
 /* =====================================================
    MESSAGES : Communication avec les clients
    ===================================================== */
-self.addEventListener('message', (event) => {
+self.addEventListener("message", (event) => {
   const data = event.data;
   if (!data || !data.type) return;
 
   // Envoyé par js/sw-update.js quand la page peut se recharger sans gêner
   // l'utilisateur : c'est le déclencheur de la bascule de version.
-  if (data.type === 'SKIP_WAITING') {
+  if (data.type === "SKIP_WAITING") {
     self.skipWaiting();
     return;
   }
 
   // Permet à la page de vérifier que son code appartient bien à la génération
   // servie par ce SW (voir la détection de décalage dans js/sw-update.js).
-  if (data.type === 'GET_VERSION') {
+  if (data.type === "GET_VERSION") {
     const port = event.ports && event.ports[0];
-    const payload = { type: 'VERSION', version: CACHE_VERSION };
+    const payload = { type: "VERSION", version: CACHE_VERSION };
     if (port) port.postMessage(payload);
     else if (event.source) event.source.postMessage(payload);
     return;
@@ -367,13 +365,13 @@ self.addEventListener('message', (event) => {
 
   // Vidage complet (dépannage) : les onglets se rechargent sur une génération
   // fraîchement téléchargée.
-  if (data.type === 'CLEAR_CACHE') {
-    console.log('[SW] Clear cache demandé');
+  if (data.type === "CLEAR_CACHE") {
+    console.log("[SW] Clear cache demandé");
     event.waitUntil(
       caches
         .keys()
         .then((names) => Promise.all(names.map((name) => caches.delete(name))))
-        .then(() => self.clients.matchAll({ type: 'window' }))
+        .then(() => self.clients.matchAll({ type: "window" }))
         .then((clients) => {
           clients.forEach((client) => client.navigate(client.url));
         })

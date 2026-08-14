@@ -3,10 +3,7 @@
 // mais restent importables par les fonctions voisines.
 
 // Origines autorisées à appeler les fonctions depuis le navigateur.
-const ALLOWED_ORIGINS = [
-  "https://wald52.github.io",
-  "https://larouedelaservitude.netlify.app"
-];
+const ALLOWED_ORIGINS = ["https://wald52.github.io", "https://larouedelaservitude.netlify.app"];
 
 // Construit les en-têtes CORS pour une requête donnée.
 // L'origine est renvoyée seulement si elle figure dans l'allow-list ;
@@ -17,7 +14,7 @@ function corsHeaders(event) {
     "Access-Control-Allow-Origin": ALLOWED_ORIGINS.includes(origin) ? origin : "null",
     "Access-Control-Allow-Headers": "Content-Type",
     "Access-Control-Allow-Methods": "POST, OPTIONS",
-    "Vary": "Origin"
+    Vary: "Origin"
   };
 }
 

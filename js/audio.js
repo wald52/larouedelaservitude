@@ -9,15 +9,15 @@
 import { BASE_PATH } from "./constants.js";
 import { isSoundEnabled as readStoredSoundSetting } from "./settings.js";
 
-const AUDIO_DB_NAME = 'LaRoueAudio';
+const AUDIO_DB_NAME = "LaRoueAudio";
 const AUDIO_DB_VERSION = 1;
-const AUDIO_STORE_NAME = 'sounds';
+const AUDIO_STORE_NAME = "sounds";
 
 // Sons disponibles
 const SOUNDS = {
-  spin: 'audio/wheel-spin2.mp3',      // Son de rotation (clic secteur)
-  coin: 'audio/coin4.mp3',            // Son de victoire (résultat)
-  bill: 'audio/frottement-papier2.mp3' // Son des billets
+  spin: "audio/wheel-spin2.mp3", // Son de rotation (clic secteur)
+  coin: "audio/coin4.mp3", // Son de victoire (résultat)
+  bill: "audio/frottement-papier2.mp3" // Son des billets
 };
 
 let audioContext = null;
@@ -54,21 +54,21 @@ function openAudioDB() {
       resolve(dbInstance);
       return;
     }
-    
+
     const request = indexedDB.open(AUDIO_DB_NAME, AUDIO_DB_VERSION);
-    
+
     request.onupgradeneeded = (event) => {
       const db = event.target.result;
       if (!db.objectStoreNames.contains(AUDIO_STORE_NAME)) {
-        db.createObjectStore(AUDIO_STORE_NAME, { keyPath: 'name' });
+        db.createObjectStore(AUDIO_STORE_NAME, { keyPath: "name" });
       }
     };
-    
+
     request.onsuccess = (event) => {
       dbInstance = event.target.result;
       resolve(dbInstance);
     };
-    
+
     request.onerror = () => reject(request.error);
   });
 }
@@ -77,19 +77,19 @@ async function getCachedSound(name) {
   try {
     const db = await openAudioDB();
     return new Promise((resolve) => {
-      const tx = db.transaction(AUDIO_STORE_NAME, 'readonly');
+      const tx = db.transaction(AUDIO_STORE_NAME, "readonly");
       const store = tx.objectStore(AUDIO_STORE_NAME);
       const request = store.get(name);
-      
+
       request.onsuccess = () => {
         const result = request.result;
         resolve(result ? result.buffer : null);
       };
-      
+
       request.onerror = () => resolve(null);
     });
   } catch (e) {
-    console.warn('IndexedDB audio non disponible:', e);
+    console.warn("IndexedDB audio non disponible:", e);
     return null;
   }
 }
@@ -98,20 +98,20 @@ async function cacheSound(name, arrayBuffer) {
   try {
     const db = await openAudioDB();
     return new Promise((resolve) => {
-      const tx = db.transaction(AUDIO_STORE_NAME, 'readwrite');
+      const tx = db.transaction(AUDIO_STORE_NAME, "readwrite");
       const store = tx.objectStore(AUDIO_STORE_NAME);
-      
+
       store.put({
         name,
         buffer: arrayBuffer,
         timestamp: Date.now()
       });
-      
+
       tx.oncomplete = () => resolve();
       tx.onerror = () => resolve();
     });
   } catch (e) {
-    console.warn('Impossible de cacher le son dans IndexedDB:', e);
+    console.warn("Impossible de cacher le son dans IndexedDB:", e);
   }
 }
 
@@ -128,7 +128,7 @@ export async function initAudio() {
   runtimeSoundEnabled = readStoredSoundSetting();
 
   if (!runtimeSoundEnabled) {
-    console.log('[AUDIO] Son désactivé, initialisation ignorée');
+    console.log("[AUDIO] Son désactivé, initialisation ignorée");
     return false;
   }
 
@@ -139,7 +139,7 @@ export async function initAudio() {
   // Le son de rotation est le seul son critique au premier geste.
   // Les sons plus lourds/moins urgents sont préparés quand le navigateur est au repos
   // afin d'éviter un pic CPU/réseau pendant l'animation de la roue sur mobile.
-  await loadSound('spin');
+  await loadSound("spin");
   isInitialized = true;
   scheduleSecondarySoundsLoad();
 
@@ -169,7 +169,7 @@ async function loadSound(name) {
     }
 
     const url = SOUNDS[name];
-    const fullUrl = `${BASE_PATH}/${url}`.replace(/\/+/g, '/');
+    const fullUrl = `${BASE_PATH}/${url}`.replace(/\/+/g, "/");
     const response = await fetch(fullUrl);
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
@@ -194,12 +194,12 @@ function scheduleSecondarySoundsLoad() {
   secondarySoundsScheduled = true;
 
   const loadSecondarySounds = () => {
-    Promise.all(['coin', 'bill'].map(loadSound)).then(() => {
-      console.log('[AUDIO] Sons secondaires prêts');
+    Promise.all(["coin", "bill"].map(loadSound)).then(() => {
+      console.log("[AUDIO] Sons secondaires prêts");
     });
   };
 
-  if ('requestIdleCallback' in window) {
+  if ("requestIdleCallback" in window) {
     requestIdleCallback(loadSecondarySounds, { timeout: 4000 });
   } else {
     setTimeout(loadSecondarySounds, 1200);
@@ -210,12 +210,12 @@ function scheduleSecondarySoundsLoad() {
  * Déverrouille le contexte audio (nécessaire suite à une interaction utilisateur)
  */
 export async function unlockAudio() {
-  if (audioContext && audioContext.state === 'suspended') {
+  if (audioContext && audioContext.state === "suspended") {
     try {
       await audioContext.resume();
-      console.log('[AUDIO] AudioContext déverrouillé');
+      console.log("[AUDIO] AudioContext déverrouillé");
     } catch (e) {
-      console.error('[AUDIO] Échec déverrouillage:', e);
+      console.error("[AUDIO] Échec déverrouillage:", e);
     }
   }
 }
@@ -240,14 +240,14 @@ export function playSound(name, volume = 1, playbackRate = 1, options = {}) {
     }
     return;
   }
-  
+
   try {
     const source = audioContext.createBufferSource();
     const gainNode = audioContext.createGain();
-    
+
     source.buffer = decodedBuffers[name];
     source.playbackRate.value = playbackRate;
-    
+
     gainNode.gain.value = volume;
 
     source.connect(gainNode);
@@ -271,10 +271,10 @@ export function playSound(name, volume = 1, playbackRate = 1, options = {}) {
       source.disconnect();
       gainNode.disconnect();
     };
-    
+
     return source;
   } catch (e) {
-    console.error('[AUDIO] Erreur playback:', e);
+    console.error("[AUDIO] Erreur playback:", e);
   }
 }
 
@@ -285,20 +285,16 @@ export function playSound(name, volume = 1, playbackRate = 1, options = {}) {
  * @param {{volume?: number, rate?: number, maxDuration?: number}} [options]
  */
 export function playSpinClick(options = {}) {
-  const {
-    volume = 0.45,
-    rate = 1,
-    maxDuration = 0.1
-  } = options;
+  const { volume = 0.45, rate = 1, maxDuration = 0.1 } = options;
 
-  playSound('spin', volume, rate, { maxDuration });
+  playSound("spin", volume, rate, { maxDuration });
 }
 
 /**
  * Joue le son de victoire
  */
 export function playWinSound() {
-  playSound('coin', 0.95, 1);
+  playSound("coin", 0.95, 1);
 }
 
 /**
@@ -308,8 +304,8 @@ export function playWinSound() {
 export function playBillSound(delay = 0) {
   setTimeout(() => {
     if (!runtimeSoundEnabled) return;
-    const rate = 1.35 + Math.random() * 0.20;
-    playSound('bill', 1, rate);
+    const rate = 1.35 + Math.random() * 0.2;
+    playSound("bill", 1, rate);
   }, delay);
 }
 
@@ -328,7 +324,7 @@ export function isSoundReady(name) {
  */
 export function areAllSoundsReady() {
   if (!isInitialized) return false;
-  return Object.keys(SOUNDS).every(name => !!decodedBuffers[name]);
+  return Object.keys(SOUNDS).every((name) => !!decodedBuffers[name]);
 }
 
 /**
@@ -339,13 +335,13 @@ export async function refreshSounds() {
   decodedBuffers = {};
   soundLoadPromises = {};
   secondarySoundsScheduled = false;
-  
+
   // Vider IndexedDB
   if (dbInstance) {
-    const tx = dbInstance.transaction(AUDIO_STORE_NAME, 'readwrite');
+    const tx = dbInstance.transaction(AUDIO_STORE_NAME, "readwrite");
     tx.objectStore(AUDIO_STORE_NAME).clear();
   }
-  
+
   await initAudio();
 }
 
@@ -357,18 +353,16 @@ export function getAudioStatus() {
   return {
     initialized: isInitialized,
     soundEnabled: runtimeSoundEnabled,
-    contextState: audioContext?.state || 'none',
-    sounds: Object.fromEntries(
-      Object.keys(SOUNDS).map(name => [name, !!decodedBuffers[name]])
-    ),
+    contextState: audioContext?.state || "none",
+    sounds: Object.fromEntries(Object.keys(SOUNDS).map((name) => [name, !!decodedBuffers[name]])),
     allReady: areAllSoundsReady()
   };
 }
 
 // Pour débogage dans la console
-if (typeof window !== 'undefined') {
+if (typeof window !== "undefined") {
   window.__AUDIO_STATUS__ = getAudioStatus;
-  window.addEventListener('soundModeChange', (event) => {
+  window.addEventListener("soundModeChange", (event) => {
     setRuntimeSoundEnabled(event.detail !== false);
   });
 }

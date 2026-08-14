@@ -14,12 +14,12 @@
 
 import { BASE_PATH } from "./constants.js";
 
-const DB_NAME = 'LaRoueDeLaServitude';
+const DB_NAME = "LaRoueDeLaServitude";
 const DB_VERSION = 1;
-const STORE_NAME = 'cache';
+const STORE_NAME = "cache";
 
-const LIGHT_KEY = 'entries-light';
-const FULL_KEY = 'entries-full';
+const LIGHT_KEY = "entries-light";
+const FULL_KEY = "entries-full";
 
 let entriesLight = null;
 let entriesFull = null;
@@ -45,21 +45,21 @@ function openDB() {
       resolve(dbInstance);
       return;
     }
-    
+
     const request = indexedDB.open(DB_NAME, DB_VERSION);
-    
+
     request.onupgradeneeded = (event) => {
       const db = event.target.result;
       if (!db.objectStoreNames.contains(STORE_NAME)) {
-        db.createObjectStore(STORE_NAME, { keyPath: 'key' });
+        db.createObjectStore(STORE_NAME, { keyPath: "key" });
       }
     };
-    
+
     request.onsuccess = (event) => {
       dbInstance = event.target.result;
       resolve(dbInstance);
     };
-    
+
     request.onerror = () => reject(request.error);
   });
 }
@@ -71,7 +71,7 @@ async function getFromCache(key) {
   try {
     const db = await openDB();
     return new Promise((resolve) => {
-      const tx = db.transaction(STORE_NAME, 'readonly');
+      const tx = db.transaction(STORE_NAME, "readonly");
       const store = tx.objectStore(STORE_NAME);
       const request = store.get(key);
 
@@ -83,7 +83,7 @@ async function getFromCache(key) {
       request.onerror = () => resolve(null);
     });
   } catch (e) {
-    console.warn('IndexedDB non disponible:', e);
+    console.warn("IndexedDB non disponible:", e);
     return null;
   }
 }
@@ -92,7 +92,7 @@ async function saveToCache(key, data, version) {
   try {
     const db = await openDB();
     return new Promise((resolve) => {
-      const tx = db.transaction(STORE_NAME, 'readwrite');
+      const tx = db.transaction(STORE_NAME, "readwrite");
       const store = tx.objectStore(STORE_NAME);
 
       store.put({
@@ -106,7 +106,7 @@ async function saveToCache(key, data, version) {
       tx.onerror = () => resolve();
     });
   } catch (e) {
-    console.warn('Impossible de sauvegarder dans IndexedDB:', e);
+    console.warn("Impossible de sauvegarder dans IndexedDB:", e);
   }
 }
 
@@ -114,14 +114,14 @@ async function clearCache() {
   try {
     const db = await openDB();
     return new Promise((resolve) => {
-      const tx = db.transaction(STORE_NAME, 'readwrite');
+      const tx = db.transaction(STORE_NAME, "readwrite");
       const store = tx.objectStore(STORE_NAME);
       store.clear();
       tx.oncomplete = () => resolve();
       tx.onerror = () => resolve();
     });
   } catch (e) {
-    console.warn('Impossible de vider le cache:', e);
+    console.warn("Impossible de vider le cache:", e);
   }
 }
 
@@ -145,19 +145,17 @@ function unwrap(payload) {
 // distincte est le seul moyen fiable d'obtenir la version publiée.
 // Le service worker laisse passer ces requêtes (voir son gestionnaire fetch).
 async function fetchEntries(file, { fresh = false } = {}) {
-  const url = fresh
-    ? `${BASE_PATH}/data/${file}?fresh=${Date.now()}`
-    : `${BASE_PATH}/data/${file}`;
+  const url = fresh ? `${BASE_PATH}/data/${file}?fresh=${Date.now()}` : `${BASE_PATH}/data/${file}`;
 
-  const res = await fetch(url, fresh ? { cache: 'reload' } : undefined);
-  if (!res.ok) throw new Error('HTTP ' + res.status);
+  const res = await fetch(url, fresh ? { cache: "reload" } : undefined);
+  if (!res.ok) throw new Error("HTTP " + res.status);
   return unwrap(await res.json());
 }
 
 // Prévient l'application que les données ont changé sous ses pieds.
 // `scope` vaut 'light' (la roue doit être reconstruite) ou 'full'.
 function notifyEntriesUpdated(scope) {
-  window.dispatchEvent(new CustomEvent('entriesUpdated', { detail: { scope } }));
+  window.dispatchEvent(new CustomEvent("entriesUpdated", { detail: { scope } }));
 }
 
 // Une version en cache identique à celle du réseau = rien à faire. Un cache
@@ -170,19 +168,19 @@ function isUpToDate(cachedVersion, networkVersion) {
 function revalidateLight() {
   if (lightRevalidation) return lightRevalidation;
 
-  lightRevalidation = fetchEntries('entries-light.json', { fresh: true })
+  lightRevalidation = fetchEntries("entries-light.json", { fresh: true })
     .then(async ({ version, entries }) => {
       if (!entries.length || isUpToDate(lightVersion, version)) return;
 
       entriesLight = entries;
       lightVersion = version;
       await saveToCache(LIGHT_KEY, entries, version);
-      console.log('[DATA] Données légères mises à jour:', version);
-      notifyEntriesUpdated('light');
+      console.log("[DATA] Données légères mises à jour:", version);
+      notifyEntriesUpdated("light");
     })
     .catch((e) => {
       // Hors ligne : le cache déjà servi fait parfaitement l'affaire.
-      console.warn('[DATA] Revalidation du fichier léger impossible:', e);
+      console.warn("[DATA] Revalidation du fichier léger impossible:", e);
     })
     .finally(() => {
       lightRevalidation = null;
@@ -194,7 +192,7 @@ function revalidateLight() {
 function revalidateFull() {
   if (fullRevalidation) return fullRevalidation;
 
-  fullRevalidation = fetchEntries('entries-full.json', { fresh: true })
+  fullRevalidation = fetchEntries("entries-full.json", { fresh: true })
     .then(async ({ version, entries }) => {
       if (!entries.length || isUpToDate(fullVersion, version)) return;
 
@@ -202,11 +200,11 @@ function revalidateFull() {
       entriesFullById = new Map(entries.map((entry) => [entry.id, entry]));
       fullVersion = version;
       await saveToCache(FULL_KEY, entries, version);
-      console.log('[DATA] Données complètes mises à jour:', version);
-      notifyEntriesUpdated('full');
+      console.log("[DATA] Données complètes mises à jour:", version);
+      notifyEntriesUpdated("full");
     })
     .catch((e) => {
-      console.warn('[DATA] Revalidation du fichier complet impossible:', e);
+      console.warn("[DATA] Revalidation du fichier complet impossible:", e);
     })
     .finally(() => {
       fullRevalidation = null;
@@ -238,12 +236,12 @@ export async function initWheel() {
   }
 
   try {
-    const { version, entries } = await fetchEntries('entries-light.json');
+    const { version, entries } = await fetchEntries("entries-light.json");
     entriesLight = entries;
     lightVersion = version;
     await saveToCache(LIGHT_KEY, entries, version);
   } catch (e) {
-    console.error('Échec chargement entries-light:', e);
+    console.error("Échec chargement entries-light:", e);
     // Fallback: données vides
     entriesLight = [];
   }
@@ -269,18 +267,18 @@ export async function loadFullData() {
       revalidateFull();
     } else {
       try {
-        const { version, entries } = await fetchEntries('entries-full.json');
+        const { version, entries } = await fetchEntries("entries-full.json");
         entriesFull = entries;
         fullVersion = version;
         await saveToCache(FULL_KEY, entries, version);
       } catch (e) {
-        console.error('Échec chargement entries-full:', e);
+        console.error("Échec chargement entries-full:", e);
         // Fallback: données vides
         entriesFull = [];
       }
     }
 
-    entriesFullById = new Map(entriesFull.map(entry => [entry.id, entry]));
+    entriesFullById = new Map(entriesFull.map((entry) => [entry.id, entry]));
     fullDataPromise = null;
     return entriesFull;
   })().catch((error) => {
@@ -292,12 +290,12 @@ export async function loadFullData() {
 }
 
 function escapeHtml(value) {
-  return String(value ?? '')
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#39;');
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
 }
 
 /**
@@ -309,19 +307,21 @@ export async function getEntryDetails(index) {
   if (!entriesLight || index < 0 || index >= entriesLight.length) {
     return null;
   }
-  
+
   const lightEntry = entriesLight[index];
   await loadFullData();
   const fullEntry = entriesFullById?.get(lightEntry.id);
-  
-  return fullEntry || {
-    id: lightEntry.id,
-    nom: lightEntry.nom,
-    nom_complet: lightEntry.nom,
-    recette: null,
-    recette_meur: null,
-    annee: null
-  };
+
+  return (
+    fullEntry || {
+      id: lightEntry.id,
+      nom: lightEntry.nom,
+      nom_complet: lightEntry.nom,
+      recette: null,
+      recette_meur: null,
+      annee: null
+    }
+  );
 }
 
 /**
@@ -345,7 +345,7 @@ export function getDataVersion() {
   return fullVersion ?? lightVersion;
 }
 
-const NUMBER_FORMAT = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 });
+const NUMBER_FORMAT = new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 1 });
 
 /**
  * Met en forme la recette d'une entrée.
@@ -359,15 +359,15 @@ export function formatRecette(entry) {
   const montant = entry?.recette_meur;
 
   if (montant === null || montant === undefined || !Number.isFinite(montant)) {
-    return entry?.recette ? String(entry.recette) : '';
+    return entry?.recette ? String(entry.recette) : "";
   }
 
   if (Math.abs(montant) >= 1000) {
     const milliards = montant / 1000;
-    return `${NUMBER_FORMAT.format(milliards)} milliard${Math.abs(milliards) >= 2 ? 's' : ''} d'euros`;
+    return `${NUMBER_FORMAT.format(milliards)} milliard${Math.abs(milliards) >= 2 ? "s" : ""} d'euros`;
   }
 
-  return `${NUMBER_FORMAT.format(montant)} million${Math.abs(montant) >= 2 ? 's' : ''} d'euros`;
+  return `${NUMBER_FORMAT.format(montant)} million${Math.abs(montant) >= 2 ? "s" : ""} d'euros`;
 }
 
 /**
@@ -376,7 +376,7 @@ export function formatRecette(entry) {
  * @returns {string}
  */
 export function formatEntryForDisplay(entry) {
-  if (!entry) return '';
+  if (!entry) return "";
 
   const parts = [];
 
@@ -394,7 +394,7 @@ export function formatEntryForDisplay(entry) {
     parts.push(`<br>📅 Date de création : ${escapeHtml(entry.annee)}`);
   }
 
-  return parts.join('<br>');
+  return parts.join("<br>");
 }
 
 /**
@@ -420,5 +420,5 @@ export async function refreshData() {
 export const getEntries = async () => {
   const data = await initWheel();
   // Retourner juste les noms pour compatibilité avec l'ancien code
-  return data.map(e => e.nom);
+  return data.map((e) => e.nom);
 };

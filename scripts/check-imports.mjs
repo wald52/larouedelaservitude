@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
-import path from 'node:path';
+import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
+import path from "node:path";
 
 const root = process.cwd();
 const failures = [];
@@ -8,21 +8,25 @@ const jsFiles = [];
 
 function walk(dir) {
   for (const entry of readdirSync(dir)) {
-    if (entry === '.git' || entry === 'node_modules') continue;
+    if (entry === ".git" || entry === "node_modules") continue;
     const full = path.join(dir, entry);
     const st = statSync(full);
     if (st.isDirectory()) walk(full);
-    else if (full.endsWith('.js') || full.endsWith('.mjs')) jsFiles.push(full);
+    else if (full.endsWith(".js") || full.endsWith(".mjs")) jsFiles.push(full);
   }
 }
 
-function rel(file) { return path.relative(root, file).replaceAll(path.sep, '/'); }
+function rel(file) {
+  return path.relative(root, file).replaceAll(path.sep, "/");
+}
 
 function checkImport(specifier, fromFile) {
-  if (!specifier.startsWith('.') && !specifier.startsWith('/')) return;
-  const base = specifier.startsWith('/') ? root : path.dirname(fromFile);
+  if (!specifier.startsWith(".") && !specifier.startsWith("/")) return;
+  const base = specifier.startsWith("/") ? root : path.dirname(fromFile);
   const resolved = path.resolve(base, specifier);
-  const candidates = path.extname(resolved) ? [resolved] : [`${resolved}.js`, `${resolved}.mjs`, path.join(resolved, 'index.js')];
+  const candidates = path.extname(resolved)
+    ? [resolved]
+    : [`${resolved}.js`, `${resolved}.mjs`, path.join(resolved, "index.js")];
   if (!candidates.some(existsSync)) {
     failures.push(`${rel(fromFile)} imports missing module "${specifier}"`);
   }
@@ -39,7 +43,7 @@ function scanJavaScript(file, source) {
 }
 
 function scanHtml(file) {
-  const source = readFileSync(file, 'utf8');
+  const source = readFileSync(file, "utf8");
   const scriptSrcRe = /<script\b[^>]*\bsrc=["']([^"']+)["'][^>]*>/gi;
   let match;
   while ((match = scriptSrcRe.exec(source))) checkImport(match[1], file);
@@ -48,18 +52,18 @@ function scanHtml(file) {
   while ((match = moduleScriptRe.exec(source))) scanJavaScript(file, match[1]);
 }
 
-const htmlPages = ['index.html', 'donnees.html'];
+const htmlPages = ["index.html", "donnees.html"];
 
 walk(root);
-for (const file of jsFiles) scanJavaScript(file, readFileSync(file, 'utf8'));
+for (const file of jsFiles) scanJavaScript(file, readFileSync(file, "utf8"));
 for (const page of htmlPages) scanHtml(path.join(root, page));
 
 if (failures.length) {
-  console.error('Import consistency check failed:');
+  console.error("Import consistency check failed:");
   for (const failure of failures) console.error(`- ${failure}`);
   process.exit(1);
 }
 
 console.log(
-  `Import consistency check passed (${jsFiles.length} JavaScript files + ${htmlPages.join(', ')}).`
+  `Import consistency check passed (${jsFiles.length} JavaScript files + ${htmlPages.join(", ")}).`
 );

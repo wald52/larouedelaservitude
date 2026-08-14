@@ -21,41 +21,43 @@ export let clearBills = null;
 // Fonction d'initialisation (appelée par index.html)
 export function initBills() {
   // Import dynamique du module audio
-  import('./js/audio.js').then(({ playBillSound }) => {
-    playBillAudio = playBillSound;
-    console.log('[BILLS] Module audio chargé pour les sons de billets');
-  }).catch(() => {
-    console.warn('[BILLS] Module audio non disponible, fallback vers Audio()');
-    // Fallback vers l'ancienne méthode
-    const fallbackSound = new Audio(BILL_SOUND_URL);
-    fallbackSound.volume = 1;
-    fallbackSound.preload = 'auto';
-    
-    playBillAudio = (delay) => {
-      setTimeout(() => {
-        if (!isSoundEnabled()) return;
-        const snd = fallbackSound.cloneNode(true);
-        snd.playbackRate = 1.35 + Math.random() * 0.20;
-        snd.play().catch(() => {});
-      }, delay);
-    };
-  });
+  import("./js/audio.js")
+    .then(({ playBillSound }) => {
+      playBillAudio = playBillSound;
+      console.log("[BILLS] Module audio chargé pour les sons de billets");
+    })
+    .catch(() => {
+      console.warn("[BILLS] Module audio non disponible, fallback vers Audio()");
+      // Fallback vers l'ancienne méthode
+      const fallbackSound = new Audio(BILL_SOUND_URL);
+      fallbackSound.volume = 1;
+      fallbackSound.preload = "auto";
+
+      playBillAudio = (delay) => {
+        setTimeout(() => {
+          if (!isSoundEnabled()) return;
+          const snd = fallbackSound.cloneNode(true);
+          snd.playbackRate = 1.35 + Math.random() * 0.2;
+          snd.play().catch(() => {});
+        }, delay);
+      };
+    });
 }
 
 (() => {
-  const MAX_BILLS = 64;        // max éléments en DOM
-  const GRAVITY = 0.40;        // gravité en px/frame² (~1440 px/s² à 60fps)
-  const TERMINAL_VY = 5.2;     // vitesse de chute max en px/frame (le papier plane)
-  const TERMINAL_EASE = 0.08;  // douceur d'arrivée à la vitesse terminale
-  const AIR_X = 0.965;         // freinage horizontal (l'éjection s'amortit vite)
-  const AIR_Y = 0.995;         // freinage vertical (léger, la terminale fait le reste)
-  const LIFETIME = 10000;      // durée avant fade
-  const SIZE_BASE = 24;        // taille de base emoji
-  const OUTER_FORCE = 7.5;     // force initiale d'éjection
-  const UP_FORCE = 8.5;        // impulsion vers le haut (base)
-  const UP_FORCE_VAR = 5;      // variation aléatoire de l'impulsion
-  const ROT_SPIN = 1.8;        // degrés/frame max de rotation propre
-  const ROT_SWAY = 1.6;        // degrés/frame d'oscillation liée au flottement
+  const MAX_BILLS = 64; // max éléments en DOM
+  const GRAVITY = 0.4; // gravité en px/frame² (~1440 px/s² à 60fps)
+  const TERMINAL_VY = 5.2; // vitesse de chute max en px/frame (le papier plane)
+  const TERMINAL_EASE = 0.08; // douceur d'arrivée à la vitesse terminale
+  const AIR_X = 0.965; // freinage horizontal (l'éjection s'amortit vite)
+  const AIR_Y = 0.995; // freinage vertical (léger, la terminale fait le reste)
+  const LIFETIME = 10000; // durée avant fade
+  const SIZE_BASE = 24; // taille de base emoji
+  const OUTER_FORCE = 7.5; // force initiale d'éjection
+  const UP_FORCE = 8.5; // impulsion vers le haut (base)
+  const UP_FORCE_VAR = 5; // variation aléatoire de l'impulsion
+  const ROT_SPIN = 1.8; // degrés/frame max de rotation propre
+  const ROT_SWAY = 1.6; // degrés/frame d'oscillation liée au flottement
 
   let recentSounds = 0;
   const MAX_SOUNDS_PER_SEC = 10;
@@ -70,7 +72,7 @@ export function initBills() {
     recentSounds++;
 
     const delay = i * 40;
-    
+
     // Utiliser le module audio si disponible, sinon fallback
     if (playBillAudio) {
       playBillAudio(delay);
@@ -80,7 +82,7 @@ export function initBills() {
         if (!isSoundEnabled()) return;
         const snd = new Audio(BILL_SOUND_URL);
         snd.volume = 0.5;
-        snd.playbackRate = 1.35 + Math.random() * 0.20;
+        snd.playbackRate = 1.35 + Math.random() * 0.2;
         snd.play().catch(() => {});
       }, delay);
     }
@@ -95,16 +97,30 @@ export function initBills() {
 
   // crée le pool
   for (let i = 0; i < MAX_BILLS; i++) {
-    const el = doc.createElement('div');
-    el.className = 'bill';
-    el.textContent = '💶';
-    el.style.left = '0';
-    el.style.top = '0';
-    el.style.opacity = '0';
+    const el = doc.createElement("div");
+    el.className = "bill";
+    el.textContent = "💶";
+    el.style.left = "0";
+    el.style.top = "0";
+    el.style.opacity = "0";
     root.appendChild(el);
     pool.push({
-      el, inUse: false, x: -9999, y: -9999, vx: 0, vy: 0, rot: 0, vrot: 0, born: 0, ttl: 0, lastFrame: 0,
-      gravity: GRAVITY, terminal: TERMINAL_VY, swayAmp: 0, swayFreq: 0, swayPhase: 0
+      el,
+      inUse: false,
+      x: -9999,
+      y: -9999,
+      vx: 0,
+      vy: 0,
+      rot: 0,
+      vrot: 0,
+      born: 0,
+      ttl: 0,
+      lastFrame: 0,
+      gravity: GRAVITY,
+      terminal: TERMINAL_VY,
+      swayAmp: 0,
+      swayFreq: 0,
+      swayPhase: 0
     });
   }
 
@@ -116,8 +132,9 @@ export function initBills() {
   }
 
   // spawn en cercle autour du point (option C: ejection circulaire)
-  spawnBills = function(ev, count = 12) {
-    let x = window.innerWidth / 2, y = window.innerHeight / 2;
+  spawnBills = function (ev, count = 12) {
+    let x = window.innerWidth / 2,
+      y = window.innerHeight / 2;
 
     if (ev) {
       if (ev.touches && ev.touches[0]) {
@@ -148,7 +165,7 @@ export function initBills() {
 
       // taille aléatoire
       const scale = 0.8 + Math.random() * 1.6;
-      node.el.style.fontSize = Math.round(SIZE_BASE * scale) + 'px';
+      node.el.style.fontSize = Math.round(SIZE_BASE * scale) + "px";
 
       // vecteur initial : éjection en cercle + légère impulsion vers le haut
       const dir = i * angleStep + (Math.random() - 0.5) * (angleStep * 0.4);
@@ -170,7 +187,7 @@ export function initBills() {
       node.rot = (Math.random() - 0.5) * 30;
       node.vrot = (Math.random() - 0.5) * ROT_SPIN;
       node.el.style.transform = `translate3d(${node.x}px, ${node.y}px, 0) rotate(${node.rot}deg)`;
-      node.el.style.opacity = '1';
+      node.el.style.opacity = "1";
 
       node.born = now;
       node.lastFrame = now;
@@ -212,9 +229,10 @@ export function initBills() {
 
       // fade out conditions
       const age = now - node.born;
-      const offscreen = node.y > (window.innerHeight + 200) || node.x < -200 || node.x > window.innerWidth + 200;
+      const offscreen =
+        node.y > window.innerHeight + 200 || node.x < -200 || node.x > window.innerWidth + 200;
       if (age > node.ttl || offscreen) {
-        node.el.style.opacity = '0';
+        node.el.style.opacity = "0";
         // release shortly after
         setTimeout(() => release(node), 420);
         active.delete(node);
@@ -234,17 +252,16 @@ export function initBills() {
 
   function release(node) {
     node.inUse = false;
-    node.el.style.transform = 'translate3d(0, 0, 0) rotate(0deg)';
-    node.el.style.opacity = '0';
+    node.el.style.transform = "translate3d(0, 0, 0) rotate(0deg)";
+    node.el.style.opacity = "0";
     node.vx = node.vy = node.vrot = 0;
     node.x = node.y = -9999;
     node.lastFrame = 0;
   }
 
   // optional API to clear everything
-  clearBills = function() {
+  clearBills = function () {
     for (const node of pool) release(node);
     active.clear();
   };
-
 })();

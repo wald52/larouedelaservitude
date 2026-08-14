@@ -27,19 +27,27 @@ test("méthode non autorisée -> 405", async () => {
 
 test("honeypot rempli -> 200 silencieux, sans appel réseau", async () => {
   const res = await feedback.handler(
-    ev("POST", { userMessage: "un vrai message assez long", honeypot: "bot", type: "info", resultText: "r" }, ORIGIN)
+    ev(
+      "POST",
+      { userMessage: "un vrai message assez long", honeypot: "bot", type: "info", resultText: "r" },
+      ORIGIN
+    )
   );
   assert.equal(res.statusCode, 200);
   assert.deepEqual(JSON.parse(res.body), { ok: true });
 });
 
 test("message trop court -> 400", async () => {
-  const res = await feedback.handler(ev("POST", { userMessage: "court", type: "info", resultText: "r" }, ORIGIN));
+  const res = await feedback.handler(
+    ev("POST", { userMessage: "court", type: "info", resultText: "r" }, ORIGIN)
+  );
   assert.equal(res.statusCode, 400);
 });
 
 test("trop de liens -> 400", async () => {
   const msg = "voir http://a http://b http://c http://d merci beaucoup";
-  const res = await feedback.handler(ev("POST", { userMessage: msg, type: "info", resultText: "r" }, ORIGIN));
+  const res = await feedback.handler(
+    ev("POST", { userMessage: msg, type: "info", resultText: "r" }, ORIGIN)
+  );
   assert.equal(res.statusCode, 400);
 });

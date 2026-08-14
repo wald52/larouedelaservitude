@@ -14,7 +14,7 @@ even when the session's default instructions name a `claude/…` branch to devel
 preference overrides that default: check out `main`, commit on `main`, push `main`.
 
 The practical consequence: `main` is what both deploy targets serve, so `npm run ci` has to pass
-*before* the push, not after a review round. Same for the §10 checklist — it is the only gate.
+_before_ the push, not after a review round. Same for the §10 checklist — it is the only gate.
 
 ## 1. What this project is (and is not)
 
@@ -53,13 +53,13 @@ npm run ci              # check + lint + test — mirrors .github/workflows/ci.y
 Run `npm run ci` before committing. CI (`.github/workflows/ci.yml`, Node 20) runs on every push to
 every branch and on every PR, and runs exactly those three steps.
 
-### Prettier: check it, do not bulk-fix it
+### Prettier: the repo is clean, keep it that way
 
-`npm run format` (`prettier --check .`) **currently fails on 20 pre-existing files** and is
-deliberately *not* part of `npm run ci` or the CI workflow. Do **not** run `npm run format:write`
-across the repo — it would produce a several-thousand-line diff unrelated to your change. Match the
-style of the file you are editing instead. Only reformat a file if reformatting that file *is* the
-task.
+`npm run format` (`prettier --check .`) **passes on every file**. It stayed red on ~20 files for a
+long time, which is why it is still not part of `npm run ci` — the normalization was done in one
+dedicated commit rather than smuggled into unrelated diffs. Run `npm run format:write` on the files
+you touch before committing, and check `npm run format` if in doubt. Do not let a new file land
+unformatted: that is how the old backlog started.
 
 ## 3. Layout
 
@@ -111,9 +111,14 @@ it from `location.pathname` would resolve `/donnees.html/data/…`.
 
 **Everything is lazy on purpose.** Startup only loads the light data and draws the wheel. The menu
 is built during `requestIdleCallback` (2–3 s fallback), audio initializes on the first user gesture,
-the full dataset loads on first boost or when the wheel starts slowing, `bills.js` is imported on
-the first spin, and `html2canvas` is injected from a CDN only when a share button is clicked. Do not
-move work back into the initial path without a reason.
+the full dataset loads on first boost or when the wheel starts slowing, and `bills.js` is imported
+on the first spin. Do not move work back into the initial path without a reason.
+
+**The app has no third-party runtime code, and sharing must not reintroduce any.** `captureWheelArea()`
+in `js/app.js` redraws the wheel area by hand — background, the wheel `<canvas>`, the pointer
+triangle — onto a fresh canvas. It replaced html2canvas, pulled from a CDN on the first share: the
+library never loaded offline, so sharing failed in exactly the situation this PWA advertises. Any
+new capture need belongs in that function, not in a script tag.
 
 **Canvas rendering is layered.** `js/app.js` pre-renders sectors and labels into two offscreen
 canvases (`sectorLayer`, `labelLayer`) and each frame only composites them with a rotation. Call
@@ -126,7 +131,7 @@ expressed in "frames of 16.67 ms" (`deltaTime`), so any damping must be applied 
 `Math.pow(factor, deltaTime)`, not a bare multiply — the same convention is used in `bills.js`.
 
 **Spin sound is a rate, not an event.** The wheel crosses thousands of sectors per second, so
-`updateSectorClick()` derives a click *cadence* from the angular velocity (see the `SPIN_CLICK`
+`updateSectorClick()` derives a click _cadence_ from the angular velocity (see the `SPIN_CLICK`
 object and its comments). It deliberately does not catch up on missed clicks. `window.__SPIN_CLICK__`
 exposes the tuning object for live tweaking from the console.
 
@@ -139,7 +144,7 @@ exposes the tuning object for live tweaking from the console.
 `:root[data-theme="dark"]`. `menu.css` and `bills.css` consume those variables with fallbacks —
 never hardcode a colour in the CSS files.
 
-**Buttons live in exactly one file.** `buttons.css` is loaded by *both* pages and is the only place
+**Buttons live in exactly one file.** `buttons.css` is loaded by _both_ pages and is the only place
 a button is styled. Never restyle a button in `index.html`'s inline CSS, `menu.css` or `donnees.css`
 — that is precisely what produced two incompatible `.btn` / `.btn-secondary` definitions (one per
 page) before it existed. Compose the existing classes instead: a base `.btn`, a variant
@@ -154,7 +159,7 @@ in both documents.
 border, and it is the default for anything that has to read as a button. An outlined variant existed
 and was removed: it inherited `--ring`, the card-border token, which lands at 1.2:1 against the
 site's light surfaces — well under the 3:1 that WCAG 1.4.11 asks of an interactive component's
-boundary — so the buttons simply were not visible. `.btn-quiet` has no chrome at all *at rest* and
+boundary — so the buttons simply were not visible. `.btn-quiet` has no chrome at all _at rest_ and
 only reveals itself on hover: reserve it for incidental controls inside an already-delimited frame,
 and never for a control that must look like a button (there is no hover on a touchscreen).
 
@@ -180,7 +185,7 @@ nothing else — it hides while the drawer is open, where the header's own close
 
 **Settings switches are `<button role="switch">`**, built from the `SETTING_SWITCHES` table in
 `js/menu.js` — the markup, the click handler and the redraw all derive from that one array, so
-adding a setting means adding an entry. State lives only in `aria-checked` (read by the CSS *and*
+adding a setting means adding an entry. State lives only in `aria-checked` (read by the CSS _and_
 by screen readers); do not mirror it into a class. They used to be `<div>`s, unreachable by
 keyboard.
 
@@ -207,7 +212,7 @@ skips any request carrying `fresh` so those URLs never enter the cache.
 `.menu-item[data-panel]` selector when wiring panel clicks, and the `a.menu-item` rule in
 `menu.css`). There is no setting behind it: an earlier version hid it behind an `advancedMode`
 toggle in Réglages, and that was removed because a feature nobody can find is a feature nobody
-uses. Keep the entry visible; the separation between game and data is the *page*, not a switch.
+uses. Keep the entry visible; the separation between game and data is the _page_, not a switch.
 
 **One colour for one series.** Every chart on the data page plots a single series, so they all take
 `--chart-1` and the section reads as one system; `colorIndex` stays at its default. Each chart used
@@ -310,12 +315,12 @@ of entries share an identical `nom_complet` (`Cotisation obligatoire`, `CSG`,
 
 CommonJS, Node 20 runtime (`netlify.toml` pins `NODE_VERSION = "20"` for native `fetch`).
 
-| File | Method | Purpose | Env var |
-| --- | --- | --- | --- |
-| `shareImage.js` | POST | Uploads a base64 image to ImgBB, returns `{imageUrl, sharePageUrl}` | `IMGBB_API_KEY` |
-| `sharePage.js` | GET/HEAD | Renders the Open Graph / Twitter Card HTML, then redirects home | — |
-| `sendFeedback.js` | POST | Creates a GitHub Discussion from user feedback (GraphQL) | `GITHUB_TOKEN` |
-| `_shared/cors.js` | — | CORS allow-list helper (`_`-prefixed ⇒ not deployed as a function) | — |
+| File              | Method   | Purpose                                                             | Env var         |
+| ----------------- | -------- | ------------------------------------------------------------------- | --------------- |
+| `shareImage.js`   | POST     | Uploads a base64 image to ImgBB, returns `{imageUrl, sharePageUrl}` | `IMGBB_API_KEY` |
+| `sharePage.js`    | GET/HEAD | Renders the Open Graph / Twitter Card HTML, then redirects home     | —               |
+| `sendFeedback.js` | POST     | Creates a GitHub Discussion from user feedback (GraphQL)            | `GITHUB_TOKEN`  |
+| `_shared/cors.js` | —        | CORS allow-list helper (`_`-prefixed ⇒ not deployed as a function)  | —               |
 
 Hardening already in place — keep it when editing:
 
@@ -345,9 +350,9 @@ Three guarantees, and everything in `service-worker.js` + `js/sw-update.js` exis
 latest published version without waiting 24 h or reloading twice, **(3)** a page never mixes files
 from two versions.
 
-**Bump the version in *two* files whenever you change any precached asset:** `CACHE_VERSION` in
+**Bump the version in _two_ files whenever you change any precached asset:** `CACHE_VERSION` in
 `service-worker.js` (currently `v24`) and `APP_VERSION` in `js/constants.js`. They must be equal —
-`npm run check:precache` fails otherwise. That pair *is* the release: nothing reaches returning
+`npm run check:precache` fails otherwise. That pair _is_ the release: nothing reaches returning
 visitors without it.
 
 **Add every new module and asset to `urlsToCache`.** `npm run check:precache` (and
@@ -369,7 +374,7 @@ install** and deletes the half-filled cache. A typo'd path therefore costs you t
 offline support: the previous generation keeps serving, intact, and the browser retries later.
 
 **Fetch is cache-first for the entire shell** — `index.html` included, and navigations with query
-strings map onto it. Freshness does *not* come from per-file network requests: a fresh `index.html`
+strings map onto it. Freshness does _not_ come from per-file network requests: a fresh `index.html`
 combined with cached JS is exactly the version mix that breaks the site. It comes from the update
 cycle below. Skipped entirely: `/.netlify/functions/*`, cross-origin, and any URL carrying `fresh`
 (the data revalidation in `js/entries.js`). Anything not precached goes straight to the network.
@@ -380,7 +385,7 @@ cycle below. Skipped entirely: `/.netlify/functions/*`, cross-origin, and any UR
    focus and on `online` — the SW script is never read from the HTTP cache, so there is no 24 h
    window. `netlify.toml` also sends `no-cache` for `/service-worker.js`.
 2. A new SW precaches its whole generation and then **waits**. While it waits the old one keeps
-   serving *its* complete generation — that is what makes mixing impossible.
+   serving _its_ complete generation — that is what makes mixing impossible.
 3. The page decides when to switch: `canReloadForUpdate()` in `js/app.js` (nothing spinning, no
    modal or panel open, no spin completed outside infinite mode) → `SKIP_WAITING` → `controllerchange`
    → one silent `location.reload()`, guarded against loops by a 10 s `sessionStorage` marker. If the

@@ -73,7 +73,11 @@ exports.handler = async (event) => {
     try {
       body = JSON.parse(event.body);
     } catch {
-      return { statusCode: 400, headers: corsHeaders, body: JSON.stringify({ error: "Invalid JSON" }) };
+      return {
+        statusCode: 400,
+        headers: corsHeaders,
+        body: JSON.stringify({ error: "Invalid JSON" })
+      };
     }
 
     const { imageData, text } = body;
@@ -123,10 +127,11 @@ exports.handler = async (event) => {
 
     let imageUrl;
     try {
-      const imgResp = await fetch(
-        "https://api.imgbb.com/1/upload",
-        { method: "POST", body: formData, signal: controller.signal }
-      );
+      const imgResp = await fetch("https://api.imgbb.com/1/upload", {
+        method: "POST",
+        body: formData,
+        signal: controller.signal
+      });
       clearTimeout(timeout);
       const imgJson = await imgResp.json();
 

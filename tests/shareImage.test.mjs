@@ -12,11 +12,17 @@ const ev = (method, body, origin) => ({
 });
 
 test("escapeHtml échappe les caractères sensibles", () => {
-  assert.equal(shareImage.escapeHtml('<a href="x">&\'</a>'), "&lt;a href=&quot;x&quot;&gt;&amp;&#39;&lt;/a&gt;");
+  assert.equal(
+    shareImage.escapeHtml('<a href="x">&\'</a>'),
+    "&lt;a href=&quot;x&quot;&gt;&amp;&#39;&lt;/a&gt;"
+  );
 });
 
 test("validateImgBbHttpsUrl accepte les hôtes ImgBB en https", () => {
-  assert.equal(shareImage.validateImgBbHttpsUrl("https://i.ibb.co/abc/x.png"), "https://i.ibb.co/abc/x.png");
+  assert.equal(
+    shareImage.validateImgBbHttpsUrl("https://i.ibb.co/abc/x.png"),
+    "https://i.ibb.co/abc/x.png"
+  );
 });
 
 test("validateImgBbHttpsUrl rejette un autre hôte", () => {

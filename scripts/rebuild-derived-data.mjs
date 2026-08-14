@@ -22,10 +22,10 @@
 //   node scripts/rebuild-derived-data.mjs           # écrit les fichiers
 //   node scripts/rebuild-derived-data.mjs --check   # signale sans écrire
 
-import { readFileSync, writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from "node:fs";
 
-const LIGHT_PATH = 'data/entries-light.json';
-const FULL_PATH = 'data/entries-full.json';
+const LIGHT_PATH = "data/entries-light.json";
+const FULL_PATH = "data/entries-full.json";
 
 // Budget de caractères d'un libellé court. buildLabelLayer() (js/app.js)
 // retronque de toute façon selon la largeur mesurée du secteur : ce budget
@@ -33,7 +33,7 @@ const FULL_PATH = 'data/entries-full.json';
 // fichier léger.
 const MAX_LABEL_LENGTH = 30;
 
-const checkOnly = process.argv.includes('--check');
+const checkOnly = process.argv.includes("--check");
 
 // ===============================
 //  Recette : chaîne → nombre
@@ -43,14 +43,14 @@ const checkOnly = process.argv.includes('--check');
 const RECETTE_PATTERN = /^([\d  ]+(?:,\d+)?) millions d'euros$/;
 
 function parseRecette(recette, id) {
-  if (recette === null || recette === undefined || recette === '') return null;
+  if (recette === null || recette === undefined || recette === "") return null;
 
   const match = String(recette).trim().match(RECETTE_PATTERN);
   if (!match) {
     throw new Error(`Format de recette non reconnu pour "${id}" : ${JSON.stringify(recette)}`);
   }
 
-  const value = Number(match[1].replace(/[  ]/g, '').replace(',', '.'));
+  const value = Number(match[1].replace(/[  ]/g, "").replace(",", "."));
   if (!Number.isFinite(value)) {
     throw new Error(`Recette non numérique pour "${id}" : ${JSON.stringify(recette)}`);
   }
@@ -66,23 +66,23 @@ function parseRecette(recette, id) {
 // les plus longues d'abord, pour que "Taxe spéciale d'équipement" l'emporte
 // sur "Taxe".
 const ABBREVIATIONS = [
-  [/^Taxe spéciale d'équipement\b/i, 'TSE'],
-  [/^Imposition forfaitaire sur les entreprises de réseaux\b/i, 'IFER'],
-  [/^Taxe pour le développement\b/i, 'Dév.'],
-  [/^Taxe pour frais de\b/i, 'Frais de'],
-  [/^Taxe additionnelle\b/i, 'Taxe add.'],
-  [/^Retraite complémentaire\b/i, 'Retr. compl.'],
-  [/^Taxe sur la valeur ajoutée\b/i, 'TVA'],
-  [/^Contribution sociale généralisée\b/i, 'CSG'],
-  [/^Participation au financement\b/i, 'Financement'],
-  [/^Participation des employeurs\b/i, 'Particip. employeurs'],
-  [/^Contribution\b/i, 'Contrib.'],
-  [/^Contributions\b/i, 'Contrib.'],
-  [/^Participation\b/i, 'Particip.'],
-  [/^Prélèvements?\b/i, 'Prélèv.'],
-  [/^Cotisation additionnelle\b/i, 'Cotis. add.'],
-  [/^Cotisations?\b/i, 'Cotis.'],
-  [/^Redevances?\b/i, 'Redev.']
+  [/^Taxe spéciale d'équipement\b/i, "TSE"],
+  [/^Imposition forfaitaire sur les entreprises de réseaux\b/i, "IFER"],
+  [/^Taxe pour le développement\b/i, "Dév."],
+  [/^Taxe pour frais de\b/i, "Frais de"],
+  [/^Taxe additionnelle\b/i, "Taxe add."],
+  [/^Retraite complémentaire\b/i, "Retr. compl."],
+  [/^Taxe sur la valeur ajoutée\b/i, "TVA"],
+  [/^Contribution sociale généralisée\b/i, "CSG"],
+  [/^Participation au financement\b/i, "Financement"],
+  [/^Participation des employeurs\b/i, "Particip. employeurs"],
+  [/^Contribution\b/i, "Contrib."],
+  [/^Contributions\b/i, "Contrib."],
+  [/^Participation\b/i, "Particip."],
+  [/^Prélèvements?\b/i, "Prélèv."],
+  [/^Cotisation additionnelle\b/i, "Cotis. add."],
+  [/^Cotisations?\b/i, "Cotis."],
+  [/^Redevances?\b/i, "Redev."]
 ];
 
 // Segments de liaison qui n'apportent aucune information distinctive et
@@ -100,32 +100,32 @@ const FILLERS = [
 
 // Abréviations applicables n'importe où dans le libellé.
 const INLINE_ABBREVIATIONS = [
-  [/\bétablissements? publics? fonciers?(?: et d'aménagement)?\b/gi, 'EPF'],
-  [/\bétablissements? publics? locaux?\b/gi, 'ét. public local'],
-  [/\bétablissements? publics?\b/gi, 'ét. public'],
-  [/\bformation professionnelle\b/gi, 'formation pro.'],
-  [/\bprofessionnelle\b/gi, 'pro.'],
-  [/\bSécurité sociale\b/gi, 'Sécu'],
-  [/\bindustries? (?:de la|de l'|des|du|de)\s*/gi, 'ind. '],
-  [/\bindustries?\b/gi, 'ind.'],
-  [/\bpropriétés? non bâties?\b/gi, 'prop. non bâties'],
-  [/\bpropriétés? bâties?\b/gi, 'prop. bâties'],
-  [/\bdépartementale?\b/gi, 'dép.'],
-  [/\bAssurance vieillesse\b/gi, 'Assur. vieillesse']
+  [/\bétablissements? publics? fonciers?(?: et d'aménagement)?\b/gi, "EPF"],
+  [/\bétablissements? publics? locaux?\b/gi, "ét. public local"],
+  [/\bétablissements? publics?\b/gi, "ét. public"],
+  [/\bformation professionnelle\b/gi, "formation pro."],
+  [/\bprofessionnelle\b/gi, "pro."],
+  [/\bSécurité sociale\b/gi, "Sécu"],
+  [/\bindustries? (?:de la|de l'|des|du|de)\s*/gi, "ind. "],
+  [/\bindustries?\b/gi, "ind."],
+  [/\bpropriétés? non bâties?\b/gi, "prop. non bâties"],
+  [/\bpropriétés? bâties?\b/gi, "prop. bâties"],
+  [/\bdépartementale?\b/gi, "dép."],
+  [/\bAssurance vieillesse\b/gi, "Assur. vieillesse"]
 ];
 
 function normalize(text) {
   return String(text)
     .replace(/[’‘]/g, "'")
-    .replace(/\s+/g, ' ')
-    .replace(/\s*\.\s*$/, '')
+    .replace(/\s+/g, " ")
+    .replace(/\s*\.\s*$/, "")
     .trim();
 }
 
 // Retire les codes techniques entre parenthèses en fin de nom
 // (ex. "(IF-AUT-80)", "(TFP-TASC)") — ils ne parlent pas à l'utilisateur.
 function stripTechnicalCode(text) {
-  const stripped = text.replace(/\s*\([A-Z0-9][A-Z0-9\-.\s]*\)\s*$/, '').trim();
+  const stripped = text.replace(/\s*\([A-Z0-9][A-Z0-9\-.\s]*\)\s*$/, "").trim();
   // Quelques entrées n'ont *que* leur code pour tout nom (ex. "(TFP-TFSCT)") :
   // mieux vaut un code qu'un libellé vide.
   return stripped || text.trim();
@@ -136,15 +136,15 @@ function applyRules(text, rules) {
   for (const [pattern, replacement] of rules) {
     result = result.replace(pattern, replacement);
   }
-  return result.replace(/\s+/g, ' ').trim();
+  return result.replace(/\s+/g, " ").trim();
 }
 
 function stripFillers(text) {
   let result = text;
   for (const pattern of FILLERS) {
-    result = result.replace(pattern, '');
+    result = result.replace(pattern, "");
   }
-  return result.replace(/\s+/g, ' ').trim();
+  return result.replace(/\s+/g, " ").trim();
 }
 
 // Mots de liaison qui n'ont aucun sens en fin de libellé : une coupe qui
@@ -157,15 +157,15 @@ const TRAILING_STOPWORDS =
 // milieu de la phrase : on lui rend sa majuscule. Appliqué avant tout test
 // d'unicité, pour que deux libellés ne diffèrent jamais que par la casse.
 function capitalize(text) {
-  return text.charAt(0).toLocaleUpperCase('fr-FR') + text.slice(1);
+  return text.charAt(0).toLocaleUpperCase("fr-FR") + text.slice(1);
 }
 
 function tidy(text) {
-  let result = text.trim().replace(/[\s,;:–-]+$/, '');
+  let result = text.trim().replace(/[\s,;:–-]+$/, "");
   let previous;
   do {
     previous = result;
-    result = result.replace(TRAILING_STOPWORDS, '').replace(/[\s,;:–-]+$/, '');
+    result = result.replace(TRAILING_STOPWORDS, "").replace(/[\s,;:–-]+$/, "");
   } while (result !== previous && result.length > 0);
   return result || text.trim();
 }
@@ -173,27 +173,27 @@ function tidy(text) {
 // Garde le plus de mots entiers possible dans le budget. Renvoie une chaîne
 // vide si même le premier mot déborde — à l'appelant de décider quoi faire.
 function fitWords(text, maxLength) {
-  if (maxLength <= 0) return '';
+  if (maxLength <= 0) return "";
 
-  const words = text.split(' ');
-  let result = '';
+  const words = text.split(" ");
+  let result = "";
   for (const word of words) {
     const candidate = result ? `${result} ${word}` : word;
     if (candidate.length > maxLength) break;
     result = candidate;
   }
 
-  return result ? tidy(result) : '';
+  return result ? tidy(result) : "";
 }
 
 // Coupe sur une limite de mot, jamais au milieu d'un mot.
 function truncateOnWord(text, maxLength) {
-  if (maxLength <= 0) return '';
+  if (maxLength <= 0) return "";
   if (text.length <= maxLength) return tidy(text);
 
   const fitted = fitWords(text, maxLength);
   // Un premier mot plus long que le budget : coupe nette, faute de mieux.
-  return fitted || tidy(text.split(' ')[0].slice(0, maxLength));
+  return fitted || tidy(text.split(" ")[0].slice(0, maxLength));
 }
 
 // Construit un libellé en partant du nom complet, en desserrant
@@ -217,20 +217,42 @@ function shorten(nomComplet) {
 
 // Mots trop courants pour discriminer quoi que ce soit.
 const STOPWORDS = new Set([
-  'de', 'du', 'des', 'd', 'la', 'le', 'les', 'l', 'à', 'au', 'aux', 'en', 'et',
-  'sur', 'pour', 'dans', 'par', 'ainsi', 'que', 'sa', 'ses', 'son', 'un', 'une'
+  "de",
+  "du",
+  "des",
+  "d",
+  "la",
+  "le",
+  "les",
+  "l",
+  "à",
+  "au",
+  "aux",
+  "en",
+  "et",
+  "sur",
+  "pour",
+  "dans",
+  "par",
+  "ainsi",
+  "que",
+  "sa",
+  "ses",
+  "son",
+  "un",
+  "une"
 ]);
 
 // Découpe un libellé en mots signifiants, en gardant la forme d'origine pour
 // l'affichage et une forme normalisée pour la comparaison.
 function significantWords(text) {
   return text
-    .split(' ')
+    .split(" ")
     .map((word) => ({
       // Le point final est conservé : il fait partie des abréviations
       // ("Contrib.", "Particip.").
-      raw: word.replace(/^[([{«"']+|[)\]}»",;:]+$/g, ''),
-      key: word.toLowerCase().replace(/[^\p{L}\p{N}']/gu, '')
+      raw: word.replace(/^[([{«"']+|[)\]}»",;:]+$/g, ""),
+      key: word.toLowerCase().replace(/[^\p{L}\p{N}']/gu, "")
     }))
     .filter((word) => word.raw && word.key && !STOPWORDS.has(word.key));
 }
@@ -294,7 +316,7 @@ function disambiguate(entries) {
         const tail = distinctive
           .slice(0, count)
           .map((word) => word.raw)
-          .join(' ');
+          .join(" ");
         if (tail.length + 2 > MAX_LABEL_LENGTH) return null;
         // fitWords et non truncateOnWord : une tête amputée en plein mot
         // ("Particip" pour "Particip.") est pire que pas de tête du tout.
@@ -356,7 +378,7 @@ function disambiguate(entries) {
 // ===============================
 
 function readJson(path) {
-  return JSON.parse(readFileSync(path, 'utf8'));
+  return JSON.parse(readFileSync(path, "utf8"));
 }
 
 function unwrap(data) {
@@ -421,11 +443,11 @@ if (checkOnly) {
 const version = fullData.version;
 if (!version) throw new Error(`${FULL_PATH} : champ "version" manquant`);
 
-writeFileSync(LIGHT_PATH, `${JSON.stringify({ version, entries: lightEntries }, null, 2)}\n`, 'utf8');
 writeFileSync(
-  FULL_PATH,
-  `${JSON.stringify({ version, entries: fullEntries }, null, 2)}\n`,
-  'utf8'
+  LIGHT_PATH,
+  `${JSON.stringify({ version, entries: lightEntries }, null, 2)}\n`,
+  "utf8"
 );
+writeFileSync(FULL_PATH, `${JSON.stringify({ version, entries: fullEntries }, null, 2)}\n`, "utf8");
 
 console.log(`Écrit : ${LIGHT_PATH}, ${FULL_PATH}`);

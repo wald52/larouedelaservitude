@@ -3,12 +3,16 @@
 const { escapeHtml, validateImgBbHttpsUrl } = require("./shareImage");
 
 function normalizeText(value, maxLength) {
-  return String(value || "").replace(/\s+/g, " ").trim().substring(0, maxLength);
+  return String(value || "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .substring(0, maxLength);
 }
 
 function normalizeRedirectUrl(value, event) {
   const host = event.headers.host || event.headers.Host;
-  const fallbackProtocol = host?.includes("localhost") || host?.startsWith("127.0.0.1") ? "http" : "https";
+  const fallbackProtocol =
+    host?.includes("localhost") || host?.startsWith("127.0.0.1") ? "http" : "https";
   const fallbackUrl = host ? `${fallbackProtocol}://${host}` : "/";
 
   if (!value || !host) {
@@ -17,7 +21,10 @@ function normalizeRedirectUrl(value, event) {
 
   try {
     const parsedUrl = new URL(value);
-    if ((parsedUrl.protocol === "https:" || parsedUrl.protocol === "http:") && parsedUrl.host === host) {
+    if (
+      (parsedUrl.protocol === "https:" || parsedUrl.protocol === "http:") &&
+      parsedUrl.host === host
+    ) {
       return parsedUrl.toString().replace(/\/$/, "");
     }
   } catch {
@@ -45,7 +52,8 @@ exports.handler = async (event) => {
   }
 
   const title = normalizeText(params.title, 100) || "La roue de la servitude";
-  const description = normalizeText(params.description, 200) || "Résultat partagé depuis La roue de la servitude.";
+  const description =
+    normalizeText(params.description, 200) || "Résultat partagé depuis La roue de la servitude.";
   const redirectUrl = normalizeRedirectUrl(params.redirect, event);
   // On ne réinjecte que des valeurs déjà assainies dans l'URL canonique / og:url,
   // pour ne pas refléter des paramètres arbitraires fournis par l'appelant.

@@ -71,12 +71,10 @@ exports.handler = async (event) => {
     const safeResult =
       typeof resultText === "string" && resultText.trim() ? resultText : "(résultat non précisé)";
 
-    const title =
-      `${type === "error" ? "🛠️ Signalement" : "💡 Complément"} sur le résultat : ${safeResult}`;
+    const title = `${type === "error" ? "🛠️ Signalement" : "💡 Complément"} sur le résultat : ${safeResult}`;
 
     const body =
-      `**Résultat :** ${safeResult}\n\n` +
-      `**Message de l'utilisateur :**\n${userMessage}`;
+      `**Résultat :** ${safeResult}\n\n` + `**Message de l'utilisateur :**\n${userMessage}`;
 
     // === 🧩 Mutation GraphQL ===
     const query = `
@@ -105,7 +103,7 @@ exports.handler = async (event) => {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
+        "Content-Type": "application/json"
       },
       body: JSON.stringify({ query, variables })
     });
@@ -130,7 +128,6 @@ exports.handler = async (event) => {
       headers: corsHeaders,
       body: JSON.stringify({ url })
     };
-
   } catch (err) {
     console.error("Erreur serveur :", err);
     return {

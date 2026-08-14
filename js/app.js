@@ -12,33 +12,33 @@ function requireElement(id) {
   return element;
 }
 
-const canvas = requireElement('wheelCanvas');
-const ctx = canvas.getContext('2d');
-const wheelArea = requireElement('wheelArea');
-const btn = requireElement('spinBtn');
-const countInfo = requireElement('countInfo');
-const installPromptBanner = document.getElementById('installPrompt');
-const installPromptAction = document.getElementById('installPromptAction');
-const installPromptClose = document.getElementById('installPromptClose');
-const overlay = requireElement('overlay');
-const overlayText = requireElement('overlayText');
-const overlayClose = requireElement('overlayClose');
-const copyBtn = requireElement('copyText');
-const shareButtons = document.querySelectorAll('#shareBar button[data-platform]');
+const canvas = requireElement("wheelCanvas");
+const ctx = canvas.getContext("2d");
+const wheelArea = requireElement("wheelArea");
+const btn = requireElement("spinBtn");
+const countInfo = requireElement("countInfo");
+const installPromptBanner = document.getElementById("installPrompt");
+const installPromptAction = document.getElementById("installPromptAction");
+const installPromptClose = document.getElementById("installPromptClose");
+const overlay = requireElement("overlay");
+const overlayText = requireElement("overlayText");
+const overlayClose = requireElement("overlayClose");
+const copyBtn = requireElement("copyText");
+const shareButtons = document.querySelectorAll("#shareBar button[data-platform]");
 if (shareButtons.length === 0) {
-  throw new Error('[APP] Aucun bouton de partage trouvé.');
+  throw new Error("[APP] Aucun bouton de partage trouvé.");
 }
-const sectorLayer = document.createElement('canvas');
-const sectorCtx = sectorLayer.getContext('2d');
-const labelLayer = document.createElement('canvas');
-const labelCtx = labelLayer.getContext('2d');
+const sectorLayer = document.createElement("canvas");
+const sectorCtx = sectorLayer.getContext("2d");
+const labelLayer = document.createElement("canvas");
+const labelCtx = labelLayer.getContext("2d");
 
 /* Tuning */
 const rotationFactor = 1.4;
 const MAX_VEL = 0.45 * rotationFactor;
 const BOOST = 0.05 * rotationFactor;
 const BASE_DAMPING = 0.9945 + (rotationFactor - 1) * 0.0015;
-const LERP = 0.10;
+const LERP = 0.1;
 const INTRO_DURATION_MS = 650;
 const CENTER_INTRO_DURATION_MS = 360;
 const LABEL_MIN_ARC_PX = 20;
@@ -49,7 +49,7 @@ const REDUCED_MOTION_DAMPING = 0.93;
 
 // Préférence système « mouvement réduit ». Interrogée en direct (et non figée
 // au démarrage) pour suivre un changement de réglage sans rechargement.
-const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
 
 function prefersReducedMotion() {
   return reducedMotionQuery.matches;
@@ -106,12 +106,21 @@ const centerIntroState = {
 };
 
 /* COLORS PERSISTANTES */
-const COLOR_PALETTE = ["#f87171", "#60a5fa", "#34d399", "#fbbf24", "#a78bfa", "#fb923c", "#2dd4bf", "#c084fc"];
+const COLOR_PALETTE = [
+  "#f87171",
+  "#60a5fa",
+  "#34d399",
+  "#fbbf24",
+  "#a78bfa",
+  "#fb923c",
+  "#2dd4bf",
+  "#c084fc"
+];
 
 /* IMAGE CENTRALE */
 const centerImg = new Image();
-centerImg.decoding = 'async';
-centerImg.src = 'images/center3.avif';
+centerImg.decoding = "async";
+centerImg.src = "images/center3.avif";
 let centerLoaded = false;
 centerImg.onload = () => {
   centerLoaded = true;
@@ -128,39 +137,43 @@ function easeOutCubic(t) {
 }
 
 function isAppInstalled() {
-  return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  return (
+    window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true
+  );
 }
 
 function isOverlayOpen() {
-  return overlay.getAttribute('aria-hidden') === 'false';
+  return overlay.getAttribute("aria-hidden") === "false";
 }
 
 function showInstallPromptBanner() {
   if (!installPromptBanner || isAppInstalled()) return;
   installPromptBanner.hidden = false;
-  installPromptBanner.setAttribute('aria-hidden', 'false');
+  installPromptBanner.setAttribute("aria-hidden", "false");
   requestAnimationFrame(() => {
-    installPromptBanner.classList.add('is-visible');
+    installPromptBanner.classList.add("is-visible");
   });
 }
 
 function hideInstallPromptBanner() {
   if (!installPromptBanner) return;
-  installPromptBanner.classList.remove('is-visible');
-  installPromptBanner.setAttribute('aria-hidden', 'true');
+  installPromptBanner.classList.remove("is-visible");
+  installPromptBanner.setAttribute("aria-hidden", "true");
   clearTimeout(installPromptHideTimer);
   installPromptHideTimer = setTimeout(() => {
-    if (!installPromptBanner.classList.contains('is-visible')) {
+    if (!installPromptBanner.classList.contains("is-visible")) {
       installPromptBanner.hidden = true;
     }
   }, 260);
 }
 
 function shouldShowInstallPrompt() {
-  return Boolean(deferredInstallPrompt)
-    && !installPromptDismissed
-    && !isAppInstalled()
-    && completedSpinCount >= INSTALL_PROMPT_SPIN_THRESHOLD;
+  return (
+    Boolean(deferredInstallPrompt) &&
+    !installPromptDismissed &&
+    !isAppInstalled() &&
+    completedSpinCount >= INSTALL_PROMPT_SPIN_THRESHOLD
+  );
 }
 
 function syncInstallPromptVisibility() {
@@ -203,8 +216,8 @@ function closeModal(container) {
 }
 
 function hideResultOverlay() {
-  overlay.style.display = 'none';
-  overlay.setAttribute('aria-hidden', 'true');
+  overlay.style.display = "none";
+  overlay.setAttribute("aria-hidden", "true");
   closeModal(overlay);
 
   if (installPromptPendingAfterOverlay) {
@@ -216,13 +229,13 @@ function hideResultOverlay() {
   applyPendingUpdate();
 }
 
-window.addEventListener('beforeinstallprompt', (event) => {
+window.addEventListener("beforeinstallprompt", (event) => {
   event.preventDefault();
   deferredInstallPrompt = event;
   syncInstallPromptVisibility();
 });
 
-window.addEventListener('appinstalled', () => {
+window.addEventListener("appinstalled", () => {
   deferredInstallPrompt = null;
   installPromptDismissed = true;
   installPromptPendingAfterOverlay = false;
@@ -230,7 +243,7 @@ window.addEventListener('appinstalled', () => {
 });
 
 if (installPromptClose) {
-  installPromptClose.addEventListener('click', () => {
+  installPromptClose.addEventListener("click", () => {
     installPromptDismissed = true;
     installPromptPendingAfterOverlay = false;
     hideInstallPromptBanner();
@@ -238,7 +251,7 @@ if (installPromptClose) {
 }
 
 if (installPromptAction) {
-  installPromptAction.addEventListener('click', async () => {
+  installPromptAction.addEventListener("click", async () => {
     if (!deferredInstallPrompt) return;
 
     const installEvent = deferredInstallPrompt;
@@ -250,14 +263,14 @@ if (installPromptAction) {
       await installEvent.prompt();
       await installEvent.userChoice;
     } catch (error) {
-      console.warn('[PWA] Impossible d’ouvrir le prompt d’installation :', error);
+      console.warn("[PWA] Impossible d’ouvrir le prompt d’installation :", error);
     }
   });
 }
 
-const standaloneMediaQuery = window.matchMedia('(display-mode: standalone)');
+const standaloneMediaQuery = window.matchMedia("(display-mode: standalone)");
 if (standaloneMediaQuery.addEventListener) {
-  standaloneMediaQuery.addEventListener('change', syncInstallPromptVisibility);
+  standaloneMediaQuery.addEventListener("change", syncInstallPromptVisibility);
 }
 
 function scheduleAnimationFrame() {
@@ -274,7 +287,7 @@ function stopAnimationFrame() {
 function resetContext(targetCtx) {
   targetCtx.setTransform(deviceScale, 0, 0, deviceScale, 0, 0);
   targetCtx.imageSmoothingEnabled = true;
-  targetCtx.imageSmoothingQuality = 'high';
+  targetCtx.imageSmoothingQuality = "high";
 }
 
 function resizeLayer(targetCanvas, targetCtx, size) {
@@ -288,7 +301,7 @@ function getCanvasScale(viewportWidth = window.innerWidth) {
   const pixelRatio = Math.max(1, window.devicePixelRatio || 1);
   const deviceMemory = Number(navigator.deviceMemory) || Infinity;
   const isSmallViewport = viewportWidth <= 768;
-  const isTouchViewport = window.matchMedia('(hover: none), (pointer: coarse)').matches;
+  const isTouchViewport = window.matchMedia("(hover: none), (pointer: coarse)").matches;
   const isConstrainedDevice = deviceMemory <= 4 || prefersReducedMotion();
   const scaleCap = isSmallViewport || isTouchViewport || isConstrainedDevice ? 1.5 : 2;
 
@@ -357,7 +370,7 @@ function updateCountInfo() {
   countInfo.textContent = summary;
   // La roue est un canvas : sans nom accessible, un lecteur d'écran ne voit
   // rien du tout à cet endroit de la page.
-  canvas.setAttribute('aria-label', `Roue des taxes et prélèvements français — ${summary}`);
+  canvas.setAttribute("aria-label", `Roue des taxes et prélèvements français — ${summary}`);
 }
 
 function buildSectorLayer() {
@@ -514,7 +527,10 @@ function getCenterIntroProgress(now = performance.now()) {
     return 0;
   }
 
-  const rawProgress = Math.min(1, Math.max(0, (now - centerIntroState.startTime) / centerIntroState.duration));
+  const rawProgress = Math.min(
+    1,
+    Math.max(0, (now - centerIntroState.startTime) / centerIntroState.duration)
+  );
 
   if (rawProgress >= 1) {
     completeCenterIntro();
@@ -534,7 +550,7 @@ function drawCenterLayer(now = performance.now()) {
   ctx.save();
   ctx.rotate(Math.PI / 2);
   ctx.globalAlpha = progress;
-  const scale = 0.82 + (0.18 * progress);
+  const scale = 0.82 + 0.18 * progress;
   ctx.scale(scale, scale);
   ctx.beginPath();
   ctx.arc(0, 0, imgSize / 2, 0, Math.PI * 2);
@@ -609,28 +625,30 @@ function ensureAudioInitialized() {
     .then((initialized) => {
       audioReady = initialized === true;
       if (audioReady) {
-        console.log('[APP] Audio prêt après interaction');
+        console.log("[APP] Audio prêt après interaction");
       }
       return audioReady;
     })
     .catch((error) => {
       audioInitPromise = null;
-      console.error('[APP] Erreur initialisation audio:', error);
+      console.error("[APP] Erreur initialisation audio:", error);
     });
 
   return audioInitPromise;
 }
 
-function scheduleFullDataLoad(reason = 'interaction') {
+function scheduleFullDataLoad(reason = "interaction") {
   if (fullDataLoadScheduled) return;
   fullDataLoadScheduled = true;
 
-  loadFullData().then(() => {
-    console.log(`[APP] Données complètes chargées (${reason})`);
-  }).catch((error) => {
-    fullDataLoadScheduled = false;
-    console.error('[APP] Erreur chargement données complètes:', error);
-  });
+  loadFullData()
+    .then(() => {
+      console.log(`[APP] Données complètes chargées (${reason})`);
+    })
+    .catch((error) => {
+      fullDataLoadScheduled = false;
+      console.error("[APP] Erreur chargement données complètes:", error);
+    });
 }
 
 function scheduleDeferredInit() {
@@ -639,11 +657,11 @@ function scheduleDeferredInit() {
       menuInitialized = true;
       initMenu();
       updateCountInfo();
-      console.log('[APP] Menu initialisé (lazy)');
+      console.log("[APP] Menu initialisé (lazy)");
     }
   };
 
-  if ('requestIdleCallback' in window) {
+  if ("requestIdleCallback" in window) {
     // On attend que le navigateur soit au repos, avec un délai max de 3s
     requestIdleCallback(launch, { timeout: 3000 });
   } else {
@@ -653,7 +671,12 @@ function scheduleDeferredInit() {
 }
 
 function shouldAnimate() {
-  return introState.active || centerIntroState.active || Math.abs(angularVelocity) > 0.001 || Math.abs(targetVelocity) > 0.001;
+  return (
+    introState.active ||
+    centerIntroState.active ||
+    Math.abs(angularVelocity) > 0.001 ||
+    Math.abs(targetVelocity) > 0.001
+  );
 }
 
 async function initializeApp() {
@@ -664,7 +687,7 @@ async function initializeApp() {
     syncCanvasSize();
 
     const lightData = await initWheel();
-    ENTRIES = lightData.map(entry => entry.nom);
+    ENTRIES = lightData.map((entry) => entry.nom);
 
     buildColors();
     buildWheelLayers();
@@ -677,16 +700,16 @@ async function initializeApp() {
     // 🔊 Préserve le déverrouillage audio mobile sans charger/décoder les sons.
     const unlock = () => {
       unlockAudio();
-      window.removeEventListener('click', unlock);
-      window.removeEventListener('touchstart', unlock);
+      window.removeEventListener("click", unlock);
+      window.removeEventListener("touchstart", unlock);
     };
-    window.addEventListener('click', unlock);
-    window.addEventListener('touchstart', unlock);
+    window.addEventListener("click", unlock);
+    window.addEventListener("touchstart", unlock);
 
-    console.log('[APP] Roue initialisée avec', ENTRIES.length, 'entrées');
+    console.log("[APP] Roue initialisée avec", ENTRIES.length, "entrées");
   } catch (e) {
-    console.error('[APP] Erreur initialisation:', e);
-    ENTRIES = ['Erreur de chargement', 'Veuillez rafraîchir la page'];
+    console.error("[APP] Erreur initialisation:", e);
+    ENTRIES = ["Erreur de chargement", "Veuillez rafraîchir la page"];
     syncCanvasSize(true);
     buildWheelLayers();
     drawWheel(angle);
@@ -706,27 +729,27 @@ function applyEntriesUpdate() {
   // tout reconstruire annulerait la partie en cours. La prochaine visite
   // prendra la mise à jour.
   if (completedSpinCount > 0 && !isInfiniteMode()) {
-    console.log('[APP] Données mises à jour, reconstruction reportée à la prochaine visite');
+    console.log("[APP] Données mises à jour, reconstruction reportée à la prochaine visite");
     return;
   }
 
   initWheel()
     .then((lightData) => {
-      ENTRIES = lightData.map(entry => entry.nom);
+      ENTRIES = lightData.map((entry) => entry.nom);
       ENTRY_COLORS.length = 0;
       buildColors();
       buildWheelLayers();
       updateCountInfo();
       drawWheel(angle);
-      console.log('[APP] Roue reconstruite avec', ENTRIES.length, 'entrées');
+      console.log("[APP] Roue reconstruite avec", ENTRIES.length, "entrées");
     })
     .catch((error) => {
-      console.warn('[APP] Reconstruction de la roue impossible:', error);
+      console.warn("[APP] Reconstruction de la roue impossible:", error);
     });
 }
 
-window.addEventListener('entriesUpdated', (event) => {
-  if (event.detail?.scope !== 'light') return;
+window.addEventListener("entriesUpdated", (event) => {
+  if (event.detail?.scope !== "light") return;
 
   // Ne jamais changer le contenu des secteurs pendant que la roue tourne :
   // le pointeur désignerait soudain autre chose.
@@ -743,13 +766,13 @@ window.addEventListener('entriesUpdated', (event) => {
    ======================= */
 
 function spawnBillsWhenReady(event, count) {
-  if (billsModule && typeof billsModule.spawnBills === 'function') {
+  if (billsModule && typeof billsModule.spawnBills === "function") {
     billsModule.spawnBills(event, count);
     return;
   }
 
   if (!billsInitPromise) {
-    billsInitPromise = import('../bills.js')
+    billsInitPromise = import("../bills.js")
       .then((mod) => {
         if (mod.initBills) {
           mod.initBills();
@@ -759,13 +782,13 @@ function spawnBillsWhenReady(event, count) {
       })
       .catch((error) => {
         billsInitPromise = null;
-        console.warn('[APP] Effet billets indisponible:', error);
+        console.warn("[APP] Effet billets indisponible:", error);
         return false;
       });
   }
 
   billsInitPromise.then((ready) => {
-    if (ready && billsModule && typeof billsModule.spawnBills === 'function') {
+    if (ready && billsModule && typeof billsModule.spawnBills === "function") {
       billsModule.spawnBills(event, count);
     }
   });
@@ -773,14 +796,14 @@ function spawnBillsWhenReady(event, count) {
 
 function boostWheel(e) {
   if (ENTRIES.length === 0) {
-    console.warn('[BOOST] ENTRIES est vide !');
+    console.warn("[BOOST] ENTRIES est vide !");
     return;
   }
 
   finishIntroBuild();
   completeCenterIntro();
   ensureAudioInitialized();
-  scheduleFullDataLoad('premier boost');
+  scheduleFullDataLoad("premier boost");
   hasBeenSpun = true;
 
   // Les billets sont purement décoratifs : on ne les lance pas à qui demande
@@ -803,9 +826,12 @@ function boostWheel(e) {
   clearTimeout(frictionResumeTimer);
   // En mouvement réduit, pas de sursis de 600 ms avant le freinage : la roue
   // ralentit immédiatement.
-  frictionResumeTimer = setTimeout(() => {
-    frictionActive = true;
-  }, prefersReducedMotion() ? 0 : 600);
+  frictionResumeTimer = setTimeout(
+    () => {
+      frictionActive = true;
+    },
+    prefersReducedMotion() ? 0 : 600
+  );
 
   showedResult = false;
   resetSectorClick();
@@ -815,10 +841,10 @@ function boostWheel(e) {
 
 function attachWheelListeners() {
   if (canvas && btn) {
-    canvas.addEventListener('pointerdown', boostWheel);
-    btn.addEventListener('click', boostWheel);
+    canvas.addEventListener("pointerdown", boostWheel);
+    btn.addEventListener("click", boostWheel);
   } else {
-    console.error('[BOOST] canvas ou btn non trouvé !');
+    console.error("[BOOST] canvas ou btn non trouvé !");
   }
 }
 
@@ -835,16 +861,16 @@ function attachWheelListeners() {
 //
 // Réglable à chaud depuis la console via window.__SPIN_CLICK__ pendant un spin.
 const SPIN_CLICK = {
-  maxRate: 18,       // clics/s à pleine vitesse (plafond anti-mitraillette)
-  minRate: 0.8,      // en dessous, on arrête de cliquer
-  curve: 0.5,        // <1 = garde des clics audibles à basse vitesse (0.5 = racine)
-  volumeMin: 0.30,   // volume du dernier clic (roue presque arrêtée)
-  volumeMax: 0.55,   // volume à pleine vitesse
-  pitchMin: 0.95,    // plage de hauteur VOLONTAIREMENT étroite :
-  pitchMax: 1.20,    // au-delà, on entend une sirène qui monte et descend
+  maxRate: 18, // clics/s à pleine vitesse (plafond anti-mitraillette)
+  minRate: 0.8, // en dessous, on arrête de cliquer
+  curve: 0.5, // <1 = garde des clics audibles à basse vitesse (0.5 = racine)
+  volumeMin: 0.3, // volume du dernier clic (roue presque arrêtée)
+  volumeMax: 0.55, // volume à pleine vitesse
+  pitchMin: 0.95, // plage de hauteur VOLONTAIREMENT étroite :
+  pitchMax: 1.2, // au-delà, on entend une sirène qui monte et descend
   pitchJitter: 0.04, // variation aléatoire, évite l'effet « boucle » mécanique
-  clickDecay: 1.2    // longueur d'un clic = clickDecay / cadence (borné ci-dessous)
-                     // >1.5 : les clics se chevauchent et « bavent » ; <1 : très sec
+  clickDecay: 1.2 // longueur d'un clic = clickDecay / cadence (borné ci-dessous)
+  // >1.5 : les clics se chevauchent et « bavent » ; <1 : très sec
 };
 
 const SPIN_CLICK_MAX_DURATION = 0.12; // s — coupe la queue du sample
@@ -893,23 +919,23 @@ function playSectorClick(eased, clickRate) {
   playSpinClick({ volume, rate, maxDuration });
 }
 
-if (typeof window !== 'undefined') {
+if (typeof window !== "undefined") {
   window.__SPIN_CLICK__ = SPIN_CLICK;
 }
 
 /* =======================
    SELECTION / OVERLAY
    ======================= */
-function getSelectedIndex(a){
+function getSelectedIndex(a) {
   const n = ENTRIES.length;
   if (n === 0) return -1;
-  const step = (Math.PI*2)/n;
-  let theta = (-Math.PI/2 - a) % (Math.PI*2);
-  if (theta < 0) theta += Math.PI*2;
+  const step = (Math.PI * 2) / n;
+  let theta = (-Math.PI / 2 - a) % (Math.PI * 2);
+  if (theta < 0) theta += Math.PI * 2;
   return Math.floor(theta / step);
 }
 
-async function showOverlay(entryIndex){
+async function showOverlay(entryIndex) {
   const intros = [
     "🎯 Le Fisc a parlé !",
     "✨ Voici votre contribution :",
@@ -921,8 +947,8 @@ async function showOverlay(entryIndex){
     "🏅 Médaille d'or pour votre contribution fiscale !",
     "💣 Boom ! Voici votre prochaine taxe !"
   ];
-  const intro = intros[Math.floor(Math.random()*intros.length)];
-  
+  const intro = intros[Math.floor(Math.random() * intros.length)];
+
   // Récupérer les détails complets de l'entrée
   const entry = await getEntryDetails(entryIndex);
   const formatted = formatEntryForDisplay(entry);
@@ -936,23 +962,23 @@ async function showOverlay(entryIndex){
     </div>
   `;
 
-  overlay.style.display = 'flex';
-  overlay.setAttribute('aria-hidden','false');
+  overlay.style.display = "flex";
+  overlay.setAttribute("aria-hidden", "false");
   // .bubble porte tabindex="-1" : y placer le focus fait annoncer le dialogue
   // par les lecteurs d'écran et amorce le piège de focus.
-  openModal(overlay, overlay.querySelector('.bubble'));
+  openModal(overlay, overlay.querySelector(".bubble"));
 }
 
 // 🧩 Attache les écouteurs de feedback UNE SEULE FOIS au démarrage.
 // Délégué sur #overlayText (et non document) car .bubble stoppe la propagation des clics.
-overlayText.addEventListener('click', (e) => {
-  const infoBtn = e.target.closest('#btn-info');
-  const errorBtn = e.target.closest('#btn-error');
+overlayText.addEventListener("click", (e) => {
+  const infoBtn = e.target.closest("#btn-info");
+  const errorBtn = e.target.closest("#btn-error");
 
   if (!infoBtn && !errorBtn) return;
 
   // On récupère le texte du résultat actuel dans l'overlay
-  const feedbackText = overlayText.innerText.split('\n\n')[1] || overlayText.innerText;
+  const feedbackText = overlayText.innerText.split("\n\n")[1] || overlayText.innerText;
 
   openFeedback(feedbackText, infoBtn ? "info" : "error");
 });
@@ -965,103 +991,116 @@ const FEEDBACK_ENDPOINT = isNetlifyHost
   ? "/.netlify/functions/sendFeedback"
   : "https://larouedelaservitude.netlify.app/.netlify/functions/sendFeedback";
 
-const modal = requireElement('feedbackModal');
-const form = requireElement('feedbackForm');
-const closeBtn = requireElement('closeFeedback');
-const status = requireElement('feedbackStatus');
+const modal = requireElement("feedbackModal");
+const form = requireElement("feedbackForm");
+const closeBtn = requireElement("closeFeedback");
+const status = requireElement("feedbackStatus");
 
 // Limite anti-abus côté client : 1 envoi par minute max
 let lastFeedbackTime = 0;
 
-function openFeedback(resultText, type = 'info'){
-  requireElement('formResult').value = resultText;
-  requireElement('formType').value = type;
-  requireElement('formMessage').value = '';
-  requireElement('honeypot').value = '';
-  status.style.display = 'none';
-  modal.style.display = 'flex';
-  openModal(modal, requireElement('formMessage'));
+function openFeedback(resultText, type = "info") {
+  requireElement("formResult").value = resultText;
+  requireElement("formType").value = type;
+  requireElement("formMessage").value = "";
+  requireElement("honeypot").value = "";
+  status.style.display = "none";
+  modal.style.display = "flex";
+  openModal(modal, requireElement("formMessage"));
 }
 
-function closeFeedback(){
-  modal.style.display = 'none';
+function closeFeedback() {
+  modal.style.display = "none";
   closeModal(modal);
 }
 
-closeBtn.addEventListener('click', closeFeedback);
-modal.addEventListener('click', (e)=> { if (e.target === modal) closeFeedback(); });
-document.addEventListener('keydown', (e)=> {
-  if (e.key !== 'Escape') return;
-  if (modal.style.display === 'flex') {
+closeBtn.addEventListener("click", closeFeedback);
+modal.addEventListener("click", (e) => {
+  if (e.target === modal) closeFeedback();
+});
+document.addEventListener("keydown", (e) => {
+  if (e.key !== "Escape") return;
+  if (modal.style.display === "flex") {
     closeFeedback();
   } else if (isOverlayOpen()) {
     hideResultOverlay();
   }
 });
 
-form.addEventListener('submit', async (e) => {
+form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const now = Date.now();
   if (now - lastFeedbackTime < 60000) {
-    status.style.display = 'block';
-    status.textContent = 'Merci d’attendre une minute avant d’envoyer un nouveau message.';
+    status.style.display = "block";
+    status.textContent = "Merci d’attendre une minute avant d’envoyer un nouveau message.";
     return;
   }
 
-  status.style.display = 'block'; status.textContent = 'Envoi en cours…';
+  status.style.display = "block";
+  status.textContent = "Envoi en cours…";
   const payload = {
-    resultText: requireElement('formResult').value,
-    userMessage: requireElement('formMessage').value,
-    type: requireElement('formType').value || 'info',
-    honeypot: requireElement('honeypot').value || ''
+    resultText: requireElement("formResult").value,
+    userMessage: requireElement("formMessage").value,
+    type: requireElement("formType").value || "info",
+    honeypot: requireElement("honeypot").value || ""
   };
   try {
     const resp = await fetch(FEEDBACK_ENDPOINT, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
     });
 
     if (!resp.ok) {
       const text = await resp.text();
-      status.textContent = 'Erreur lors de l’envoi : ' + (text || resp.status);
+      status.textContent = "Erreur lors de l’envoi : " + (text || resp.status);
       return;
     }
 
     lastFeedbackTime = now;
     const json = await resp.json().catch(() => ({}));
-    status.textContent = 'Merci — votre message a été envoyé !';
+    status.textContent = "Merci — votre message a été envoyé !";
     if (json.url) {
       const ticketUrl = new URL(json.url, window.location.origin);
-      const lineBreak = document.createElement('br');
-      const link = document.createElement('a');
+      const lineBreak = document.createElement("br");
+      const link = document.createElement("a");
       link.href = ticketUrl.href;
-      link.target = '_blank';
-      link.rel = 'noopener';
-      link.textContent = 'Voir le ticket sur GitHub';
+      link.target = "_blank";
+      link.rel = "noopener";
+      link.textContent = "Voir le ticket sur GitHub";
       status.append(lineBreak, link);
     }
     setTimeout(closeFeedback, 1500);
   } catch (err) {
     console.error(err);
-    status.textContent = 'Erreur réseau lors de l’envoi.';
+    status.textContent = "Erreur réseau lors de l’envoi.";
   }
 });
 
-overlayClose.addEventListener('click', hideResultOverlay);
-overlay.addEventListener('click', e => { if (e.target === overlay) { hideResultOverlay(); }});
-overlay.querySelector('.bubble').addEventListener('click', e => e.stopPropagation());
-copyBtn && copyBtn.addEventListener('click', async ()=>{
-  try { await navigator.clipboard.writeText(overlayText.innerText); copyBtn.textContent = '✅'; setTimeout(()=>copyBtn.textContent='📋',800); }
-  catch { alert('Impossible de copier'); }
+overlayClose.addEventListener("click", hideResultOverlay);
+overlay.addEventListener("click", (e) => {
+  if (e.target === overlay) {
+    hideResultOverlay();
+  }
 });
+overlay.querySelector(".bubble").addEventListener("click", (e) => e.stopPropagation());
+copyBtn &&
+  copyBtn.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(overlayText.innerText);
+      copyBtn.textContent = "✅";
+      setTimeout(() => (copyBtn.textContent = "📋"), 800);
+    } catch {
+      alert("Impossible de copier");
+    }
+  });
 
 /* =======================
    ANIMATION
    ======================= */
 function finalizeSpinResult(idx) {
-  getEntryDetails(idx).then(entry => {
+  getEntryDetails(idx).then((entry) => {
     if (entry) {
       recordSpin(entry);
     }
@@ -1078,7 +1117,9 @@ function finalizeSpinResult(idx) {
     }
 
     drawWheel(angle);
-    setTimeout(() => { hasBeenSpun = false; }, 300);
+    setTimeout(() => {
+      hasBeenSpun = false;
+    }, 300);
   });
 }
 
@@ -1113,7 +1154,7 @@ function animate(now) {
       frictionActive = true;
       frictionTimer = 0;
       frictionDuration = 180 + Math.random() * 120;
-      scheduleFullDataLoad('ralentissement');
+      scheduleFullDataLoad("ralentissement");
     }
     const damping = prefersReducedMotion() ? REDUCED_MOTION_DAMPING : BASE_DAMPING;
     const t = frictionTimer / frictionDuration;
@@ -1185,7 +1226,6 @@ document.addEventListener("visibilitychange", () => {
   }
 });
 
-
 async function optimizeImageWebP(base64, maxWidth = 1200, quality = 0.8) {
   return new Promise((resolve, reject) => {
     const img = new Image();
@@ -1204,7 +1244,8 @@ async function optimizeImageWebP(base64, maxWidth = 1200, quality = 0.8) {
         ctx.imageSmoothingEnabled = true;
         ctx.imageSmoothingQuality = "high";
         ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
-        const optimized = canvas.toDataURL("image/webp", quality)
+        const optimized = canvas
+          .toDataURL("image/webp", quality)
           .replace(/^data:image\/webp;base64,/, "");
         resolve(optimized);
       } catch (e) {
@@ -1247,12 +1288,12 @@ function fillPointer(ctx, rect, area, scale) {
 
 async function captureWheelArea() {
   const area = wheelArea.getBoundingClientRect();
-  const output = document.createElement('canvas');
+  const output = document.createElement("canvas");
   output.width = Math.round(area.width * CAPTURE_SCALE);
   output.height = Math.round(area.height * CAPTURE_SCALE);
 
-  const ctx = output.getContext('2d');
-  const board = document.querySelector('.board') || document.body;
+  const ctx = output.getContext("2d");
+  const board = document.querySelector(".board") || document.body;
 
   // Le fond suit le thème : la capture était figée en clair, et le partage d'un
   // utilisateur en thème sombre sortait sur un fond qui n'était pas le sien.
@@ -1268,7 +1309,7 @@ async function captureWheelArea() {
     wheel.height * CAPTURE_SCALE
   );
 
-  const pointer = wheelArea.querySelector('.pointer');
+  const pointer = wheelArea.querySelector(".pointer");
   if (pointer) {
     ctx.fillStyle = getComputedStyle(pointer).borderTopColor;
     fillPointer(ctx, pointer.getBoundingClientRect(), area, CAPTURE_SCALE);
@@ -1286,26 +1327,26 @@ async function captureWheelArea() {
 // suffit à revenir à l'état initial — d'où le `finally` plus bas.
 function setShareButtonBusy(button) {
   button.disabled = true;
-  button.classList.add('is-busy');
+  button.classList.add("is-busy");
   button.dataset.restoreLabel = button.textContent;
-  button.textContent = '⏳';
+  button.textContent = "⏳";
 }
 
 function clearShareButtonBusy(button) {
-  if (!('restoreLabel' in button.dataset)) return;
+  if (!("restoreLabel" in button.dataset)) return;
   button.disabled = false;
-  button.classList.remove('is-busy');
+  button.classList.remove("is-busy");
   button.textContent = button.dataset.restoreLabel;
   delete button.dataset.restoreLabel;
 }
 
-shareButtons.forEach(btn => {
-  btn.addEventListener('click', async () => {
+shareButtons.forEach((btn) => {
+  btn.addEventListener("click", async () => {
     const platform = btn.dataset.platform;
     const text = overlayText.innerText;
 
     // CAS SPÉCIAUX : Téléchargement direct (Instagram, TikTok, Snapchat)
-    if (['instagram', 'tiktok', 'snapchat'].includes(platform)) {
+    if (["instagram", "tiktok", "snapchat"].includes(platform)) {
       try {
         const canvasCap = await captureWheelArea();
 
@@ -1313,20 +1354,22 @@ shareButtons.forEach(btn => {
 
         // On passe à 800px de large max et qualité 0.6 (suffisant pour Twitter/FB)
         // Cela peut diviser le poids du fichier par 4 ou 5.
-        const optimizedBase64 = await optimizeImageWebP(rawBase64, 800, 0.60);
+        const optimizedBase64 = await optimizeImageWebP(rawBase64, 800, 0.6);
 
         const imageData = "data:image/webp;base64," + optimizedBase64;
-        const a = document.createElement('a');
+        const a = document.createElement("a");
         a.href = imageData;
         a.download = `roue-${platform}-${Date.now()}.webp`;
         document.body.appendChild(a);
         a.click();
         a.remove();
 
-        alert(`✅ Image téléchargée !\n\n📱 Ouvrez ${platform.toUpperCase()} et publiez l'image depuis votre galerie.`);
+        alert(
+          `✅ Image téléchargée !\n\n📱 Ouvrez ${platform.toUpperCase()} et publiez l'image depuis votre galerie.`
+        );
       } catch (error) {
-        console.error('Erreur téléchargement:', error);
-        alert('❌ Erreur lors du téléchargement de l\'image.');
+        console.error("Erreur téléchargement:", error);
+        alert("❌ Erreur lors du téléchargement de l'image.");
       }
       return;
     }
@@ -1344,10 +1387,9 @@ shareButtons.forEach(btn => {
         ? "/.netlify/functions/shareImage"
         : "https://larouedelaservitude.netlify.app/.netlify/functions/shareImage";
 
-      
       const response = await fetch(SHARE_IMAGE_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           imageData: optimizedBase64,
           text: text
@@ -1356,48 +1398,48 @@ shareButtons.forEach(btn => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Erreur serveur');
+        throw new Error(errorData.error || "Erreur serveur");
       }
 
       const result = await response.json();
 
       if (!result.success) {
-        throw new Error(result.error || 'Upload échoué');
+        throw new Error(result.error || "Upload échoué");
       }
 
       const { imageUrl, sharePageUrl } = result;
 
       const msg = encodeURIComponent(text);
       const siteUrl = window.location.origin + window.location.pathname;
-      let shareUrl = '';
+      let shareUrl = "";
 
       switch (platform) {
-        case 'facebook':
+        case "facebook":
           shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(sharePageUrl)}`;
           break;
-        case 'x':
-          shareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(sharePageUrl)}&text=${encodeURIComponent(text.split('\n')[0])}`;
+        case "x":
+          shareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(sharePageUrl)}&text=${encodeURIComponent(text.split("\n")[0])}`;
           break;
-        case 'linkedin':
+        case "linkedin":
           shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(sharePageUrl)}`;
           break;
-        case 'pinterest':
+        case "pinterest":
           shareUrl = `https://pinterest.com/pin/create/button/?url=${encodeURIComponent(siteUrl)}&media=${encodeURIComponent(imageUrl)}&description=${msg}`;
           break;
-        case 'whatsapp':
+        case "whatsapp":
           shareUrl = `https://api.whatsapp.com/send?text=${msg}%0A%0A${encodeURIComponent(imageUrl)}`;
           break;
-        case 'telegram':
+        case "telegram":
           shareUrl = `https://t.me/share/url?url=${encodeURIComponent(imageUrl)}&text=${msg}`;
           break;
         default:
-          alert('Plateforme non supportée');
+          alert("Plateforme non supportée");
           return;
       }
 
-      window.open(shareUrl, '_blank', 'noopener,noreferrer');
+      window.open(shareUrl, "_blank", "noopener,noreferrer");
     } catch (error) {
-      console.error('❌ Erreur lors du partage:', error);
+      console.error("❌ Erreur lors du partage:", error);
       alert(`❌ Erreur : ${error.message}`);
     } finally {
       clearShareButtonBusy(btn);
@@ -1408,11 +1450,11 @@ shareButtons.forEach(btn => {
 /* =======================
    INIT
    ======================= */
-function updateBg(){
-  const d = Math.sqrt(innerWidth**2 + innerHeight**2);
-  document.documentElement.style.setProperty('--bg-size', `${Math.ceil(d*1.2)}px`);
-  const base = Math.max(36, Math.min(Math.round(innerWidth/12), 160));
-  document.documentElement.style.setProperty('--emoji-size', `${base}px`);
+function updateBg() {
+  const d = Math.sqrt(innerWidth ** 2 + innerHeight ** 2);
+  document.documentElement.style.setProperty("--bg-size", `${Math.ceil(d * 1.2)}px`);
+  const base = Math.max(36, Math.min(Math.round(innerWidth / 12), 160));
+  document.documentElement.style.setProperty("--emoji-size", `${base}px`);
 }
 
 function handleResize() {
@@ -1436,8 +1478,8 @@ function scheduleResizeRecalculation() {
   });
 }
 
-addEventListener('resize', scheduleResizeRecalculation);
-addEventListener('orientationchange', scheduleResizeRecalculation);
+addEventListener("resize", scheduleResizeRecalculation);
+addEventListener("orientationchange", scheduleResizeRecalculation);
 updateBg();
 initializeApp();
 
@@ -1450,14 +1492,14 @@ function isAnySurfaceOpen() {
 }
 
 // ✅ Gère la touche Espace uniquement quand aucune fenêtre n'est ouverte
-document.addEventListener('keydown', (e) => {
-  if (e.code !== 'Space') return;
+document.addEventListener("keydown", (e) => {
+  if (e.code !== "Space") return;
 
   // Espace appartient d'abord au contrôle qui a le focus : il doit l'activer
   // normalement (bouton, interrupteur des réglages, champ de saisie). Sans cette
   // sortie, le preventDefault ci-dessous annulait cette activation native et les
   // contrôles devenaient inutilisables au clavier.
-  if (e.target instanceof Element && e.target.closest('button, a, input, textarea, select')) {
+  if (e.target instanceof Element && e.target.closest("button, a, input, textarea, select")) {
     return;
   }
 
@@ -1469,7 +1511,7 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-window.addEventListener('infiniteModeChange', () => {
+window.addEventListener("infiniteModeChange", () => {
   updateCountInfo();
 });
 
@@ -1492,8 +1534,8 @@ function canReloadForUpdate() {
 
 // Enregistrement après `load` pour ne pas disputer la bande passante au premier
 // affichage : le pré-cache complet de la PWA démarre juste après.
-window.addEventListener('load', () => {
+window.addEventListener("load", () => {
   initServiceWorker({ canReload: canReloadForUpdate });
 });
 
-  // L'effet billets est chargé à la première utilisation pour alléger le démarrage.
+// L'effet billets est chargé à la première utilisation pour alléger le démarrage.

@@ -39,7 +39,9 @@ test("handler POST -> 405", async () => {
 });
 
 test("handler image invalide -> 400", async () => {
-  const res = await sharePage.handler(eventWithHost("host.example", { image: "https://evil.example/x" }));
+  const res = await sharePage.handler(
+    eventWithHost("host.example", { image: "https://evil.example/x" })
+  );
   assert.equal(res.statusCode, 400);
 });
 
@@ -47,7 +49,7 @@ test("handler échappe le titre (pas de XSS) et redirige vers l'hôte de la requ
   const res = await sharePage.handler(
     eventWithHost("host.example", {
       image: "https://i.ibb.co/abc/x.png",
-      title: '<script>alert(1)</script>',
+      title: "<script>alert(1)</script>",
       redirect: "https://evil.example/steal"
     })
   );
