@@ -12,6 +12,9 @@
   --menu-panel-bg: var(--surface-alt, #1a1a1a);
   --menu-border: var(--ring, #333);
   --menu-muted: var(--legend, #888);
+  --menu-icon-bg: var(--surface-inset, #242b38);
+  --menu-icon-hover: var(--ring, #333);
+  --menu-icon-fg: var(--fg, #fff);
 }
 
 /* Bouton hamburger : il ouvre le tiroir, et rien d'autre. Il s'efface quand le
@@ -222,16 +225,33 @@
   }
 }
 
+/* L'icône est posée sur une pastille : c'est elle qui donne du poids à la
+   ligne. Sans elle, les entrées se dissolvaient dans le blanc du tiroir. */
 .menu-item__icon {
-  width: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 19px;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: 11px;
+  background: var(--menu-icon-bg);
+  color: var(--menu-icon-fg);
+  transition: background-color 0.15s ease;
+}
+
+.menu-item:hover .menu-item__icon {
+  background: var(--menu-icon-hover);
+}
+
+.menu-item__glyph {
+  width: 20px;
+  height: 20px;
+  display: block;
 }
 
 .menu-item__label {
   flex: 1;
+  min-width: 0;
 }
 
 .menu-item__badge {
@@ -245,12 +265,16 @@
   text-align: center;
 }
 
-/* Dit que l'entrée mène ailleurs : « › » pour un panneau, « ↗ » pour la page
-   d'analyse. Rien ne distinguait les deux auparavant. */
+/* Dit que l'entrée mène ailleurs : chevron pour un panneau, flèche oblique pour
+   la page d'analyse, qu'on quitte le tiroir pour rejoindre. Tracés au même
+   trait que les icônes, plutôt qu'écrits en « › » et « ↗ » — ces caractères
+   n'ont ni la même graisse ni le même alignement d'une police système à
+   l'autre. */
 .menu-item__chevron {
+  width: 17px;
+  height: 17px;
+  flex-shrink: 0;
   color: var(--menu-muted);
-  font-size: 18px;
-  line-height: 1;
   transition: transform 0.15s ease;
 }
 
@@ -288,10 +312,9 @@
   text-decoration: underline;
 }
 
-.menu-footer__version {
-  padding: 2px 8px;
-  border: 1px solid var(--menu-border);
-  border-radius: 999px;
+/* Une ligne discrète. La version était encadrée d'une pastille, ce qui la
+   faisait ressembler à une information de débogage. */
+.menu-footer span {
   font-variant-numeric: tabular-nums;
 }
 

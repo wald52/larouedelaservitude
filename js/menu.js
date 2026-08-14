@@ -178,13 +178,51 @@ export function getSettings() {
 // même piège à focus, même touche Échap. Rien n'est atteignable au clavier
 // tant que la surface est fermée (visibility, menu.css).
 
+// Icônes de navigation, tracées et monochromes : elles héritent de la couleur
+// du texte et partagent une même épaisseur de trait. Les trois emojis qu'elles
+// remplacent (📜 ⚙️ 📊) venaient de familles graphiques différentes, en couleur,
+// et juraient entre eux comme avec le reste de l'interface — qui est plate et
+// monochrome.
+const ICON_SVG_ATTRS =
+  'viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" ' +
+  'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"';
+
+function navIcon(paths) {
+  return `<svg class="menu-item__glyph" ${ICON_SVG_ATTRS}>${paths}</svg>`;
+}
+
+// Indicateur de fin de ligne, au même trait que les icônes.
+function metaIcon(paths) {
+  return `<svg class="menu-item__chevron" ${ICON_SVG_ATTRS}>${paths}</svg>`;
+}
+
+const ICONS = {
+  // Une horloge : l'historique des tirages.
+  historique: navIcon('<circle cx="12" cy="12" r="8.5"/><path d="M12 7.4V12l3.2 1.9"/>'),
+  // Deux curseurs de réglage.
+  reglages: navIcon(
+    '<path d="M4 7.5h6.6"/><path d="M15.6 7.5H20"/><circle cx="13.1" cy="7.5" r="2.3"/>' +
+      '<path d="M4 16.5h3.2"/><path d="M12.2 16.5H20"/><circle cx="9.7" cy="16.5" r="2.3"/>'
+  ),
+  // Un diagramme en barres.
+  donnees: navIcon(
+    '<path d="M3.5 20h17"/><path d="M7.5 20v-5.4"/><path d="M12 20V8"/><path d="M16.5 20v-8.4"/>'
+  ),
+  // Chevron : l'entrée ouvre un panneau, au même niveau de navigation.
+  chevron: metaIcon('<path d="m9.5 5.5 7 6.5-7 6.5"/>'),
+  // Flèche oblique : l'entrée quitte la page. Une bordure pivotée ne pouvait
+  // pas la dessiner — elle donnait un chevron vers le haut, qu'on lisait comme
+  // un repli.
+  externe: metaIcon('<path d="M7 17 17 7"/><path d="M8.5 7H17v8.5"/>')
+};
+
 // Les entrées du menu qui ouvrent un panneau. Le bouton de navigation, le
 // panneau, son bouton retour et le rendu de son contenu en découlent tous :
 // ajouter une rubrique, c'est ajouter une ligne ici.
 const MENU_PANELS = [
   {
     id: 'historique',
-    icon: '📜',
+    icon: ICONS.historique,
     label: 'Historique',
     badgeId: 'historyBadge',
     render: renderHistory,
@@ -198,7 +236,7 @@ const MENU_PANELS = [
   },
   {
     id: 'reglages',
-    icon: '⚙️',
+    icon: ICONS.reglages,
     label: 'Réglages',
     render: renderSettings,
     content: `
@@ -264,14 +302,15 @@ function createMenuHTML() {
     <div class="menu-nav">
       ${MENU_PANELS.map(renderMenuItem).join('')}
       <a class="menu-item" id="advancedLink" href="donnees.html">
-        <span class="menu-item__icon" aria-hidden="true">📊</span>
+        <span class="menu-item__icon">${ICONS.donnees}</span>
         <span class="menu-item__label">Données &amp; analyse</span>
-        <span class="menu-item__chevron" aria-hidden="true">↗</span>
+        ${ICONS.externe}
       </a>
     </div>
     <div class="menu-footer">
       <a href="https://github.com/wald52/larouedelaservitude" target="_blank" rel="noopener">GitHub</a>
-      <span class="menu-footer__version">${APP_VERSION}</span>
+      <span aria-hidden="true">·</span>
+      <span>${APP_VERSION}</span>
     </div>
   `;
   document.body.appendChild(sidebar);
@@ -290,10 +329,10 @@ function renderMenuItem({ id, icon, label, badgeId }) {
   const badge = badgeId ? `<span class="menu-item__badge" id="${badgeId}" hidden>0</span>` : '';
   return `
     <button class="menu-item" type="button" data-panel="${id}" aria-controls="${panelElementId(id)}">
-      <span class="menu-item__icon" aria-hidden="true">${icon}</span>
+      <span class="menu-item__icon">${icon}</span>
       <span class="menu-item__label">${label}</span>
       ${badge}
-      <span class="menu-item__chevron" aria-hidden="true">›</span>
+      ${ICONS.chevron}
     </button>
   `;
 }
