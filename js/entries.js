@@ -378,23 +378,28 @@ export function formatRecette(entry) {
 export function formatEntryForDisplay(entry) {
   if (!entry) return "";
 
-  const parts = [];
-
-  // Nom complet en premier
-  parts.push(`<strong>${escapeHtml(entry.nom_complet)}</strong>`);
-
-  // Recette si disponible
+  // Les deux lignes sont toujours affichées, même vides de contenu.
+  //
+  // 60 % des prélèvements n'ont pas de recette renseignée, 54 % pas d'année, et
+  // 51 % ni l'une ni l'autre : plus d'un tirage sur deux ne montrait donc que
+  // son intitulé, dans une bulle qu'on prenait pour un affichage incomplet.
+  // Dire « non renseignée » informe — c'est une lacune connue du jeu de
+  // données — là où le silence laissait croire à une panne.
+  const unknown = (label) => `<span class="result-unknown">${label} : non renseignée</span>`;
   const recette = formatRecette(entry);
-  if (recette) {
-    parts.push(`<br>💰 Recette : ${escapeHtml(recette)}`);
-  }
 
-  // Année si disponible
-  if (entry.annee) {
-    parts.push(`<br>📅 Date de création : ${escapeHtml(entry.annee)}`);
-  }
+  // Chaque bloc porte son propre <br>, et la jointure en ajoute un second :
+  // c'est cette paire qui produit la ligne vide de séparation.
+  const ligneRecette = recette ? `💰 Recette : ${escapeHtml(recette)}` : unknown("💰 Recette");
+  const ligneAnnee = entry.annee
+    ? `📅 Date de création : ${escapeHtml(entry.annee)}`
+    : unknown("📅 Date de création");
 
-  return parts.join("<br>");
+  return [
+    `<strong>${escapeHtml(entry.nom_complet)}</strong>`,
+    `<br>${ligneRecette}`,
+    `<br>${ligneAnnee}`
+  ].join("<br>");
 }
 
 /**

@@ -312,6 +312,12 @@
       /* Une grille plutôt qu'un flex-wrap : le nombre de pastilles par rangée est
    décidé, pas subi. En flex, les neuf boutons se cassaient en 6 + 3 selon la
    largeur du texte au-dessus. */
+      /* 51 % des prélèvements n'ont ni recette ni année : la mention grisée
+         évite une bulle réduite au seul intitulé, qu'on prenait pour un bug. */
+      .result-unknown {
+        opacity: 0.62;
+        font-weight: 500;
+      }
       .share-bar {
         margin-top: 18px;
         display: grid;
@@ -353,14 +359,27 @@
       }
 
       /* Boutons de retour utilisateur : posés sur la bulle, d'où la variante
-     .btn-inverse dans le balisage. Ici, uniquement leur placement.
+     .btn-inverse dans le balisage. Ici, leur placement et leur poids.
      En grille : les deux libellés sont de longueurs très différentes, et un
      flex-wrap les disposait en escalier — le premier sur toute la largeur, le
-     second centré dessous. */
+     second centré dessous.
+     Signaler une erreur reste une action tertiaire : deux pavés pleine largeur
+     lui donnaient plus de présence qu'au résultat lui-même. */
       .feedback-buttons {
-        margin-top: 18px;
+        margin-top: 16px;
         display: grid;
-        gap: 8px;
+        gap: 6px;
+      }
+
+      .feedback-buttons .btn {
+        min-height: 34px;
+        font-size: 12px;
+        font-weight: 500;
+        opacity: 0.72;
+      }
+
+      .feedback-buttons .btn:hover {
+        opacity: 1;
       }
 
       @media (min-width: 560px) {
@@ -750,6 +769,17 @@
                 d="M5 15H4.4A2.4 2.4 0 0 1 2 12.6V4.4A2.4 2.4 0 0 1 4.4 2h8.2A2.4 2.4 0 0 1 15 4.4V5"
               />
             </svg>
+          </button>
+        </div>
+        <!-- Hors de #overlayText, qui est une zone aria-live : ces deux boutons y
+             étaient injectés à chaque tirage, donc réannoncés avec le résultat.
+             Ils viennent après le partage, qui est l'action attendue ici. -->
+        <div class="feedback-buttons">
+          <button id="btn-info" type="button" class="btn btn-inverse btn-sm">
+            Donner un complément d'information
+          </button>
+          <button id="btn-error" type="button" class="btn btn-inverse btn-sm">
+            Signaler une erreur
           </button>
         </div>
         <button

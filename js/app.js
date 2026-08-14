@@ -956,10 +956,6 @@ async function showOverlay(entryIndex) {
   // 💬 contenu principal du résultat
   overlayText.innerHTML = `
     ${intro}<br><br>${formatted}
-    <div class="feedback-buttons">
-      <button id="btn-info" type="button" class="btn btn-inverse btn-sm">Donner un complément d'information</button>
-      <button id="btn-error" type="button" class="btn btn-inverse btn-sm">Signaler une erreur</button>
-    </div>
   `;
 
   overlay.style.display = "flex";
@@ -969,18 +965,24 @@ async function showOverlay(entryIndex) {
   openModal(overlay, overlay.querySelector(".bubble"));
 }
 
-// 🧩 Attache les écouteurs de feedback UNE SEULE FOIS au démarrage.
-// Délégué sur #overlayText (et non document) car .bubble stoppe la propagation des clics.
-overlayText.addEventListener("click", (e) => {
-  const infoBtn = e.target.closest("#btn-info");
-  const errorBtn = e.target.closest("#btn-error");
+// Les deux boutons vivent maintenant dans le balisage : plus de délégation, un
+// écouteur chacun. Le texte transmis est celui du résultat, sans l'accroche
+// aléatoire qui le précède.
+// Tout ce qui suit l'accroche aléatoire : l'intitulé et ses deux lignes de
+// données. On ne gardait que le premier bloc, si bien qu'un signalement partait
+// avec le seul nom, sans la recette ni l'année sur lesquelles il portait
+// peut-être.
+function currentResultText() {
+  const blocks = overlayText.innerText.split("\n\n");
+  return blocks.length > 1 ? blocks.slice(1).join("\n").trim() : overlayText.innerText;
+}
 
-  if (!infoBtn && !errorBtn) return;
+requireElement("btn-info").addEventListener("click", () => {
+  openFeedback(currentResultText(), "info");
+});
 
-  // On récupère le texte du résultat actuel dans l'overlay
-  const feedbackText = overlayText.innerText.split("\n\n")[1] || overlayText.innerText;
-
-  openFeedback(feedbackText, infoBtn ? "info" : "error");
+requireElement("btn-error").addEventListener("click", () => {
+  openFeedback(currentResultText(), "error");
 });
 
 // === Feedback modal ===
