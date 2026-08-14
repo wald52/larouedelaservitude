@@ -516,7 +516,6 @@ function renderCharts(rows) {
     ariaLabel: "Nombre de prélèvements créés par période",
     formatValue: (value) => formatNumber(value),
     axisLabel: "Année de création",
-    colorIndex: 0,
     emptyMessage: "Aucune année de création connue dans cette sélection."
   });
 
@@ -533,7 +532,6 @@ function renderCharts(rows) {
     })),
     ariaLabel: `Les ${state.topCount} prélèvements les plus rentables de la sélection`,
     formatValue: formatMontant,
-    colorIndex: 1,
     emptyMessage: "Aucune recette connue dans cette sélection."
   });
 
@@ -556,7 +554,6 @@ function renderCharts(rows) {
     ariaLabel: "Répartition des recettes par ordre de grandeur",
     formatValue: (value) => formatNumber(value),
     axisLabel: "Ordre de grandeur de la recette",
-    colorIndex: 3,
     emptyMessage: "Aucune recette strictement positive dans cette sélection."
   });
 

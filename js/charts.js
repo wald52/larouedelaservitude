@@ -17,6 +17,10 @@ const SVG_NS = "http://www.w3.org/2000/svg";
 const VIEW = { width: 720, height: 380 };
 
 const SERIES_COLORS = [
+  // Un graphique à série unique garde `colorIndex` à 0 : les cinq de la page
+  // d'analyse le sont tous, et en piochant chacun dans la palette ils
+  // affichaient cinq couleurs sans rapport entre elles. Les suivantes ne
+  // servent qu'à un graphique portant plusieurs séries.
   "var(--chart-1)",
   "var(--chart-2)",
   "var(--chart-3)",
@@ -173,7 +177,7 @@ export function renderBarChart(container, options) {
  * @param {{data: Array<{label:string,value:number,title?:string}>, ariaLabel:string, formatValue?:(v:number)=>string, colorIndex?:number, emptyMessage?:string}} options
  */
 export function renderHorizontalBarChart(container, options) {
-  const { data = [], ariaLabel = "Classement", formatValue, colorIndex = 1 } = options;
+  const { data = [], ariaLabel = "Classement", formatValue, colorIndex = 0 } = options;
   if (!data.length) return mount(container, null, options.emptyMessage);
 
   const format = formatValue || ((value) => String(value));
@@ -282,11 +286,11 @@ export function renderLorenzChart(container, options) {
     el("polygon", {
       points: `0,${plotHeight} ${path} ${plotWidth},${plotHeight}`,
       class: "chart-area",
-      fill: SERIES_COLORS[2]
+      fill: SERIES_COLORS[0]
     })
   );
   plot.appendChild(
-    el("polyline", { points: path, fill: "none", stroke: SERIES_COLORS[2], class: "chart-line" })
+    el("polyline", { points: path, fill: "none", stroke: SERIES_COLORS[0], class: "chart-line" })
   );
 
   plot.appendChild(

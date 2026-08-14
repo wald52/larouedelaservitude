@@ -23,16 +23,25 @@
   --muted: #6b7280;
   --accent: #c00;
   --focus: #f59e0b;
-  --row-hover: rgba(17, 17, 17, 0.04);
+  --row-hover: rgba(17, 17, 17, 0.06);
+  --row-stripe: rgba(17, 17, 17, 0.025);
   --row-selected: rgba(204, 0, 0, 0.08);
   --code-bg: #f4f4f5;
+  --card-shadow: 0 1px 2px rgba(17, 17, 17, 0.04), 0 6px 18px rgba(17, 17, 17, 0.05);
 
-  --chart-1: #2563eb;
-  --chart-2: #c026d3;
-  --chart-3: #059669;
-  --chart-4: #d97706;
-  --chart-5: #dc2626;
-  --chart-6: #0891b2;
+  /* Palette de séries harmonisée : mêmes clarté et saturation, teintes
+     réparties dans l'ordre du cercle chromatique, et le rouge du site en
+     tête. Elle remplace six couleurs choisies séparément (bleu vif, fuchsia,
+     vert, ambre…) qui ne formaient pas un ensemble : chaque graphique
+     arborait la sienne. Tous les graphiques de la page sont à série unique et
+     prennent donc la première ; les suivantes n'existent que pour le jour où
+     un graphique portera plusieurs séries. */
+  --chart-1: #b91c1c;
+  --chart-2: #c2410c;
+  --chart-3: #a16207;
+  --chart-4: #15803d;
+  --chart-5: #1d4ed8;
+  --chart-6: #7e22ce;
   --chart-grid: rgba(17, 17, 17, 0.1);
   --chart-axis: rgba(17, 17, 17, 0.35);
   --chart-text: #52525b;
@@ -51,16 +60,18 @@
   --muted: #9ca3af;
   --accent: #f87171;
   --focus: #f59e0b;
-  --row-hover: rgba(243, 244, 246, 0.06);
+  --row-hover: rgba(243, 244, 246, 0.08);
+  --row-stripe: rgba(243, 244, 246, 0.035);
   --row-selected: rgba(248, 113, 113, 0.14);
   --code-bg: #0b0e13;
+  --card-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 6px 18px rgba(0, 0, 0, 0.32);
 
-  --chart-1: #60a5fa;
-  --chart-2: #e879f9;
-  --chart-3: #34d399;
-  --chart-4: #fbbf24;
-  --chart-5: #f87171;
-  --chart-6: #22d3ee;
+  --chart-1: #f87171;
+  --chart-2: #fb923c;
+  --chart-3: #fbbf24;
+  --chart-4: #4ade80;
+  --chart-5: #60a5fa;
+  --chart-6: #c084fc;
   --chart-grid: rgba(243, 244, 246, 0.12);
   --chart-axis: rgba(243, 244, 246, 0.4);
   --chart-text: #a1a1aa;
@@ -213,10 +224,14 @@ a {
   gap: 20px;
 }
 
+/* Le blanc des cartes ne se détache que de trois pour cent du fond de page :
+   une ombre douce fait le reste du travail, là où la bordure seule laissait
+   l'ensemble à plat. */
 .card {
   background: var(--surface);
   border: 1px solid var(--ring);
   border-radius: 14px;
+  box-shadow: var(--card-shadow);
   padding: 18px;
   /* Sans ce min-width, la largeur naturelle du tableau (six colonnes) gonfle
      la grille de la page et fait défiler tout le document sur mobile, malgré
@@ -280,9 +295,23 @@ a {
 
 .filters {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  grid-template-columns: minmax(0, 1fr);
   gap: 14px;
   align-items: end;
+}
+
+@media (min-width: 620px) {
+  .filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Quatre colonnes, la recherche sur deux : la première rangée est pleine, et
+   il ne reste qu'un seul creux en fin de formulaire au lieu de quatre. */
+@media (min-width: 1000px) {
+  .filters {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
 }
 
 .field {
@@ -353,23 +382,42 @@ kbd {
    Statistiques
    =============================== */
 
+/* Un nombre fixe de colonnes plutôt qu'un auto-fit : les huit statistiques se
+   répartissaient en six puis deux, laissant une deuxième rangée aux deux tiers
+   vide. En quatre colonnes, elles forment deux rangées pleines. */
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
 }
 
+@media (min-width: 1080px) {
+  .stats-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 420px) {
+  .stats-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
 .stat-card {
-  padding: 14px;
+  padding: 16px;
   border: 1px solid var(--ring);
   border-radius: 12px;
   background: var(--surface-alt);
 }
 
 .stat-value {
-  font-size: 22px;
+  font-size: 26px;
   font-weight: 800;
+  line-height: 1.15;
   letter-spacing: -0.02em;
+  /* Les chiffres gardent la même chasse : les valeurs d'une colonne à l'autre
+     s'alignent au lieu de danser. */
+  font-variant-numeric: tabular-nums;
   overflow-wrap: anywhere;
 }
 
@@ -389,19 +437,29 @@ kbd {
    Graphiques
    =============================== */
 
+/* Deux colonnes au plus : les quatre graphiques carrés forment alors deux
+   rangées pleines, suivies du graphique large. En trois colonnes, le quatrième
+   restait seul sur sa ligne — et chacun était trop petit pour être lu. */
 .charts-grid {
   display: grid;
-  /* min(340px, 100%) : sur un écran étroit la colonne se réduit au lieu de
-     déborder. */
-  grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr));
+  grid-template-columns: minmax(0, 1fr);
   gap: 18px;
 }
 
+@media (min-width: 900px) {
+  .charts-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* align-content: start — sinon, dans une rangée, les cartes sans note sous le
+   graphique étirent leur contenu pour rattraper la plus haute. */
 .chart {
   margin: 0;
   display: grid;
-  gap: 8px;
-  padding: 14px;
+  align-content: start;
+  gap: 10px;
+  padding: 16px;
   border: 1px solid var(--ring);
   border-radius: 12px;
   background: var(--surface-alt);
@@ -522,7 +580,7 @@ kbd {
   margin: 0;
   font-size: 14px;
   font-weight: 600;
-  color: var(--accent);
+  font-variant-numeric: tabular-nums;
 }
 
 /* ===============================
@@ -592,6 +650,12 @@ kbd {
   cursor: pointer;
 }
 
+/* Une rangée sur deux légèrement teintée : sur 371 lignes et six colonnes,
+   c'est ce qui permet de suivre une ligne jusqu'au bout de l'œil. */
+.data-table tbody tr:nth-child(even) {
+  background: var(--row-stripe);
+}
+
 .data-table tbody tr:hover {
   background: var(--row-hover);
 }
@@ -601,8 +665,8 @@ kbd {
 }
 
 .data-table td {
-  padding: 8px 10px;
-  vertical-align: top;
+  padding: 10px;
+  vertical-align: middle;
 }
 
 .data-table td.is-number {
@@ -627,12 +691,33 @@ kbd {
   color: var(--legend);
 }
 
+/* Sur un téléphone, ces deux colonnes occupaient toute la largeur visible et
+   rejetaient la recette — la donnée que l'on vient chercher — hors de l'écran :
+   il fallait faire défiler horizontalement pour voir le moindre chiffre.
+   L'intitulé complet répète largement le nom court, et l'identifiant n'est utile
+   qu'à qui exporte. Les deux restent dans la fiche détaillée, ouverte d'un clic
+   sur la ligne, et dans les exports CSV et JSON. */
+@media (max-width: 760px) {
+  .data-table .col-nom_complet,
+  .data-table .col-id {
+    display: none;
+  }
+}
+
+/* L'identifiant est un slug qui atteint la cinquantaine de caractères. Coupé à
+   la volée, il empilait jusqu'à quatre lignes et imposait sa hauteur à toute la
+   rangée : les lignes du tableau allaient du simple au quintuple. Il tient
+   désormais sur une ligne, tronqué, et son texte complet reste accessible dans
+   la fiche détaillée comme dans l'export. */
 .data-table .col-id {
   color: var(--muted);
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   font-size: 11px;
-  max-width: 220px;
-  overflow-wrap: anywhere;
+  width: 180px;
+  max-width: 180px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* ===============================

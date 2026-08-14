@@ -209,6 +209,20 @@ skips any request carrying `fresh` so those URLs never enter the cache.
 toggle in Réglages, and that was removed because a feature nobody can find is a feature nobody
 uses. Keep the entry visible; the separation between game and data is the *page*, not a switch.
 
+**One colour for one series.** Every chart on the data page plots a single series, so they all take
+`--chart-1` and the section reads as one system; `colorIndex` stays at its default. Each chart used
+to pick a different slot, which put a blue histogram next to a green curve, an orange histogram and
+a fuchsia ranking. The six `--chart-*` tokens are a harmonised categorical ramp (equal lightness,
+hues in wheel order, the site's red first) and exist for the day a chart carries several series —
+not to give each chart its own colour. `.charts-grid` and `.stats-grid` use fixed column counts
+rather than `auto-fit`: the auto layouts landed on 6+2 stat cards and a lone fourth chart.
+
+**The table's widest columns are dropped below 760px**, not shrunk: `col-nom_complet` (which largely
+repeats `col-nom`) and `col-id` pushed the recette column off-screen on a phone, so the one figure
+worth coming for needed a horizontal scroll. Both stay in the detail card and in the exports.
+`col-id` is also truncated on one line at every width — that slug reaches fifty characters and used
+to set the height of its whole row.
+
 **The data page computes nothing on its own.** Every figure it displays comes from `js/stats.js`,
 which has no DOM access and is covered by `tests/stats.test.mjs` — that is the whole reason it is a
 separate module. Watch out for missing values: 222 of 371 entries have no `recette`, and
