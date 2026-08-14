@@ -150,11 +150,22 @@ canvas{width:clamp(250px,80vw,540px);aspect-ratio:1/1;display:block;border-radiu
 .controls{display:grid;gap:10px;justify-items:center;padding-block:6px;}
 .legend{font-size:12px;color:var(--legend);}
 .overlay{position:fixed;top:0;left:0;right:0;bottom:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.35);z-index:9999;}
-.bubble{position:relative;max-width:92%;padding:20px 48px 20px 20px;border-radius:14px;background:var(--bubble-bg);color:var(--bubble-fg);
+/* Rembourrage haut plus généreux plutôt qu'à droite : le bouton de fermeture
+   loge dans cette bande, et le texte reste centré. Avec 48px à droite et 20 à
+   gauche, il était décalé sur toute la hauteur de la bulle. */
+.bubble{position:relative;max-width:min(92%,620px);padding:46px 20px 20px;border-radius:14px;background:var(--bubble-bg);color:var(--bubble-fg);
 box-shadow:0 8px 24px rgba(0,0,0,0.25);font-size:clamp(14px,2.4vw,20px);font-weight:600;text-align:center;line-height:1.35;}
 /* Positionnement seul : l'apparence des boutons vient de buttons.css. */
 .close{position:absolute;top:10px;right:10px;}
-.share-bar{margin-top:16px;display:flex;gap:8px;flex-wrap:wrap;justify-content:center;}
+
+/* Une grille plutôt qu'un flex-wrap : le nombre de pastilles par rangée est
+   décidé, pas subi. En flex, les neuf boutons se cassaient en 6 + 3 selon la
+   largeur du texte au-dessus. */
+.share-bar{margin-top:18px;display:grid;grid-template-columns:repeat(9,auto);gap:8px;justify-content:center;}
+.share-icon{width:20px;height:20px;display:block;}
+@media (max-width: 520px){
+  .share-bar{grid-template-columns:repeat(5,auto);}
+}
 /* Ajustement du cadre de résultat sur mobile */
 @media (max-width: 600px) {
   .overlay {
@@ -166,7 +177,7 @@ box-shadow:0 8px 24px rgba(0,0,0,0.25);font-size:clamp(14px,2.4vw,20px);font-wei
   .bubble {
     max-width: 90%;
     max-width: 340px;
-    padding: 16px 36px 16px 16px;
+    padding: 42px 16px 16px;
     font-size: 15px;
     border-radius: 16px;
     margin: 0 auto;
@@ -179,9 +190,20 @@ box-shadow:0 8px 24px rgba(0,0,0,0.25);font-size:clamp(14px,2.4vw,20px);font-wei
 }
 
   /* Boutons de retour utilisateur : posés sur la bulle, d'où la variante
-     .btn-inverse dans le balisage. Ici, uniquement leur placement. */
+     .btn-inverse dans le balisage. Ici, uniquement leur placement.
+     En grille : les deux libellés sont de longueurs très différentes, et un
+     flex-wrap les disposait en escalier — le premier sur toute la largeur, le
+     second centré dessous. */
 .feedback-buttons {
-  margin-top: 16px;
+  margin-top: 18px;
+  display: grid;
+  gap: 8px;
+}
+
+@media (min-width: 560px) {
+  .feedback-buttons {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 
 /* Empêche un fond plus grand que l’écran */
@@ -320,15 +342,15 @@ body {
     <!-- `aria-label` sert à la fois de nom accessible et d'info-bulle (.btn-tip,
          buttons.css) : plus de `title` à garder synchronisé. -->
     <div class="share-bar" id="shareBar">
-      <button class="btn btn-icon btn-pill btn-inverse btn-tip" type="button" data-platform="facebook" aria-label="Partager sur Facebook">📘</button>
-      <button class="btn btn-icon btn-pill btn-inverse btn-tip" type="button" data-platform="x" aria-label="Partager sur X / Twitter">🐦</button>
-      <button class="btn btn-icon btn-pill btn-inverse btn-tip" type="button" data-platform="instagram" aria-label="Partager sur Instagram">📸</button>
-      <button class="btn btn-icon btn-pill btn-inverse btn-tip" type="button" data-platform="linkedin" aria-label="Partager sur LinkedIn">💼</button>
-      <button class="btn btn-icon btn-pill btn-inverse btn-tip" type="button" data-platform="snapchat" aria-label="Partager sur Snapchat">👻</button>
-      <button class="btn btn-icon btn-pill btn-inverse btn-tip" type="button" data-platform="tiktok" aria-label="Partager sur TikTok">🎵</button>
-      <button class="btn btn-icon btn-pill btn-inverse btn-tip" type="button" data-platform="whatsapp" aria-label="Partager sur WhatsApp">💬</button>
-      <button class="btn btn-icon btn-pill btn-inverse btn-tip" type="button" data-platform="telegram" aria-label="Partager sur Telegram">📨</button>
-      <button class="btn btn-icon btn-pill btn-inverse btn-tip" type="button" id="copyText" aria-label="Copier le texte">📋</button>
+      <button class="btn btn-icon btn-pill btn-inverse btn-tip" type="button" data-platform="facebook" aria-label="Partager sur Facebook"><svg class="share-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3h-2.5A4.5 4.5 0 0 0 10 7.5V10H7.5v3.5H10V21h3.5v-7.5h2.6l.6-3.5h-3.2V7.5a1 1 0 0 1 1-1H17z"/></svg></button>
+      <button class="btn btn-icon btn-pill btn-inverse btn-tip" type="button" data-platform="x" aria-label="Partager sur X / Twitter"><svg class="share-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4l7 8.6M4 20l6.6-7.6M20 4l-6.6 7.6M20 20l-7-8.6"/><path d="M4 4h2.6l13.4 16h-2.6z"/></svg></button>
+      <button class="btn btn-icon btn-pill btn-inverse btn-tip" type="button" data-platform="instagram" aria-label="Partager sur Instagram"><svg class="share-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5.2"/><circle cx="12" cy="12" r="4"/><path d="M17 7h.01"/></svg></button>
+      <button class="btn btn-icon btn-pill btn-inverse btn-tip" type="button" data-platform="linkedin" aria-label="Partager sur LinkedIn"><svg class="share-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="9" width="3.6" height="12" rx="0.6"/><circle cx="4.8" cy="4.6" r="1.8"/><path d="M11 21v-9"/><path d="M11 15.2a3.2 3.2 0 0 1 6.4 0V21"/></svg></button>
+      <button class="btn btn-icon btn-pill btn-inverse btn-tip" type="button" data-platform="snapchat" aria-label="Partager sur Snapchat"><svg class="share-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5c2.7 0 4.2 2 4.1 4.4 0 .8-.1 1.4.1 1.8.2.4.9.3 1.3.2.4-.1.6.5.2.8-.4.3-1.3.4-1.4.9-.1.4 1 2.2 2.7 2.8.3.1.2.6-.1.6-.9.3-1.6.2-1.8.6-.1.3-.1.6-.5.6-.6 0-1.1-.2-2-.1-.9.2-1.5 1.2-2.6 1.2s-1.7-1-2.6-1.2c-.9-.2-1.4.1-2 .1-.4 0-.4-.3-.5-.6-.2-.4-.9-.3-1.8-.6-.3 0-.4-.5-.1-.6 1.7-.6 2.8-2.4 2.7-2.8-.1-.5-1-.6-1.4-.9-.4-.3-.2-.9.2-.8.4.1 1.1.2 1.3-.2.2-.4.1-1 .1-1.8C7.8 5.5 9.3 3.5 12 3.5z"/></svg></button>
+      <button class="btn btn-icon btn-pill btn-inverse btn-tip" type="button" data-platform="tiktok" aria-label="Partager sur TikTok"><svg class="share-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.5 20.5a4 4 0 1 0-4-4"/><path d="M13.5 3v11.5"/><path d="M13.5 3c.4 2.6 2.3 4.4 5 4.6"/></svg></button>
+      <button class="btn btn-icon btn-pill btn-inverse btn-tip" type="button" data-platform="whatsapp" aria-label="Partager sur WhatsApp"><svg class="share-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 11.6a8.5 8.5 0 0 1-12.6 7.5L3.5 20.5l1.4-4.4A8.5 8.5 0 1 1 20.5 11.6z"/><path d="M9 8.6c.4-.1.7 0 .9.4l.7 1.3c.1.3.1.5-.1.8l-.4.5c-.2.2-.2.4-.1.6a6 6 0 0 0 2.3 2.3c.2.1.4.1.6-.1l.5-.4c.3-.2.5-.2.8-.1l1.3.7c.4.2.5.5.4.9-.2.9-1.1 1.4-2 1.3-3-.4-5.6-3-6-6-.1-.9.4-1.8 1.3-2z"/></svg></button>
+      <button class="btn btn-icon btn-pill btn-inverse btn-tip" type="button" data-platform="telegram" aria-label="Partager sur Telegram"><svg class="share-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 4L3 11l5.5 2z"/><path d="M21 4l-3 16-6.5-5.6L8.5 13z"/><path d="M8.5 13v5l3-3.4"/></svg></button>
+      <button class="btn btn-icon btn-pill btn-inverse btn-tip" type="button" id="copyText" aria-label="Copier le texte"><svg class="share-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2.4"/><path d="M5 15H4.4A2.4 2.4 0 0 1 2 12.6V4.4A2.4 2.4 0 0 1 4.4 2h8.2A2.4 2.4 0 0 1 15 4.4V5"/></svg></button>
     </div>
     <button id="overlayClose" class="close btn btn-icon btn-sm btn-pill btn-inverse btn-close" type="button" aria-label="Fermer"></button>
   </div>

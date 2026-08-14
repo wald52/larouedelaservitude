@@ -930,7 +930,7 @@ async function showOverlay(entryIndex){
   // 💬 contenu principal du résultat
   overlayText.innerHTML = `
     ${intro}<br><br>${formatted}
-    <div class="feedback-buttons btn-row btn-row--center">
+    <div class="feedback-buttons">
       <button id="btn-info" type="button" class="btn btn-inverse btn-sm">Donner un complément d'information</button>
       <button id="btn-error" type="button" class="btn btn-inverse btn-sm">Signaler une erreur</button>
     </div>
