@@ -1,4 +1,10 @@
-import { initWheel, loadFullData, getEntryDetails, formatEntryForDisplay } from "./entries.js";
+import {
+  initWheel,
+  loadFullData,
+  getEntryDetails,
+  formatEntryForDisplay,
+  formatEntryAsText
+} from "./entries.js";
 import { initAudio, unlockAudio, isSoundEnabled, playSpinClick, playWinSound } from "./audio.js";
 import { initMenu, loadHistory, loadSettings, recordSpin, isInfiniteMode } from "./menu.js";
 import { initServiceWorker, applyPendingUpdate } from "./sw-update.js";
@@ -20,9 +26,9 @@ const countInfo = requireElement("countInfo");
 const installPromptBanner = document.getElementById("installPrompt");
 const installPromptAction = document.getElementById("installPromptAction");
 const installPromptClose = document.getElementById("installPromptClose");
-const overlay = requireElement("overlay");
-const overlayText = requireElement("overlayText");
-const overlayClose = requireElement("overlayClose");
+const resultCard = requireElement("resultCard");
+const resultText = requireElement("resultText");
+const resultClose = requireElement("resultClose");
 const copyBtn = requireElement("copyText");
 const shareButtons = document.querySelectorAll("#shareBar button[data-platform]");
 if (shareButtons.length === 0) {
@@ -82,11 +88,17 @@ let fullDataLoadScheduled = false;
 let deferredInstallPrompt = null;
 let completedSpinCount = 0;
 let installPromptDismissed = false;
-let installPromptPendingAfterOverlay = false;
+let installPromptPendingAfterResult = false;
 let billsInitPromise = null;
 let billsModule = null;
+// Entrée affichée par la carte de résultat, et l'accroche tirée au sort qui la
+// coiffe : le partage, la copie et le formulaire de retour les reprennent tels
+// quels, sans relire le balisage de la carte.
+let currentEntry = null;
+let currentIntro = "";
 let animFrameId = null;
 let frictionResumeTimer = 0;
+let spinResetTimer = 0;
 let installPromptHideTimer = 0;
 // Mise à jour de données reçue pendant une rotation, appliquée à l'arrêt.
 let pendingEntriesRefresh = false;
@@ -142,8 +154,8 @@ function isAppInstalled() {
   );
 }
 
-function isOverlayOpen() {
-  return overlay.getAttribute("aria-hidden") === "false";
+function isResultVisible() {
+  return !resultCard.hidden;
 }
 
 function showInstallPromptBanner() {
@@ -178,18 +190,20 @@ function shouldShowInstallPrompt() {
 
 function syncInstallPromptVisibility() {
   if (!shouldShowInstallPrompt()) {
-    installPromptPendingAfterOverlay = false;
+    installPromptPendingAfterResult = false;
     hideInstallPromptBanner();
     return;
   }
 
-  if (isOverlayOpen()) {
-    installPromptPendingAfterOverlay = true;
+  // La bannière flotte au-dessus de la barre d'onglets, donc par-dessus le bas
+  // de la carte de résultat : tant qu'un résultat est affiché, elle attend.
+  if (isResultVisible()) {
+    installPromptPendingAfterResult = true;
     hideInstallPromptBanner();
     return;
   }
 
-  installPromptPendingAfterOverlay = false;
+  installPromptPendingAfterResult = false;
   showInstallPromptBanner();
 }
 
@@ -199,11 +213,12 @@ function registerCompletedSpin() {
 }
 
 /* =======================
-   MODALES : FOCUS
+   MODALE : FOCUS
    ======================= */
-// Les deux modales (résultat et retour utilisateur) partagent le même
-// comportement : le focus entre dedans à l'ouverture, y reste tant qu'elles
-// sont ouvertes, et revient à son point de départ à la fermeture.
+// Le formulaire de retour utilisateur recouvre la page : le focus y entre à
+// l'ouverture, y reste tant qu'elle est ouverte, et revient à son point de
+// départ à la fermeture. La carte de résultat, elle, ne recouvre rien et ne
+// prend donc jamais le focus (voir showResult).
 
 // La mécanique elle-même (pile de surfaces, capture du Tab, restitution du
 // focus) vit dans js/focus-trap.js, partagée avec le menu.
@@ -215,18 +230,72 @@ function closeModal(container) {
   popFocusTrap(container);
 }
 
-function hideResultOverlay() {
-  overlay.style.display = "none";
-  overlay.setAttribute("aria-hidden", "true");
-  closeModal(overlay);
+/* =======================
+   CARTE DE RÉSULTAT
+   ======================= */
+// Le résultat s'affiche sous la roue, dans le flux de la page. `data-result`
+// sur <html> resserre la roue en CSS pour lui faire de la place ; la taille du
+// canvas étant lue dans le style calculé, syncCanvasSize() reconstruit ensuite
+// les calques à la nouvelle dimension.
 
-  if (installPromptPendingAfterOverlay) {
+function setResultOpen(open) {
+  if (isResultVisible() === open) return;
+
+  resultCard.hidden = !open;
+  document.documentElement.dataset.result = open ? "open" : "closed";
+  syncCanvasSize();
+}
+
+function hideResult() {
+  if (!isResultVisible()) return;
+
+  setResultOpen(false);
+
+  if (installPromptPendingAfterResult) {
     syncInstallPromptVisibility();
   }
 
   // Moment calme : si une mise à jour attendait que l'utilisateur soit
   // disponible, c'est ici qu'elle s'applique.
   applyPendingUpdate();
+}
+
+function showResult(entry) {
+  if (!entry) return;
+
+  const intros = [
+    "🎯 Le Fisc a parlé !",
+    "✨ Voici votre contribution :",
+    "🍀 Et le grand gagnant est… votre portefeuille !",
+    "💸 Félicitations, vous venez de gagner une nouvelle taxe !",
+    "🎉 Bravo, vous avez été sélectionné pour payer plus !",
+    "💰 La taxe du jour :",
+    "🎁 Surprise ! Une nouvelle taxe pour vous !",
+    "🏅 Médaille d'or pour votre contribution fiscale !",
+    "💣 Boom ! Voici votre prochaine taxe !"
+  ];
+
+  currentEntry = entry;
+  currentIntro = intros[Math.floor(Math.random() * intros.length)];
+
+  // L'accroche est écrite ici et non dans entries.js : elle relève du ton de la
+  // roue, pas de la mise en forme d'une donnée.
+  resultText.innerHTML =
+    `<p class="result__intro">${currentIntro}</p>` + formatEntryForDisplay(entry);
+
+  setResultOpen(true);
+  // La carte peut avoir été défilée jusqu'aux boutons de partage : le tirage
+  // suivant doit s'ouvrir sur son intitulé, pas au milieu de la fiche.
+  resultCard.scrollTop = 0;
+}
+
+// Le résultat en texte brut — partage, presse-papiers, formulaire de retour.
+function currentResultText() {
+  return formatEntryAsText(currentEntry);
+}
+
+function currentShareText() {
+  return `${currentIntro}\n\n${currentResultText()}`;
 }
 
 window.addEventListener("beforeinstallprompt", (event) => {
@@ -238,14 +307,14 @@ window.addEventListener("beforeinstallprompt", (event) => {
 window.addEventListener("appinstalled", () => {
   deferredInstallPrompt = null;
   installPromptDismissed = true;
-  installPromptPendingAfterOverlay = false;
+  installPromptPendingAfterResult = false;
   hideInstallPromptBanner();
 });
 
 if (installPromptClose) {
   installPromptClose.addEventListener("click", () => {
     installPromptDismissed = true;
-    installPromptPendingAfterOverlay = false;
+    installPromptPendingAfterResult = false;
     hideInstallPromptBanner();
   });
 }
@@ -256,7 +325,7 @@ if (installPromptAction) {
 
     const installEvent = deferredInstallPrompt;
     deferredInstallPrompt = null;
-    installPromptPendingAfterOverlay = false;
+    installPromptPendingAfterResult = false;
     hideInstallPromptBanner();
 
     try {
@@ -804,6 +873,7 @@ function boostWheel(e) {
   completeCenterIntro();
   ensureAudioInitialized();
   scheduleFullDataLoad("premier boost");
+  clearTimeout(spinResetTimer);
   hasBeenSpun = true;
 
   // Les billets sont purement décoratifs : on ne les lance pas à qui demande
@@ -924,7 +994,7 @@ if (typeof window !== "undefined") {
 }
 
 /* =======================
-   SELECTION / OVERLAY
+   SÉLECTION
    ======================= */
 function getSelectedIndex(a) {
   const n = ENTRIES.length;
@@ -935,48 +1005,10 @@ function getSelectedIndex(a) {
   return Math.floor(theta / step);
 }
 
-async function showOverlay(entryIndex) {
-  const intros = [
-    "🎯 Le Fisc a parlé !",
-    "✨ Voici votre contribution :",
-    "🍀 Et le grand gagnant est… votre portefeuille !",
-    "💸 Félicitations, vous venez de gagner une nouvelle taxe !",
-    "🎉 Bravo, vous avez été sélectionné pour payer plus !",
-    "💰 La taxe du jour :",
-    "🎁 Surprise ! Une nouvelle taxe pour vous !",
-    "🏅 Médaille d'or pour votre contribution fiscale !",
-    "💣 Boom ! Voici votre prochaine taxe !"
-  ];
-  const intro = intros[Math.floor(Math.random() * intros.length)];
-
-  // Récupérer les détails complets de l'entrée
-  const entry = await getEntryDetails(entryIndex);
-  const formatted = formatEntryForDisplay(entry);
-
-  // 💬 contenu principal du résultat
-  overlayText.innerHTML = `
-    ${intro}<br><br>${formatted}
-  `;
-
-  overlay.style.display = "flex";
-  overlay.setAttribute("aria-hidden", "false");
-  // .bubble porte tabindex="-1" : y placer le focus fait annoncer le dialogue
-  // par les lecteurs d'écran et amorce le piège de focus.
-  openModal(overlay, overlay.querySelector(".bubble"));
-}
-
-// Les deux boutons vivent maintenant dans le balisage : plus de délégation, un
-// écouteur chacun. Le texte transmis est celui du résultat, sans l'accroche
-// aléatoire qui le précède.
-// Tout ce qui suit l'accroche aléatoire : l'intitulé et ses deux lignes de
-// données. On ne gardait que le premier bloc, si bien qu'un signalement partait
-// avec le seul nom, sans la recette ni l'année sur lesquelles il portait
-// peut-être.
-function currentResultText() {
-  const blocks = overlayText.innerText.split("\n\n");
-  return blocks.length > 1 ? blocks.slice(1).join("\n").trim() : overlayText.innerText;
-}
-
+// Les deux boutons vivent dans le balisage : plus de délégation, un écouteur
+// chacun. Le texte transmis est celui du résultat, sans l'accroche aléatoire
+// qui le précède — un signalement doit partir avec l'intitulé *et* les données
+// sur lesquelles il porte peut-être.
 requireElement("btn-info").addEventListener("click", () => {
   openFeedback(currentResultText(), "info");
 });
@@ -1024,8 +1056,8 @@ document.addEventListener("keydown", (e) => {
   if (e.key !== "Escape") return;
   if (modal.style.display === "flex") {
     closeFeedback();
-  } else if (isOverlayOpen()) {
-    hideResultOverlay();
+  } else if (isResultVisible()) {
+    hideResult();
   }
 });
 
@@ -1080,23 +1112,22 @@ form.addEventListener("submit", async (e) => {
   }
 });
 
-overlayClose.addEventListener("click", hideResultOverlay);
-overlay.addEventListener("click", (e) => {
-  if (e.target === overlay) {
-    hideResultOverlay();
+resultClose.addEventListener("click", hideResult);
+
+// La confirmation passe par une classe et non par le contenu du bouton :
+// `textContent = "✅"` effaçait l'icône SVG, qui ne revenait jamais.
+let copyFeedbackTimer = 0;
+
+copyBtn.addEventListener("click", async () => {
+  try {
+    await navigator.clipboard.writeText(currentResultText());
+    copyBtn.classList.add("is-copied");
+    clearTimeout(copyFeedbackTimer);
+    copyFeedbackTimer = setTimeout(() => copyBtn.classList.remove("is-copied"), 800);
+  } catch {
+    alert("Impossible de copier");
   }
 });
-overlay.querySelector(".bubble").addEventListener("click", (e) => e.stopPropagation());
-copyBtn &&
-  copyBtn.addEventListener("click", async () => {
-    try {
-      await navigator.clipboard.writeText(overlayText.innerText);
-      copyBtn.textContent = "✅";
-      setTimeout(() => (copyBtn.textContent = "📋"), 800);
-    } catch {
-      alert("Impossible de copier");
-    }
-  });
 
 /* =======================
    ANIMATION
@@ -1108,8 +1139,10 @@ function finalizeSpinResult(idx) {
     }
 
     registerCompletedSpin();
-    showOverlay(idx);
 
+    // Le retrait de l'entrée précède l'affichage : la carte resserre la roue à
+    // sa première ouverture, et syncCanvasSize() reconstruit alors les calques
+    // une seule fois, avec la liste déjà à jour.
     if (!isInfiniteMode()) {
       ENTRIES.splice(idx, 1);
       ENTRY_COLORS.splice(idx, 1);
@@ -1118,8 +1151,16 @@ function finalizeSpinResult(idx) {
       resetSectorClick();
     }
 
+    showResult(entry);
+
     drawWheel(angle);
-    setTimeout(() => {
+    // Désarme le tirage après le résidu de mouvement qui suit l'arrêt, pour
+    // qu'un second passage à vitesse nulle ne redonne pas un résultat.
+    // Le minuteur est annulé par boostWheel : sans cela, une relance dans les
+    // 300 ms — désormais possible d'un simple clic, la carte ne masquant plus
+    // le bouton — voyait son propre résultat annulé au vol.
+    clearTimeout(spinResetTimer);
+    spinResetTimer = setTimeout(() => {
       hasBeenSpun = false;
     }, 300);
   });
@@ -1327,25 +1368,24 @@ async function captureWheelArea() {
 // L'attente est signalée par une classe (.is-busy, buttons.css) et non par un
 // style inline : l'apparence reste dans la feuille de style, et un seul appel
 // suffit à revenir à l'état initial — d'où le `finally` plus bas.
+//
+// Le contenu du bouton n'est jamais touché : y écrire « ⏳ » remplaçait le SVG
+// du logo, que la restauration ne savait pas reconstruire — le bouton restait
+// vide jusqu'au rechargement.
 function setShareButtonBusy(button) {
   button.disabled = true;
   button.classList.add("is-busy");
-  button.dataset.restoreLabel = button.textContent;
-  button.textContent = "⏳";
 }
 
 function clearShareButtonBusy(button) {
-  if (!("restoreLabel" in button.dataset)) return;
   button.disabled = false;
   button.classList.remove("is-busy");
-  button.textContent = button.dataset.restoreLabel;
-  delete button.dataset.restoreLabel;
 }
 
 shareButtons.forEach((btn) => {
   btn.addEventListener("click", async () => {
     const platform = btn.dataset.platform;
-    const text = overlayText.innerText;
+    const text = currentShareText();
 
     // CAS SPÉCIAUX : Téléchargement direct (Instagram, TikTok, Snapchat)
     if (["instagram", "tiktok", "snapchat"].includes(platform)) {
@@ -1485,12 +1525,14 @@ addEventListener("orientationchange", scheduleResizeRecalculation);
 updateBg();
 initializeApp();
 
-// Vrai dès qu'une surface recouvre la roue : résultat, formulaire, menu ou
+// Vrai dès qu'une surface recouvre la roue : formulaire de retour, menu ou
 // panneau. Toutes passent par le piège à focus, donc une seule question suffit —
 // avant, la touche Espace et canReloadForUpdate répétaient chacune la liste des
 // sélecteurs du menu, et l'oubli d'un cas passait inaperçu.
+// La carte de résultat n'en fait pas partie : elle ne recouvre rien, et la roue
+// doit rester actionnable pendant qu'on la lit.
 function isAnySurfaceOpen() {
-  return hasFocusTrap() || isOverlayOpen();
+  return hasFocusTrap();
 }
 
 // ✅ Gère la touche Espace uniquement quand aucune fenêtre n'est ouverte
@@ -1530,6 +1572,10 @@ window.addEventListener("infiniteModeChange", () => {
 function canReloadForUpdate() {
   if (shouldAnimate()) return false;
   if (isAnySurfaceOpen()) return false;
+  // Un résultat affiché est ce que l'utilisateur est en train de lire : le
+  // rechargement l'effacerait sous ses yeux. Il attend la fermeture de la carte
+  // (hideResult appelle applyPendingUpdate) ou la prochaine visite.
+  if (isResultVisible()) return false;
   if (completedSpinCount > 0 && !isInfiniteMode()) return false;
   return true;
 }

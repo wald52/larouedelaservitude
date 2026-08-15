@@ -66,13 +66,13 @@ unformatted: that is how the old backlog started.
 ```
 index.html              Wheel page: PWA/social meta, all app-shell CSS inline, DOM, loads js/app.js
 donnees.html            « Données & analyse » page (advanced mode), loads js/data-explorer.js
-js/app.js               Wheel rendering, physics, spin sound cadence, overlay, sharing, SW registration
+js/app.js               Wheel rendering, physics, spin cadence, result card, sharing, SW registration
 js/entries.js           Two-tier data loading (light → full) + IndexedDB cache
 js/audio.js             WebAudio, offline-first sound decoding + IndexedDB cache
 js/menu.js              Bottom tab bar, panels, history, settings; builds its own DOM at runtime
 js/settings.js          Reads the sound setting (data-attribute first, localStorage fallback)
 js/sw-update.js         SW registration + version switchover (see §7)
-js/focus-trap.js        Focus stack shared by the modals (app.js) and the menu surfaces (menu.js)
+js/focus-trap.js        Focus stack shared by the feedback modal (app.js) and the menu surfaces
 js/constants.js         SETTINGS_KEY, BASE_PATH and APP_VERSION — shared by front-end modules
 js/data-explorer.js     Table, filters, multi-key sort, export, URL state for donnees.html
 js/stats.js             Pure descriptive statistics (no DOM) — the only unit-tested front-end module
@@ -95,7 +95,7 @@ shares/                 Runtime artifacts only; share-*.html is gitignored
 `donnees.html` → `js/data-explorer.js` → `js/entries.js`, `js/menu.js`, `js/sw-update.js`,
 `js/stats.js`, `js/charts.js`
 `js/audio.js` → `js/settings.js` → `js/constants.js` ← `js/sw-update.js`, `js/entries.js`
-`js/app.js`, `js/menu.js` → `js/focus-trap.js` (piled surfaces: modals, menu panels)
+`js/app.js`, `js/menu.js` → `js/focus-trap.js` (piled surfaces: feedback modal, menu panels)
 `js/app.js` → `import('../bills.js')` (dynamic, on first spin) → `js/settings.js`, and
 `bills.js` → `import('./js/audio.js')` (dynamic, inside `initBills()`)
 
@@ -149,7 +149,7 @@ a button is styled. Never restyle a button in `index.html`'s inline CSS, `menu.c
 — that is precisely what produced two incompatible `.btn` / `.btn-secondary` definitions (one per
 page) before it existed. Compose the existing classes instead: a base `.btn`, a variant
 (`.btn-accent` for the page's main action, `.btn-primary`, `.btn-secondary`, `.btn-quiet`,
-`.btn-inverse` for anything sitting on the result bubble), then modifiers (`.btn-sm` / `.btn-lg`,
+`.btn-inverse` for anything sitting on an already-inverted surface), then modifiers (`.btn-sm` / `.btn-lg`,
 `.btn-pill`, `.btn-icon`, `.btn-block`, `.btn-tip` for an icon-only button whose `aria-label`
 doubles as its tooltip). Layout-only rules (position, margin) stay with the feature; `.btn-row`
 covers the common "row of buttons" case. Its `--btn-*` tokens are self-contained so the file works
@@ -165,10 +165,27 @@ and never for a control that must look like a button (there is no hover on a tou
 
 **Icon buttons are rounded squares; the circle is opt-in.** `.btn-icon` keeps `.btn`'s radius,
 because the rounded square is the shape of the whole interface (tabs, settings rows, buttons); add
-`.btn-pill` where a circle is actually wanted — the share dots on the result bubble. Two glyphs are
+`.btn-pill` where a circle is actually wanted — the share dots on the result card. Two glyphs are
 drawn in CSS rather than typed as characters, `.btn-close` (the cross) and `.btn-back` (the
 chevron): `✕` and `←` render at wildly different weights across system fonts, and both were
 duplicated in several files. Those buttons carry no text — their name comes from `aria-label`.
+
+**The result is a card under the wheel, not a modal.** `showResult()` in `js/app.js` fills
+`#resultCard` (markup built by `formatEntryForDisplay()` in `js/entries.js`) and sets
+`data-result="open"` on `<html>`; the CSS tightens the wheel's height bound so the column has room
+for one more thing, and `syncCanvasSize()` then rebuilds the layers at the new size — the canvas
+size is always read from CSS, never written from JS. The card takes no focus and no focus trap: it
+covers nothing, so `Space` and the spin button keep working while it is read, and the next draw
+replaces its contents (the wheel is resized once, on open, and once on close). It is the flexible
+item of the column (`flex: 0 1 auto`, `min-height: 0`, `overflow-y: auto`, plus `touch-action:
+pan-y` since `body` kills touch scrolling): when the screen is short, the card scrolls, never the
+wheel or its button. The entry itself is kept in `currentEntry` — sharing, the clipboard and the
+feedback form go through `formatEntryAsText()`, not through the card's `innerText`.
+
+The modal it replaced covered the wheel it commented on and had to be dismissed before spinning
+again. Two consequences to keep in mind: an automatic SW reload is held while a card is on screen
+(`canReloadForUpdate`), and the install banner — which floats over the same bottom strip — waits
+for the card to be closed.
 
 **Navigation is a bottom tab bar, not a hamburger.** `js/menu.js` builds a fixed bar at the bottom
 of `index.html` from two tables: `MENU_TABS` (the four tabs, in display order) and `MENU_PANELS`
@@ -267,11 +284,11 @@ app fails loudly at startup — update both sides.
 
 **Accessibility has load-bearing pieces — don't strip them.** The wheel is a `<canvas>`, so it
 carries `role="img"` plus an `aria-label` that `updateCountInfo()` rewrites on every change; without
-it a screen reader sees nothing there. The result (`#overlayText`), the counter (`#countInfo`) and
+it a screen reader sees nothing there. The result (`#resultText`), the counter (`#countInfo`) and
 the feedback status are `role="status" aria-live="polite"` regions — that is the only way a spin
-result gets announced. Every surface that covers the page — the two modals and the menu panels —
-goes through `js/focus-trap.js`: it moves focus in, traps `Tab` inside, and hands
-focus back on close; `.bubble` carries `tabindex="-1"` for that purpose. `prefers-reduced-motion`
+result gets announced, since the result card never takes focus. Every surface that _covers_ the
+page — the feedback modal and the menu panels — goes through `js/focus-trap.js`: it moves focus in,
+traps `Tab` inside, and hands focus back on close. `prefers-reduced-motion`
 is honoured for real — the wheel damps
 much faster (`REDUCED_MOTION_DAMPING`) and `bills.js` is never invoked — on top of its older use as
 a "constrained device" hint in `getCanvasScale()`. The global `@media (prefers-reduced-motion)`
@@ -283,7 +300,7 @@ block and the `:focus-visible` ring live in `index.html`'s inline CSS and cover 
 Two files, kept in lockstep, **both** shaped `{version, entries: [...]}`. The light file
 (`entries: [{id, nom}]`) loads first so the wheel can draw; the full file
 (`entries: [{id, nom, nom_complet, recette, recette_meur, annee}]`) loads later and feeds the
-result overlay. The two `version` strings must match — that value is what invalidates the
+result card. The two `version` strings must match — that value is what invalidates the
 IndexedDB cache (see §4), so **bumping it is what actually ships a data fix**.
 
 Two fields are **derived** and must not be hand-edited:
@@ -373,7 +390,7 @@ latest published version without waiting 24 h or reloading twice, **(3)** a page
 from two versions.
 
 **Bump the version in _two_ files whenever you change any precached asset:** `CACHE_VERSION` in
-`service-worker.js` (currently `v24`) and `APP_VERSION` in `js/constants.js`. They must be equal —
+`service-worker.js` (currently `v45`) and `APP_VERSION` in `js/constants.js`. They must be equal —
 `npm run check:precache` fails otherwise. That pair _is_ the release: nothing reaches returning
 visitors without it.
 
@@ -409,10 +426,11 @@ cycle below. Skipped entirely: `/.netlify/functions/*`, cross-origin, and any UR
 2. A new SW precaches its whole generation and then **waits**. While it waits the old one keeps
    serving _its_ complete generation — that is what makes mixing impossible.
 3. The page decides when to switch: `canReloadForUpdate()` in `js/app.js` (nothing spinning, no
-   modal or panel open, no spin completed outside infinite mode) → `SKIP_WAITING` → `controllerchange`
+   modal or panel open, no result card on screen, no spin completed outside infinite mode) →
+   `SKIP_WAITING` → `controllerchange`
    → one silent `location.reload()`, guarded against loops by a 10 s `sessionStorage` marker. If the
    user is busy, the update is held and re-applied on the next idle moment (`applyPendingUpdate()`,
-   called when the result overlay closes and on tab focus) or at the next launch, in a single load.
+   called when the result card closes and on tab focus) or at the next launch, in a single load.
 4. Belt and braces: the page asks the controlling SW for its version (`GET_VERSION`) and compares it
    to `APP_VERSION`. A mismatch means the code and the cache are from different generations — it
    re-checks for an update and realigns.

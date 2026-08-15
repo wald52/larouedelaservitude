@@ -66,8 +66,6 @@
         --button-fg: #fff;
         --legend: #666;
         --pointer: #111;
-        --bubble-bg: #111;
-        --bubble-fg: #fff;
         --tooltip-bg: #111;
         --tooltip-fg: #fff;
         --modal-surface: #fff;
@@ -92,7 +90,7 @@
            écrite dans son `fill` — et une retouche du motif est à reporter sur
            les deux valeurs. */
         --pattern-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160' fill='%23111'><text x='40' y='40' font-size='50'>☭</text><text x='120' y='120' font-size='50'>☭</text></svg>");
-        /* Ambre : lisible aussi bien sur les fonds clairs que sur la bulle sombre */
+        /* Ambre : lisible sur les fonds clairs comme sur les fonds sombres */
         --focus: #f59e0b;
         /* Romaine du bandeau de titre. Pile entièrement système : aucune police
            n'est téléchargée, l'application reste complète hors ligne dès le
@@ -114,8 +112,6 @@
         --button-fg: #101317;
         --legend: #a1a1aa;
         --pointer: #f3f4f6;
-        --bubble-bg: #f3f4f6;
-        --bubble-fg: #101317;
         --tooltip-bg: #f3f4f6;
         --tooltip-fg: #101317;
         --modal-surface: #151922;
@@ -139,13 +135,6 @@
       :focus-visible {
         outline: 3px solid var(--focus);
         outline-offset: 2px;
-      }
-
-      /* .bubble reçoit le focus par programme à l'ouverture du dialogue (openModal
-   dans js/app.js) : pas de contour à afficher pour autant. */
-      .bubble:focus,
-      .bubble:focus-visible {
-        outline: none;
       }
 
       /* Respect de la préférence système « mouvement réduit ». Couvre aussi
@@ -211,9 +200,14 @@
         background-position: calc(var(--emoji-size) / 2) calc(var(--emoji-size) / 2);
       }
 
+      /* `height` autant que `min-height` : le corps est en position fixe, donc
+         haut comme la fenêtre, et cette hauteur ferme doit descendre jusqu'à la
+         carte de résultat — sans elle, la carte ne saurait pas de quelle place
+         elle dispose et déborderait sous la barre d'onglets. */
       .wrap {
         position: relative;
         z-index: 1;
+        height: 100%;
         min-height: 100vh;
         display: flex;
         flex-direction: column;
@@ -224,14 +218,19 @@
         padding-bottom: calc(24px + var(--tabbar-room));
         box-sizing: border-box;
       }
+      /* Colonne flexible plutôt que grille : la roue garde sa taille (flex-shrink: 0)
+         et la carte de résultat encaisse seule le manque de place. */
       .container {
         width: 100%;
         max-width: 720px;
         padding-inline: 12px;
         margin-top: clamp(16px, 3vh, 32px);
-        display: grid;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
         gap: 12px;
-        justify-items: center;
+        min-height: 0;
+        box-sizing: border-box;
       }
       /* ===============================
    BANDEAU DE TITRE
@@ -309,6 +308,7 @@
         justify-items: center;
         max-width: 560px;
         box-sizing: border-box;
+        flex-shrink: 0;
       }
       .wheel-area {
         position: relative;
@@ -347,6 +347,23 @@
         background: var(--surface-alt);
         box-shadow: inset 0 0 0 5px var(--surface-inset);
       }
+      /* Un résultat est affiché : la colonne doit loger une chose de plus, et
+         c'est la roue qui rend la place. Elle est resserrée une seule fois, à
+         l'apparition de la carte, et retrouve sa taille à sa fermeture — les
+         tirages suivants ne la font plus bouger. `data-result` est posé sur
+         <html> par js/app.js, qui appelle ensuite syncCanvasSize() : la taille
+         du canvas est lue en CSS, jamais écrite en JS. */
+      :root[data-result="open"] canvas {
+        width: clamp(220px, 62vw, 460px);
+        width: min(clamp(220px, 62vw, 460px), 30svh);
+      }
+      :root[data-result="open"] .wrap {
+        padding-top: clamp(12px, 2.5vh, 40px);
+        padding-bottom: calc(12px + var(--tabbar-room));
+      }
+      :root[data-result="open"] .container {
+        margin-top: clamp(8px, 1.5vh, 18px);
+      }
       .controls {
         display: grid;
         gap: 10px;
@@ -357,63 +374,119 @@
         font-size: 12px;
         color: var(--legend);
       }
-      .overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        display: none;
-        align-items: center;
-        justify-content: center;
-        background: rgba(0, 0, 0, 0.35);
-        z-index: 9999;
-      }
-      /* Rembourrage haut plus généreux plutôt qu'à droite : le bouton de fermeture
-   loge dans cette bande, et le texte reste centré. Avec 48px à droite et 20 à
-   gauche, il était décalé sur toute la hauteur de la bulle. */
-      /* --bubble-close-room : la hauteur réservée en haut pour la croix, qui est
-         en position absolue. Elle vaut sa position (10px) + sa taille + une
-         marge. La règle tactile de buttons.css la fait passer de 34 à 44px, et
-         la valeur figée qui traînait ici la laissait alors mordre sur le texte. */
-      .bubble {
+      /* ===============================
+   CARTE DE RÉSULTAT
+   ===============================
+
+   Le résultat se lit sous la roue, dans le flux de la page, et non plus dans
+   une fenêtre modale posée par-dessus. La modale recouvrait la roue qu'elle
+   commentait et il fallait la fermer avant de pouvoir retourner la roue ; la
+   carte se laisse lire à côté du plateau et se remplace d'elle-même au tirage
+   suivant.
+
+   Le corps de la page ne défile pas : la carte est donc l'élément élastique de
+   la colonne (`flex: 0 1 auto` + `min-height: 0`) et c'est elle, jamais la
+   roue ni son bouton, qui défile quand la place manque. */
+      .result {
         position: relative;
-        --bubble-close-room: 52px;
-        max-width: min(92%, 620px);
-        padding: var(--bubble-close-room) 20px 20px;
-        border-radius: 14px;
-        background: var(--bubble-bg);
-        color: var(--bubble-fg);
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
-        font-size: clamp(14px, 2.4vw, 20px);
-        font-weight: 600;
-        text-align: center;
-        line-height: 1.35;
+        width: 100%;
+        max-width: 560px;
+        box-sizing: border-box;
+        padding: 12px 14px 14px;
+        border: 1px solid var(--ring);
+        border-radius: 12px;
+        background: var(--surface);
+        text-align: left;
+        flex: 0 1 auto;
+        min-height: 0;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        /* body porte `touch-action: none` pour neutraliser le défilement de la
+           page : sans cette exception, la carte ne défilerait pas au doigt. */
+        touch-action: pan-y;
       }
+
+      /* Spécificité supérieure à `.result` : sans elle, `display` reprendrait le
+         dessus sur le comportement par défaut de [hidden]. */
+      .result[hidden] {
+        display: none;
+      }
+
       /* Positionnement seul : l'apparence des boutons vient de buttons.css. */
-      .close {
+      .result__close {
         position: absolute;
         top: 10px;
         right: 10px;
       }
 
-      @media (pointer: coarse) {
-        .bubble {
-          --bubble-close-room: 62px;
-        }
+      /* La croix est en position absolue : les deux lignes qu'elle surplombe
+         réservent sa place, le reste de la carte occupe toute la largeur. */
+      .result__intro,
+      .result__title {
+        padding-right: 44px;
+      }
+
+      .result__intro {
+        margin: 0 0 4px;
+        font-size: 12px;
+        color: var(--legend);
+      }
+
+      /* La romaine du bandeau de titre : l'intitulé du prélèvement est ce que
+         l'on vient chercher, il se lit comme un titre d'article. */
+      .result__title {
+        margin: 0;
+        font-family: var(--serif);
+        font-size: clamp(17px, 4.2vw, 24px);
+        font-weight: 700;
+        line-height: 1.15;
+      }
+
+      .result__facts {
+        margin: 12px 0 0;
+        padding-top: 10px;
+        border-top: 1px solid var(--ring);
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+
+      .result__fact + .result__fact {
+        padding-left: 16px;
+        border-left: 1px solid var(--ring);
+      }
+
+      .result__label {
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--legend);
+      }
+
+      .result__value {
+        margin: 4px 0 0;
+        font-size: clamp(15px, 3.2vw, 18px);
+        font-weight: 700;
+        line-height: 1.25;
+      }
+
+      .result__year {
+        color: var(--masthead-accent);
+      }
+
+      /* 51 % des prélèvements n'ont ni recette ni année : la mention grisée
+         évite une carte réduite au seul intitulé, qu'on prenait pour un bug. */
+      .result__value.result__unknown {
+        font-weight: 500;
+        opacity: 0.62;
       }
 
       /* Une grille plutôt qu'un flex-wrap : le nombre de pastilles par rangée est
    décidé, pas subi. En flex, les neuf boutons se cassaient en 6 + 3 selon la
    largeur du texte au-dessus. */
-      /* 51 % des prélèvements n'ont ni recette ni année : la mention grisée
-         évite une bulle réduite au seul intitulé, qu'on prenait pour un bug. */
-      .result-unknown {
-        opacity: 0.62;
-        font-weight: 500;
-      }
       .share-bar {
-        margin-top: 18px;
+        margin-top: 12px;
         display: grid;
         grid-template-columns: repeat(9, auto);
         gap: 8px;
@@ -429,38 +502,16 @@
           grid-template-columns: repeat(5, auto);
         }
       }
-      /* Ajustement du cadre de résultat sur mobile */
-      @media (max-width: 600px) {
-        .overlay {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          padding-top: 0;
-        }
-        .bubble {
-          max-width: 90%;
-          max-width: 340px;
-          padding: var(--bubble-close-room) 16px 16px;
-          font-size: 15px;
-          border-radius: 16px;
-          margin: 0 auto;
-          box-sizing: border-box;
-        }
-      }
-      /* Empêche l'affichage initial de la fenêtre de résultat */
-      .overlay[aria-hidden="true"] {
-        display: none !important;
-      }
 
-      /* Boutons de retour utilisateur : posés sur la bulle, d'où la variante
-     .btn-inverse dans le balisage. Ici, leur placement et leur poids.
+      /* Boutons de retour utilisateur : leur placement et leur poids, l'apparence
+     restant celle de buttons.css.
      En grille : les deux libellés sont de longueurs très différentes, et un
      flex-wrap les disposait en escalier — le premier sur toute la largeur, le
      second centré dessous.
      Signaler une erreur reste une action tertiaire : deux pavés pleine largeur
      lui donnaient plus de présence qu'au résultat lui-même. */
       .feedback-buttons {
-        margin-top: 16px;
+        margin-top: 10px;
         display: grid;
         gap: 6px;
       }
@@ -648,6 +699,182 @@
             <div class="legend" id="countInfo" role="status" aria-live="polite"></div>
           </div>
         </div>
+        <!-- Le résultat du tirage, dans le flux, sous la roue. `hidden` tant
+     qu'aucun tirage n'a eu lieu ; js/app.js le lève et pose
+     data-result="open" sur <html>. -->
+        <section id="resultCard" class="result" hidden aria-label="Résultat du tirage">
+          <button
+            id="resultClose"
+            class="result__close btn btn-icon btn-sm btn-secondary btn-close"
+            type="button"
+            aria-label="Fermer le résultat"
+          ></button>
+          <!-- role="status" : le résultat d'un tirage n'est annoncé aux lecteurs
+       d'écran que par cette région, la carte ne prenant pas le focus. -->
+          <div id="resultText" role="status" aria-live="polite"></div>
+          <!-- `aria-label` sert à la fois de nom accessible et d'info-bulle (.btn-tip,
+         buttons.css) : plus de `title` à garder synchronisé. -->
+          <div class="share-bar" id="shareBar">
+            <!-- Logos de marque repris du projet « Jours de retraite »
+               (lemodelesocialfrancais.github.io/joursderetraite). Ils remplacent des
+               glyphes dessinés à la main, dont plusieurs se devinaient mal.
+               Certains sont tracés, d'autres pleins : chaque <svg> porte donc ses
+               propres attributs plutôt qu'un jeu commun. -->
+            <button
+              class="btn btn-icon btn-sm btn-pill btn-secondary btn-tip"
+              type="button"
+              data-platform="facebook"
+              aria-label="Partager sur Facebook"
+            >
+              <svg
+                class="share-icon"
+                fill="none"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+              </svg>
+            </button>
+            <button
+              class="btn btn-icon btn-sm btn-pill btn-secondary btn-tip"
+              type="button"
+              data-platform="x"
+              aria-label="Partager sur X / Twitter"
+            >
+              <svg
+                class="share-icon"
+                fill="none"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path
+                  d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2"
+                />
+              </svg>
+            </button>
+            <button
+              class="btn btn-icon btn-sm btn-pill btn-secondary btn-tip"
+              type="button"
+              data-platform="instagram"
+              aria-label="Partager sur Instagram"
+            >
+              <svg class="share-icon" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  d="M12 2.16c3.2 0 3.58.01 4.85.07 3.25.15 4.77 1.7 4.92 4.92.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.15 3.23-1.66 4.77-4.92 4.92-1.27.06-1.64.07-4.85.07a83 83 0 0 1-4.85-.07c-3.26-.15-4.77-1.7-4.92-4.92-.06-1.27-.07-1.64-.07-4.85s.02-3.58.07-4.85c.15-3.23 1.67-4.77 4.92-4.92A84 84 0 0 1 12 2.16M12 0C8.74 0 8.33.01 7.05.07 2.7.27.27 2.7.07 7.05.01 8.33 0 8.75 0 12s.01 3.67.07 4.95c.2 4.36 2.62 6.78 6.98 6.98 1.28.06 1.7.07 4.95.07s3.67-.01 4.95-.07c4.35-.2 6.78-2.62 6.98-6.98.06-1.28.07-1.7.07-4.95s-.01-3.67-.07-4.95C23.73 2.7 21.3.27 16.95.07A84 84 0 0 0 12 0m0 5.84a6.16 6.16 0 1 0 0 12.32 6.16 6.16 0 0 0 0-12.32M12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8m6.4-11.84a1.44 1.44 0 1 0 0 2.88 1.44 1.44 0 0 0 0-2.88"
+                />
+              </svg>
+            </button>
+            <button
+              class="btn btn-icon btn-sm btn-pill btn-secondary btn-tip"
+              type="button"
+              data-platform="linkedin"
+              aria-label="Partager sur LinkedIn"
+            >
+              <svg
+                class="share-icon"
+                fill="none"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path
+                  d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6M2 9h4v12H2z"
+                />
+                <circle cx="4" cy="4" r="2" />
+              </svg>
+            </button>
+            <button
+              class="btn btn-icon btn-sm btn-pill btn-secondary btn-tip"
+              type="button"
+              data-platform="snapchat"
+              aria-label="Partager sur Snapchat"
+            >
+              <svg class="share-icon" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  d="M12.2.8c1 0 4.35.27 5.94 3.81.52 1.2.4 3.22.3 4.85v.06l-.04.51q.11.09.4.1.46-.04 1.04-.31a1 1 0 0 1 .46-.1q.28 0 .5.09c.46.15.74.48.74.83q.03.68-1.21 1.17l-.34.12c-.45.14-1.14.36-1.34.81q-.14.34.12.87l.02.01c.06.14 1.52 3.48 4.79 4.02a.5.5 0 0 1 .42.5l-.05.23q-.35.85-3.14 1.27c-.06.1-.12.38-.17.57q-.04.26-.13.56-.12.4-.56.4h-.03a3 3 0 0 1-.53-.07 6 6 0 0 0-1.28-.14q-.45 0-.9.08c-.6.1-1.13.46-1.73.88-.86.6-1.83 1.29-3.3 1.29l-.18-.02h-.15a5.3 5.3 0 0 1-3.27-1.28c-.6-.42-1.11-.78-1.71-.89a7 7 0 0 0-.93-.07c-.54 0-.96.09-1.27.15a3 3 0 0 1-.54.07c-.38 0-.52-.22-.58-.42q-.1-.3-.14-.57c-.05-.18-.1-.5-.17-.57Q.4 19.27.06 18.4L0 18.17a.5.5 0 0 1 .42-.5c3.26-.55 4.73-3.89 4.8-4.03v-.03q.28-.52.13-.86c-.2-.44-.89-.66-1.34-.81l-.34-.12c-1.1-.44-1.26-.93-1.2-1.28.1-.47.68-.79 1.17-.79q.22 0 .38.08.64.3 1.1.3.36-.02.47-.11l-.04-.57c-.1-1.62-.23-3.65.3-4.84A6.3 6.3 0 0 1 11.73.8h.48z"
+                />
+              </svg>
+            </button>
+            <button
+              class="btn btn-icon btn-sm btn-pill btn-secondary btn-tip"
+              type="button"
+              data-platform="tiktok"
+              aria-label="Partager sur TikTok"
+            >
+              <svg class="share-icon" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  d="M15.5 3a5.2 5.2 0 0 0 3 3.02V9a6 6 0 0 1-3.2-.9v6.18a5.3 5.3 0 1 1-5.3-5.3q.35 0 .7.06v2.86a2.52 2.52 0 1 0 1.86 2.42V3z"
+                />
+              </svg>
+            </button>
+            <button
+              class="btn btn-icon btn-sm btn-pill btn-secondary btn-tip"
+              type="button"
+              data-platform="whatsapp"
+              aria-label="Partager sur WhatsApp"
+            >
+              <svg class="share-icon" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97s-.47-.14-.67.15-.76.97-.94 1.17-.34.22-.64.07-1.26-.46-2.4-1.47a9 9 0 0 1-1.64-2.06c-.18-.3-.02-.46.13-.6.13-.14.3-.35.44-.53s.2-.3.3-.5.05-.36-.03-.51-.66-1.62-.91-2.21c-.24-.58-.49-.5-.67-.51l-.57-.01c-.2 0-.52.07-.8.37-.26.3-1.03 1.02-1.03 2.48s1.06 2.88 1.21 3.08 2.1 3.2 5.08 4.48q1.04.44 1.7.63c.7.22 1.35.2 1.86.11.57-.08 1.76-.71 2-1.4s.26-1.3.18-1.42c-.07-.13-.27-.2-.57-.35m-5.42 7.4A10 10 0 0 1 7 20.42l-.36-.22-3.74.99 1-3.65-.23-.38a10 10 0 0 1-1.51-5.26 9.9 9.9 0 0 1 16.87-6.98 9.8 9.8 0 0 1 2.9 7 9.9 9.9 0 0 1-9.89 9.88m8.41-18.3a11.8 11.8 0 0 0-8.4-3.5 11.9 11.9 0 0 0-10.3 17.84L.05 24l6.31-1.65a12 12 0 0 0 5.69 1.44c6.55 0 11.89-5.33 11.9-11.89a11.8 11.8 0 0 0-3.49-8.41"
+                />
+              </svg>
+            </button>
+            <button
+              class="btn btn-icon btn-sm btn-pill btn-secondary btn-tip"
+              type="button"
+              data-platform="telegram"
+              aria-label="Partager sur Telegram"
+            >
+              <svg class="share-icon" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  d="m2.12 11.08 19.04-7.35c.89-.34 1.66.21 1.38 1.51L19.3 20.51c-.24 1.14-.93 1.13-1.52.5l-4.24-3.93-2.04 1.97c-.23.22-.42.41-.85.41l.3-4.3 7.84-7.08c.34-.3-.08-.47-.53-.16l-9.68 6.1L4.4 12.7c-.9-.29-.92-.9.2-1.35z"
+                />
+              </svg>
+            </button>
+            <button
+              class="btn btn-icon btn-sm btn-pill btn-secondary btn-tip"
+              type="button"
+              id="copyText"
+              aria-label="Copier le texte"
+            >
+              <svg
+                class="share-icon"
+                fill="none"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+                <path d="M4 16a2 2 0 0 1-2-2V4c0-1.1.9-2 2-2h10a2 2 0 0 1 2 2" />
+              </svg>
+            </button>
+          </div>
+          <!-- Hors de #resultText, qui est une zone aria-live : ces deux boutons y
+             étaient injectés à chaque tirage, donc réannoncés avec le résultat.
+             Ils viennent après le partage, qui est l'action attendue ici. -->
+          <div class="feedback-buttons">
+            <button id="btn-info" type="button" class="btn btn-secondary btn-sm">
+              Donner un complément d'information
+            </button>
+            <button id="btn-error" type="button" class="btn btn-secondary btn-sm">
+              Signaler une erreur
+            </button>
+          </div>
+        </section>
       </div>
     </div>
 
@@ -660,187 +887,6 @@
         <button
           id="installPromptClose"
           class="btn btn-icon btn-sm btn-secondary btn-close"
-          type="button"
-          aria-label="Fermer"
-        ></button>
-      </div>
-    </div>
-
-    <div id="overlay" class="overlay" aria-hidden="true">
-      <!-- tabindex="-1" : js/app.js y place le focus à l'ouverture (openModal) -->
-      <div
-        class="bubble"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="overlayText"
-        tabindex="-1"
-      >
-        <div id="overlayText" role="status" aria-live="polite"></div>
-        <!-- `aria-label` sert à la fois de nom accessible et d'info-bulle (.btn-tip,
-         buttons.css) : plus de `title` à garder synchronisé. -->
-        <div class="share-bar" id="shareBar">
-          <!-- Logos de marque repris du projet « Jours de retraite »
-               (lemodelesocialfrancais.github.io/joursderetraite). Ils remplacent des
-               glyphes dessinés à la main, dont plusieurs se devinaient mal.
-               Certains sont tracés, d'autres pleins : chaque <svg> porte donc ses
-               propres attributs plutôt qu'un jeu commun. -->
-          <button
-            class="btn btn-icon btn-pill btn-inverse btn-tip"
-            type="button"
-            data-platform="facebook"
-            aria-label="Partager sur Facebook"
-          >
-            <svg
-              class="share-icon"
-              fill="none"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              viewBox="0 0 24 24"
-              aria-hidden="true"
-            >
-              <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
-            </svg>
-          </button>
-          <button
-            class="btn btn-icon btn-pill btn-inverse btn-tip"
-            type="button"
-            data-platform="x"
-            aria-label="Partager sur X / Twitter"
-          >
-            <svg
-              class="share-icon"
-              fill="none"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              viewBox="0 0 24 24"
-              aria-hidden="true"
-            >
-              <path
-                d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2"
-              />
-            </svg>
-          </button>
-          <button
-            class="btn btn-icon btn-pill btn-inverse btn-tip"
-            type="button"
-            data-platform="instagram"
-            aria-label="Partager sur Instagram"
-          >
-            <svg class="share-icon" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path
-                d="M12 2.16c3.2 0 3.58.01 4.85.07 3.25.15 4.77 1.7 4.92 4.92.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.15 3.23-1.66 4.77-4.92 4.92-1.27.06-1.64.07-4.85.07a83 83 0 0 1-4.85-.07c-3.26-.15-4.77-1.7-4.92-4.92-.06-1.27-.07-1.64-.07-4.85s.02-3.58.07-4.85c.15-3.23 1.67-4.77 4.92-4.92A84 84 0 0 1 12 2.16M12 0C8.74 0 8.33.01 7.05.07 2.7.27.27 2.7.07 7.05.01 8.33 0 8.75 0 12s.01 3.67.07 4.95c.2 4.36 2.62 6.78 6.98 6.98 1.28.06 1.7.07 4.95.07s3.67-.01 4.95-.07c4.35-.2 6.78-2.62 6.98-6.98.06-1.28.07-1.7.07-4.95s-.01-3.67-.07-4.95C23.73 2.7 21.3.27 16.95.07A84 84 0 0 0 12 0m0 5.84a6.16 6.16 0 1 0 0 12.32 6.16 6.16 0 0 0 0-12.32M12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8m6.4-11.84a1.44 1.44 0 1 0 0 2.88 1.44 1.44 0 0 0 0-2.88"
-              />
-            </svg>
-          </button>
-          <button
-            class="btn btn-icon btn-pill btn-inverse btn-tip"
-            type="button"
-            data-platform="linkedin"
-            aria-label="Partager sur LinkedIn"
-          >
-            <svg
-              class="share-icon"
-              fill="none"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              viewBox="0 0 24 24"
-              aria-hidden="true"
-            >
-              <path
-                d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6M2 9h4v12H2z"
-              />
-              <circle cx="4" cy="4" r="2" />
-            </svg>
-          </button>
-          <button
-            class="btn btn-icon btn-pill btn-inverse btn-tip"
-            type="button"
-            data-platform="snapchat"
-            aria-label="Partager sur Snapchat"
-          >
-            <svg class="share-icon" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path
-                d="M12.2.8c1 0 4.35.27 5.94 3.81.52 1.2.4 3.22.3 4.85v.06l-.04.51q.11.09.4.1.46-.04 1.04-.31a1 1 0 0 1 .46-.1q.28 0 .5.09c.46.15.74.48.74.83q.03.68-1.21 1.17l-.34.12c-.45.14-1.14.36-1.34.81q-.14.34.12.87l.02.01c.06.14 1.52 3.48 4.79 4.02a.5.5 0 0 1 .42.5l-.05.23q-.35.85-3.14 1.27c-.06.1-.12.38-.17.57q-.04.26-.13.56-.12.4-.56.4h-.03a3 3 0 0 1-.53-.07 6 6 0 0 0-1.28-.14q-.45 0-.9.08c-.6.1-1.13.46-1.73.88-.86.6-1.83 1.29-3.3 1.29l-.18-.02h-.15a5.3 5.3 0 0 1-3.27-1.28c-.6-.42-1.11-.78-1.71-.89a7 7 0 0 0-.93-.07c-.54 0-.96.09-1.27.15a3 3 0 0 1-.54.07c-.38 0-.52-.22-.58-.42q-.1-.3-.14-.57c-.05-.18-.1-.5-.17-.57Q.4 19.27.06 18.4L0 18.17a.5.5 0 0 1 .42-.5c3.26-.55 4.73-3.89 4.8-4.03v-.03q.28-.52.13-.86c-.2-.44-.89-.66-1.34-.81l-.34-.12c-1.1-.44-1.26-.93-1.2-1.28.1-.47.68-.79 1.17-.79q.22 0 .38.08.64.3 1.1.3.36-.02.47-.11l-.04-.57c-.1-1.62-.23-3.65.3-4.84A6.3 6.3 0 0 1 11.73.8h.48z"
-              />
-            </svg>
-          </button>
-          <button
-            class="btn btn-icon btn-pill btn-inverse btn-tip"
-            type="button"
-            data-platform="tiktok"
-            aria-label="Partager sur TikTok"
-          >
-            <svg class="share-icon" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path
-                d="M15.5 3a5.2 5.2 0 0 0 3 3.02V9a6 6 0 0 1-3.2-.9v6.18a5.3 5.3 0 1 1-5.3-5.3q.35 0 .7.06v2.86a2.52 2.52 0 1 0 1.86 2.42V3z"
-              />
-            </svg>
-          </button>
-          <button
-            class="btn btn-icon btn-pill btn-inverse btn-tip"
-            type="button"
-            data-platform="whatsapp"
-            aria-label="Partager sur WhatsApp"
-          >
-            <svg class="share-icon" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path
-                d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97s-.47-.14-.67.15-.76.97-.94 1.17-.34.22-.64.07-1.26-.46-2.4-1.47a9 9 0 0 1-1.64-2.06c-.18-.3-.02-.46.13-.6.13-.14.3-.35.44-.53s.2-.3.3-.5.05-.36-.03-.51-.66-1.62-.91-2.21c-.24-.58-.49-.5-.67-.51l-.57-.01c-.2 0-.52.07-.8.37-.26.3-1.03 1.02-1.03 2.48s1.06 2.88 1.21 3.08 2.1 3.2 5.08 4.48q1.04.44 1.7.63c.7.22 1.35.2 1.86.11.57-.08 1.76-.71 2-1.4s.26-1.3.18-1.42c-.07-.13-.27-.2-.57-.35m-5.42 7.4A10 10 0 0 1 7 20.42l-.36-.22-3.74.99 1-3.65-.23-.38a10 10 0 0 1-1.51-5.26 9.9 9.9 0 0 1 16.87-6.98 9.8 9.8 0 0 1 2.9 7 9.9 9.9 0 0 1-9.89 9.88m8.41-18.3a11.8 11.8 0 0 0-8.4-3.5 11.9 11.9 0 0 0-10.3 17.84L.05 24l6.31-1.65a12 12 0 0 0 5.69 1.44c6.55 0 11.89-5.33 11.9-11.89a11.8 11.8 0 0 0-3.49-8.41"
-              />
-            </svg>
-          </button>
-          <button
-            class="btn btn-icon btn-pill btn-inverse btn-tip"
-            type="button"
-            data-platform="telegram"
-            aria-label="Partager sur Telegram"
-          >
-            <svg class="share-icon" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path
-                d="m2.12 11.08 19.04-7.35c.89-.34 1.66.21 1.38 1.51L19.3 20.51c-.24 1.14-.93 1.13-1.52.5l-4.24-3.93-2.04 1.97c-.23.22-.42.41-.85.41l.3-4.3 7.84-7.08c.34-.3-.08-.47-.53-.16l-9.68 6.1L4.4 12.7c-.9-.29-.92-.9.2-1.35z"
-              />
-            </svg>
-          </button>
-          <button
-            class="btn btn-icon btn-pill btn-inverse btn-tip"
-            type="button"
-            id="copyText"
-            aria-label="Copier le texte"
-          >
-            <svg
-              class="share-icon"
-              fill="none"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              viewBox="0 0 24 24"
-              aria-hidden="true"
-            >
-              <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
-              <path d="M4 16a2 2 0 0 1-2-2V4c0-1.1.9-2 2-2h10a2 2 0 0 1 2 2" />
-            </svg>
-          </button>
-        </div>
-        <!-- Hors de #overlayText, qui est une zone aria-live : ces deux boutons y
-             étaient injectés à chaque tirage, donc réannoncés avec le résultat.
-             Ils viennent après le partage, qui est l'action attendue ici. -->
-        <div class="feedback-buttons">
-          <button id="btn-info" type="button" class="btn btn-inverse btn-sm">
-            Donner un complément d'information
-          </button>
-          <button id="btn-error" type="button" class="btn btn-inverse btn-sm">
-            Signaler une erreur
-          </button>
-        </div>
-        <button
-          id="overlayClose"
-          class="close btn btn-icon btn-sm btn-pill btn-inverse btn-close"
           type="button"
           aria-label="Fermer"
         ></button>

@@ -2,7 +2,7 @@
 //  entries.js — Chargement 2 niveaux
 // ===============================
 // 1. Chargement initial : données légères (noms courts) pour afficher la roue rapidement
-// 2. Chargement background : données complètes (recette, année) pour l'overlay
+// 2. Chargement background : données complètes (recette, année) pour la carte de résultat
 // 3. Cache IndexedDB pour fonctionnement offline
 //
 // Fraîcheur : le cache est servi immédiatement (peinture rapide), puis
@@ -370,36 +370,67 @@ export function formatRecette(entry) {
   return `${NUMBER_FORMAT.format(montant)} million${Math.abs(montant) >= 2 ? "s" : ""} d'euros`;
 }
 
+// Une donnée de la carte : son libellé et sa valeur, ou la mention « non
+// renseignée ».
+//
+// Les deux données sont toujours affichées, même vides de contenu. 60 % des
+// prélèvements n'ont pas de recette renseignée, 54 % pas d'année, et 51 % ni
+// l'une ni l'autre : plus d'un tirage sur deux ne montrait donc que son
+// intitulé, dans un cadre qu'on prenait pour un affichage incomplet. Dire
+// « non renseignée » informe — c'est une lacune connue du jeu de données — là
+// où le silence laissait croire à une panne.
+function renderFact(label, value, valueClass = "") {
+  const known = Boolean(value);
+  const classes = ["result__value", known ? valueClass : "result__unknown"]
+    .filter(Boolean)
+    .join(" ");
+
+  return [
+    `<div class="result__fact">`,
+    `<dt class="result__label">${escapeHtml(label)}</dt>`,
+    `<dd class="${classes}">${known ? escapeHtml(value) : "Non renseignée"}</dd>`,
+    `</div>`
+  ].join("");
+}
+
 /**
- * Formate le texte pour l'overlay de résultat
+ * Formate le résultat pour la carte affichée sous la roue (index.html).
+ * L'intitulé se lit comme un titre d'article, les deux données comme les
+ * champs d'une fiche — le style des libellés vit dans le CSS de la page.
  * @param {object} entry - Entrée complète
- * @returns {string}
+ * @returns {string} HTML
  */
 export function formatEntryForDisplay(entry) {
   if (!entry) return "";
 
-  // Les deux lignes sont toujours affichées, même vides de contenu.
-  //
-  // 60 % des prélèvements n'ont pas de recette renseignée, 54 % pas d'année, et
-  // 51 % ni l'une ni l'autre : plus d'un tirage sur deux ne montrait donc que
-  // son intitulé, dans une bulle qu'on prenait pour un affichage incomplet.
-  // Dire « non renseignée » informe — c'est une lacune connue du jeu de
-  // données — là où le silence laissait croire à une panne.
-  const unknown = (label) => `<span class="result-unknown">${label} : non renseignée</span>`;
+  return [
+    `<h2 class="result__title">${escapeHtml(entry.nom_complet)}</h2>`,
+    `<dl class="result__facts">`,
+    renderFact("Recette", formatRecette(entry)),
+    renderFact("Date de création", entry.annee, "result__year"),
+    `</dl>`
+  ].join("");
+}
+
+/**
+ * Même résultat, en texte brut : c'est ce qui part au partage, au
+ * presse-papiers et au formulaire de retour utilisateur.
+ * Lire le texte de la carte (innerText) donnerait la même chose, mais au prix
+ * d'une dépendance au balisage — et l'ancienne version en découpait le contenu
+ * à coups de séparateurs pour retrouver ses morceaux.
+ * @param {object} entry - Entrée complète
+ * @returns {string}
+ */
+export function formatEntryAsText(entry) {
+  if (!entry) return "";
+
   const recette = formatRecette(entry);
 
-  // Chaque bloc porte son propre <br>, et la jointure en ajoute un second :
-  // c'est cette paire qui produit la ligne vide de séparation.
-  const ligneRecette = recette ? `💰 Recette : ${escapeHtml(recette)}` : unknown("💰 Recette");
-  const ligneAnnee = entry.annee
-    ? `📅 Date de création : ${escapeHtml(entry.annee)}`
-    : unknown("📅 Date de création");
-
   return [
-    `<strong>${escapeHtml(entry.nom_complet)}</strong>`,
-    `<br>${ligneRecette}`,
-    `<br>${ligneAnnee}`
-  ].join("<br>");
+    entry.nom_complet,
+    `💰 Recette : ${recette || "non renseignée"}`,
+    `📅 Date de création : ${entry.annee || "non renseignée"}`
+  ].join("\n");
 }
 
 /**

@@ -16,8 +16,7 @@
    - une classe = un rôle. On compose : `.btn .btn-accent .btn-lg .btn-pill`.
 
    Variantes : accent (action principale), primary (solide inversé), secondary
-   (aplat, le cas courant), inverse (sur une surface déjà inversée, comme la
-   bulle de résultat).
+   (aplat, le cas courant), inverse (sur une surface déjà inversée).
    Modificateurs : sm / lg (taille), pill (arrondi complet), icon (carré),
    back / close / tip (glyphe tracé), is-busy (action en cours).
 
@@ -45,8 +44,8 @@
   --btn-soft-hover: #dbdfe7;
   --btn-soft-fg: var(--fg, #111);
 
-  /* Surface inversée (bulle de résultat) : un gris translucide fonctionne
-     sur fond clair comme sur fond sombre, sans jeton par thème. */
+  /* Surface déjà inversée : un gris translucide fonctionne sur fond clair
+     comme sur fond sombre, sans jeton par thème. */
   --btn-inverse-bg: rgba(128, 128, 128, 0.2);
   --btn-inverse-hover: rgba(128, 128, 128, 0.36);
 
@@ -173,8 +172,8 @@
   background: var(--btn-soft-hover);
 }
 
-/* Sur une surface déjà inversée (bulle de résultat) : la couleur du texte est
-   héritée du conteneur, seul le fond est translucide. */
+/* Sur une surface déjà inversée : la couleur du texte est héritée du
+   conteneur, seul le fond est translucide. */
 .btn-inverse {
   background: var(--btn-inverse-bg);
   color: inherit;
@@ -207,9 +206,9 @@
 }
 
 /* Bouton carré ne contenant qu'une icône ou un emoji. Il garde le rayon de
-   `.btn` : le carré arrondi est la forme de toute l'interface (hamburger,
+   `.btn` : le carré arrondi est la forme de toute l'interface (onglets,
    entrées de menu, boutons), et un rond y détonnait. Ajouter `.btn-pill` là où
-   un cercle est voulu — les pastilles de partage sur la bulle de résultat. */
+   un cercle est voulu — les pastilles de partage de la carte de résultat. */
 .btn-icon {
   width: 40px;
   min-height: 40px;
@@ -246,6 +245,14 @@
   cursor: progress;
   opacity: 0.6;
   transform: none;
+}
+
+/* Confirmation brève d'une action instantanée (la copie du résultat). Un état,
+   et non un changement de contenu : écrire « ✅ » dans le bouton effaçait
+   l'icône SVG qu'il contient, et elle ne revenait pas. */
+.btn.is-copied {
+  background: var(--switch-on);
+  color: #fff;
 }
 
 /* ===============================
