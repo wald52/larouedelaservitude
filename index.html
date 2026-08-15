@@ -87,13 +87,34 @@
         /* Hauteur réservée à la bannière d'installation quand elle est affichée
            (sa hauteur propre, plus l'espace qui la sépare du reste). */
         --install-room: 84px;
-        /* Taille de la roue, en deux jetons : la largeur voulue et le plafond en
-           hauteur. Les deux consommateurs (le <canvas> et la carte de résultat,
-           qui s'aligne dessus) en font le `min()` eux-mêmes plutôt que de le
-           recevoir tout fait — c'est ce qui permet de garder une déclaration de
-           repli sans `svh` dans chacun d'eux. */
+        /* Taille de la roue : la largeur voulue, puis un plafond en hauteur.
+           Ce plafond est la place qui reste une fois la carte de résultat
+           servie — et cette place lui est réservée dès le premier rendu, même
+           si aucun tirage n'a eu lieu. C'est ce qui donne à la roue exactement
+           la même taille avant et après un tirage : elle ne se resserre plus à
+           l'apparition de la carte. */
         --wheel-size: clamp(250px, 86vw, 540px);
-        --wheel-cap: 52svh;
+        /* Hauteur réservée à la carte. Mesurée sur les 371 intitulés du jeu à
+           la largeur d'un téléphone : 224 px suffisent à la moitié d'entre eux,
+           244 aux neuf dixièmes, 264 à dix-neuf sur vingt. C'est cette dernière
+           valeur — au-delà, les quelques noms à rallonge font défiler le texte
+           de la carte, sans ascenseur visible, et la roue ne bouge toujours
+           pas. La couvrir jusqu'au plus long (301 px) aurait coûté 40 px de
+           roue à tout le monde pour cinq pour cent des tirages. */
+        --card-room: 264px;
+        /* Tout le reste de la colonne : marge haute, bandeau de titre, écart
+           entre la roue et la carte, marge basse et barre d'onglets. */
+        --column-room: calc(117px + var(--tabbar-room));
+        /* La première déclaration est le repli des navigateurs sans `svh`. */
+        --wheel-cap: 52vh;
+        --wheel-cap: min(52svh, calc(100svh - var(--card-room) - var(--column-room)));
+      }
+
+      /* La bannière d'installation prend sa place dans la colonne : la roue lui
+         rend cette hauteur, faute de quoi c'est la carte qui perdrait le tiers
+         de son contenu tant que la bannière est là. */
+      :root[data-install="open"] {
+        --column-room: calc(117px + var(--tabbar-room) + var(--install-room));
         /* La trame de fond, une image par thème. Le SVG est un document
            indépendant : `currentColor` n'y a pas cours et son glyphe est noir
            par défaut, ce qui l'éteignait sur le fond sombre. La couleur est donc
@@ -359,26 +380,20 @@
          replie — la roue aurait été redimensionnée en pleine rotation.
          La première déclaration est le repli des navigateurs sans `svh`.
 
-         Trois bornes donc : la largeur voulue, le plafond en hauteur de fenêtre, et
-         `--wheel-fit` — la place que js/app.js a dû rendre à la carte de
-         résultat (voir fitWheelToResult). Le troisième terme n'existe que
-         lorsqu'un résultat est affiché et ne peut que réduire la roue. */
+         Deux bornes donc : la largeur voulue et le plafond en hauteur, ce
+         dernier réservant déjà la place de la carte de résultat. */
       canvas {
         width: var(--wheel-size);
-        width: min(var(--wheel-size), var(--wheel-cap), var(--wheel-fit, 100vmax));
+        width: min(var(--wheel-size), var(--wheel-cap));
         aspect-ratio: 1/1;
         display: block;
         border-radius: 50%;
         background: var(--surface-alt);
         box-shadow: inset 0 0 0 5px var(--surface-inset);
       }
-      /* Rien ne bouge au-dessus de la roue quand un résultat s'affiche : le
-         titre et le bouton sont à leur place définitive dès le premier rendu.
-         C'est la roue seule qui rend à la carte ce qui lui manque — mesuré, pas
-         forfaitaire (voir `--wheel-fit` plus haut et fitWheelToResult dans
-         js/app.js). Un intitulé court tient sur deux lignes, le plus long du jeu
-         en demande huit : aucune fraction fixe de la hauteur ne pouvait convenir
-         aux deux. */
+      /* Rien ne bouge quand un résultat s'affiche : le titre, le bouton et la
+         roue sont à leur place et à leur taille définitives dès le premier
+         rendu, la carte occupant la hauteur qui lui était déjà réservée. */
       /* ===============================
    CARTE DE RÉSULTAT
    ===============================
@@ -787,8 +802,8 @@
           </button>
         </div>
         <!-- Le résultat du tirage, dans le flux, sous la roue. `hidden` tant
-     qu'aucun tirage n'a eu lieu ; js/app.js le lève et pose
-     data-result="open" sur <html>. -->
+     qu'aucun tirage n'a eu lieu ; sa hauteur lui est réservée d'avance
+     (--card-room), la roue ne bouge donc pas quand il paraît. -->
         <section id="resultCard" class="result" hidden aria-label="Résultat du tirage">
           <!-- La tête de carte porte l'accroche et loge la croix. Elle est hors
                de la zone défilante : l'intitulé récupère ainsi toute la largeur

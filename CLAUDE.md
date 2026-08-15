@@ -178,14 +178,19 @@ the spin button keep working while it is read, and the next draw replaces its co
 is kept in `currentEntry` — sharing, the clipboard and the feedback form go through
 `formatEntryAsText()`, never through the card's `innerText`.
 
-**The wheel gives the card exactly the height it lacks.** The page does not scroll, so something
-has to yield, and no fixed fraction could: a two-line name and the longest one in the dataset
-(eight lines) do not ask for the same card. `fitWheelToResult()` measures the overflow of
-`.result__scroll` and lowers `--wheel-fit`, a third bound in the `min()` that sizes the `canvas` —
-so the size is still decided in CSS, JS only reports the shortfall. It converges in at most three
-passes, only ever shrinks (a spin never makes the wheel jump back up), stops at `WHEEL_MIN_FIT`
-(150 px, where the card starts scrolling instead), and is released when the card closes or the
-window is resized. `syncCanvasSize()` then rebuilds the layers once.
+**The wheel has one size, decided in CSS, and it never changes.** `--wheel-cap` is
+`100svh` minus `--card-room` (the height reserved for the result card) minus `--column-room`
+(masthead, margins, tab bar): the card's place is held from the very first paint, so the wheel is
+exactly as big before a draw as after one. `--card-room` is 264 px, measured over all 371 names at
+phone width — 224 px covers half of them, 244 nine tenths, 264 nineteen twentieths. The last five
+percent make the card's text scroll instead (silently, see below); covering the longest name would
+have cost every draw 40 px of wheel. The only thing that moves the wheel is the install banner,
+which adds its own `--install-room` to `--column-room` — otherwise the card would lose a third of
+its content while the banner is up.
+
+An earlier version measured the overflow in JS and shrank the wheel by exactly that much
+(`--wheel-fit`). It was optimal per draw and unpleasant to use: the wheel changed size on almost
+every spin. Don't bring it back.
 
 **Inside the card, only the text scrolls.** `.result__head` (kicker + close button) and
 `.result__actions` sit outside `.result__scroll`, which alone carries `overflow-y: auto` and

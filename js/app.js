@@ -54,13 +54,6 @@ const INTRO_DURATION_MS = 650;
 const CENTER_INTRO_DURATION_MS = 360;
 const LABEL_MIN_ARC_PX = 20;
 const INSTALL_PROMPT_SPIN_THRESHOLD = 3;
-// En deçà, la roue cesse de rendre de la place à la carte de résultat : c'est
-// elle qu'on est venu voir, et la carte sait défiler.
-const WHEEL_MIN_FIT = 150;
-// La roue ne reprend le terrain laissé libre qu'au-delà de ce seuil : sous
-// quelques dizaines de pixels, le gain ne vaut pas de la voir changer de taille
-// à chaque tirage.
-const WHEEL_GROW_STEP = 32;
 // Amortissement appliqué quand l'utilisateur demande moins d'animation : la
 // roue tourne une fraction de seconde puis livre son résultat.
 const REDUCED_MOTION_DAMPING = 0.93;
@@ -171,8 +164,8 @@ function isResultVisible() {
 
 // La bannière est en position fixe au-dessus de la barre d'onglets, donc
 // par-dessus le bas de la carte de résultat. `data-install` sur <html> lui fait
-// réserver sa hauteur dans la colonne : la carte remonte d'autant, et la roue
-// rend la différence comme elle le fait pour la carte.
+// réserver sa hauteur dans la colonne : la carte remonte d'autant (et son texte
+// défile si besoin), la roue ne bouge pas.
 //
 // Elle attendait auparavant que la carte soit fermée. Une carte reste
 // maintenant à l'écran d'un tirage à l'autre : la bannière n'était donc plus
@@ -182,7 +175,8 @@ function showInstallPromptBanner() {
   installPromptBanner.hidden = false;
   installPromptBanner.setAttribute("aria-hidden", "false");
   document.documentElement.dataset.install = "open";
-  refitLayout();
+  // La colonne réserve la hauteur de la bannière : la roue s'y ajuste.
+  syncCanvasSize();
   requestAnimationFrame(() => {
     installPromptBanner.classList.add("is-visible");
   });
@@ -192,10 +186,8 @@ function hideInstallPromptBanner() {
   if (!installPromptBanner) return;
   installPromptBanner.classList.remove("is-visible");
   installPromptBanner.setAttribute("aria-hidden", "true");
-  if (document.documentElement.dataset.install) {
-    delete document.documentElement.dataset.install;
-    refitLayout();
-  }
+  delete document.documentElement.dataset.install;
+  syncCanvasSize();
   clearTimeout(installPromptHideTimer);
   installPromptHideTimer = setTimeout(() => {
     if (!installPromptBanner.classList.contains("is-visible")) {
@@ -249,99 +241,14 @@ function closeModal(container) {
 /* =======================
    CARTE DE RÉSULTAT
    ======================= */
-// Le résultat s'affiche sous la roue, dans le flux de la page. `data-result`
-// sur <html> resserre la roue en CSS pour lui faire de la place ; la taille du
-// canvas étant lue dans le style calculé, syncCanvasSize() reconstruit ensuite
-// les calques à la nouvelle dimension.
+// Le résultat s'affiche sous la roue, dans le flux de la page. Sa hauteur lui
+// est réservée en CSS dès le premier rendu (`--card-room`, index.html) : la
+// roue a donc la même taille avant et après un tirage, et rien ne bouge quand
+// la carte paraît.
 
 function setResultOpen(open) {
   if (isResultVisible() === open) return;
-
   resultCard.hidden = !open;
-  document.documentElement.dataset.result = open ? "open" : "closed";
-  if (!open) {
-    releaseWheelFit();
-  }
-  syncCanvasSize();
-}
-
-// La roue rend à la carte ce qui lui manque, et seulement cela.
-//
-// Aucune fraction fixe de la hauteur ne convenait : le corps de la page ne
-// défile pas, et la carte demande deux lignes pour « Droit de sécurité » comme
-// huit pour « Imposition forfaitaire sur les centrales de production d'énergie
-// électrique d'origine photovoltaïque ou hydraulique ». On mesure donc ce qui
-// dépasse, et la roue cède exactement cette hauteur — jamais sous WHEEL_MIN_FIT.
-//
-// La taille reste décidée en CSS : ce jeton n'est qu'une borne supplémentaire
-// dans le `min()` de la règle `canvas`. Il ne fait que réduire, et il est levé
-// à la fermeture de la carte.
-function releaseWheelFit() {
-  document.documentElement.style.removeProperty("--wheel-fit");
-}
-
-// Hauteur restée libre sous la carte, à l'intérieur de la colonne. C'est ce que
-// la roue peut reprendre quand le tirage précédent portait un intitulé plus long
-// que le nouveau.
-function resultSlack() {
-  const wrap = document.querySelector(".wrap");
-  if (!wrap) return 0;
-
-  const bottom =
-    wrap.getBoundingClientRect().bottom - parseFloat(getComputedStyle(wrap).paddingBottom || "0");
-  return Math.floor(bottom - resultCard.getBoundingClientRect().bottom);
-}
-
-function fitWheelToResult() {
-  if (!isResultVisible()) return;
-
-  // Quelques passes : une hauteur rendue par la roue n'est pas toujours reprise
-  // en entier par la carte (marges de la colonne), et une mesure suffit rarement
-  // à converger. Trois suffisent, et la boucle s'arrête dès que tout tient.
-  // Le canvas n'est reconstruit qu'une fois, à la fin.
-  let changed = false;
-
-  for (let pass = 0; pass < 3; pass++) {
-    // Lecture après écriture : elle force le recalcul de la mise en page, donc
-    // la passe suivante mesure bien l'effet de la précédente.
-    const current = canvas.getBoundingClientRect().width;
-    const missing = resultScroll.scrollHeight - resultScroll.clientHeight;
-    let next = current;
-
-    if (missing > 0) {
-      // Un pixel de marge en plus : au pixel près, l'arrondi de `--wheel-fit`
-      // laissait un résidu de débordement — donc un ascenseur, là où il n'y
-      // avait rien à faire défiler.
-      next = Math.max(WHEEL_MIN_FIT, current - missing - 1);
-    } else if (document.documentElement.style.getPropertyValue("--wheel-fit")) {
-      // Tout tient : la roue reprend le vide laissé sous la carte. Le `min()` de
-      // la règle CSS la rattrape si elle dépasse sa taille normale.
-      const slack = resultSlack();
-      if (slack >= WHEEL_GROW_STEP) {
-        next = current + slack;
-      }
-    }
-
-    if (Math.abs(next - current) < 1) break;
-
-    document.documentElement.style.setProperty("--wheel-fit", `${Math.round(next)}px`);
-    changed = true;
-  }
-
-  if (changed) {
-    syncCanvasSize();
-  }
-}
-
-// La place disponible a changé (fenêtre redimensionnée, bannière d'installation
-// entrée ou sortie) : l'ajustement précédent ne veut plus rien dire, on repart
-// de la taille normale de la roue avant de remesurer.
-// @returns {boolean} true si la roue a changé de taille.
-function refitLayout() {
-  releaseWheelFit();
-  const resized = syncCanvasSize();
-  fitWheelToResult();
-  return resized;
 }
 
 function hideResult() {
@@ -382,7 +289,6 @@ function showResult(entry) {
   // Un intitulé long a pu être défilé : le tirage suivant se relit depuis le
   // début, pas au milieu du précédent.
   resultScroll.scrollTop = 0;
-  fitWheelToResult();
 
   // Le fondu est relancé à chaque tirage : une animation CSS ne rejoue pas
   // d'elle-même sur un élément déjà affiché, d'où le retrait de la classe puis
@@ -1634,7 +1540,7 @@ function updateBg() {
 
 function handleResize() {
   updateBg();
-  const resized = refitLayout();
+  const resized = syncCanvasSize();
   if (resized && shouldAnimate()) {
     lastTime = performance.now();
     scheduleAnimationFrame();
