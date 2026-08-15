@@ -10,7 +10,7 @@ export const SETTINGS_KEY = "larouedelaservitude_settings";
 // comparaison des deux qui permet de détecter qu'une page tourne avec du code
 // d'une autre génération que celle servie par le service worker
 // (voir js/sw-update.js). L'égalité est vérifiée par `npm run check:precache`.
-export const APP_VERSION = "v40";
+export const APP_VERSION = "v41";
 
 // Chemin de base de l'application (gère le déploiement en sous-dossier,
 // ex. GitHub Pages).
