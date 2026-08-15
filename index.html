@@ -79,6 +79,12 @@
         --install-title: #111;
         --emoji-size: 80px;
         --bg-size: 200vw;
+        /* La trame de fond, une image par thème. Le SVG est un document
+           indépendant : `currentColor` n'y a pas cours et son glyphe est noir
+           par défaut, ce qui l'éteignait sur le fond sombre. La couleur est donc
+           écrite dans son `fill` — et une retouche du motif est à reporter sur
+           les deux valeurs. */
+        --pattern-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160' fill='%23111'><text x='40' y='40' font-size='50'>☭</text><text x='120' y='120' font-size='50'>☭</text></svg>");
         /* Ambre : lisible aussi bien sur les fonds clairs que sur la bulle sombre */
         --focus: #f59e0b;
         /* Romaine du bandeau de titre. Pile entièrement système : aucune police
@@ -114,6 +120,7 @@
         --install-title: #f3f4f6;
         --focus: #f59e0b;
         --masthead-accent: #dc2626;
+        --pattern-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160' fill='%23f3f4f6'><text x='40' y='40' font-size='50'>☭</text><text x='120' y='120' font-size='50'>☭</text></svg>");
       }
 
       /* ===============================
@@ -189,11 +196,7 @@
         top: calc(50% - var(--bg-size) / 2);
         left: calc(50% - var(--bg-size) / 2);
         pointer-events: none;
-        background-image: url("data:image/svg+xml;utf8,\
-<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'>\
-<text x='40' y='40' font-size='50'>☭</text>\
-<text x='120' y='120' font-size='50'>☭</text>\
-</svg>");
+        background-image: var(--pattern-image);
         background-repeat: repeat;
         background-size: var(--emoji-size) var(--emoji-size);
       }
