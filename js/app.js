@@ -22,7 +22,6 @@ const canvas = requireElement("wheelCanvas");
 const ctx = canvas.getContext("2d");
 const wheelArea = requireElement("wheelArea");
 const btn = requireElement("spinBtn");
-const countInfo = requireElement("countInfo");
 const installPromptBanner = document.getElementById("installPrompt");
 const installPromptAction = document.getElementById("installPromptAction");
 const installPromptClose = document.getElementById("installPromptClose");
@@ -58,6 +57,10 @@ const INSTALL_PROMPT_SPIN_THRESHOLD = 3;
 // En deçà, la roue cesse de rendre de la place à la carte de résultat : c'est
 // elle qu'on est venu voir, et la carte sait défiler.
 const WHEEL_MIN_FIT = 150;
+// La roue ne reprend le terrain laissé libre qu'au-delà de ce seuil : sous
+// quelques dizaines de pixels, le gain ne vaut pas de la voir changer de taille
+// à chaque tirage.
+const WHEEL_GROW_STEP = 32;
 // Amortissement appliqué quand l'utilisateur demande moins d'animation : la
 // roue tourne une fraction de seconde puis livre son résultat.
 const REDUCED_MOTION_DAMPING = 0.93;
@@ -274,6 +277,18 @@ function releaseWheelFit() {
   document.documentElement.style.removeProperty("--wheel-fit");
 }
 
+// Hauteur restée libre sous la carte, à l'intérieur de la colonne. C'est ce que
+// la roue peut reprendre quand le tirage précédent portait un intitulé plus long
+// que le nouveau.
+function resultSlack() {
+  const wrap = document.querySelector(".wrap");
+  if (!wrap) return 0;
+
+  const bottom =
+    wrap.getBoundingClientRect().bottom - parseFloat(getComputedStyle(wrap).paddingBottom || "0");
+  return Math.floor(bottom - resultCard.getBoundingClientRect().bottom);
+}
+
 function fitWheelToResult() {
   if (!isResultVisible()) return;
 
@@ -281,23 +296,33 @@ function fitWheelToResult() {
   // en entier par la carte (marges de la colonne), et une mesure suffit rarement
   // à converger. Trois suffisent, et la boucle s'arrête dès que tout tient.
   // Le canvas n'est reconstruit qu'une fois, à la fin.
-  let applied = 0;
+  let changed = false;
 
   for (let pass = 0; pass < 3; pass++) {
-    const missing = resultScroll.scrollHeight - resultScroll.clientHeight;
-    if (missing <= 1) break;
-
     // Lecture après écriture : elle force le recalcul de la mise en page, donc
     // la passe suivante mesure bien l'effet de la précédente.
     const current = canvas.getBoundingClientRect().width;
-    const next = Math.max(WHEEL_MIN_FIT, current - missing);
-    if (next >= current - 1) break;
+    const missing = resultScroll.scrollHeight - resultScroll.clientHeight;
+    let next = current;
+
+    if (missing > 1) {
+      next = Math.max(WHEEL_MIN_FIT, current - missing);
+    } else if (document.documentElement.style.getPropertyValue("--wheel-fit")) {
+      // Tout tient : la roue reprend le vide laissé sous la carte. Le `min()` de
+      // la règle CSS la rattrape si elle dépasse sa taille normale.
+      const slack = resultSlack();
+      if (slack >= WHEEL_GROW_STEP) {
+        next = current + slack;
+      }
+    }
+
+    if (Math.abs(next - current) < 1) break;
 
     document.documentElement.style.setProperty("--wheel-fit", `${Math.round(next)}px`);
-    applied = next;
+    changed = true;
   }
 
-  if (applied) {
+  if (changed) {
     syncCanvasSize();
   }
 }
@@ -490,13 +515,14 @@ function shouldShowLabels(entryCount = ENTRIES.length) {
   return getSliceArcPx(entryCount) >= LABEL_MIN_ARC_PX;
 }
 
-function updateCountInfo() {
-  if (!countInfo) return;
+// La roue est un canvas : sans nom accessible, un lecteur d'écran ne voit rien
+// du tout à cet endroit de la page. Ce nom porte aussi le décompte des entrées
+// restantes, qui n'est plus affiché — la ligne « 370 éléments restants » sous le
+// bouton a été retirée, elle chiffrait le jeu sans le servir et coûtait une
+// rangée à la carte de résultat.
+function updateWheelLabel() {
   const suffix = isInfiniteMode() ? " · mode sans fin" : "";
   const summary = ENTRIES.length + " éléments restants" + suffix;
-  countInfo.textContent = summary;
-  // La roue est un canvas : sans nom accessible, un lecteur d'écran ne voit
-  // rien du tout à cet endroit de la page.
   canvas.setAttribute("aria-label", `Roue des taxes et prélèvements français — ${summary}`);
 }
 
@@ -783,7 +809,7 @@ function scheduleDeferredInit() {
     if (!menuInitialized) {
       menuInitialized = true;
       initMenu();
-      updateCountInfo();
+      updateWheelLabel();
       console.log("[APP] Menu initialisé (lazy)");
     }
   };
@@ -818,7 +844,7 @@ async function initializeApp() {
 
     buildColors();
     buildWheelLayers();
-    updateCountInfo();
+    updateWheelLabel();
     drawWheel(angle);
     runIntroBuild();
     attachWheelListeners();
@@ -866,7 +892,7 @@ function applyEntriesUpdate() {
       ENTRY_COLORS.length = 0;
       buildColors();
       buildWheelLayers();
-      updateCountInfo();
+      updateWheelLabel();
       drawWheel(angle);
       console.log("[APP] Roue reconstruite avec", ENTRIES.length, "entrées");
     })
@@ -1235,7 +1261,7 @@ function finalizeSpinResult(idx) {
       ENTRIES.splice(idx, 1);
       ENTRY_COLORS.splice(idx, 1);
       buildWheelLayers();
-      updateCountInfo();
+      updateWheelLabel();
       resetSectorClick();
     }
 
@@ -1424,11 +1450,11 @@ async function captureWheelArea() {
   output.height = Math.round(area.height * CAPTURE_SCALE);
 
   const ctx = output.getContext("2d");
-  const board = document.querySelector(".board") || document.body;
 
   // Le fond suit le thème : la capture était figée en clair, et le partage d'un
   // utilisateur en thème sombre sortait sur un fond qui n'était pas le sien.
-  ctx.fillStyle = getComputedStyle(board).backgroundColor;
+  // Le plateau blanc qui entourait la roue a disparu : c'est le fond de page.
+  ctx.fillStyle = getComputedStyle(document.body).backgroundColor;
   ctx.fillRect(0, 0, output.width, output.height);
 
   const wheel = canvas.getBoundingClientRect();
@@ -1650,7 +1676,7 @@ document.addEventListener("keydown", (e) => {
 });
 
 window.addEventListener("infiniteModeChange", () => {
-  updateCountInfo();
+  updateWheelLabel();
 });
 
 /* =======================

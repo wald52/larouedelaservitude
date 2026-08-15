@@ -194,9 +194,17 @@ the tab bar, and a cut edge reads as a bug rather than as something to scroll. T
 to keep the close button out of the title's way: reserving its width on every line cost nearly a
 line of text per long name.
 
-**The plateau and the card share the column's full width.** `.board` used to hug the wheel, which
-left two stacked cards with different edges. Since the wheel's size now varies, matching the card
-to it was not an option either — both simply take `width: 100%` up to 560 px.
+**The wheel page is a stack of four things and nothing else**: the masthead, the « Tourner la roue »
+button, the wheel, and the result card. The button sits _above_ the wheel — it is the command, it
+reads before its effect, and it keeps its place when the card makes the wheel give ground. The white
+`.board` that framed the wheel and the « N éléments restants » counter are both gone: the frame cost
+height without saying anything, and the count now lives only in the canvas's `aria-label`
+(`updateWheelLabel()`), where a screen reader still gets it. The card is therefore the only surface
+on the page, hence the only thing the eye looks for.
+
+**Nothing above the wheel ever moves.** The column's top spacing is the same before and after a
+draw — the masthead and the button are at their final position on first paint. Only the wheel
+yields height to the card. Do not reintroduce a `data-result` rule that shifts the top of the page.
 
 **Two actions, and only two** (`Partager`, `Signaler`): they must hold on one row down to a 320 px
 screen, or the card folds on a short phone. The nine share pills moved into `#shareModal`, a
@@ -305,8 +313,9 @@ app fails loudly at startup — update both sides.
 
 **Accessibility has load-bearing pieces — don't strip them.** The wheel is a `<canvas>`, so it
 carries `role="img"` plus an `aria-label` that `updateCountInfo()` rewrites on every change; without
-it a screen reader sees nothing there. The result (`#resultText`), the counter (`#countInfo`) and
-the feedback status are `role="status" aria-live="polite"` regions — that is the only way a spin
+it a screen reader sees nothing there — and that label is also the only place the number of
+remaining entries is written. The result (`#resultText`) and the feedback status are
+`role="status" aria-live="polite"` regions — that is the only way a spin
 result gets announced, since the result card never takes focus. Every surface that _covers_ the
 page — the share sheet, the feedback form and the menu panels — goes through `js/focus-trap.js`: it moves focus in,
 traps `Tab` inside, and hands focus back on close. `prefers-reduced-motion`
@@ -411,7 +420,7 @@ latest published version without waiting 24 h or reloading twice, **(3)** a page
 from two versions.
 
 **Bump the version in _two_ files whenever you change any precached asset:** `CACHE_VERSION` in
-`service-worker.js` (currently `v46`) and `APP_VERSION` in `js/constants.js`. They must be equal —
+`service-worker.js` (currently `v47`) and `APP_VERSION` in `js/constants.js`. They must be equal —
 `npm run check:precache` fails otherwise. That pair _is_ the release: nothing reaches returning
 visitors without it.
 

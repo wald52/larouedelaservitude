@@ -89,7 +89,7 @@
            qui s'aligne dessus) en font le `min()` eux-mêmes plutôt que de le
            recevoir tout fait — c'est ce qui permet de garder une déclaration de
            repli sans `svh` dans chacun d'eux. */
-        --wheel-size: clamp(250px, 80vw, 540px);
+        --wheel-size: clamp(250px, 86vw, 540px);
         --wheel-cap: 52svh;
         /* La trame de fond, une image par thème. Le SVG est un document
            indépendant : `currentColor` n'y a pas cours et son glyphe est noir
@@ -219,10 +219,10 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        padding-top: clamp(24px, 6vh, 80px);
+        padding-top: clamp(12px, 2.5vh, 40px);
         /* La barre d'onglets est fixée : sans cette réserve, elle recouvrirait
-           le bouton « Tourner la roue » et le compteur. */
-        padding-bottom: calc(24px + var(--tabbar-room));
+           le bas de la page. */
+        padding-bottom: calc(12px + var(--tabbar-room));
         box-sizing: border-box;
       }
       /* Colonne flexible plutôt que grille : la roue garde sa taille (flex-shrink: 0)
@@ -231,7 +231,7 @@
         width: 100%;
         max-width: 720px;
         padding-inline: 12px;
-        margin-top: clamp(16px, 3vh, 32px);
+        margin-top: clamp(10px, 2vh, 22px);
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -305,30 +305,19 @@
         border-radius: 999px;
         background: var(--masthead-accent);
       }
-      /* Le plateau occupe toute la largeur de la colonne, comme la carte de
-         résultat : tant qu'il se contentait de la largeur de la roue, les deux
-         cartes empilées avaient des bords différents.
-         Il rend de la hauteur quand il en manque (`flex: 0 1 auto`) — c'est la
-         roue qui encaisse, jamais le bouton ni le compteur. */
-      .board {
-        background: var(--surface);
-        border: 1px solid var(--ring);
-        border-radius: 12px;
-        padding: 8px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 8px;
-        width: 100%;
-        max-width: 560px;
-        box-sizing: border-box;
-        flex-shrink: 0;
-      }
+      /* La roue est posée à même le fond : le cadre blanc qui l'entourait
+         mangeait de la hauteur sans rien dire de plus, et la carte de résultat
+         est désormais la seule surface de la page — donc la seule chose que
+         l'œil y cherche. */
       .wheel-area {
         position: relative;
         width: 100%;
         display: grid;
         place-items: center;
+        flex-shrink: 0;
+      }
+      #spinBtn {
+        flex-shrink: 0;
       }
       .pointer {
         position: absolute;
@@ -344,15 +333,14 @@
         border-right: var(--w) solid transparent;
         border-top: var(--h) solid var(--pointer);
       }
-      /* La roue est bornée par la largeur *et* par la hauteur. Le corps de la
-         page ne défile pas : ce qui ne tient pas dans l'écran est perdu, et sur
-         un écran large mais bas (une fenêtre de portable), la roue à 540 px
-         poussait le bouton et le compteur sous la barre d'onglets.
+      /* La roue est bornée par la largeur *et* par la hauteur : le corps de la
+         page ne défile pas, ce qui ne tient pas dans l'écran est perdu.
          `svh` plutôt que `dvh` : la petite hauteur de vue est stable, alors que
          la hauteur dynamique change quand la barre d'adresse du téléphone se
          replie — la roue aurait été redimensionnée en pleine rotation.
-         La première déclaration est le repli des navigateurs sans `svh`. */
-      /* Trois bornes : la largeur voulue, le plafond en hauteur de fenêtre, et
+         La première déclaration est le repli des navigateurs sans `svh`.
+
+         Trois bornes donc : la largeur voulue, le plafond en hauteur de fenêtre, et
          `--wheel-fit` — la place que js/app.js a dû rendre à la carte de
          résultat (voir fitWheelToResult). Le troisième terme n'existe que
          lorsqu'un résultat est affiché et ne peut que réduire la roue. */
@@ -365,36 +353,13 @@
         background: var(--surface-alt);
         box-shadow: inset 0 0 0 5px var(--surface-inset);
       }
-      /* Un résultat est affiché : la colonne se resserre d'un cran, et la roue
-         rend à la carte ce qui lui manque — mesuré, pas forfaitaire (voir
-         `--wheel-fit` plus haut et fitWheelToResult dans js/app.js). Un
-         intitulé court tient sur deux lignes, le plus long du jeu en demande
-         huit : aucune fraction fixe de la hauteur ne pouvait convenir aux
-         deux. */
-      :root[data-result="open"] .wrap {
-        padding-top: clamp(8px, 1.5vh, 32px);
-        padding-bottom: calc(12px + var(--tabbar-room));
-      }
-      :root[data-result="open"] .container {
-        margin-top: clamp(6px, 1vh, 16px);
-      }
-      :root[data-result="open"] .board {
-        gap: 6px;
-      }
-      :root[data-result="open"] .controls {
-        gap: 6px;
-        padding-block: 2px;
-      }
-      .controls {
-        display: grid;
-        gap: 10px;
-        justify-items: center;
-        padding-block: 6px;
-      }
-      .legend {
-        font-size: 12px;
-        color: var(--legend);
-      }
+      /* Rien ne bouge au-dessus de la roue quand un résultat s'affiche : le
+         titre et le bouton sont à leur place définitive dès le premier rendu.
+         C'est la roue seule qui rend à la carte ce qui lui manque — mesuré, pas
+         forfaitaire (voir `--wheel-fit` plus haut et fitWheelToResult dans
+         js/app.js). Un intitulé court tient sur deux lignes, le plus long du jeu
+         en demande huit : aucune fraction fixe de la hauteur ne pouvait convenir
+         aux deux. */
       /* ===============================
    CARTE DE RÉSULTAT
    ===============================
@@ -748,27 +713,27 @@
         <div class="masthead__rule" aria-hidden="true"></div>
       </header>
       <div class="container">
-        <div class="board">
-          <div class="wheel-area" id="wheelArea">
-            <div class="pointer"></div>
-            <!-- aria-label est réactualisé par updateCountInfo() (js/app.js) -->
-            <canvas
-              id="wheelCanvas"
-              width="800"
-              height="800"
-              role="img"
-              aria-label="Roue des taxes et prélèvements français"
-            >
-              La roue des taxes et prélèvements obligatoires français. Utilisez le bouton « Tourner
-              la roue » pour tirer une entrée au sort.
-            </canvas>
-          </div>
-          <div class="controls">
-            <button id="spinBtn" class="btn btn-accent btn-lg btn-pill" type="button">
-              Tourner la roue
-            </button>
-            <div class="legend" id="countInfo" role="status" aria-live="polite"></div>
-          </div>
+        <!-- Le bouton précède la roue : c'est la commande, elle se lit avant son
+             effet, et elle reste à la même hauteur quand la carte de résultat
+             pousse la roue à se resserrer. -->
+        <button id="spinBtn" class="btn btn-accent btn-lg btn-pill" type="button">
+          Tourner la roue
+        </button>
+        <div class="wheel-area" id="wheelArea">
+          <div class="pointer"></div>
+          <!-- aria-label est réactualisé par updateWheelLabel() (js/app.js) : il
+               porte le décompte des entrées restantes, qui n'est plus écrit
+               nulle part ailleurs. -->
+          <canvas
+            id="wheelCanvas"
+            width="800"
+            height="800"
+            role="img"
+            aria-label="Roue des taxes et prélèvements français"
+          >
+            La roue des taxes et prélèvements obligatoires français. Utilisez le bouton « Tourner la
+            roue » pour tirer une entrée au sort.
+          </canvas>
         </div>
         <!-- Le résultat du tirage, dans le flux, sous la roue. `hidden` tant
      qu'aucun tirage n'a eu lieu ; js/app.js le lève et pose
