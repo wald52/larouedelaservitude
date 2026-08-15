@@ -81,6 +81,13 @@
         --bg-size: 200vw;
         /* Ambre : lisible aussi bien sur les fonds clairs que sur la bulle sombre */
         --focus: #f59e0b;
+        /* Romaine du bandeau de titre. Pile entièrement système : aucune police
+           n'est téléchargée, l'application reste complète hors ligne dès le
+           premier chargement (cf. le refus de toute ressource tierce). */
+        --serif:
+          "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia,
+          "Times New Roman", serif;
+        --masthead-accent: #c00;
       }
 
       :root[data-theme="dark"] {
@@ -106,6 +113,7 @@
         --install-shadow: 0 18px 40px rgba(0, 0, 0, 0.42);
         --install-title: #f3f4f6;
         --focus: #f59e0b;
+        --masthead-accent: #dc2626;
       }
 
       /* ===============================
@@ -212,18 +220,66 @@
         gap: 12px;
         justify-items: center;
       }
-      h1 {
-        margin: 0;
-        font-size: clamp(18px, 2.6vw, 22px);
-        font-weight: 700;
-        text-transform: uppercase;
+      /* ===============================
+   BANDEAU DE TITRE
+   =============================== */
+
+      /* Un bandeau de revue plutôt qu'une étiquette : titre en romaine sur deux
+   lignes, filet rouge, ligne d'intention. Le rouge de la marque n'est plus un
+   pavé plein derrière le titre — il tient dans le filet, ce qui laisse la roue
+   être la seule tache de couleur de la page. */
+      .masthead {
+        display: grid;
+        justify-items: center;
+        gap: 10px;
         text-align: center;
       }
-      h1 .highlight {
-        background: #c00;
-        color: #fff;
-        padding: 4px 10px;
-        border-radius: 6px;
+      h1 {
+        margin: 0;
+        display: grid;
+        gap: 2px;
+        font-family: var(--serif);
+        font-weight: 700;
+        text-transform: uppercase;
+        line-height: 1.02;
+      }
+      /* Deux lignes de tailles très différentes : c'est le contraste qui fait
+   la une, pas la taille absolue. */
+      .masthead__lead {
+        font-size: clamp(15px, 3.6vw, 20px);
+        letter-spacing: 0.14em;
+      }
+      .masthead__main {
+        font-size: clamp(26px, 6.6vw, 38px);
+        letter-spacing: 0.02em;
+      }
+      .masthead__rule {
+        width: 54px;
+        height: 3px;
+        border-radius: 999px;
+        background: var(--masthead-accent);
+      }
+      /* Du texte qui se replie, pas une grille : les trois mentions ne tiennent
+   pas sur une ligne de téléphone, et un flex-wrap les cassait en 2 + 1 centré,
+   ce qui se lit comme un défaut. En ligne, la coupure passe pour une phrase qui
+   continue. */
+      .masthead__tagline {
+        margin: 0;
+        line-height: 1.7;
+        font-size: clamp(10.5px, 2.6vw, 12px);
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        color: var(--legend);
+      }
+      .masthead__tagline span {
+        white-space: nowrap;
+        margin-inline: 5px;
+      }
+      .masthead__tagline span::before {
+        content: "•";
+        margin-right: 7px;
+        color: var(--masthead-accent);
+        opacity: 0.6;
       }
       .board {
         background: var(--surface);
@@ -534,7 +590,18 @@
   <body>
     <div class="wrap">
       <div class="container">
-        <h1><span class="highlight">La roue de la servitude</span></h1>
+        <header class="masthead">
+          <h1>
+            <span class="masthead__lead">La roue de</span>
+            <span class="masthead__main">La servitude</span>
+          </h1>
+          <div class="masthead__rule" aria-hidden="true"></div>
+          <p class="masthead__tagline">
+            <span>Données publiques</span>
+            <span>Transparence</span>
+            <span>Éducation civique</span>
+          </p>
+        </header>
         <div class="board">
           <div class="wheel-area" id="wheelArea">
             <div class="pointer"></div>
