@@ -79,13 +79,6 @@
         --install-title: #111;
         --emoji-size: 80px;
         --bg-size: 200vw;
-        /* La trame de faucilles était à pleine densité : elle passait derrière
-           le titre et derrière le compteur, qui devenaient pénibles à lire. En
-           filigrane, elle reste parfaitement identifiable et cesse de disputer
-           la page au texte. Les glyphes du SVG sont noirs quel que soit le
-           thème, d'où une valeur par thème : sur fond sombre ils sont déjà
-           presque éteints, les atténuer les ferait disparaître. */
-        --pattern-opacity: 0.14;
         /* Ambre : lisible aussi bien sur les fonds clairs que sur la bulle sombre */
         --focus: #f59e0b;
         /* Romaine du bandeau de titre. Pile entièrement système : aucune police
@@ -121,7 +114,6 @@
         --install-title: #f3f4f6;
         --focus: #f59e0b;
         --masthead-accent: #dc2626;
-        --pattern-opacity: 1;
       }
 
       /* ===============================
@@ -197,7 +189,6 @@
         top: calc(50% - var(--bg-size) / 2);
         left: calc(50% - var(--bg-size) / 2);
         pointer-events: none;
-        opacity: var(--pattern-opacity);
         background-image: url("data:image/svg+xml;utf8,\
 <svg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'>\
 <text x='40' y='40' font-size='50'>☭</text>\
@@ -239,15 +230,37 @@
    plein derrière le titre — il tient dans ce filet, ce qui laisse la roue être
    la seule tache de couleur de la page.
 
-   Rien n'est posé sous le titre pour le détacher : c'est la trame de fond qui
-   a été ramenée au filigrane (voir --pattern-opacity). Un bandeau opaque a été
-   essayé — il réglait le contraste, mais un rectangle plein rapporté sur un
-   motif dense se voit comme une pièce cousue. */
+   Le titre se détache par une clairière, pas par un cadre : ::before étale un
+   disque de la couleur du fond, opaque au centre et dissous sur les bords, qui
+   efface la trame juste autour des lettres. La trame reste à pleine densité
+   partout ailleurs.
+
+   Deux essais ont précédé. Un bandeau opaque : il réglait le contraste, mais un
+   rectangle plein rapporté sur un motif dense se voit comme une pièce cousue.
+   Puis la trame atténuée sur toute la page : lisible, mais elle y perdait sa
+   présence, alors que le problème ne se posait qu'au niveau du titre.
+
+   Le disque déborde largement de la boîte (d'où ::before plutôt qu'un
+   `background` sur .masthead) : un dégradé radial posé sur l'élément est rogné
+   par ses bords, ce qui recoupe net le fondu en haut et en bas. */
       .masthead {
+        position: relative;
         display: grid;
         justify-items: center;
         gap: 10px;
         text-align: center;
+      }
+      .masthead::before {
+        content: "";
+        position: absolute;
+        z-index: -1;
+        left: 50%;
+        top: 50%;
+        translate: -50% -50%;
+        width: min(720px, 118vw);
+        height: 300px;
+        pointer-events: none;
+        background: radial-gradient(closest-side, var(--bg) 0%, var(--bg) 58%, transparent 100%);
       }
       h1 {
         margin: 0;
