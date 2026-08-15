@@ -419,12 +419,23 @@
 
       /* Le texte du résultat, seule partie qui défile. `touch-action` : body
          porte `none` pour neutraliser le défilement de la page, sans cette
-         exception le bloc ne défilerait pas au doigt. */
+         exception le bloc ne défilerait pas au doigt.
+
+         Sans ascenseur visible : la roue rend à la carte de quoi tout afficher
+         (fitWheelToResult), le débordement est donc l'exception — un intitulé
+         de huit lignes sur un téléphone court. Une barre grise en travers de la
+         fiche, elle, était visible à chaque tirage dès que le calcul laissait
+         un pixel de marge. Le défilement lui-même reste actif. */
       .result__scroll {
         min-height: 0;
         overflow-y: auto;
         overscroll-behavior: contain;
         touch-action: pan-y;
+        scrollbar-width: none;
+      }
+
+      .result__scroll::-webkit-scrollbar {
+        display: none;
       }
 
       /* Spécificité supérieure à `.result` : sans elle, `display` reprendrait le

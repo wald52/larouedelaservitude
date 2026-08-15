@@ -308,8 +308,11 @@ function fitWheelToResult() {
     const missing = resultScroll.scrollHeight - resultScroll.clientHeight;
     let next = current;
 
-    if (missing > 1) {
-      next = Math.max(WHEEL_MIN_FIT, current - missing);
+    if (missing > 0) {
+      // Un pixel de marge en plus : au pixel près, l'arrondi de `--wheel-fit`
+      // laissait un résidu de débordement — donc un ascenseur, là où il n'y
+      // avait rien à faire défiler.
+      next = Math.max(WHEEL_MIN_FIT, current - missing - 1);
     } else if (document.documentElement.style.getPropertyValue("--wheel-fit")) {
       // Tout tient : la roue reprend le vide laissé sous la carte. Le `min()` de
       // la règle CSS la rattrape si elle dépasse sa taille normale.
