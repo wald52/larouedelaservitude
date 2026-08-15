@@ -84,6 +84,13 @@
            apparaît. La marge du menu système iOS s'y ajoute. */
         --tabbar-h: 62px;
         --tabbar-room: calc(var(--tabbar-h) + env(safe-area-inset-bottom, 0px));
+        /* Taille de la roue, en deux jetons : la largeur voulue et le plafond en
+           hauteur. Les deux consommateurs (le <canvas> et la carte de résultat,
+           qui s'aligne dessus) en font le `min()` eux-mêmes plutôt que de le
+           recevoir tout fait — c'est ce qui permet de garder une déclaration de
+           repli sans `svh` dans chacun d'eux. */
+        --wheel-size: clamp(250px, 80vw, 540px);
+        --wheel-cap: 52svh;
         /* La trame de fond, une image par thème. Le SVG est un document
            indépendant : `currentColor` n'y a pas cours et son glyphe est noir
            par défaut, ce qui l'éteignait sur le fond sombre. La couleur est donc
@@ -298,14 +305,21 @@
         border-radius: 999px;
         background: var(--masthead-accent);
       }
+      /* Le plateau occupe toute la largeur de la colonne, comme la carte de
+         résultat : tant qu'il se contentait de la largeur de la roue, les deux
+         cartes empilées avaient des bords différents.
+         Il rend de la hauteur quand il en manque (`flex: 0 1 auto`) — c'est la
+         roue qui encaisse, jamais le bouton ni le compteur. */
       .board {
         background: var(--surface);
         border: 1px solid var(--ring);
         border-radius: 12px;
         padding: 8px;
-        display: grid;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
         gap: 8px;
-        justify-items: center;
+        width: 100%;
         max-width: 560px;
         box-sizing: border-box;
         flex-shrink: 0;
@@ -338,31 +352,38 @@
          la hauteur dynamique change quand la barre d'adresse du téléphone se
          replie — la roue aurait été redimensionnée en pleine rotation.
          La première déclaration est le repli des navigateurs sans `svh`. */
+      /* Trois bornes : la largeur voulue, le plafond en hauteur de fenêtre, et
+         `--wheel-fit` — la place que js/app.js a dû rendre à la carte de
+         résultat (voir fitWheelToResult). Le troisième terme n'existe que
+         lorsqu'un résultat est affiché et ne peut que réduire la roue. */
       canvas {
-        width: clamp(250px, 80vw, 540px);
-        width: min(clamp(250px, 80vw, 540px), 52svh);
+        width: var(--wheel-size);
+        width: min(var(--wheel-size), var(--wheel-cap), var(--wheel-fit, 100vmax));
         aspect-ratio: 1/1;
         display: block;
         border-radius: 50%;
         background: var(--surface-alt);
         box-shadow: inset 0 0 0 5px var(--surface-inset);
       }
-      /* Un résultat est affiché : la colonne doit loger une chose de plus, et
-         c'est la roue qui rend la place. Elle est resserrée une seule fois, à
-         l'apparition de la carte, et retrouve sa taille à sa fermeture — les
-         tirages suivants ne la font plus bouger. `data-result` est posé sur
-         <html> par js/app.js, qui appelle ensuite syncCanvasSize() : la taille
-         du canvas est lue en CSS, jamais écrite en JS. */
-      :root[data-result="open"] canvas {
-        width: clamp(220px, 62vw, 460px);
-        width: min(clamp(220px, 62vw, 460px), 30svh);
-      }
+      /* Un résultat est affiché : la colonne se resserre d'un cran, et la roue
+         rend à la carte ce qui lui manque — mesuré, pas forfaitaire (voir
+         `--wheel-fit` plus haut et fitWheelToResult dans js/app.js). Un
+         intitulé court tient sur deux lignes, le plus long du jeu en demande
+         huit : aucune fraction fixe de la hauteur ne pouvait convenir aux
+         deux. */
       :root[data-result="open"] .wrap {
-        padding-top: clamp(12px, 2.5vh, 40px);
+        padding-top: clamp(8px, 1.5vh, 32px);
         padding-bottom: calc(12px + var(--tabbar-room));
       }
       :root[data-result="open"] .container {
-        margin-top: clamp(8px, 1.5vh, 18px);
+        margin-top: clamp(6px, 1vh, 16px);
+      }
+      :root[data-result="open"] .board {
+        gap: 6px;
+      }
+      :root[data-result="open"] .controls {
+        gap: 6px;
+        padding-block: 2px;
       }
       .controls {
         display: grid;
@@ -385,24 +406,40 @@
    suivant.
 
    Le corps de la page ne défile pas : la carte est donc l'élément élastique de
-   la colonne (`flex: 0 1 auto` + `min-height: 0`) et c'est elle, jamais la
-   roue ni son bouton, qui défile quand la place manque. */
+   la colonne (`flex: 0 1 auto` + `min-height: 0`). Mais ce n'est pas elle qui
+   défile — c'est son seul bloc de texte (`.result__scroll`). Le cadre, la croix
+   et la rangée d'actions restent entiers en toutes circonstances : une carte
+   qui défilait d'un bloc se faisait trancher net par la barre d'onglets, et ce
+   bord coupé se lisait comme un bug plutôt que comme un contenu à faire défiler.
+
+   Elle a la largeur du plateau — toute celle de la colonne : deux cartes de
+   largeurs différentes empilées ne formaient pas une colonne. */
       .result {
         position: relative;
         width: 100%;
         max-width: 560px;
+        /* Au-delà, c'est la roue qui disparaîtrait : passé ce plafond, c'est le
+           texte de la carte qui défile. */
+        max-height: 52svh;
         box-sizing: border-box;
-        padding: 12px 14px 14px;
+        padding: 12px 14px;
         border: 1px solid var(--ring);
         border-radius: 12px;
         background: var(--surface);
         text-align: left;
+        display: flex;
+        flex-direction: column;
         flex: 0 1 auto;
+        min-height: 0;
+      }
+
+      /* Le texte du résultat, seule partie qui défile. `touch-action` : body
+         porte `none` pour neutraliser le défilement de la page, sans cette
+         exception le bloc ne défilerait pas au doigt. */
+      .result__scroll {
         min-height: 0;
         overflow-y: auto;
         overscroll-behavior: contain;
-        /* body porte `touch-action: none` pour neutraliser le défilement de la
-           page : sans cette exception, la carte ne défilerait pas au doigt. */
         touch-action: pan-y;
       }
 
@@ -412,24 +449,36 @@
         display: none;
       }
 
-      /* Positionnement seul : l'apparence des boutons vient de buttons.css. */
-      .result__close {
-        position: absolute;
-        top: 10px;
-        right: 10px;
+      /* La hauteur de la croix (34 px, 44 au doigt — cf. buttons.css) : la tête
+         la réserve pour que l'accroche ne passe pas dessous. */
+      .result__head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 10px;
+        min-height: 34px;
+        flex-shrink: 0;
       }
 
-      /* La croix est en position absolue : les deux lignes qu'elle surplombe
-         réservent sa place, le reste de la carte occupe toute la largeur. */
-      .result__intro,
-      .result__title {
-        padding-right: 44px;
+      @media (pointer: coarse) {
+        .result__head {
+          min-height: 44px;
+        }
+      }
+
+      /* Positionnement seul : l'apparence des boutons vient de buttons.css. */
+      .result__close {
+        flex-shrink: 0;
+        margin-top: -2px;
       }
 
       .result__intro {
-        margin: 0 0 4px;
+        margin: 0;
         font-size: 12px;
         color: var(--legend);
+        /* Évite le mot — ou le point d'exclamation — resté seul sur la seconde
+           ligne. Ignoré par les navigateurs qui ne connaissent pas la propriété. */
+        text-wrap: balance;
       }
 
       /* La romaine du bandeau de titre : l'intitulé du prélèvement est ce que
@@ -437,23 +486,36 @@
       .result__title {
         margin: 0;
         font-family: var(--serif);
-        font-size: clamp(17px, 4.2vw, 24px);
+        font-size: clamp(16px, 4vw, 23px);
         font-weight: 700;
-        line-height: 1.15;
+        line-height: 1.2;
       }
 
+      /* Une ligne par donnée, libellé à gauche et valeur à droite, comme sur une
+         fiche. En deux colonnes côte à côte, la valeur la plus courante
+         (« 115,3 millions d'euros ») se cassait en deux lignes sur un téléphone,
+         et la carte y perdait une rangée entière. */
       .result__facts {
-        margin: 12px 0 0;
-        padding-top: 10px;
+        margin: 10px 0 0;
+        padding-top: 8px;
         border-top: 1px solid var(--ring);
         display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 16px;
+        gap: 5px;
+      }
+
+      /* `center` et non `baseline` : aligner les lignes de base d'un libellé de
+         11 px et d'une valeur de 14 px enfle la rangée de près de dix pixels,
+         soit une ligne de texte perdue sur un téléphone. */
+      .result__fact {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
       }
 
       .result__fact + .result__fact {
-        padding-left: 16px;
-        border-left: 1px solid var(--ring);
+        padding-top: 5px;
+        border-top: 1px solid var(--ring);
       }
 
       .result__label {
@@ -465,10 +527,11 @@
       }
 
       .result__value {
-        margin: 4px 0 0;
-        font-size: clamp(15px, 3.2vw, 18px);
+        margin: 0;
+        font-size: clamp(14px, 3.4vw, 17px);
         font-weight: 700;
         line-height: 1.25;
+        text-align: right;
       }
 
       .result__year {
@@ -482,11 +545,24 @@
         opacity: 0.62;
       }
 
+      /* Trois actions courtes sur une seule rangée, hors de la zone défilante :
+         elles restent atteignables quelle que soit la longueur de l'intitulé.
+         Les neuf pastilles de partage qui tenaient ici occupaient deux rangées
+         et, avec les deux boutons de retour, plus de place que le résultat
+         lui-même — elles sont passées dans la feuille « Partager ». */
+      .result__actions {
+        margin-top: 8px;
+        padding-top: 6px;
+        border-top: 1px solid var(--ring);
+        gap: 8px;
+        flex-shrink: 0;
+      }
+
       /* Une grille plutôt qu'un flex-wrap : le nombre de pastilles par rangée est
    décidé, pas subi. En flex, les neuf boutons se cassaient en 6 + 3 selon la
    largeur du texte au-dessus. */
       .share-bar {
-        margin-top: 12px;
+        margin-top: 14px;
         display: grid;
         grid-template-columns: repeat(9, auto);
         gap: 8px;
@@ -500,36 +576,6 @@
       @media (max-width: 520px) {
         .share-bar {
           grid-template-columns: repeat(5, auto);
-        }
-      }
-
-      /* Boutons de retour utilisateur : leur placement et leur poids, l'apparence
-     restant celle de buttons.css.
-     En grille : les deux libellés sont de longueurs très différentes, et un
-     flex-wrap les disposait en escalier — le premier sur toute la largeur, le
-     second centré dessous.
-     Signaler une erreur reste une action tertiaire : deux pavés pleine largeur
-     lui donnaient plus de présence qu'au résultat lui-même. */
-      .feedback-buttons {
-        margin-top: 10px;
-        display: grid;
-        gap: 6px;
-      }
-
-      .feedback-buttons .btn {
-        min-height: 34px;
-        font-size: 12px;
-        font-weight: 500;
-        opacity: 0.72;
-      }
-
-      .feedback-buttons .btn:hover {
-        opacity: 1;
-      }
-
-      @media (min-width: 560px) {
-        .feedback-buttons {
-          grid-template-columns: 1fr 1fr;
         }
       }
 
@@ -617,8 +663,15 @@
         }
       }
 
-      /* Feedback modal */
-      .feedback-modal {
+      /* ===============================
+   MODALES
+   ===============================
+
+   Deux surfaces recouvrent encore la page : la feuille « Partager » et le
+   formulaire de retour utilisateur. Elles partagent le même habillage — la
+   nommer d'après l'une des deux (`.feedback-modal`) obligeait la seconde à
+   emprunter le nom de la première. */
+      .modal {
         display: none;
         position: fixed;
         inset: 0;
@@ -627,7 +680,7 @@
         justify-content: center;
         background: rgba(0, 0, 0, 0.45);
       }
-      .feedback-form {
+      .modal-panel {
         background: var(--modal-surface, #fff);
         color: var(--modal-text, #111);
         padding: 18px;
@@ -637,11 +690,32 @@
         box-sizing: border-box;
         box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
       }
-      .feedback-form h3 {
+      .modal-panel h3 {
         margin: 0 0 8px;
+      }
+      .modal-actions {
+        margin-top: 14px;
       }
       .feedback-honeypot {
         display: none;
+      }
+      .feedback-type {
+        margin: 0;
+        padding: 0;
+        border: 0;
+      }
+      .feedback-type legend {
+        padding: 0;
+        font-size: 13px;
+        color: var(--modal-muted, #333);
+      }
+      .feedback-choice {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 6px;
+        font-size: 14px;
+        cursor: pointer;
       }
       .feedback-label {
         display: block;
@@ -655,9 +729,6 @@
         padding: 10px;
         font-size: 14px;
         resize: vertical;
-      }
-      .feedback-actions {
-        margin-top: 14px;
       }
       .feedback-status {
         margin-top: 10px;
@@ -703,175 +774,45 @@
      qu'aucun tirage n'a eu lieu ; js/app.js le lève et pose
      data-result="open" sur <html>. -->
         <section id="resultCard" class="result" hidden aria-label="Résultat du tirage">
-          <button
-            id="resultClose"
-            class="result__close btn btn-icon btn-sm btn-secondary btn-close"
-            type="button"
-            aria-label="Fermer le résultat"
-          ></button>
+          <!-- La tête de carte porte l'accroche et loge la croix. Elle est hors
+               de la zone défilante : l'intitulé récupère ainsi toute la largeur
+               (44 px de plus, soit près d'une ligne de moins sur les noms les
+               plus longs) et rien ne vient jamais glisser sous la croix. -->
+          <div class="result__head">
+            <p class="result__intro" id="resultIntro"></p>
+            <button
+              id="resultClose"
+              class="result__close btn btn-icon btn-sm btn-secondary btn-close"
+              type="button"
+              aria-label="Fermer le résultat"
+            ></button>
+          </div>
           <!-- role="status" : le résultat d'un tirage n'est annoncé aux lecteurs
        d'écran que par cette région, la carte ne prenant pas le focus. -->
-          <div id="resultText" role="status" aria-live="polite"></div>
-          <!-- `aria-label` sert à la fois de nom accessible et d'info-bulle (.btn-tip,
-         buttons.css) : plus de `title` à garder synchronisé. -->
-          <div class="share-bar" id="shareBar">
-            <!-- Logos de marque repris du projet « Jours de retraite »
-               (lemodelesocialfrancais.github.io/joursderetraite). Ils remplacent des
-               glyphes dessinés à la main, dont plusieurs se devinaient mal.
-               Certains sont tracés, d'autres pleins : chaque <svg> porte donc ses
-               propres attributs plutôt qu'un jeu commun. -->
-            <button
-              class="btn btn-icon btn-sm btn-pill btn-secondary btn-tip"
-              type="button"
-              data-platform="facebook"
-              aria-label="Partager sur Facebook"
-            >
-              <svg
-                class="share-icon"
-                fill="none"
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-              >
-                <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
-              </svg>
-            </button>
-            <button
-              class="btn btn-icon btn-sm btn-pill btn-secondary btn-tip"
-              type="button"
-              data-platform="x"
-              aria-label="Partager sur X / Twitter"
-            >
-              <svg
-                class="share-icon"
-                fill="none"
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-              >
-                <path
-                  d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2"
-                />
-              </svg>
-            </button>
-            <button
-              class="btn btn-icon btn-sm btn-pill btn-secondary btn-tip"
-              type="button"
-              data-platform="instagram"
-              aria-label="Partager sur Instagram"
-            >
-              <svg class="share-icon" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path
-                  d="M12 2.16c3.2 0 3.58.01 4.85.07 3.25.15 4.77 1.7 4.92 4.92.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.15 3.23-1.66 4.77-4.92 4.92-1.27.06-1.64.07-4.85.07a83 83 0 0 1-4.85-.07c-3.26-.15-4.77-1.7-4.92-4.92-.06-1.27-.07-1.64-.07-4.85s.02-3.58.07-4.85c.15-3.23 1.67-4.77 4.92-4.92A84 84 0 0 1 12 2.16M12 0C8.74 0 8.33.01 7.05.07 2.7.27.27 2.7.07 7.05.01 8.33 0 8.75 0 12s.01 3.67.07 4.95c.2 4.36 2.62 6.78 6.98 6.98 1.28.06 1.7.07 4.95.07s3.67-.01 4.95-.07c4.35-.2 6.78-2.62 6.98-6.98.06-1.28.07-1.7.07-4.95s-.01-3.67-.07-4.95C23.73 2.7 21.3.27 16.95.07A84 84 0 0 0 12 0m0 5.84a6.16 6.16 0 1 0 0 12.32 6.16 6.16 0 0 0 0-12.32M12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8m6.4-11.84a1.44 1.44 0 1 0 0 2.88 1.44 1.44 0 0 0 0-2.88"
-                />
-              </svg>
-            </button>
-            <button
-              class="btn btn-icon btn-sm btn-pill btn-secondary btn-tip"
-              type="button"
-              data-platform="linkedin"
-              aria-label="Partager sur LinkedIn"
-            >
-              <svg
-                class="share-icon"
-                fill="none"
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-              >
-                <path
-                  d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6M2 9h4v12H2z"
-                />
-                <circle cx="4" cy="4" r="2" />
-              </svg>
-            </button>
-            <button
-              class="btn btn-icon btn-sm btn-pill btn-secondary btn-tip"
-              type="button"
-              data-platform="snapchat"
-              aria-label="Partager sur Snapchat"
-            >
-              <svg class="share-icon" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path
-                  d="M12.2.8c1 0 4.35.27 5.94 3.81.52 1.2.4 3.22.3 4.85v.06l-.04.51q.11.09.4.1.46-.04 1.04-.31a1 1 0 0 1 .46-.1q.28 0 .5.09c.46.15.74.48.74.83q.03.68-1.21 1.17l-.34.12c-.45.14-1.14.36-1.34.81q-.14.34.12.87l.02.01c.06.14 1.52 3.48 4.79 4.02a.5.5 0 0 1 .42.5l-.05.23q-.35.85-3.14 1.27c-.06.1-.12.38-.17.57q-.04.26-.13.56-.12.4-.56.4h-.03a3 3 0 0 1-.53-.07 6 6 0 0 0-1.28-.14q-.45 0-.9.08c-.6.1-1.13.46-1.73.88-.86.6-1.83 1.29-3.3 1.29l-.18-.02h-.15a5.3 5.3 0 0 1-3.27-1.28c-.6-.42-1.11-.78-1.71-.89a7 7 0 0 0-.93-.07c-.54 0-.96.09-1.27.15a3 3 0 0 1-.54.07c-.38 0-.52-.22-.58-.42q-.1-.3-.14-.57c-.05-.18-.1-.5-.17-.57Q.4 19.27.06 18.4L0 18.17a.5.5 0 0 1 .42-.5c3.26-.55 4.73-3.89 4.8-4.03v-.03q.28-.52.13-.86c-.2-.44-.89-.66-1.34-.81l-.34-.12c-1.1-.44-1.26-.93-1.2-1.28.1-.47.68-.79 1.17-.79q.22 0 .38.08.64.3 1.1.3.36-.02.47-.11l-.04-.57c-.1-1.62-.23-3.65.3-4.84A6.3 6.3 0 0 1 11.73.8h.48z"
-                />
-              </svg>
-            </button>
-            <button
-              class="btn btn-icon btn-sm btn-pill btn-secondary btn-tip"
-              type="button"
-              data-platform="tiktok"
-              aria-label="Partager sur TikTok"
-            >
-              <svg class="share-icon" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path
-                  d="M15.5 3a5.2 5.2 0 0 0 3 3.02V9a6 6 0 0 1-3.2-.9v6.18a5.3 5.3 0 1 1-5.3-5.3q.35 0 .7.06v2.86a2.52 2.52 0 1 0 1.86 2.42V3z"
-                />
-              </svg>
-            </button>
-            <button
-              class="btn btn-icon btn-sm btn-pill btn-secondary btn-tip"
-              type="button"
-              data-platform="whatsapp"
-              aria-label="Partager sur WhatsApp"
-            >
-              <svg class="share-icon" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path
-                  d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97s-.47-.14-.67.15-.76.97-.94 1.17-.34.22-.64.07-1.26-.46-2.4-1.47a9 9 0 0 1-1.64-2.06c-.18-.3-.02-.46.13-.6.13-.14.3-.35.44-.53s.2-.3.3-.5.05-.36-.03-.51-.66-1.62-.91-2.21c-.24-.58-.49-.5-.67-.51l-.57-.01c-.2 0-.52.07-.8.37-.26.3-1.03 1.02-1.03 2.48s1.06 2.88 1.21 3.08 2.1 3.2 5.08 4.48q1.04.44 1.7.63c.7.22 1.35.2 1.86.11.57-.08 1.76-.71 2-1.4s.26-1.3.18-1.42c-.07-.13-.27-.2-.57-.35m-5.42 7.4A10 10 0 0 1 7 20.42l-.36-.22-3.74.99 1-3.65-.23-.38a10 10 0 0 1-1.51-5.26 9.9 9.9 0 0 1 16.87-6.98 9.8 9.8 0 0 1 2.9 7 9.9 9.9 0 0 1-9.89 9.88m8.41-18.3a11.8 11.8 0 0 0-8.4-3.5 11.9 11.9 0 0 0-10.3 17.84L.05 24l6.31-1.65a12 12 0 0 0 5.69 1.44c6.55 0 11.89-5.33 11.9-11.89a11.8 11.8 0 0 0-3.49-8.41"
-                />
-              </svg>
-            </button>
-            <button
-              class="btn btn-icon btn-sm btn-pill btn-secondary btn-tip"
-              type="button"
-              data-platform="telegram"
-              aria-label="Partager sur Telegram"
-            >
-              <svg class="share-icon" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path
-                  d="m2.12 11.08 19.04-7.35c.89-.34 1.66.21 1.38 1.51L19.3 20.51c-.24 1.14-.93 1.13-1.52.5l-4.24-3.93-2.04 1.97c-.23.22-.42.41-.85.41l.3-4.3 7.84-7.08c.34-.3-.08-.47-.53-.16l-9.68 6.1L4.4 12.7c-.9-.29-.92-.9.2-1.35z"
-                />
-              </svg>
-            </button>
-            <button
-              class="btn btn-icon btn-sm btn-pill btn-secondary btn-tip"
-              type="button"
-              id="copyText"
-              aria-label="Copier le texte"
-            >
-              <svg
-                class="share-icon"
-                fill="none"
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-              >
-                <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
-                <path d="M4 16a2 2 0 0 1-2-2V4c0-1.1.9-2 2-2h10a2 2 0 0 1 2 2" />
-              </svg>
-            </button>
+          <div class="result__scroll">
+            <div id="resultText" role="status" aria-live="polite"></div>
           </div>
-          <!-- Hors de #resultText, qui est une zone aria-live : ces deux boutons y
-             étaient injectés à chaque tirage, donc réannoncés avec le résultat.
-             Ils viennent après le partage, qui est l'action attendue ici. -->
-          <div class="feedback-buttons">
-            <button id="btn-info" type="button" class="btn btn-secondary btn-sm">
-              Donner un complément d'information
+          <!-- Deux actions, et deux seulement : elles doivent tenir sur une
+     rangée jusque sur un écran de 320 px, sinon la carte se replie sur
+     un téléphone court. Les libellés sont abrégés, `aria-label` porte
+     l'intitulé complet — et le contient, sinon la commande vocale ne
+     retrouve plus le bouton. -->
+          <div class="result__actions btn-row btn-row--center">
+            <button
+              id="btn-share"
+              class="btn btn-secondary btn-sm"
+              type="button"
+              aria-label="Partager ce résultat"
+            >
+              Partager
             </button>
-            <button id="btn-error" type="button" class="btn btn-secondary btn-sm">
-              Signaler une erreur
+            <button
+              id="btn-feedback"
+              class="btn btn-secondary btn-sm"
+              type="button"
+              aria-label="Signaler une erreur ou apporter un complément"
+            >
+              Signaler
             </button>
           </div>
         </section>
@@ -893,18 +834,193 @@
       </div>
     </div>
 
+    <!-- Feuille « Partager » : les neuf pastilles vivaient dans la carte de
+         résultat, où elles occupaient deux rangées sur un téléphone. -->
+    <div id="shareModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="shareTitle">
+      <div class="modal-panel">
+        <h3 id="shareTitle">Partager ce résultat</h3>
+        <!-- `aria-label` sert à la fois de nom accessible et d'info-bulle (.btn-tip,
+         buttons.css) : plus de `title` à garder synchronisé. -->
+        <div class="share-bar" id="shareBar">
+          <!-- Logos de marque repris du projet « Jours de retraite »
+               (lemodelesocialfrancais.github.io/joursderetraite). Ils remplacent des
+               glyphes dessinés à la main, dont plusieurs se devinaient mal.
+               Certains sont tracés, d'autres pleins : chaque <svg> porte donc ses
+               propres attributs plutôt qu'un jeu commun. -->
+          <button
+            class="btn btn-icon btn-sm btn-pill btn-secondary btn-tip"
+            type="button"
+            data-platform="facebook"
+            aria-label="Partager sur Facebook"
+          >
+            <svg
+              class="share-icon"
+              fill="none"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+            </svg>
+          </button>
+          <button
+            class="btn btn-icon btn-sm btn-pill btn-secondary btn-tip"
+            type="button"
+            data-platform="x"
+            aria-label="Partager sur X / Twitter"
+          >
+            <svg
+              class="share-icon"
+              fill="none"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <path
+                d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2"
+              />
+            </svg>
+          </button>
+          <button
+            class="btn btn-icon btn-sm btn-pill btn-secondary btn-tip"
+            type="button"
+            data-platform="instagram"
+            aria-label="Partager sur Instagram"
+          >
+            <svg class="share-icon" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M12 2.16c3.2 0 3.58.01 4.85.07 3.25.15 4.77 1.7 4.92 4.92.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.15 3.23-1.66 4.77-4.92 4.92-1.27.06-1.64.07-4.85.07a83 83 0 0 1-4.85-.07c-3.26-.15-4.77-1.7-4.92-4.92-.06-1.27-.07-1.64-.07-4.85s.02-3.58.07-4.85c.15-3.23 1.67-4.77 4.92-4.92A84 84 0 0 1 12 2.16M12 0C8.74 0 8.33.01 7.05.07 2.7.27.27 2.7.07 7.05.01 8.33 0 8.75 0 12s.01 3.67.07 4.95c.2 4.36 2.62 6.78 6.98 6.98 1.28.06 1.7.07 4.95.07s3.67-.01 4.95-.07c4.35-.2 6.78-2.62 6.98-6.98.06-1.28.07-1.7.07-4.95s-.01-3.67-.07-4.95C23.73 2.7 21.3.27 16.95.07A84 84 0 0 0 12 0m0 5.84a6.16 6.16 0 1 0 0 12.32 6.16 6.16 0 0 0 0-12.32M12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8m6.4-11.84a1.44 1.44 0 1 0 0 2.88 1.44 1.44 0 0 0 0-2.88"
+              />
+            </svg>
+          </button>
+          <button
+            class="btn btn-icon btn-sm btn-pill btn-secondary btn-tip"
+            type="button"
+            data-platform="linkedin"
+            aria-label="Partager sur LinkedIn"
+          >
+            <svg
+              class="share-icon"
+              fill="none"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <path
+                d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6M2 9h4v12H2z"
+              />
+              <circle cx="4" cy="4" r="2" />
+            </svg>
+          </button>
+          <button
+            class="btn btn-icon btn-sm btn-pill btn-secondary btn-tip"
+            type="button"
+            data-platform="snapchat"
+            aria-label="Partager sur Snapchat"
+          >
+            <svg class="share-icon" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M12.2.8c1 0 4.35.27 5.94 3.81.52 1.2.4 3.22.3 4.85v.06l-.04.51q.11.09.4.1.46-.04 1.04-.31a1 1 0 0 1 .46-.1q.28 0 .5.09c.46.15.74.48.74.83q.03.68-1.21 1.17l-.34.12c-.45.14-1.14.36-1.34.81q-.14.34.12.87l.02.01c.06.14 1.52 3.48 4.79 4.02a.5.5 0 0 1 .42.5l-.05.23q-.35.85-3.14 1.27c-.06.1-.12.38-.17.57q-.04.26-.13.56-.12.4-.56.4h-.03a3 3 0 0 1-.53-.07 6 6 0 0 0-1.28-.14q-.45 0-.9.08c-.6.1-1.13.46-1.73.88-.86.6-1.83 1.29-3.3 1.29l-.18-.02h-.15a5.3 5.3 0 0 1-3.27-1.28c-.6-.42-1.11-.78-1.71-.89a7 7 0 0 0-.93-.07c-.54 0-.96.09-1.27.15a3 3 0 0 1-.54.07c-.38 0-.52-.22-.58-.42q-.1-.3-.14-.57c-.05-.18-.1-.5-.17-.57Q.4 19.27.06 18.4L0 18.17a.5.5 0 0 1 .42-.5c3.26-.55 4.73-3.89 4.8-4.03v-.03q.28-.52.13-.86c-.2-.44-.89-.66-1.34-.81l-.34-.12c-1.1-.44-1.26-.93-1.2-1.28.1-.47.68-.79 1.17-.79q.22 0 .38.08.64.3 1.1.3.36-.02.47-.11l-.04-.57c-.1-1.62-.23-3.65.3-4.84A6.3 6.3 0 0 1 11.73.8h.48z"
+              />
+            </svg>
+          </button>
+          <button
+            class="btn btn-icon btn-sm btn-pill btn-secondary btn-tip"
+            type="button"
+            data-platform="tiktok"
+            aria-label="Partager sur TikTok"
+          >
+            <svg class="share-icon" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M15.5 3a5.2 5.2 0 0 0 3 3.02V9a6 6 0 0 1-3.2-.9v6.18a5.3 5.3 0 1 1-5.3-5.3q.35 0 .7.06v2.86a2.52 2.52 0 1 0 1.86 2.42V3z"
+              />
+            </svg>
+          </button>
+          <button
+            class="btn btn-icon btn-sm btn-pill btn-secondary btn-tip"
+            type="button"
+            data-platform="whatsapp"
+            aria-label="Partager sur WhatsApp"
+          >
+            <svg class="share-icon" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97s-.47-.14-.67.15-.76.97-.94 1.17-.34.22-.64.07-1.26-.46-2.4-1.47a9 9 0 0 1-1.64-2.06c-.18-.3-.02-.46.13-.6.13-.14.3-.35.44-.53s.2-.3.3-.5.05-.36-.03-.51-.66-1.62-.91-2.21c-.24-.58-.49-.5-.67-.51l-.57-.01c-.2 0-.52.07-.8.37-.26.3-1.03 1.02-1.03 2.48s1.06 2.88 1.21 3.08 2.1 3.2 5.08 4.48q1.04.44 1.7.63c.7.22 1.35.2 1.86.11.57-.08 1.76-.71 2-1.4s.26-1.3.18-1.42c-.07-.13-.27-.2-.57-.35m-5.42 7.4A10 10 0 0 1 7 20.42l-.36-.22-3.74.99 1-3.65-.23-.38a10 10 0 0 1-1.51-5.26 9.9 9.9 0 0 1 16.87-6.98 9.8 9.8 0 0 1 2.9 7 9.9 9.9 0 0 1-9.89 9.88m8.41-18.3a11.8 11.8 0 0 0-8.4-3.5 11.9 11.9 0 0 0-10.3 17.84L.05 24l6.31-1.65a12 12 0 0 0 5.69 1.44c6.55 0 11.89-5.33 11.9-11.89a11.8 11.8 0 0 0-3.49-8.41"
+              />
+            </svg>
+          </button>
+          <button
+            class="btn btn-icon btn-sm btn-pill btn-secondary btn-tip"
+            type="button"
+            data-platform="telegram"
+            aria-label="Partager sur Telegram"
+          >
+            <svg class="share-icon" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="m2.12 11.08 19.04-7.35c.89-.34 1.66.21 1.38 1.51L19.3 20.51c-.24 1.14-.93 1.13-1.52.5l-4.24-3.93-2.04 1.97c-.23.22-.42.41-.85.41l.3-4.3 7.84-7.08c.34-.3-.08-.47-.53-.16l-9.68 6.1L4.4 12.7c-.9-.29-.92-.9.2-1.35z"
+              />
+            </svg>
+          </button>
+          <button
+            class="btn btn-icon btn-sm btn-pill btn-secondary btn-tip"
+            type="button"
+            id="copyText"
+            aria-label="Copier le texte"
+          >
+            <svg
+              class="share-icon"
+              fill="none"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+              <path d="M4 16a2 2 0 0 1-2-2V4c0-1.1.9-2 2-2h10a2 2 0 0 1 2 2" />
+            </svg>
+          </button>
+        </div>
+        <div class="modal-actions btn-row btn-row--end">
+          <button type="button" id="closeShare" class="btn btn-secondary">Fermer</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Modal feedback -->
     <div
       id="feedbackModal"
-      class="feedback-modal"
+      class="modal"
       role="dialog"
       aria-modal="true"
       aria-labelledby="feedbackTitle"
     >
-      <form id="feedbackForm" class="feedback-form">
-        <h3 id="feedbackTitle">Donner un complément d'information</h3>
+      <form id="feedbackForm" class="modal-panel">
+        <h3 id="feedbackTitle">Votre retour sur ce prélèvement</h3>
         <input type="hidden" id="formResult" name="resultText" value="" />
-        <input type="hidden" id="formType" name="type" value="info" />
+        <!-- Le type était porté par deux boutons distincts dans la carte, et le
+             titre du formulaire annonçait « complément » dans les deux cas. Un
+             seul bouton l'ouvre désormais, le type se choisit ici. -->
+        <fieldset class="feedback-type">
+          <legend>Votre message porte sur</legend>
+          <label class="feedback-choice">
+            <input type="radio" name="type" value="info" checked />
+            Un complément d'information
+          </label>
+          <label class="feedback-choice">
+            <input type="radio" name="type" value="error" />
+            Une erreur à corriger
+          </label>
+        </fieldset>
         <input
           type="text"
           name="honeypot"
@@ -923,7 +1039,7 @@
             class="feedback-textarea"
           ></textarea>
         </label>
-        <div class="feedback-actions btn-row btn-row--end">
+        <div class="modal-actions btn-row btn-row--end">
           <button type="button" id="closeFeedback" class="btn btn-secondary">Annuler</button>
           <button type="submit" class="btn btn-primary">Envoyer</button>
         </div>

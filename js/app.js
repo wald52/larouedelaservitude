@@ -28,6 +28,12 @@ const installPromptAction = document.getElementById("installPromptAction");
 const installPromptClose = document.getElementById("installPromptClose");
 const resultCard = requireElement("resultCard");
 const resultText = requireElement("resultText");
+const resultIntro = requireElement("resultIntro");
+// Seul bloc défilant de la carte : le cadre et les actions restent entiers.
+const resultScroll = resultCard.querySelector(".result__scroll");
+if (!resultScroll) {
+  throw new Error("[APP] Zone défilante du résultat introuvable (.result__scroll).");
+}
 const resultClose = requireElement("resultClose");
 const copyBtn = requireElement("copyText");
 const shareButtons = document.querySelectorAll("#shareBar button[data-platform]");
@@ -49,6 +55,9 @@ const INTRO_DURATION_MS = 650;
 const CENTER_INTRO_DURATION_MS = 360;
 const LABEL_MIN_ARC_PX = 20;
 const INSTALL_PROMPT_SPIN_THRESHOLD = 3;
+// En deçà, la roue cesse de rendre de la place à la carte de résultat : c'est
+// elle qu'on est venu voir, et la carte sait défiler.
+const WHEEL_MIN_FIT = 150;
 // Amortissement appliqué quand l'utilisateur demande moins d'animation : la
 // roue tourne une fraction de seconde puis livre son résultat.
 const REDUCED_MOTION_DAMPING = 0.93;
@@ -213,10 +222,11 @@ function registerCompletedSpin() {
 }
 
 /* =======================
-   MODALE : FOCUS
+   MODALES : FOCUS
    ======================= */
-// Le formulaire de retour utilisateur recouvre la page : le focus y entre à
-// l'ouverture, y reste tant qu'elle est ouverte, et revient à son point de
+// Les deux surfaces qui recouvrent la page (la feuille de partage et le
+// formulaire de retour) partagent le même comportement : le focus entre dedans
+// à l'ouverture, y reste tant qu'elles sont ouvertes, et revient à son point de
 // départ à la fermeture. La carte de résultat, elle, ne recouvre rien et ne
 // prend donc jamais le focus (voir showResult).
 
@@ -243,7 +253,53 @@ function setResultOpen(open) {
 
   resultCard.hidden = !open;
   document.documentElement.dataset.result = open ? "open" : "closed";
+  if (!open) {
+    releaseWheelFit();
+  }
   syncCanvasSize();
+}
+
+// La roue rend à la carte ce qui lui manque, et seulement cela.
+//
+// Aucune fraction fixe de la hauteur ne convenait : le corps de la page ne
+// défile pas, et la carte demande deux lignes pour « Droit de sécurité » comme
+// huit pour « Imposition forfaitaire sur les centrales de production d'énergie
+// électrique d'origine photovoltaïque ou hydraulique ». On mesure donc ce qui
+// dépasse, et la roue cède exactement cette hauteur — jamais sous WHEEL_MIN_FIT.
+//
+// La taille reste décidée en CSS : ce jeton n'est qu'une borne supplémentaire
+// dans le `min()` de la règle `canvas`. Il ne fait que réduire, et il est levé
+// à la fermeture de la carte.
+function releaseWheelFit() {
+  document.documentElement.style.removeProperty("--wheel-fit");
+}
+
+function fitWheelToResult() {
+  if (!isResultVisible()) return;
+
+  // Quelques passes : une hauteur rendue par la roue n'est pas toujours reprise
+  // en entier par la carte (marges de la colonne), et une mesure suffit rarement
+  // à converger. Trois suffisent, et la boucle s'arrête dès que tout tient.
+  // Le canvas n'est reconstruit qu'une fois, à la fin.
+  let applied = 0;
+
+  for (let pass = 0; pass < 3; pass++) {
+    const missing = resultScroll.scrollHeight - resultScroll.clientHeight;
+    if (missing <= 1) break;
+
+    // Lecture après écriture : elle force le recalcul de la mise en page, donc
+    // la passe suivante mesure bien l'effet de la précédente.
+    const current = canvas.getBoundingClientRect().width;
+    const next = Math.max(WHEEL_MIN_FIT, current - missing);
+    if (next >= current - 1) break;
+
+    document.documentElement.style.setProperty("--wheel-fit", `${Math.round(next)}px`);
+    applied = next;
+  }
+
+  if (applied) {
+    syncCanvasSize();
+  }
 }
 
 function hideResult() {
@@ -279,14 +335,16 @@ function showResult(entry) {
   currentIntro = intros[Math.floor(Math.random() * intros.length)];
 
   // L'accroche est écrite ici et non dans entries.js : elle relève du ton de la
-  // roue, pas de la mise en forme d'une donnée.
-  resultText.innerHTML =
-    `<p class="result__intro">${currentIntro}</p>` + formatEntryForDisplay(entry);
+  // roue, pas de la mise en forme d'une donnée. Elle vit hors de la région
+  // aria-live : ce qui est annoncé, c'est le résultat, pas la plaisanterie.
+  resultIntro.textContent = currentIntro;
+  resultText.innerHTML = formatEntryForDisplay(entry);
 
   setResultOpen(true);
-  // La carte peut avoir été défilée jusqu'aux boutons de partage : le tirage
-  // suivant doit s'ouvrir sur son intitulé, pas au milieu de la fiche.
-  resultCard.scrollTop = 0;
+  // Un intitulé long a pu être défilé : le tirage suivant se relit depuis le
+  // début, pas au milieu du précédent.
+  resultScroll.scrollTop = 0;
+  fitWheelToResult();
 }
 
 // Le résultat en texte brut — partage, presse-papiers, formulaire de retour.
@@ -1005,16 +1063,40 @@ function getSelectedIndex(a) {
   return Math.floor(theta / step);
 }
 
-// Les deux boutons vivent dans le balisage : plus de délégation, un écouteur
-// chacun. Le texte transmis est celui du résultat, sans l'accroche aléatoire
-// qui le précède — un signalement doit partir avec l'intitulé *et* les données
-// sur lesquelles il porte peut-être.
-requireElement("btn-info").addEventListener("click", () => {
-  openFeedback(currentResultText(), "info");
+// Les trois boutons vivent dans le balisage : plus de délégation, un écouteur
+// chacun. Le texte transmis au formulaire est celui du résultat, sans l'accroche
+// aléatoire qui le précède — un signalement doit partir avec l'intitulé *et* les
+// données sur lesquelles il porte peut-être.
+requireElement("btn-share").addEventListener("click", openShare);
+
+requireElement("btn-feedback").addEventListener("click", () => {
+  openFeedback(currentResultText());
 });
 
-requireElement("btn-error").addEventListener("click", () => {
-  openFeedback(currentResultText(), "error");
+// === Feuille de partage ===
+// Les neuf pastilles occupaient deux rangées dans la carte de résultat, sur un
+// téléphone, plus que le résultat lui-même. Elles s'ouvrent maintenant à la
+// demande, dans une surface qui, elle, a le droit de recouvrir la page.
+const shareModal = requireElement("shareModal");
+
+function isShareOpen() {
+  return shareModal.style.display === "flex";
+}
+
+function openShare() {
+  shareModal.style.display = "flex";
+  openModal(shareModal, shareModal.querySelector("#shareBar button"));
+}
+
+function closeShare() {
+  if (!isShareOpen()) return;
+  shareModal.style.display = "none";
+  closeModal(shareModal);
+}
+
+requireElement("closeShare").addEventListener("click", closeShare);
+shareModal.addEventListener("click", (e) => {
+  if (e.target === shareModal) closeShare();
 });
 
 // === Feedback modal ===
@@ -1033,9 +1115,11 @@ const status = requireElement("feedbackStatus");
 // Limite anti-abus côté client : 1 envoi par minute max
 let lastFeedbackTime = 0;
 
-function openFeedback(resultText, type = "info") {
+function openFeedback(resultText) {
   requireElement("formResult").value = resultText;
-  requireElement("formType").value = type;
+  // Le type revient à son défaut : le formulaire est le même d'un envoi à
+  // l'autre, il ne doit pas garder le choix du précédent.
+  form.querySelector('input[name="type"][value="info"]').checked = true;
   requireElement("formMessage").value = "";
   requireElement("honeypot").value = "";
   status.style.display = "none";
@@ -1052,10 +1136,14 @@ closeBtn.addEventListener("click", closeFeedback);
 modal.addEventListener("click", (e) => {
   if (e.target === modal) closeFeedback();
 });
+// Échap ferme la surface la plus haute : le formulaire couvre la feuille de
+// partage, qui couvre la carte de résultat.
 document.addEventListener("keydown", (e) => {
   if (e.key !== "Escape") return;
   if (modal.style.display === "flex") {
     closeFeedback();
+  } else if (isShareOpen()) {
+    closeShare();
   } else if (isResultVisible()) {
     hideResult();
   }
@@ -1076,7 +1164,7 @@ form.addEventListener("submit", async (e) => {
   const payload = {
     resultText: requireElement("formResult").value,
     userMessage: requireElement("formMessage").value,
-    type: requireElement("formType").value || "info",
+    type: form.querySelector('input[name="type"]:checked')?.value || "info",
     honeypot: requireElement("honeypot").value || ""
   };
   try {
@@ -1406,6 +1494,7 @@ shareButtons.forEach((btn) => {
         a.click();
         a.remove();
 
+        closeShare();
         alert(
           `✅ Image téléchargée !\n\n📱 Ouvrez ${platform.toUpperCase()} et publiez l'image depuis votre galerie.`
         );
@@ -1480,6 +1569,7 @@ shareButtons.forEach((btn) => {
       }
 
       window.open(shareUrl, "_blank", "noopener,noreferrer");
+      closeShare();
     } catch (error) {
       console.error("❌ Erreur lors du partage:", error);
       alert(`❌ Erreur : ${error.message}`);
@@ -1501,7 +1591,11 @@ function updateBg() {
 
 function handleResize() {
   updateBg();
+  // La fenêtre a changé de taille : l'ajustement précédent ne veut plus rien
+  // dire, on repart de la taille normale avant de remesurer.
+  releaseWheelFit();
   const resized = syncCanvasSize();
+  fitWheelToResult();
   if (resized && shouldAnimate()) {
     lastTime = performance.now();
     scheduleAnimationFrame();

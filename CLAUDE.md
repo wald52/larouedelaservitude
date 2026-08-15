@@ -72,7 +72,7 @@ js/audio.js             WebAudio, offline-first sound decoding + IndexedDB cache
 js/menu.js              Bottom tab bar, panels, history, settings; builds its own DOM at runtime
 js/settings.js          Reads the sound setting (data-attribute first, localStorage fallback)
 js/sw-update.js         SW registration + version switchover (see §7)
-js/focus-trap.js        Focus stack shared by the feedback modal (app.js) and the menu surfaces
+js/focus-trap.js        Focus stack shared by the modals (app.js) and the menu surfaces (menu.js)
 js/constants.js         SETTINGS_KEY, BASE_PATH and APP_VERSION — shared by front-end modules
 js/data-explorer.js     Table, filters, multi-key sort, export, URL state for donnees.html
 js/stats.js             Pure descriptive statistics (no DOM) — the only unit-tested front-end module
@@ -95,7 +95,7 @@ shares/                 Runtime artifacts only; share-*.html is gitignored
 `donnees.html` → `js/data-explorer.js` → `js/entries.js`, `js/menu.js`, `js/sw-update.js`,
 `js/stats.js`, `js/charts.js`
 `js/audio.js` → `js/settings.js` → `js/constants.js` ← `js/sw-update.js`, `js/entries.js`
-`js/app.js`, `js/menu.js` → `js/focus-trap.js` (piled surfaces: feedback modal, menu panels)
+`js/app.js`, `js/menu.js` → `js/focus-trap.js` (piled surfaces: share sheet, feedback form, panels)
 `js/app.js` → `import('../bills.js')` (dynamic, on first spin) → `js/settings.js`, and
 `bills.js` → `import('./js/audio.js')` (dynamic, inside `initBills()`)
 
@@ -171,21 +171,42 @@ chevron): `✕` and `←` render at wildly different weights across system fonts
 duplicated in several files. Those buttons carry no text — their name comes from `aria-label`.
 
 **The result is a card under the wheel, not a modal.** `showResult()` in `js/app.js` fills
-`#resultCard` (markup built by `formatEntryForDisplay()` in `js/entries.js`) and sets
-`data-result="open"` on `<html>`; the CSS tightens the wheel's height bound so the column has room
-for one more thing, and `syncCanvasSize()` then rebuilds the layers at the new size — the canvas
-size is always read from CSS, never written from JS. The card takes no focus and no focus trap: it
-covers nothing, so `Space` and the spin button keep working while it is read, and the next draw
-replaces its contents (the wheel is resized once, on open, and once on close). It is the flexible
-item of the column (`flex: 0 1 auto`, `min-height: 0`, `overflow-y: auto`, plus `touch-action:
-pan-y` since `body` kills touch scrolling): when the screen is short, the card scrolls, never the
-wheel or its button. The entry itself is kept in `currentEntry` — sharing, the clipboard and the
-feedback form go through `formatEntryAsText()`, not through the card's `innerText`.
+`#resultCard` (the title and the two facts come from `formatEntryForDisplay()` in `js/entries.js`,
+the random kicker from `app.js` itself) and sets `data-result="open"` on `<html>`, which tightens
+the column's spacing. The card takes no focus and no focus trap: it covers nothing, so `Space` and
+the spin button keep working while it is read, and the next draw replaces its contents. The entry
+is kept in `currentEntry` — sharing, the clipboard and the feedback form go through
+`formatEntryAsText()`, never through the card's `innerText`.
 
-The modal it replaced covered the wheel it commented on and had to be dismissed before spinning
-again. Two consequences to keep in mind: an automatic SW reload is held while a card is on screen
-(`canReloadForUpdate`), and the install banner — which floats over the same bottom strip — waits
-for the card to be closed.
+**The wheel gives the card exactly the height it lacks.** The page does not scroll, so something
+has to yield, and no fixed fraction could: a two-line name and the longest one in the dataset
+(eight lines) do not ask for the same card. `fitWheelToResult()` measures the overflow of
+`.result__scroll` and lowers `--wheel-fit`, a third bound in the `min()` that sizes the `canvas` —
+so the size is still decided in CSS, JS only reports the shortfall. It converges in at most three
+passes, only ever shrinks (a spin never makes the wheel jump back up), stops at `WHEEL_MIN_FIT`
+(150 px, where the card starts scrolling instead), and is released when the card closes or the
+window is resized. `syncCanvasSize()` then rebuilds the layers once.
+
+**Inside the card, only the text scrolls.** `.result__head` (kicker + close button) and
+`.result__actions` sit outside `.result__scroll`, which alone carries `overflow-y: auto` and
+`touch-action: pan-y` (`body` kills touch scrolling). A card that scrolled as a whole was sliced by
+the tab bar, and a cut edge reads as a bug rather than as something to scroll. The head also exists
+to keep the close button out of the title's way: reserving its width on every line cost nearly a
+line of text per long name.
+
+**The plateau and the card share the column's full width.** `.board` used to hug the wheel, which
+left two stacked cards with different edges. Since the wheel's size now varies, matching the card
+to it was not an option either — both simply take `width: 100%` up to 560 px.
+
+**Two actions, and only two** (`Partager`, `Signaler`): they must hold on one row down to a 320 px
+screen, or the card folds on a short phone. The nine share pills moved into `#shareModal`, a
+surface that _is_ allowed to cover the page, and the feedback form carries the info/error choice
+itself — it used to be two card buttons opening a form whose title said "complément" either way.
+
+The modal this card replaced covered the wheel it commented on and had to be dismissed before
+spinning again. Two consequences to keep in mind: an automatic SW reload is held while a card is on
+screen (`canReloadForUpdate`), and the install banner — which floats over the same bottom strip —
+waits for the card to be closed.
 
 **Navigation is a bottom tab bar, not a hamburger.** `js/menu.js` builds a fixed bar at the bottom
 of `index.html` from two tables: `MENU_TABS` (the four tabs, in display order) and `MENU_PANELS`
@@ -287,7 +308,7 @@ carries `role="img"` plus an `aria-label` that `updateCountInfo()` rewrites on e
 it a screen reader sees nothing there. The result (`#resultText`), the counter (`#countInfo`) and
 the feedback status are `role="status" aria-live="polite"` regions — that is the only way a spin
 result gets announced, since the result card never takes focus. Every surface that _covers_ the
-page — the feedback modal and the menu panels — goes through `js/focus-trap.js`: it moves focus in,
+page — the share sheet, the feedback form and the menu panels — goes through `js/focus-trap.js`: it moves focus in,
 traps `Tab` inside, and hands focus back on close. `prefers-reduced-motion`
 is honoured for real — the wheel damps
 much faster (`REDUCED_MOTION_DAMPING`) and `bills.js` is never invoked — on top of its older use as
@@ -390,7 +411,7 @@ latest published version without waiting 24 h or reloading twice, **(3)** a page
 from two versions.
 
 **Bump the version in _two_ files whenever you change any precached asset:** `CACHE_VERSION` in
-`service-worker.js` (currently `v45`) and `APP_VERSION` in `js/constants.js`. They must be equal —
+`service-worker.js` (currently `v46`) and `APP_VERSION` in `js/constants.js`. They must be equal —
 `npm run check:precache` fails otherwise. That pair _is_ the release: nothing reaches returning
 visitors without it.
 
