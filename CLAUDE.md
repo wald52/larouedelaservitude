@@ -85,7 +85,7 @@ service-worker.js       PWA atomic precache + cache-first app shell (see §7)
 data/entries-*.json     The data (see §5)
 netlify/functions/      Serverless endpoints (see §6)
 scripts/                Validation + one-off data conversion tooling
-tests/                  node:test suites (Netlify handlers, data, precache and stats invariants)
+tests/                  node:test suites (Netlify handlers, data, precache, stats, theme tokens)
 shares/                 Runtime artifacts only; share-*.html is gitignored
 ```
 
@@ -434,7 +434,7 @@ latest published version without waiting 24 h or reloading twice, **(3)** a page
 from two versions.
 
 **Bump the version in _two_ files whenever you change any precached asset:** `CACHE_VERSION` in
-`service-worker.js` (currently `v47`) and `APP_VERSION` in `js/constants.js`. They must be equal —
+`service-worker.js` (currently `v53`) and `APP_VERSION` in `js/constants.js`. They must be equal —
 `npm run check:precache` fails otherwise. That pair _is_ the release: nothing reaches returning
 visitors without it.
 
@@ -495,7 +495,11 @@ itself with a single cache left in `caches.keys()`.
 `npm test` runs Node's built-in test runner over `tests/*.test.mjs`: the data invariants, the
 precache/version invariants (`tests/precache.test.mjs`, which just runs the §7 checker), the
 statistics engine (`tests/stats.test.mjs` — pure functions plus a coherence pass over the real
-dataset), plus the three Netlify handlers exercised directly via `createRequire` (CORS behaviour,
+dataset), the theme-token invariant (`tests/theme-tokens.test.mjs`: a `:root[…]` rule may only
+_redefine_ a token, never introduce one — a rule accidentally inserted mid-block once split `:root`
+in two and left the background pattern, the serif and the red rule conditional on the install
+banner, in CSS that stayed perfectly valid), plus the three Netlify handlers exercised directly via
+`createRequire` (CORS behaviour,
 status codes, HTML escaping, redirect normalization). **There are no browser/DOM tests** —
 front-end changes in `js/` and `bills.js` must be verified manually in a browser. `js/stats.js` is
 the exception and should stay that way: keep new calculations there, DOM-free and tested.

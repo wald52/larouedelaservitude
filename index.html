@@ -108,13 +108,6 @@
         /* La première déclaration est le repli des navigateurs sans `svh`. */
         --wheel-cap: 52vh;
         --wheel-cap: min(52svh, calc(100svh - var(--card-room) - var(--column-room)));
-      }
-
-      /* La bannière d'installation prend sa place dans la colonne : la roue lui
-         rend cette hauteur, faute de quoi c'est la carte qui perdrait le tiers
-         de son contenu tant que la bannière est là. */
-      :root[data-install="open"] {
-        --column-room: calc(117px + var(--tabbar-room) + var(--install-room));
         /* La trame de fond, une image par thème. Le SVG est un document
            indépendant : `currentColor` n'y a pas cours et son glyphe est noir
            par défaut, ce qui l'éteignait sur le fond sombre. La couleur est donc
@@ -130,6 +123,13 @@
           "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia,
           "Times New Roman", serif;
         --masthead-accent: #c00;
+      }
+
+      /* La bannière d'installation prend sa place dans la colonne : la roue lui
+         rend cette hauteur, faute de quoi c'est la carte qui perdrait le tiers
+         de son contenu tant que la bannière est là. */
+      :root[data-install="open"] {
+        --column-room: calc(117px + var(--tabbar-room) + var(--install-room));
       }
 
       :root[data-theme="dark"] {
