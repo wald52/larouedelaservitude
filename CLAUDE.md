@@ -194,9 +194,11 @@ the tab bar, and a cut edge reads as a bug rather than as something to scroll. T
 to keep the close button out of the title's way: reserving its width on every line cost nearly a
 line of text per long name.
 
-**The wheel page is a stack of four things and nothing else**: the masthead, the « Tourner la roue »
-button, the wheel, and the result card. The button sits _above_ the wheel — it is the command, it
-reads before its effect, and it keeps its place when the card makes the wheel give ground. The white
+**The wheel page is a stack of three things and nothing else**: the masthead, the wheel, and the
+result card. « Tourner la roue » is not a fourth — it is absolutely positioned inside `.wheel-area`
+and overlaps the bottom of the disc, so the command sits on its own effect and the column reserves
+no row for it (`--spin-overhang` is the few pixels it hangs below, given back as the area's bottom
+margin). It follows the wheel when the card makes it give ground. The white
 `.board` that framed the wheel and the « N éléments restants » counter are both gone: the frame cost
 height without saying anything, and the count now lives only in the canvas's `aria-label`
 (`updateWheelLabel()`), where a screen reader still gets it. The card is therefore the only surface

@@ -310,14 +310,25 @@
          est désormais la seule surface de la page — donc la seule chose que
          l'œil y cherche. */
       .wheel-area {
+        /* Ce que le bouton déborde sous le disque, et que la zone doit rendre
+           pour ne pas mordre sur la carte de résultat. */
+        --spin-overhang: 4px;
         position: relative;
         width: 100%;
         display: grid;
         place-items: center;
+        margin-bottom: var(--spin-overhang);
         flex-shrink: 0;
       }
+      /* Placement seul : l'apparence du bouton vient de buttons.css, ombre
+         comprise (`.btn-accent`), qui le détache du disque bariolé. */
       #spinBtn {
-        flex-shrink: 0;
+        position: absolute;
+        left: 50%;
+        bottom: calc(-1 * var(--spin-overhang));
+        transform: translateX(-50%);
+        z-index: 7;
+        max-width: min(100%, 340px);
       }
       .pointer {
         position: absolute;
@@ -713,12 +724,6 @@
         <div class="masthead__rule" aria-hidden="true"></div>
       </header>
       <div class="container">
-        <!-- Le bouton précède la roue : c'est la commande, elle se lit avant son
-             effet, et elle reste à la même hauteur quand la carte de résultat
-             pousse la roue à se resserrer. -->
-        <button id="spinBtn" class="btn btn-accent btn-lg btn-pill" type="button">
-          Tourner la roue
-        </button>
         <div class="wheel-area" id="wheelArea">
           <div class="pointer"></div>
           <!-- aria-label est réactualisé par updateWheelLabel() (js/app.js) : il
@@ -734,6 +739,12 @@
             La roue des taxes et prélèvements obligatoires français. Utilisez le bouton « Tourner la
             roue » pour tirer une entrée au sort.
           </canvas>
+          <!-- Le bouton chevauche le bas du disque : la commande est posée sur
+               son effet, et la colonne n'a plus à lui réserver de rangée. Il
+               suit la roue quand elle se resserre pour la carte de résultat. -->
+          <button id="spinBtn" class="btn btn-accent btn-lg btn-pill" type="button">
+            Tourner la roue
+          </button>
         </div>
         <!-- Le résultat du tirage, dans le flux, sous la roue. `hidden` tant
      qu'aucun tirage n'a eu lieu ; js/app.js le lève et pose
