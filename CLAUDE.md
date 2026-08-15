@@ -470,14 +470,32 @@ cycle below. Skipped entirely: `/.netlify/functions/*`, cross-origin, and any UR
 2. A new SW precaches its whole generation and then **waits**. While it waits the old one keeps
    serving _its_ complete generation — that is what makes mixing impossible.
 3. The page decides when to switch: `canReloadForUpdate()` in `js/app.js` (nothing spinning, no
-   modal or panel open, no result card on screen, no spin completed outside infinite mode) →
-   `SKIP_WAITING` → `controllerchange`
-   → one silent `location.reload()`, guarded against loops by a 10 s `sessionStorage` marker. If the
-   user is busy, the update is held and re-applied on the next idle moment (`applyPendingUpdate()`,
-   called when the result card closes and on tab focus) or at the next launch, in a single load.
+   modal or panel open, no result card on screen) → `SKIP_WAITING` → `controllerchange`
+   → one silent `location.reload()`, guarded against loops by a 10 s `sessionStorage` marker.
+   **Every refusal is transient, and that is the whole point.** A held update re-applies itself:
+   `activateWaitingWorker()` starts a 2 s retry loop that runs until the switchover lands, on top of
+   the explicit wake-ups (animation loop parking, result card closing, tab focus, `online`). The
+   retry loop is not belt-and-braces — it is what makes "always the latest version" true. Enumerating
+   calm moments by hand is what failed before: an update ready during the 650 ms opening animation
+   hit `shouldAnimate()`, and nothing ever looked again, so the visitor kept the old version for the
+   whole visit however long they waited. That is the bug behind "I have to clear the cache".
+   A fourth refusal used to sit in `canReloadForUpdate()` — "a game has started" (`completedSpinCount
+   > 0` outside infinite mode) — and it never cleared: from the first spin onwards, no update could
+   > apply for the rest of the visit. It is gone, because the reason for it is gone (see below).
 4. Belt and braces: the page asks the controlling SW for its version (`GET_VERSION`) and compares it
    to `APP_VERSION`. A mismatch means the code and the cache are from different generations — it
    re-checks for an update and realigns.
+
+**A version switchover must not cost the player their game.** Outside infinite mode the drawn
+entries are spliced out of `ENTRIES`, so a reload used to hand all 371 back — which is exactly why
+updates were vetoed once a game had started. Instead of vetoing, `js/app.js` now saves the game
+across the reload: `sw-update.js` calls the `beforeReload` callback just before `location.reload()`,
+`savePartieEnCours()` writes the drawn labels and the spin count under `PARTIE_KEY`, and
+`restorePartieEnCours()` filters them out of the fresh wheel at startup. Three properties make this
+safe to keep: it stores **labels, not indices** (unique per the light file's invariants, so a data
+change can only fail to match, never mismatch); it uses `sessionStorage`, so a game still belongs to
+its tab and does not resurrect on the next visit; and the key is **consumed on read** and only ever
+written just before an update reload, so an ordinary F5 still starts a fresh game exactly as before.
 
 Pages from **v20 or earlier** don't know the handshake, so a v21+ install that finds only older
 cache names takes over immediately and reloads them itself via `client.navigate()` (fired without

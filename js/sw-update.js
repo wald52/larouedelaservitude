@@ -13,7 +13,13 @@
 // 3. Dès que la page peut se recharger sans gêner l'utilisateur (`canReload`),
 //    on envoie SKIP_WAITING puis on recharge à `controllerchange`. La page
 //    repart alors intégralement sur la nouvelle génération.
-// 4. Filet de sécurité : APP_VERSION (ce code) est comparée à CACHE_VERSION (le
+// 4. Une bascule refusée n'est jamais perdue : `applyPendingUpdate()` la
+//    reprend dès que l'application redevient calme (fin d'animation, fermeture
+//    de la carte, retour sur l'onglet, retour du réseau). Sans ce rattrapage,
+//    une mise à jour prête pendant l'animation d'ouverture — 650 ms où
+//    `canReload` répond non — restait en attente pour toute la visite : c'est
+//    ce qui obligeait à vider le cache pour voir la dernière version.
+// 5. Filet de sécurité : APP_VERSION (ce code) est comparée à CACHE_VERSION (le
 //    service worker qui contrôle la page). Un écart signifie qu'on tourne avec
 //    du code d'une autre génération — on se réaligne immédiatement.
 
@@ -33,6 +39,7 @@ const VERSION_REQUEST_TIMEOUT_MS = 3000;
 
 let registrationRef = null;
 let canReload = () => true;
+let beforeReload = () => {};
 let hadControllerAtStartup = false;
 let reloadRequested = false;
 let updatePending = false;
@@ -71,6 +78,16 @@ function reloadOnce(reason) {
 
   reloadRequested = true;
   writeReloadGuard(now);
+
+  // Dernière occasion pour la page de mettre de côté ce qui doit survivre à la
+  // bascule (la partie en cours, côté js/app.js). Une erreur ici ne doit pas
+  // empêcher la mise à jour : c'est elle qu'on est venu appliquer.
+  try {
+    beforeReload();
+  } catch (error) {
+    console.warn("[SW] Sauvegarde avant rechargement impossible :", error);
+  }
+
   console.log("[SW] Rechargement pour appliquer la nouvelle version :", reason);
   window.location.reload();
 }
@@ -79,16 +96,49 @@ function reloadOnce(reason) {
 //  Bascule vers la version en attente
 // ===============================
 
+// Une bascule différée se reprend d'elle-même. Les moments calmes de
+// l'application sont trop nombreux pour être tous guettés un par un — et c'est
+// bien l'oubli de l'un d'eux (la fin de l'animation d'ouverture) qui laissait
+// une mise à jour prête en plan jusqu'à la fin de la visite. Plutôt que
+// d'allonger la liste des points d'appel, l'attente se surveille elle-même :
+// tant qu'une version attend, on retente ; dès qu'elle est appliquée, on
+// s'arrête. Deux secondes : assez pour paraître immédiat, assez peu pour ne
+// rien coûter.
+const PENDING_RETRY_MS = 2000;
+let pendingRetryTimer = 0;
+
+function schedulePendingRetry() {
+  if (pendingRetryTimer) return;
+
+  pendingRetryTimer = setInterval(() => {
+    if (!updatePending) {
+      stopPendingRetry();
+      return;
+    }
+    applyPendingUpdate();
+  }, PENDING_RETRY_MS);
+}
+
+function stopPendingRetry() {
+  if (!pendingRetryTimer) return;
+  clearInterval(pendingRetryTimer);
+  pendingRetryTimer = 0;
+}
+
 function activateWaitingWorker(worker) {
   if (!worker) return;
 
   if (!canReload()) {
+    if (!updatePending) {
+      console.log("[SW] Nouvelle version prête : application différée (utilisation en cours)");
+    }
     updatePending = true;
-    console.log("[SW] Nouvelle version prête : application différée (utilisation en cours)");
+    schedulePendingRetry();
     return;
   }
 
   updatePending = false;
+  stopPendingRetry();
   console.log("[SW] Nouvelle version prête : bascule immédiate");
   worker.postMessage({ type: "SKIP_WAITING" });
 }
@@ -107,6 +157,7 @@ export function applyPendingUpdate() {
   // plus tôt et resté sans réponse.
   if (canReload()) {
     updatePending = false;
+    stopPendingRetry();
     reloadOnce("mise à jour différée");
   }
 }
@@ -188,6 +239,7 @@ async function verifyVersionMatch() {
     reloadOnce("code et cache désynchronisés");
   } else {
     updatePending = true;
+    schedulePendingRetry();
   }
 }
 
@@ -197,15 +249,21 @@ async function verifyVersionMatch() {
 
 /**
  * Enregistre le service worker et pilote les bascules de version.
- * @param {{canReload?: () => boolean}} [options] `canReload` doit renvoyer
- *   false tant qu'un rechargement gênerait l'utilisateur (roue en rotation,
- *   partie en cours, fenêtre ouverte).
+ * @param {{canReload?: () => boolean, beforeReload?: () => void}} [options]
+ *   `canReload` doit renvoyer false tant qu'un rechargement gênerait
+ *   l'utilisateur (roue en rotation, fenêtre ouverte, résultat à l'écran) ;
+ *   `beforeReload` est appelée juste avant le rechargement, pour mettre de côté
+ *   ce qui doit lui survivre.
  */
 export function initServiceWorker(options = {}) {
   if (!("serviceWorker" in navigator)) return;
 
   if (typeof options.canReload === "function") {
     canReload = options.canReload;
+  }
+
+  if (typeof options.beforeReload === "function") {
+    beforeReload = options.beforeReload;
   }
 
   hadControllerAtStartup = Boolean(navigator.serviceWorker.controller);
@@ -261,7 +319,10 @@ export function initServiceWorker(options = {}) {
     applyPendingUpdate();
   });
 
+  // Retour du réseau — le cas de l'atterrissage : on va chercher la version
+  // publiée, et on applique aussitôt celle qui attendait peut-être déjà.
   window.addEventListener("online", () => {
     checkForUpdate(true);
+    applyPendingUpdate();
   });
 }

@@ -220,6 +220,82 @@ function registerCompletedSpin() {
 }
 
 /* =======================
+   PARTIE EN COURS : SURVIVRE À UNE BASCULE DE VERSION
+   ======================= */
+// Une mise à jour s'applique en rechargeant la page. Hors mode sans fin, les
+// entrées déjà tirées ont été retirées de la roue : sans précaution, ce
+// rechargement les rendrait toutes, c'est-à-dire annulerait la partie. C'est
+// pour cela que l'application refusait jadis toute mise à jour dès le premier
+// tirage — et donc, en pratique, pour toute la visite.
+//
+// On met donc la partie de côté juste avant le rechargement (js/sw-update.js
+// appelle savePartieEnCours) et on la rétablit au démarrage suivant. La
+// bascule de version devient invisible : même roue, mêmes entrées restantes.
+//
+// sessionStorage et non localStorage : une partie appartient à l'onglet qui la
+// joue et ne doit pas ressusciter à la visite suivante — c'est déjà ce que fait
+// l'application aujourd'hui, on ne change pas la règle du jeu.
+//
+// La clé est *consommée* à la lecture : elle n'est écrite qu'avant un
+// rechargement de mise à jour, et n'y survit pas. Un F5 ordinaire redémarre donc
+// une partie neuve, exactement comme avant.
+const PARTIE_KEY = "larouedelaservitude_partie_en_cours";
+
+// Intitulés retirés de la roue depuis le début de la partie, dans l'ordre des
+// tirages. Ce sont des `nom` du fichier léger, uniques par construction
+// (invariant vérifié par `npm run check:data`), ce qui en fait une clé sûre —
+// et bien plus robuste qu'un indice, que la moindre modification des données
+// décalerait.
+let drawnLabels = [];
+
+function savePartieEnCours() {
+  try {
+    if (!drawnLabels.length && completedSpinCount === 0) return;
+
+    sessionStorage.setItem(
+      PARTIE_KEY,
+      JSON.stringify({ retirees: drawnLabels, tirages: completedSpinCount })
+    );
+  } catch {
+    // Navigation privée ou quota : la mise à jour prime sur la partie.
+  }
+}
+
+/**
+ * Rétablit la partie mise de côté avant une bascule de version.
+ * @param {string[]} labels Intitulés de la roue neuve.
+ * @returns {string[]} Les intitulés restants, entrées déjà tirées ôtées.
+ */
+function restorePartieEnCours(labels) {
+  let saved = null;
+
+  try {
+    const raw = sessionStorage.getItem(PARTIE_KEY);
+    // Consommée quoi qu'il arrive : une partie ne se rétablit qu'une fois.
+    sessionStorage.removeItem(PARTIE_KEY);
+    if (raw) saved = JSON.parse(raw);
+  } catch {
+    return labels;
+  }
+
+  if (!saved || !Array.isArray(saved.retirees)) return labels;
+
+  drawnLabels = saved.retirees;
+  completedSpinCount = Number(saved.tirages) || 0;
+
+  // Une entrée disparue des données entre-temps n'est simplement pas trouvée :
+  // la roue neuve fait foi, on ne retire que ce qui s'y trouve encore.
+  const retirees = new Set(drawnLabels);
+  const restant = labels.filter((label) => !retirees.has(label));
+
+  console.log(
+    `[APP] Partie rétablie après mise à jour : ${completedSpinCount} tirage(s), ${restant.length} entrées restantes`
+  );
+
+  return restant;
+}
+
+/* =======================
    MODALES : FOCUS
    ======================= */
 // Les deux surfaces qui recouvrent la page (la feuille de partage et le
@@ -763,7 +839,10 @@ async function initializeApp() {
     syncCanvasSize();
 
     const lightData = await initWheel();
-    ENTRIES = lightData.map((entry) => entry.nom);
+    // Avant de construire les couleurs et les calques : si ce chargement est
+    // celui qui suit une bascule de version, la roue doit repartir amputée des
+    // entrées déjà tirées, sans quoi la mise à jour annulerait la partie.
+    ENTRIES = restorePartieEnCours(lightData.map((entry) => entry.nom));
 
     buildColors();
     buildWheelLayers();
@@ -1181,6 +1260,9 @@ function finalizeSpinResult(idx) {
     // sa première ouverture, et syncCanvasSize() reconstruit alors les calques
     // une seule fois, avec la liste déjà à jour.
     if (!isInfiniteMode()) {
+      // Retenu avant le retrait : c'est ce qui permet de rétablir la partie à
+      // l'identique si une mise à jour recharge la page (voir PARTIE_KEY).
+      drawnLabels.push(ENTRIES[idx]);
       ENTRIES.splice(idx, 1);
       ENTRY_COLORS.splice(idx, 1);
       buildWheelLayers();
@@ -1263,7 +1345,15 @@ function animate(now) {
 
   if (shouldAnimate()) {
     scheduleAnimationFrame();
+    return;
   }
+
+  // La boucle se range : l'animation d'ouverture est finie, la roue est
+  // immobile. C'est le moment calme le plus fréquent de l'application, et
+  // longtemps le seul qui n'était pas guetté — une mise à jour prête pendant
+  // les 650 ms de l'intro y restait bloquée jusqu'à la fin de la visite, sur
+  // une page où l'utilisateur n'avait pourtant rien touché.
+  applyPendingUpdate();
 }
 
 /* =======================
@@ -1603,11 +1693,18 @@ window.addEventListener("infiniteModeChange", () => {
    ======================= */
 
 // Un rechargement automatique ne doit jamais interrompre l'utilisateur : ni
-// pendant une rotation, ni fenêtre ouverte, ni une fois la partie commencée
-// (hors mode sans fin, les entrées tirées ont été retirées de la roue et
-// seraient restaurées par le rechargement). Tant que cette fonction renvoie
-// false, l'ancienne version continue d'être servie *entièrement* : aucun
-// mélange de générations n'est possible pendant l'attente.
+// pendant une rotation, ni fenêtre ouverte, ni un résultat sous les yeux. Tant
+// que cette fonction renvoie false, l'ancienne version continue d'être servie
+// *entièrement* : aucun mélange de générations n'est possible pendant l'attente.
+//
+// Les trois refus sont passagers, et c'est ce qui compte : chacun a son moment
+// de rattrapage (fin d'animation, fermeture de la carte, fermeture de la
+// surface), où `applyPendingUpdate()` reprend la bascule mise de côté. Un
+// quatrième refus se tenait ici — « une partie est commencée » — et lui ne
+// passait jamais : dès le premier tirage, plus aucune mise à jour ne pouvait
+// s'appliquer de toute la visite. La partie est désormais mise de côté avant le
+// rechargement et rétablie après (voir PARTIE_KEY), si bien qu'un rechargement
+// ne coûte plus rien à l'utilisateur.
 function canReloadForUpdate() {
   if (shouldAnimate()) return false;
   if (isAnySurfaceOpen()) return false;
@@ -1615,14 +1712,16 @@ function canReloadForUpdate() {
   // rechargement l'effacerait sous ses yeux. Il attend la fermeture de la carte
   // (hideResult appelle applyPendingUpdate) ou la prochaine visite.
   if (isResultVisible()) return false;
-  if (completedSpinCount > 0 && !isInfiniteMode()) return false;
   return true;
 }
 
 // Enregistrement après `load` pour ne pas disputer la bande passante au premier
 // affichage : le pré-cache complet de la PWA démarre juste après.
 window.addEventListener("load", () => {
-  initServiceWorker({ canReload: canReloadForUpdate });
+  initServiceWorker({
+    canReload: canReloadForUpdate,
+    beforeReload: savePartieEnCours
+  });
 });
 
 // L'effet billets est chargé à la première utilisation pour alléger le démarrage.
