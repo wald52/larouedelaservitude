@@ -84,6 +84,9 @@
            apparaît. La marge du menu système iOS s'y ajoute. */
         --tabbar-h: 62px;
         --tabbar-room: calc(var(--tabbar-h) + env(safe-area-inset-bottom, 0px));
+        /* Hauteur réservée à la bannière d'installation quand elle est affichée
+           (sa hauteur propre, plus l'espace qui la sépare du reste). */
+        --install-room: 84px;
         /* Taille de la roue, en deux jetons : la largeur voulue et le plafond en
            hauteur. Les deux consommateurs (le <canvas> et la carte de résultat,
            qui s'aligne dessus) en font le `min()` eux-mêmes plutôt que de le
@@ -425,6 +428,22 @@
         display: none;
       }
 
+      /* Un tirage qui remplace le précédent au même endroit se voit mal : sans
+         ce fondu, seul le texte change, et rien ne dit que c'est un nouveau
+         résultat. La classe est reposée à chaque tirage par js/app.js (une
+         animation ne rejoue pas d'elle-même sur un élément déjà affiché).
+         La préférence « mouvement réduit » l'annule — voir la règle globale en
+         haut de cette feuille. */
+      @keyframes result-in {
+        from {
+          opacity: 0;
+          transform: translateY(6px);
+        }
+      }
+      .result.is-new {
+        animation: result-in 0.16s ease-out both;
+      }
+
       /* La hauteur de la croix (34 px, 44 au doigt — cf. buttons.css) : la tête
          la réserve pour que l'accroche ne passe pas dessous. */
       .result__head {
@@ -583,7 +602,12 @@
       }
 
       /* Posé au-dessus de la barre d'onglets, jamais dessus : les deux occupent
-         le même bord de l'écran. */
+         le même bord de l'écran. Et jamais par-dessus la carte de résultat non
+         plus : `data-install` (posé par js/app.js) fait réserver sa hauteur à la
+         colonne, la roue rendant la différence comme elle le fait pour la carte. */
+      :root[data-install="open"] .wrap {
+        padding-bottom: calc(12px + var(--tabbar-room) + var(--install-room));
+      }
       .install-banner {
         position: fixed;
         left: 50%;

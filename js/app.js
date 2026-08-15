@@ -100,7 +100,6 @@ let fullDataLoadScheduled = false;
 let deferredInstallPrompt = null;
 let completedSpinCount = 0;
 let installPromptDismissed = false;
-let installPromptPendingAfterResult = false;
 let billsInitPromise = null;
 let billsModule = null;
 // Entrée affichée par la carte de résultat, et l'accroche tirée au sort qui la
@@ -170,10 +169,20 @@ function isResultVisible() {
   return !resultCard.hidden;
 }
 
+// La bannière est en position fixe au-dessus de la barre d'onglets, donc
+// par-dessus le bas de la carte de résultat. `data-install` sur <html> lui fait
+// réserver sa hauteur dans la colonne : la carte remonte d'autant, et la roue
+// rend la différence comme elle le fait pour la carte.
+//
+// Elle attendait auparavant que la carte soit fermée. Une carte reste
+// maintenant à l'écran d'un tirage à l'autre : la bannière n'était donc plus
+// jamais montrée, au bout des trois tirages qui la déclenchent.
 function showInstallPromptBanner() {
   if (!installPromptBanner || isAppInstalled()) return;
   installPromptBanner.hidden = false;
   installPromptBanner.setAttribute("aria-hidden", "false");
+  document.documentElement.dataset.install = "open";
+  refitLayout();
   requestAnimationFrame(() => {
     installPromptBanner.classList.add("is-visible");
   });
@@ -183,6 +192,10 @@ function hideInstallPromptBanner() {
   if (!installPromptBanner) return;
   installPromptBanner.classList.remove("is-visible");
   installPromptBanner.setAttribute("aria-hidden", "true");
+  if (document.documentElement.dataset.install) {
+    delete document.documentElement.dataset.install;
+    refitLayout();
+  }
   clearTimeout(installPromptHideTimer);
   installPromptHideTimer = setTimeout(() => {
     if (!installPromptBanner.classList.contains("is-visible")) {
@@ -202,20 +215,10 @@ function shouldShowInstallPrompt() {
 
 function syncInstallPromptVisibility() {
   if (!shouldShowInstallPrompt()) {
-    installPromptPendingAfterResult = false;
     hideInstallPromptBanner();
     return;
   }
 
-  // La bannière flotte au-dessus de la barre d'onglets, donc par-dessus le bas
-  // de la carte de résultat : tant qu'un résultat est affiché, elle attend.
-  if (isResultVisible()) {
-    installPromptPendingAfterResult = true;
-    hideInstallPromptBanner();
-    return;
-  }
-
-  installPromptPendingAfterResult = false;
   showInstallPromptBanner();
 }
 
@@ -327,14 +330,21 @@ function fitWheelToResult() {
   }
 }
 
+// La place disponible a changé (fenêtre redimensionnée, bannière d'installation
+// entrée ou sortie) : l'ajustement précédent ne veut plus rien dire, on repart
+// de la taille normale de la roue avant de remesurer.
+// @returns {boolean} true si la roue a changé de taille.
+function refitLayout() {
+  releaseWheelFit();
+  const resized = syncCanvasSize();
+  fitWheelToResult();
+  return resized;
+}
+
 function hideResult() {
   if (!isResultVisible()) return;
 
   setResultOpen(false);
-
-  if (installPromptPendingAfterResult) {
-    syncInstallPromptVisibility();
-  }
 
   // Moment calme : si une mise à jour attendait que l'utilisateur soit
   // disponible, c'est ici qu'elle s'applique.
@@ -370,6 +380,13 @@ function showResult(entry) {
   // début, pas au milieu du précédent.
   resultScroll.scrollTop = 0;
   fitWheelToResult();
+
+  // Le fondu est relancé à chaque tirage : une animation CSS ne rejoue pas
+  // d'elle-même sur un élément déjà affiché, d'où le retrait de la classe puis
+  // la lecture forcée de la mise en page avant de la reposer.
+  resultCard.classList.remove("is-new");
+  resultCard.getBoundingClientRect();
+  resultCard.classList.add("is-new");
 }
 
 // Le résultat en texte brut — partage, presse-papiers, formulaire de retour.
@@ -390,14 +407,12 @@ window.addEventListener("beforeinstallprompt", (event) => {
 window.addEventListener("appinstalled", () => {
   deferredInstallPrompt = null;
   installPromptDismissed = true;
-  installPromptPendingAfterResult = false;
   hideInstallPromptBanner();
 });
 
 if (installPromptClose) {
   installPromptClose.addEventListener("click", () => {
     installPromptDismissed = true;
-    installPromptPendingAfterResult = false;
     hideInstallPromptBanner();
   });
 }
@@ -408,7 +423,6 @@ if (installPromptAction) {
 
     const installEvent = deferredInstallPrompt;
     deferredInstallPrompt = null;
-    installPromptPendingAfterResult = false;
     hideInstallPromptBanner();
 
     try {
@@ -1617,11 +1631,7 @@ function updateBg() {
 
 function handleResize() {
   updateBg();
-  // La fenêtre a changé de taille : l'ajustement précédent ne veut plus rien
-  // dire, on repart de la taille normale avant de remesurer.
-  releaseWheelFit();
-  const resized = syncCanvasSize();
-  fitWheelToResult();
+  const resized = refitLayout();
   if (resized && shouldAnimate()) {
     lastTime = performance.now();
     scheduleAnimationFrame();
