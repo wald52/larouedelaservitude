@@ -1,5 +1,5 @@
 /* ===============================
-   Menu Hamburger & Panels
+   Barre d'onglets & panneaux
    =============================== */
 
 /* Les couleurs du menu suivent les tokens de thème de l'application
@@ -8,72 +8,150 @@
 :root {
   --menu-bg: var(--surface, #111);
   --menu-text: var(--fg, #fff);
-  --menu-item-hover: var(--surface-inset, #333);
   --menu-panel-bg: var(--surface-alt, #1a1a1a);
   --menu-border: var(--ring, #333);
   --menu-muted: var(--legend, #888);
-  --menu-icon-bg: var(--surface-inset, #242b38);
-  --menu-icon-hover: var(--ring, #333);
-  --menu-icon-fg: var(--fg, #fff);
 }
 
-/* Bouton hamburger : il ouvre le tiroir, et rien d'autre. Il s'efface quand le
-   tiroir est ouvert — c'est le bouton de fermeture de l'en-tête qui prend le
-   relais. Avant, il restait posé par-dessus le tiroir, ce qui obligeait à lui
-   réserver 76 px de marge dans l'en-tête. */
-.menu-toggle {
+/* ===============================
+   Barre d'onglets
+   ===============================
+
+   La navigation principale, fixée au bas de l'écran : les quatre rubriques sont
+   lisibles en permanence, sous le pouce, au lieu d'être repliées derrière un
+   hamburger dans le coin haut gauche.
+
+   Sa hauteur est un jeton défini dans index.html (--tabbar-h) et non ici :
+   menu.css est chargé en différé, alors que la page doit réserver la place de
+   la barre dès le premier rendu, sinon le bouton « Tourner la roue » sursaute
+   au moment où la barre apparaît. */
+.menu-tabbar {
   position: fixed;
-  top: 16px;
-  left: 16px;
-  z-index: 10000;
-  width: 44px;
-  height: 44px;
-  border: 1px solid var(--menu-border);
-  border-radius: 14px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9000;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  align-items: stretch;
+  gap: 2px;
+  height: var(--tabbar-h, 62px);
+  /* content-box : la marge du menu système iOS s'ajoute à la hauteur du jeton
+     au lieu de rogner dedans — c'est exactement ce que réserve .wrap. */
+  box-sizing: content-box;
+  /* Le fond court d'un bord à l'autre, les onglets non : sur un écran large,
+     quatre onglets étalés sur 1280 px se retrouvaient isolés dans leurs coins.
+     Le rembourrage latéral les ramène dans une bande centrée de la largeur
+     d'un panneau, et retombe à 6 px dès que l'écran est plus étroit. */
+  padding: 0 max(6px, calc((100% - 560px) / 2)) env(safe-area-inset-bottom, 0px);
   background: var(--menu-bg);
-  color: var(--menu-text);
+  border-top: 1px solid var(--menu-border);
+  box-shadow: 0 -2px 18px rgba(0, 0, 0, 0.08);
+}
+
+.tabbar-item {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 3px;
+  min-width: 0;
+  padding: 6px 2px;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  /* Au repos, un onglet est en gris : c'est le contraste avec l'onglet actif,
+     en pleine couleur de texte, qui dit où l'on est. */
+  color: var(--menu-muted);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: center;
+  text-decoration: none;
   cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-  transition:
-    background-color 0.2s ease,
-    box-shadow 0.2s ease,
-    opacity 0.2s ease;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.14);
-  pointer-events: auto;
   -webkit-tap-highlight-color: transparent;
+  transition: color 0.15s ease;
 }
 
-.menu-toggle:hover {
-  background: var(--menu-item-hover);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+.tabbar-item:hover {
+  color: var(--menu-text);
 }
 
-.menu-toggle span {
+/* L'onglet courant. `aria-current` est la seule source de cet état : le CSS et
+   les lecteurs d'écran lisent le même attribut, il ne peut pas y avoir d'écart
+   entre ce qui est montré et ce qui est annoncé. */
+.tabbar-item[aria-current] {
+  color: var(--menu-text);
+}
+
+/* Un filet au ras du bord haut, à l'aplomb de l'onglet : c'est le repère qui
+   se voit d'un coup d'œil, la nuance de gris seule ne suffit pas. */
+.tabbar-item[aria-current]::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 26px;
+  height: 3px;
+  border-radius: 0 0 3px 3px;
+  background: var(--btn-accent-bg, #c00);
+}
+
+.tabbar-item__icon {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+}
+
+.tabbar-item__glyph {
+  width: 23px;
+  height: 23px;
   display: block;
-  width: 20px;
-  height: 2px;
-  border-radius: 2px;
-  background: currentColor;
 }
 
-/* Le fond ne défile plus derrière le tiroir. Remplace le
+.tabbar-item__label {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Le compteur de tirages, posé sur l'icône : dans une barre d'onglets il n'y a
+   pas de place pour une pastille en fin de ligne. */
+.tabbar-item__badge {
+  position: absolute;
+  top: -4px;
+  left: 60%;
+  min-width: 17px;
+  padding: 1px 5px;
+  border-radius: 999px;
+  background: var(--btn-accent-bg, #c00);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 15px;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+/* Écran étroit : le libellé reste, mais resserré. Le supprimer laisserait des
+   pictogrammes seuls, qui se devinent au lieu de se lire. */
+@media (max-width: 360px) {
+  .tabbar-item {
+    font-size: 10px;
+  }
+}
+
+/* Le fond ne défile plus derrière un panneau. Remplace le
    `document.body.style.overflow` que posait js/menu.js : l'état visuel reste
    dans la feuille de style. */
 .menu-open,
 .menu-open body {
   overflow: hidden;
-}
-
-/* Tiroir ouvert : le hamburger disparaît, et cesse d'être cliquable comme
-   d'être atteignable au clavier. */
-.menu-open .menu-toggle {
-  opacity: 0;
-  pointer-events: none;
-  visibility: hidden;
 }
 
 /* Voile sombre. Ne bloque jamais les clics quand il est inactif. */
@@ -97,30 +175,35 @@
 }
 
 /* ===============================
-   Surfaces glissantes
+   Panneaux (feuilles montantes)
    ===============================
 
-   Le tiroir et les panneaux arrivent tous les deux par la gauche : « retour »
-   ramène donc bien vers la gauche. Un panneau qui entrait par la droite pendant
-   que le tiroir venait de la gauche rendait la hiérarchie illisible.
+   Un panneau monte depuis le bas, c'est-à-dire depuis la barre d'onglets qui
+   l'a ouvert : une surface glisse depuis le contrôle qui l'appelle, sinon on ne
+   voit plus d'où elle vient ni où elle retourne. (Du temps du tiroir latéral,
+   c'était la gauche, pour la même raison.)
 
-   L'animation porte sur `transform` (composée par le GPU) et non sur `left` /
-   `right`, qui forçaient un recalcul de mise en page à chaque image.
+   L'animation porte sur `transform` (composée par le GPU) et non sur `top` /
+   `bottom`, qui forceraient un recalcul de mise en page à chaque image.
 
    `visibility: hidden` est la pièce maîtresse : sans elle, une surface fermée
    reste dans l'ordre de tabulation. Douze contrôles du menu étaient encore
    atteignables au clavier alors que le menu était fermé. */
-.menu-sidebar,
 .menu-panel {
   position: fixed;
-  top: 0;
-  left: 0;
-  height: 100dvh;
+  left: 50%;
+  bottom: 0;
+  z-index: 10001;
+  width: min(560px, 100vw);
+  /* Une feuille, pas une page : le voile reste visible au-dessus, ce qui dit
+     que la roue est toujours là, derrière. */
+  max-height: min(78dvh, 680px);
   display: flex;
   flex-direction: column;
-  background: var(--menu-bg);
+  background: var(--menu-panel-bg);
+  border-radius: 20px 20px 0 0;
   visibility: hidden;
-  transform: translateX(-100%);
+  transform: translate(-50%, 100%);
   /* `visibility` bascule d'un coup (durée nulle), et non progressivement : à la
      fermeture elle attend la fin du glissement, à l'ouverture elle s'applique
      immédiatement. Une vraie transition sur `visibility` laissait la surface
@@ -129,48 +212,41 @@
   transition:
     transform 0.3s cubic-bezier(0.2, 0.7, 0.3, 1),
     visibility 0s linear 0.3s;
-  box-shadow: 2px 0 24px rgba(0, 0, 0, 0.28);
+  box-shadow: 0 -6px 28px rgba(0, 0, 0, 0.28);
 }
 
-.menu-sidebar.active,
 .menu-panel.active {
   visibility: visible;
-  transform: translateX(0);
+  transform: translate(-50%, 0);
   transition:
     transform 0.3s cubic-bezier(0.2, 0.7, 0.3, 1),
     visibility 0s linear 0s;
 }
 
-.menu-sidebar {
-  width: 320px;
-  max-width: 85vw;
-  z-index: 9999;
-}
-
-/* Le panneau recouvre le tiroir : il est au-dessus et peut être plus large. */
-.menu-panel {
-  width: 400px;
-  max-width: 100vw;
-  z-index: 10001;
-  background: var(--menu-panel-bg);
-}
-
 /* ===============================
-   En-têtes
+   En-tête d'un panneau
    =============================== */
 
-.menu-header,
+/* La poignée : le signe convenu qu'on a affaire à une feuille venue du bas. */
+.panel-grabber {
+  width: 40px;
+  height: 4px;
+  margin: 8px auto 0;
+  border-radius: 999px;
+  background: var(--menu-border);
+  flex-shrink: 0;
+}
+
 .panel-header {
   display: flex;
   align-items: center;
   gap: 10px;
-  min-height: 68px;
-  padding: 12px 12px 12px 16px;
+  min-height: 56px;
+  padding: 8px 12px 8px 20px;
   border-bottom: 1px solid var(--menu-border);
   box-sizing: border-box;
 }
 
-.menu-title,
 .panel-title {
   flex: 1;
   margin: 0;
@@ -179,157 +255,13 @@
   color: var(--menu-text);
 }
 
-/* ===============================
-   Navigation
-   =============================== */
-
-.menu-nav {
-  flex: 1;
-  overflow-y: auto;
-  padding: 10px 8px;
-}
-
-.menu-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  width: 100%;
-  padding: 12px;
-  border: none;
-  border-radius: 12px;
-  background: transparent;
-  color: var(--menu-text);
-  font-size: 15px;
-  font-weight: 500;
-  text-align: left;
-  text-decoration: none;
-  cursor: pointer;
-  box-sizing: border-box;
-  transition:
-    background-color 0.15s ease,
-    transform 0.15s ease;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.menu-item:hover {
-  background: var(--menu-item-hover);
-}
-
-.menu-item:active {
-  transform: scale(0.985);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .menu-item:active {
-    transform: none;
-  }
-}
-
-/* L'icône est posée sur une pastille : c'est elle qui donne du poids à la
-   ligne. Sans elle, les entrées se dissolvaient dans le blanc du tiroir. */
-.menu-item__icon {
-  display: grid;
-  place-items: center;
-  width: 36px;
-  height: 36px;
-  flex-shrink: 0;
-  border-radius: 11px;
-  background: var(--menu-icon-bg);
-  color: var(--menu-icon-fg);
-  transition: background-color 0.15s ease;
-}
-
-.menu-item:hover .menu-item__icon {
-  background: var(--menu-icon-hover);
-}
-
-.menu-item__glyph {
-  width: 20px;
-  height: 20px;
-  display: block;
-}
-
-.menu-item__label {
-  flex: 1;
-  min-width: 0;
-}
-
-.menu-item__badge {
-  min-width: 22px;
-  padding: 2px 7px;
-  border-radius: 999px;
-  background: var(--btn-accent-bg, #c00);
-  color: #fff;
-  font-size: 11px;
-  font-weight: 700;
-  text-align: center;
-}
-
-/* Dit que l'entrée mène ailleurs : chevron pour un panneau, flèche oblique pour
-   la page d'analyse, qu'on quitte le tiroir pour rejoindre. Tracés au même
-   trait que les icônes, plutôt qu'écrits en « › » et « ↗ » — ces caractères
-   n'ont ni la même graisse ni le même alignement d'une police système à
-   l'autre. */
-.menu-item__chevron {
-  width: 17px;
-  height: 17px;
-  flex-shrink: 0;
-  color: var(--menu-muted);
-  transition: transform 0.15s ease;
-}
-
-.menu-item:hover .menu-item__chevron {
-  transform: translateX(2px);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .menu-item:hover .menu-item__chevron {
-    transform: none;
-  }
-}
-
-/* ===============================
-   Pied du tiroir
-   =============================== */
-
-.menu-footer {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 14px 16px;
-  border-top: 1px solid var(--menu-border);
-  font-size: 12px;
-  color: var(--menu-muted);
-}
-
-.menu-footer a {
-  color: var(--menu-muted);
-  text-decoration: none;
-}
-
-.menu-footer a:hover {
-  text-decoration: underline;
-}
-
-/* Voir buttons.css : au doigt, ce lien ne faisait que 14 px de haut. */
-@media (pointer: coarse) {
-  .menu-footer a {
-    display: inline-block;
-    padding-block: 13px;
-  }
-}
-
-/* Une ligne discrète. La version était encadrée d'une pastille, ce qui la
-   faisait ressembler à une information de débogage. */
-.menu-footer span {
-  font-variant-numeric: tabular-nums;
-}
-
+/* Le rembourrage bas tient compte du menu système iOS : la feuille touche le
+   bord de l'écran, le dernier bouton de la liste ne doit pas s'y perdre. */
 .panel-content {
   flex: 1;
   overflow-y: auto;
-  padding: 16px;
+  padding: 16px 16px calc(16px + env(safe-area-inset-bottom, 0px));
+  overscroll-behavior: contain;
 }
 
 /* Liste d'historique */
@@ -421,13 +353,10 @@
 /* L'interrupteur (.switch) et les boutons (.btn) viennent de buttons.css :
    ils sont communs aux deux pages du site. */
 
-/* Responsive */
+/* Responsive : sur un téléphone la feuille peut monter plus haut, il n'y a rien
+   d'autre à regarder derrière. */
 @media (max-width: 480px) {
-  .menu-sidebar {
-    max-width: 90vw;
-  }
-
   .menu-panel {
-    max-width: 100vw;
+    max-height: 82dvh;
   }
 }

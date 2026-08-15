@@ -69,7 +69,7 @@ donnees.html            « Données & analyse » page (advanced mode), loads js/
 js/app.js               Wheel rendering, physics, spin sound cadence, overlay, sharing, SW registration
 js/entries.js           Two-tier data loading (light → full) + IndexedDB cache
 js/audio.js             WebAudio, offline-first sound decoding + IndexedDB cache
-js/menu.js              Sidebar, panels, history, settings; builds its own DOM at runtime
+js/menu.js              Bottom tab bar, panels, history, settings; builds its own DOM at runtime
 js/settings.js          Reads the sound setting (data-attribute first, localStorage fallback)
 js/sw-update.js         SW registration + version switchover (see §7)
 js/focus-trap.js        Focus stack shared by the modals (app.js) and the menu surfaces (menu.js)
@@ -95,7 +95,7 @@ shares/                 Runtime artifacts only; share-*.html is gitignored
 `donnees.html` → `js/data-explorer.js` → `js/entries.js`, `js/menu.js`, `js/sw-update.js`,
 `js/stats.js`, `js/charts.js`
 `js/audio.js` → `js/settings.js` → `js/constants.js` ← `js/sw-update.js`, `js/entries.js`
-`js/app.js`, `js/menu.js` → `js/focus-trap.js` (piled surfaces: modals, drawer, panels)
+`js/app.js`, `js/menu.js` → `js/focus-trap.js` (piled surfaces: modals, menu panels)
 `js/app.js` → `import('../bills.js')` (dynamic, on first spin) → `js/settings.js`, and
 `bills.js` → `import('./js/audio.js')` (dynamic, inside `initBills()`)
 
@@ -164,24 +164,45 @@ only reveals itself on hover: reserve it for incidental controls inside an alrea
 and never for a control that must look like a button (there is no hover on a touchscreen).
 
 **Icon buttons are rounded squares; the circle is opt-in.** `.btn-icon` keeps `.btn`'s radius,
-because the rounded square is the shape of the whole interface (hamburger, menu rows, buttons); add
+because the rounded square is the shape of the whole interface (tabs, settings rows, buttons); add
 `.btn-pill` where a circle is actually wanted — the share dots on the result bubble. Two glyphs are
 drawn in CSS rather than typed as characters, `.btn-close` (the cross) and `.btn-back` (the
 chevron): `✕` and `←` render at wildly different weights across system fonts, and both were
 duplicated in several files. Those buttons carry no text — their name comes from `aria-label`.
 
-**The menu is two levels of sliding surfaces, and both obey the same three rules.** The drawer and
-the panels are built from the `MENU_PANELS` table in `js/menu.js` — one entry produces the nav
-button, the panel, its back button and the render call, so adding a section is adding a line.
-(1) Both slide in **from the left** via `transform`, never `left`/`right` — a panel arriving from
-the right while the drawer came from the left made "back" point the wrong way, and animating layout
+**Navigation is a bottom tab bar, not a hamburger.** `js/menu.js` builds a fixed bar at the bottom
+of `index.html` from two tables: `MENU_TABS` (the four tabs, in display order) and `MENU_PANELS`
+(the surfaces they open — one entry produces the panel, its header, its close button and the render
+call). A tab's nature is read off the keys it carries: neither `panel` nor `href` is Accueil, which
+just closes what is open; `panel` opens the matching entry of `MENU_PANELS`; `href` is an ordinary
+link out of the page (Données). Keep it at four — beyond that the labels no longer fit on a phone,
+and the labels stay written out, an icon alone is guessed rather than read.
+
+The active tab is marked by `aria-current="page"` and **nothing else**: the CSS keys off that same
+attribute, so what is shown can't drift from what is announced. `updateTabState()` is the only
+writer.
+
+**The panels are bottom sheets, and they obey the same three rules the drawer did.** (1) They slide
+in **from the bottom** via `transform`, never `top`/`bottom` — a surface arrives from the control
+that summons it (the drawer's panels came from the left for the same reason), and animating layout
 properties janked. (2) A closed surface is `visibility: hidden`, which is what keeps its controls
 out of the tab order; twelve menu controls used to stay reachable by `Tab` with the menu shut. The
 `visibility` transition must stay at duration `0s` (delayed on close, immediate on open) — a real
 transition on it leaves the surface still hidden when the focus trap fires, and `focus()` is then
 silently ignored. (3) Opening and closing go through `openSurface()` / `closeSurface()`, which push
-and pop `js/focus-trap.js`; `Escape` closes only the topmost surface. The hamburger opens and
-nothing else — it hides while the drawer is open, where the header's own close button takes over.
+and pop `js/focus-trap.js`; `Escape` closes only the topmost surface. Only one panel is open at a
+time — `openPanel()` closes the others first, since two sheets risen from the same edge would
+overlap with nothing to say which is which.
+
+**The bar's height is a token declared in `index.html`, not in `menu.css`.** `--tabbar-h` (and
+`--tabbar-room`, which adds the iOS home-indicator inset) sits in the blocking inline CSS because
+`menu.css` is loaded with `media="print"` and the bar itself is built during `requestIdleCallback`:
+the page has to reserve the space at first paint, or « Tourner la roue » jumps when the bar lands.
+`.wrap` and `.install-banner` both consume `--tabbar-room`. The wheel `<canvas>` is bounded by
+height as well as width (`min(clamp(250px, 80vw, 540px), 52svh)`) for the same reason — the body
+does not scroll, so on a wide-but-short window the 540px wheel pushed the button and the counter
+under the bar. `svh`, not `dvh`: the dynamic viewport changes when a phone's address bar retracts,
+which would resize the wheel mid-spin.
 
 **Settings switches are `<button role="switch">`**, built from the `SETTING_SWITCHES` table in
 `js/menu.js` — the markup, the click handler and the redraw all derive from that one array, so
@@ -207,12 +228,13 @@ The revalidation fetch appends `?fresh=<timestamp>`. That is load-bearing: `inde
 without touching the network — `{cache: 'reload'}` alone does not defeat it. The service worker
 skips any request carrying `fresh` so those URLs never enter the cache.
 
-**The data page is reached from the sidebar, and nothing gates it.** `js/menu.js` renders a plain
-« Données & analyse » link (`#advancedLink`, an `<a>` among the panel buttons — hence the
-`.menu-item[data-panel]` selector when wiring panel clicks, and the `a.menu-item` rule in
-`menu.css`). There is no setting behind it: an earlier version hid it behind an `advancedMode`
-toggle in Réglages, and that was removed because a feature nobody can find is a feature nobody
-uses. Keep the entry visible; the separation between game and data is the _page_, not a switch.
+**The data page is one of the four tabs, and nothing gates it.** It is the only tab rendered as a
+real `<a>` (middle-click and "open in a new tab" have to keep working) — hence the
+`.tabbar-item[data-panel]` selector when wiring panel clicks, which skips it. There is no setting
+behind it: an earlier version hid it behind an `advancedMode` toggle in Réglages, and that was
+removed because a feature nobody can find is a feature nobody uses. Keep the tab visible; the
+separation between game and data is the _page_, not a switch. `donnees.html` has no tab bar of its
+own (it never calls `initMenu()`) — its own « Retour à la roue » link is the way back.
 
 **One colour for one series.** Every chart on the data page plots a single series, so they all take
 `--chart-1` and the section reads as one system; `colorIndex` stays at its default. Each chart used
@@ -247,8 +269,8 @@ app fails loudly at startup — update both sides.
 carries `role="img"` plus an `aria-label` that `updateCountInfo()` rewrites on every change; without
 it a screen reader sees nothing there. The result (`#overlayText`), the counter (`#countInfo`) and
 the feedback status are `role="status" aria-live="polite"` regions — that is the only way a spin
-result gets announced. Every surface that covers the page — the two modals, the menu drawer, the
-menu panels — goes through `js/focus-trap.js`: it moves focus in, traps `Tab` inside, and hands
+result gets announced. Every surface that covers the page — the two modals and the menu panels —
+goes through `js/focus-trap.js`: it moves focus in, traps `Tab` inside, and hands
 focus back on close; `.bubble` carries `tabindex="-1"` for that purpose. `prefers-reduced-motion`
 is honoured for real — the wheel damps
 much faster (`REDUCED_MOTION_DAMPING`) and `bills.js` is never invoked — on top of its older use as

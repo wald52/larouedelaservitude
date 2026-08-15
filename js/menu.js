@@ -169,17 +169,22 @@ export function getSettings() {
 // UI du Menu
 // ===============================
 //
-// Deux niveaux de navigation : le tiroir (la liste) et, par-dessus, un panneau
-// par entrée. Les deux glissent depuis la gauche — un panneau qui arrivait par
-// la droite pendant que le tiroir venait de la gauche rendait le bouton
-// « retour » incohérent.
+// Une barre d'onglets fixée en bas de l'écran, et un panneau par rubrique qui
+// monte depuis cette barre. Le hamburger et son tiroir latéral ont été
+// remplacés : la navigation principale d'une application tenue à une main vit
+// sous le pouce, pas dans un coin haut de l'écran, et les rubriques sont
+// visibles en permanence au lieu d'être repliées derrière trois traits.
 //
-// Les deux surfaces passent par openSurface / closeSurface : même animation,
+// Les panneaux arrivent donc par le bas — d'où ils sont appelés. La règle n'a
+// pas changé, seule son origine : une surface glisse depuis le contrôle qui
+// l'ouvre, sinon la hiérarchie devient illisible.
+//
+// Les surfaces passent toutes par openSurface / closeSurface : même animation,
 // même piège à focus, même touche Échap. Rien n'est atteignable au clavier
 // tant que la surface est fermée (visibility, menu.css).
 
 // Icônes de navigation, tracées et monochromes : elles héritent de la couleur
-// du texte et partagent une même épaisseur de trait. Les trois emojis qu'elles
+// du texte et partagent une même épaisseur de trait. Les emojis qu'elles
 // remplacent (📜 ⚙️ 📊) venaient de familles graphiques différentes, en couleur,
 // et juraient entre eux comme avec le reste de l'interface — qui est plate et
 // monochrome.
@@ -188,15 +193,15 @@ const ICON_SVG_ATTRS =
   'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"';
 
 function navIcon(paths) {
-  return `<svg class="menu-item__glyph" ${ICON_SVG_ATTRS}>${paths}</svg>`;
-}
-
-// Indicateur de fin de ligne, au même trait que les icônes.
-function metaIcon(paths) {
-  return `<svg class="menu-item__chevron" ${ICON_SVG_ATTRS}>${paths}</svg>`;
+  return `<svg class="tabbar-item__glyph" ${ICON_SVG_ATTRS}>${paths}</svg>`;
 }
 
 const ICONS = {
+  // Une maison : la roue elle-même, c'est-à-dire la page en cours.
+  accueil: navIcon(
+    '<path d="M3.6 11 12 4.2 20.4 11"/>' +
+      '<path d="M5.9 9.7v9.5a.8.8 0 0 0 .8.8h10.6a.8.8 0 0 0 .8-.8V9.7"/>'
+  ),
   // Une horloge : l'historique des tirages.
   historique: navIcon('<circle cx="12" cy="12" r="8.5"/><path d="M12 7.4V12l3.2 1.9"/>'),
   // Deux curseurs de réglage.
@@ -207,24 +212,16 @@ const ICONS = {
   // Un diagramme en barres.
   donnees: navIcon(
     '<path d="M3.5 20h17"/><path d="M7.5 20v-5.4"/><path d="M12 20V8"/><path d="M16.5 20v-8.4"/>'
-  ),
-  // Chevron : l'entrée ouvre un panneau, au même niveau de navigation.
-  chevron: metaIcon('<path d="m9.5 5.5 7 6.5-7 6.5"/>'),
-  // Flèche oblique : l'entrée quitte la page. Une bordure pivotée ne pouvait
-  // pas la dessiner — elle donnait un chevron vers le haut, qu'on lisait comme
-  // un repli.
-  externe: metaIcon('<path d="M7 17 17 7"/><path d="M8.5 7H17v8.5"/>')
+  )
 };
 
-// Les entrées du menu qui ouvrent un panneau. Le bouton de navigation, le
-// panneau, son bouton retour et le rendu de son contenu en découlent tous :
-// ajouter une rubrique, c'est ajouter une ligne ici.
+// Les rubriques qui ouvrent un panneau. Le panneau, son en-tête, son bouton de
+// fermeture et le rendu de son contenu en découlent tous : ajouter une
+// rubrique, c'est ajouter une ligne ici puis une ligne dans MENU_TABS.
 const MENU_PANELS = [
   {
     id: "historique",
-    icon: ICONS.historique,
     label: "Historique",
-    badgeId: "historyBadge",
     render: renderHistory,
     content: `
       <div id="historyListContainer"></div>
@@ -236,7 +233,6 @@ const MENU_PANELS = [
   },
   {
     id: "reglages",
-    icon: ICONS.reglages,
     label: "Réglages",
     render: renderSettings,
     content: `
@@ -252,8 +248,40 @@ const MENU_PANELS = [
           <button class="btn btn-secondary btn-sm" id="resetApp" type="button">Réinitialiser</button>
         </div>
       </div>
+
+      <div class="settings-group">
+        <h3>À propos</h3>
+        <div class="setting-item">
+          <div>
+            <div class="setting-label">La roue de la servitude</div>
+            <span class="setting-desc">Version ${APP_VERSION}</span>
+          </div>
+          <a class="btn btn-secondary btn-sm" href="https://github.com/wald52/larouedelaservitude"
+             target="_blank" rel="noopener">GitHub</a>
+        </div>
+      </div>
     `
   }
+];
+
+// La barre du bas, dans l'ordre où elle s'affiche. Trois natures d'onglet, et
+// c'est la clé présente qui les distingue :
+//   - ni `panel` ni `href` : l'accueil, qui referme ce qui est ouvert ;
+//   - `panel` : ouvre le panneau du même identifiant dans MENU_PANELS ;
+//   - `href`  : une navigation ordinaire, hors de la page.
+// Quatre onglets au maximum : au-delà, les libellés ne tiennent plus sur un
+// écran de téléphone sans être tronqués.
+const MENU_TABS = [
+  { id: "accueil", icon: ICONS.accueil, label: "Accueil" },
+  {
+    id: "historique",
+    icon: ICONS.historique,
+    label: "Historique",
+    panel: "historique",
+    badgeId: "historyBadge"
+  },
+  { id: "donnees", icon: ICONS.donnees, label: "Données", href: "donnees.html" },
+  { id: "reglages", icon: ICONS.reglages, label: "Réglages", panel: "reglages" }
 ];
 
 export function initMenu() {
@@ -269,72 +297,77 @@ function panelElementId(id) {
   return `panel-${id}`;
 }
 
-function createMenuHTML() {
-  // Bouton hamburger : il ouvre, et rien d'autre. Il se retire quand le tiroir
-  // est ouvert, où un vrai bouton de fermeture prend le relais dans l'en-tête —
-  // l'ancienne version le laissait flotter par-dessus le tiroir, ce qui
-  // obligeait à réserver 76 px de marge dans l'en-tête.
-  const toggle = document.createElement("button");
-  toggle.className = "menu-toggle";
-  toggle.id = "menuToggle";
-  toggle.type = "button";
-  toggle.innerHTML = "<span></span><span></span><span></span>";
-  toggle.setAttribute("aria-label", "Ouvrir le menu");
-  toggle.setAttribute("aria-expanded", "false");
-  toggle.setAttribute("aria-controls", "menuSidebar");
-  document.body.appendChild(toggle);
+function tabElementId(id) {
+  return `tab-${id}`;
+}
 
+function createMenuHTML() {
   const overlay = document.createElement("div");
   overlay.className = "menu-overlay";
   overlay.id = "menuOverlay";
   document.body.appendChild(overlay);
 
-  const sidebar = document.createElement("nav");
-  sidebar.className = "menu-sidebar";
-  sidebar.id = "menuSidebar";
-  sidebar.setAttribute("aria-label", "Menu principal");
-  sidebar.innerHTML = `
-    <div class="menu-header">
-      <h2 class="menu-title">Menu</h2>
-      <button class="btn btn-icon btn-secondary btn-close" id="menuClose" type="button"
-              aria-label="Fermer le menu"></button>
-    </div>
-    <div class="menu-nav">
-      ${MENU_PANELS.map(renderMenuItem).join("")}
-      <a class="menu-item" id="advancedLink" href="donnees.html">
-        <span class="menu-item__icon">${ICONS.donnees}</span>
-        <span class="menu-item__label">Données &amp; analyse</span>
-        ${ICONS.externe}
-      </a>
-    </div>
-    <div class="menu-footer">
-      <a href="https://github.com/wald52/larouedelaservitude" target="_blank" rel="noopener">GitHub</a>
-      <span aria-hidden="true">·</span>
-      <span>${APP_VERSION}</span>
-    </div>
-  `;
-  document.body.appendChild(sidebar);
+  // La barre du bas est la navigation principale : elle reste affichée en
+  // permanence, contrairement au tiroir qu'il fallait d'abord déplier.
+  const tabbar = document.createElement("nav");
+  tabbar.className = "menu-tabbar";
+  tabbar.id = "menuTabbar";
+  tabbar.setAttribute("aria-label", "Navigation principale");
+  tabbar.innerHTML = MENU_TABS.map(renderTabItem).join("");
+  document.body.appendChild(tabbar);
 
   for (const panel of MENU_PANELS) {
     document.body.appendChild(createPanelElement(panel));
   }
 
+  updateTabState(null);
   updateHistoryBadge();
 }
 
-// Une entrée de navigation : icône, libellé, badge éventuel, chevron. Le
-// chevron dit que l'entrée mène ailleurs — la version précédente ne
-// distinguait pas une entrée qui ouvre un panneau d'un simple lien.
-function renderMenuItem({ id, icon, label, badgeId }) {
-  const badge = badgeId ? `<span class="menu-item__badge" id="${badgeId}" hidden>0</span>` : "";
-  return `
-    <button class="menu-item" type="button" data-panel="${id}" aria-controls="${panelElementId(id)}">
-      <span class="menu-item__icon">${icon}</span>
-      <span class="menu-item__label">${label}</span>
-      ${badge}
-      ${ICONS.chevron}
-    </button>
-  `;
+// Un onglet : icône, badge éventuel posé sur l'icône, libellé dessous. Le
+// libellé est écrit et non seulement suggéré par le pictogramme — une icône
+// seule se devine, elle ne se lit pas.
+function renderTabItem({ id, icon, label, badgeId, panel, href }) {
+  const badge = badgeId ? `<span class="tabbar-item__badge" id="${badgeId}" hidden>0</span>` : "";
+  const inner = `
+      <span class="tabbar-item__icon">${icon}${badge}</span>
+      <span class="tabbar-item__label">${label}</span>`;
+
+  // Le seul onglet qui quitte la page est un vrai lien : clic milieu, ouverture
+  // dans un onglet et menu contextuel doivent continuer de fonctionner.
+  if (href) {
+    return `<a class="tabbar-item" id="${tabElementId(id)}" href="${href}">${inner}</a>`;
+  }
+
+  const panelAttrs = panel
+    ? ` data-panel="${panel}" aria-controls="${panelElementId(panel)}" aria-expanded="false"`
+    : ' data-home="true"';
+
+  return `<button class="tabbar-item" id="${tabElementId(id)}" type="button"${panelAttrs}>${inner}</button>`;
+}
+
+// `aria-current` désigne l'endroit où l'on se trouve : l'accueil tant qu'aucun
+// panneau n'est ouvert, sinon l'onglet du panneau ouvert. C'est aussi ce que le
+// CSS interroge pour teinter l'onglet actif — pas de classe en double, donc pas
+// d'état visuel qui puisse diverger de l'état annoncé.
+function updateTabState(openPanelId) {
+  for (const tab of MENU_TABS) {
+    if (tab.href) continue;
+
+    const element = document.getElementById(tabElementId(tab.id));
+    if (!element) continue;
+
+    const isCurrent = tab.panel ? tab.panel === openPanelId : openPanelId === null;
+    if (isCurrent) {
+      element.setAttribute("aria-current", "page");
+    } else {
+      element.removeAttribute("aria-current");
+    }
+
+    if (tab.panel) {
+      element.setAttribute("aria-expanded", String(tab.panel === openPanelId));
+    }
+  }
 }
 
 // Un vrai <button role="switch"> : focalisable et actionnable au clavier, ce que
@@ -369,11 +402,14 @@ function createPanelElement({ id, label, content }) {
   panel.setAttribute("role", "dialog");
   panel.setAttribute("aria-modal", "true");
   panel.setAttribute("aria-labelledby", `${panelElementId(id)}-title`);
+  // La poignée est le signe convenu d'une feuille qu'on tire depuis le bas :
+  // purement décorative, d'où aria-hidden.
   panel.innerHTML = `
+    <div class="panel-grabber" aria-hidden="true"></div>
     <div class="panel-header">
-      <button class="btn btn-sm btn-secondary btn-back" data-close-panel="${id}" type="button"
-              aria-label="Retour au menu">Menu</button>
       <h3 class="panel-title" id="${panelElementId(id)}-title">${label}</h3>
+      <button class="btn btn-icon btn-secondary btn-close" data-close-panel="${id}" type="button"
+              aria-label="Fermer ${label.toLowerCase()}"></button>
     </div>
     <div class="panel-content">${content}</div>
   `;
@@ -394,31 +430,20 @@ function closeSurface(element) {
   popFocusTrap(element);
 }
 
-function openMenu() {
-  const toggle = document.getElementById("menuToggle");
-  toggle.setAttribute("aria-expanded", "true");
-  document.getElementById("menuOverlay").classList.add("active");
-  document.documentElement.classList.add("menu-open");
-  openSurface(document.getElementById("menuSidebar"), document.getElementById("menuClose"));
-}
-
-function closeMenu() {
-  const sidebar = document.getElementById("menuSidebar");
-  if (!sidebar.classList.contains("active")) return;
-
-  closeAllPanels();
-  document.getElementById("menuToggle").setAttribute("aria-expanded", "false");
-  document.getElementById("menuOverlay").classList.remove("active");
-  document.documentElement.classList.remove("menu-open");
-  closeSurface(sidebar);
-}
-
+// Un seul panneau à la fois : ouvrir depuis la barre referme celui qui l'était.
+// Ils ne s'empilent pas — deux feuilles montées du même bord se recouvriraient
+// sans que rien ne dise laquelle est laquelle.
 function openPanel(panelId) {
   const panel = MENU_PANELS.find((entry) => entry.id === panelId);
   if (!panel) return;
 
+  closeAllPanels();
+
   const element = document.getElementById(panelElementId(panelId));
   panel.render();
+  document.getElementById("menuOverlay").classList.add("active");
+  document.documentElement.classList.add("menu-open");
+  updateTabState(panelId);
   openSurface(element, element.querySelector("[data-close-panel]"));
 }
 
@@ -427,6 +452,9 @@ function closePanel(panelId) {
   if (!element || !element.classList.contains("active")) return;
 
   closeSurface(element);
+  document.getElementById("menuOverlay").classList.remove("active");
+  document.documentElement.classList.remove("menu-open");
+  updateTabState(null);
 }
 
 function closeAllPanels() {
@@ -434,15 +462,17 @@ function closeAllPanels() {
 }
 
 function attachMenuEvents() {
-  document.getElementById("menuToggle").addEventListener("click", openMenu);
-  document.getElementById("menuClose").addEventListener("click", closeMenu);
-  document.getElementById("menuOverlay").addEventListener("click", closeMenu);
+  document.getElementById("menuOverlay").addEventListener("click", closeAllPanels);
 
-  // Seuls les boutons ouvrant un panneau : le lien vers la page d'analyse est
-  // une navigation ordinaire.
-  document.querySelectorAll(".menu-item[data-panel]").forEach((item) => {
+  // Seuls les onglets porteurs d'un panneau : « Données » est un lien, donc une
+  // navigation ordinaire, et « Accueil » ne fait que ramener à la roue.
+  document.querySelectorAll(".tabbar-item[data-panel]").forEach((item) => {
     item.addEventListener("click", () => openPanel(item.dataset.panel));
   });
+
+  document
+    .querySelector(".tabbar-item[data-home]")
+    .addEventListener("click", () => closeAllPanels());
 
   document.querySelectorAll("[data-close-panel]").forEach((button) => {
     button.addEventListener("click", () => closePanel(button.dataset.closePanel));
@@ -481,14 +511,13 @@ function attachMenuEvents() {
       history = [];
       settings = { ...DEFAULT_SETTINGS };
       applySettingsToDocument();
-      closeMenu();
+      closeAllPanels();
       window.location.reload();
     }
   });
 
-  // Échap ne ferme que la surface du dessus : d'abord le panneau, puis le
-  // tiroir. On ne réagit pas si c'est une modale de la roue qui est au premier
-  // plan — app.js s'en charge.
+  // Échap ne ferme que la surface du dessus. On ne réagit pas si c'est une
+  // modale de la roue qui est au premier plan — app.js s'en charge.
   document.addEventListener("keydown", (event) => {
     if (event.key !== "Escape") return;
 
@@ -497,8 +526,6 @@ function attachMenuEvents() {
 
     if (top.classList.contains("menu-panel")) {
       closePanel(top.id.replace("panel-", ""));
-    } else if (top.id === "menuSidebar") {
-      closeMenu();
     }
   });
 }

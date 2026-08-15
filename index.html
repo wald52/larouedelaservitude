@@ -79,6 +79,13 @@
         --install-title: #111;
         --emoji-size: 80px;
         --bg-size: 200vw;
+        /* Hauteur de la barre d'onglets du bas (menu.css). Elle est déclarée
+           ici, dans le CSS bloquant, et non dans menu.css qui est chargé en
+           différé : la page doit réserver la place de la barre dès le premier
+           rendu, sinon le bouton « Tourner la roue » sursaute quand elle
+           apparaît. La marge du menu système iOS s'y ajoute. */
+        --tabbar-h: 62px;
+        --tabbar-room: calc(var(--tabbar-h) + env(safe-area-inset-bottom, 0px));
         /* La trame de fond, une image par thème. Le SVG est un document
            indépendant : `currentColor` n'y a pas cours et son glyphe est noir
            par défaut, ce qui l'éteignait sur le fond sombre. La couleur est donc
@@ -212,7 +219,9 @@
         flex-direction: column;
         align-items: center;
         padding-top: clamp(24px, 6vh, 80px);
-        padding-bottom: 24px;
+        /* La barre d'onglets est fixée : sans cette réserve, elle recouvrirait
+           le bouton « Tourner la roue » et le compteur. */
+        padding-bottom: calc(24px + var(--tabbar-room));
         box-sizing: border-box;
       }
       .container {
@@ -321,8 +330,17 @@
         border-right: var(--w) solid transparent;
         border-top: var(--h) solid var(--pointer);
       }
+      /* La roue est bornée par la largeur *et* par la hauteur. Le corps de la
+         page ne défile pas : ce qui ne tient pas dans l'écran est perdu, et sur
+         un écran large mais bas (une fenêtre de portable), la roue à 540 px
+         poussait le bouton et le compteur sous la barre d'onglets.
+         `svh` plutôt que `dvh` : la petite hauteur de vue est stable, alors que
+         la hauteur dynamique change quand la barre d'adresse du téléphone se
+         replie — la roue aurait été redimensionnée en pleine rotation.
+         La première déclaration est le repli des navigateurs sans `svh`. */
       canvas {
         width: clamp(250px, 80vw, 540px);
+        width: min(clamp(250px, 80vw, 540px), 52svh);
         aspect-ratio: 1/1;
         display: block;
         border-radius: 50%;
@@ -491,10 +509,12 @@
         color: var(--modal-muted) !important;
       }
 
+      /* Posé au-dessus de la barre d'onglets, jamais dessus : les deux occupent
+         le même bord de l'écran. */
       .install-banner {
         position: fixed;
         left: 50%;
-        bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+        bottom: calc(12px + var(--tabbar-room));
         transform: translate(-50%, calc(100% + 24px));
         width: min(calc(100vw - 24px), 520px);
         display: flex;
