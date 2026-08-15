@@ -1,7 +1,7 @@
 // Version de l'application - À INCRÉMENTER à chaque déploiement.
 // ⚠️ Doit rester identique à APP_VERSION dans js/constants.js
 // (égalité vérifiée par `npm run check:precache`).
-const CACHE_VERSION = "v49";
+const CACHE_VERSION = "v50";
 const CACHE_NAME = `larouedelaservitude-${CACHE_VERSION}`;
 
 /*

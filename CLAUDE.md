@@ -204,6 +204,13 @@ height without saying anything, and the count now lives only in the canvas's `ar
 (`updateWheelLabel()`), where a screen reader still gets it. The card is therefore the only surface
 on the page, hence the only thing the eye looks for.
 
+**Heights come from `svh`, never `vh`.** `.wrap` is `100svh`, the wheel's cap and the card's
+`max-height` too. On Chrome Android `100vh` is the viewport with the address bar _retracted_ — some
+70 px taller than what is actually on screen — and since the body never scrolls here, that bar never
+retracts. With `vh`, the column sized itself inside a window taller than the phone's and the bottom
+of the result card sat under the tab bar. Each such declaration keeps a `vh` line before it as the
+fallback for browsers without `svh`.
+
 **Nothing above the wheel ever moves.** The column's top spacing is the same before and after a
 draw — the masthead and the button are at their final position on first paint. Only the wheel
 yields height to the card. Do not reintroduce a `data-result` rule that shifts the top of the page.

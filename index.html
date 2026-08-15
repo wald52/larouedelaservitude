@@ -210,15 +210,20 @@
         background-position: calc(var(--emoji-size) / 2) calc(var(--emoji-size) / 2);
       }
 
-      /* `height` autant que `min-height` : le corps est en position fixe, donc
-         haut comme la fenêtre, et cette hauteur ferme doit descendre jusqu'à la
-         carte de résultat — sans elle, la carte ne saurait pas de quelle place
-         elle dispose et déborderait sous la barre d'onglets. */
+      /* Une hauteur ferme, et la bonne : c'est elle qui descend jusqu'à la carte
+         de résultat pour lui dire de quelle place elle dispose.
+         `svh`, jamais `vh` : sur Chrome Android, `100vh` est la hauteur de la
+         fenêtre *barre d'adresse rétractée*, soit près de 70 px de plus que ce
+         qui est réellement affiché — et comme le corps de la page ne défile
+         pas, cette barre ne se rétracte jamais ici. La colonne calculait donc
+         sa place dans une fenêtre plus haute que l'écran, et le bas de la carte
+         finissait sous la barre d'onglets. La première déclaration est le repli
+         des navigateurs sans `svh`. */
       .wrap {
         position: relative;
         z-index: 1;
-        height: 100%;
-        min-height: 100vh;
+        height: 100vh;
+        height: 100svh;
         display: flex;
         flex-direction: column;
         align-items: center;
