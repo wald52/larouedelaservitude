@@ -79,6 +79,13 @@
         --install-title: #111;
         --emoji-size: 80px;
         --bg-size: 200vw;
+        /* La trame de faucilles était à pleine densité : elle passait derrière
+           le titre et derrière le compteur, qui devenaient pénibles à lire. En
+           filigrane, elle reste parfaitement identifiable et cesse de disputer
+           la page au texte. Les glyphes du SVG sont noirs quel que soit le
+           thème, d'où une valeur par thème : sur fond sombre ils sont déjà
+           presque éteints, les atténuer les ferait disparaître. */
+        --pattern-opacity: 0.14;
         /* Ambre : lisible aussi bien sur les fonds clairs que sur la bulle sombre */
         --focus: #f59e0b;
         /* Romaine du bandeau de titre. Pile entièrement système : aucune police
@@ -114,6 +121,7 @@
         --install-title: #f3f4f6;
         --focus: #f59e0b;
         --masthead-accent: #dc2626;
+        --pattern-opacity: 1;
       }
 
       /* ===============================
@@ -189,6 +197,7 @@
         top: calc(50% - var(--bg-size) / 2);
         left: calc(50% - var(--bg-size) / 2);
         pointer-events: none;
+        opacity: var(--pattern-opacity);
         background-image: url("data:image/svg+xml;utf8,\
 <svg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'>\
 <text x='40' y='40' font-size='50'>☭</text>\
@@ -208,6 +217,7 @@
         display: flex;
         flex-direction: column;
         align-items: center;
+        padding-top: clamp(24px, 6vh, 80px);
         padding-bottom: 24px;
         box-sizing: border-box;
       }
@@ -215,7 +225,7 @@
         width: 100%;
         max-width: 720px;
         padding-inline: 12px;
-        margin-top: clamp(20px, 4vh, 48px);
+        margin-top: clamp(16px, 3vh, 32px);
         display: grid;
         gap: 12px;
         justify-items: center;
@@ -229,16 +239,11 @@
    plein derrière le titre — il tient dans ce filet, ce qui laisse la roue être
    la seule tache de couleur de la page.
 
-   Le bandeau va d'un bord à l'autre et porte un aplat opaque : c'est ce que
-   faisait le pavé rouge. Posé à même le fond, le titre se lisait mal — la trame
-   de faucilles passe derrière les lettres, et une romaine, dont les pleins et
-   les déliés alternent, y résiste moins bien qu'un caractère bâton. */
+   Rien n'est posé sous le titre pour le détacher : c'est la trame de fond qui
+   a été ramenée au filigrane (voir --pattern-opacity). Un bandeau opaque a été
+   essayé — il réglait le contraste, mais un rectangle plein rapporté sur un
+   motif dense se voit comme une pièce cousue. */
       .masthead {
-        width: 100%;
-        box-sizing: border-box;
-        padding: calc(16px + env(safe-area-inset-top, 0px)) 16px 18px;
-        background: var(--surface);
-        border-bottom: 1px solid var(--ring);
         display: grid;
         justify-items: center;
         gap: 10px;
@@ -577,8 +582,6 @@
   </head>
   <body>
     <div class="wrap">
-      <!-- Hors de .container : le bandeau est pleine largeur, la roue reste dans
-           les 720px du conteneur. -->
       <header class="masthead">
         <h1>
           <span class="masthead__lead">La roue de</span>
