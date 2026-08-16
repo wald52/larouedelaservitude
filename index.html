@@ -47,9 +47,6 @@
      bouton « Tourner la roue », visible d'emblée. Chargé en différé, ce bouton
      apparaîtrait d'abord nu. -->
     <link rel="stylesheet" href="buttons.css?v=8e4cf8f9" />
-    <!-- Bloquant pour la même raison : la pastille est dans le premier écran, et
-     sans son style elle s'afficherait en vignette carrée avant de s'arrondir. -->
-    <link rel="stylesheet" href="logo.css?v=fdd8c8b3" />
     <link rel="stylesheet" href="bills.css?v=3274a064" media="print" onload="this.media = 'all'" />
     <link rel="stylesheet" href="menu.css?v=90453bf1" media="print" onload="this.media = 'all'" />
     <noscript>
@@ -337,16 +334,130 @@
         border-radius: 999px;
         background: var(--masthead-accent);
       }
-      /* Placement seul : l'apparence de la pastille vient de logo.css.
+      /* ===============================
+   PASTILLE « LE MODÈLE SOCIAL FRANÇAIS »
+   =============================== */
+
+      /* Le coq, en haut à droite, mène au Linktree du Modèle Social Français.
+         Recopie de la pastille de lemodelesocialfrancais.github.io : médaillon
+         rond cerclé d'or, écusson 🔗 en coin, infobulle au survol.
+
          Elle est posée en absolu dans .wrap, donc hors de la colonne : celle-ci
          compte sa hauteur au pixel (--column-room) et rien de ce qui est
          au-dessus de la roue ne doit bouger. Le retrait de 14 px laisse la place
-         à l'écusson 🔗, qui déborde du médaillon de 8 px. */
+         à l'écusson, qui déborde du médaillon de 8 px.
+
+         L'or n'est pas un jeton de thème : il tient sur le fond clair comme sur
+         le fond sombre, et c'est la couleur de la pastille d'origine. */
       .site-logo {
+        --logo-size: 48px;
+        --logo-or: #d4af37;
+        --logo-or-clair: #e6c55a;
+        --logo-ecusson: #112240;
+
         position: absolute;
         z-index: 6;
         top: clamp(12px, 2.5vh, 40px);
         right: max(14px, env(safe-area-inset-right, 0px));
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        transition: transform 400ms cubic-bezier(0.2, 0.8, 0.2, 1);
+      }
+      .site-logo:hover {
+        transform: scale(1.08);
+      }
+      .site-logo__img {
+        display: block;
+        width: var(--logo-size);
+        height: var(--logo-size);
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid var(--logo-or);
+        box-shadow:
+          0 4px 15px rgba(212, 175, 55, 0.3),
+          0 0 0 2px rgba(212, 175, 55, 0.1);
+        transition: all 400ms cubic-bezier(0.2, 0.8, 0.2, 1);
+      }
+      .site-logo:hover .site-logo__img {
+        border-color: var(--logo-or-clair);
+        box-shadow:
+          0 6px 25px rgba(212, 175, 55, 0.5),
+          0 0 0 3px rgba(212, 175, 55, 0.2);
+      }
+      /* Écusson : dit que le lien sort du site, là où l'image seule ne le dit
+         pas. */
+      .site-logo::before {
+        content: "🔗";
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        z-index: 1;
+        width: 22px;
+        height: 22px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        line-height: 1;
+        background: var(--logo-ecusson);
+        border: 1px solid var(--logo-or);
+        border-radius: 50%;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        transition: all 400ms cubic-bezier(0.2, 0.8, 0.2, 1);
+      }
+      .site-logo:hover::before {
+        transform: scale(1.1);
+        background: var(--logo-or);
+      }
+      /* Infobulle : doublée par l'attribut `title` du lien, elle n'est donc
+         jamais la seule à porter l'information — et reste hors du pointeur.
+
+         Alignée par la droite, et non centrée sous le médaillon : la pastille
+         est au bord de l'écran, une infobulle centrée en sortait et « Mon
+         Linktree » se lisait « Mon Linktr ». */
+      .site-logo__tip {
+        position: absolute;
+        top: calc(100% + 6px);
+        right: 0;
+        padding: 4px 10px;
+        font-size: 0.75rem;
+        line-height: 1.2;
+        white-space: nowrap;
+        color: var(--logo-or-clair);
+        background: var(--logo-ecusson);
+        border: 1px solid rgba(212, 175, 55, 0.4);
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        transition:
+          opacity 400ms cubic-bezier(0.2, 0.8, 0.2, 1),
+          top 400ms cubic-bezier(0.2, 0.8, 0.2, 1),
+          visibility 0s linear 400ms;
+      }
+      .site-logo:hover .site-logo__tip,
+      .site-logo:focus-visible .site-logo__tip {
+        top: calc(100% + 11px);
+        opacity: 1;
+        visibility: visible;
+        transition-delay: 0s;
+      }
+      /* Sur les écrans étroits, le médaillon se resserre pour ne pas venir
+         toucher le titre, qui occupe le centre de la même ligne. */
+      @media (max-width: 380px) {
+        .site-logo {
+          --logo-size: 40px;
+        }
+        .site-logo::before {
+          top: -6px;
+          right: -6px;
+          width: 18px;
+          height: 18px;
+          font-size: 11px;
+        }
       }
       /* La roue est posée à même le fond : le cadre blanc qui l'entourait
          mangeait de la hauteur sans rien dire de plus, et la carte de résultat

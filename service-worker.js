@@ -43,7 +43,7 @@
  * ℹ️ FONTS : aucune — polices système uniquement.
  */
 /* --- généré par scripts/stamp-assets.mjs — ne pas éditer à la main --- */
-const VERSION = "0380335e";
+const VERSION = "cfbbe583";
 const ASSETS = [
   "./",
   "./index.html",
@@ -63,7 +63,6 @@ const ASSETS = [
   "./js/settings.js?v=ad2748e0",
   "./js/stats.js?v=a54f91d1",
   "./js/sw-update.js?v=3cf9d32b",
-  "./logo.css?v=fdd8c8b3",
   "./menu.css?v=90453bf1",
   "./data/entries-light.json",
   "./data/entries-full.json",
