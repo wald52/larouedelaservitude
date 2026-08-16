@@ -43,24 +43,25 @@
  * ℹ️ FONTS : aucune — polices système uniquement.
  */
 /* --- généré par scripts/stamp-assets.mjs — ne pas éditer à la main --- */
-const VERSION = "824bdfcd";
+const VERSION = "eebfe25a";
 const ASSETS = [
   "./",
   "./index.html",
   "./donnees.html",
   "./bills.css?v=3274a064",
-  "./bills.js?v=1416b415",
+  "./bills.js?v=d86bcbd3",
   "./buttons.css?v=8e4cf8f9",
-  "./donnees.css?v=e704b99d",
-  "./js/app.js?v=52a6b8e5",
-  "./js/audio.js?v=98016842",
+  "./donnees.css?v=4a3d61a8",
+  "./js/app.js?v=1da0ed99",
+  "./js/audio.js?v=f32973a2",
   "./js/charts.js?v=9c0905cd",
-  "./js/constants.js?v=055839fa",
-  "./js/data-explorer.js?v=e4312de1",
-  "./js/entries.js?v=fbd30d90",
+  "./js/constants.js?v=2713e882",
+  "./js/data-explorer.js?v=0d2c7e6b",
+  "./js/entries.js?v=5638691f",
   "./js/focus-trap.js?v=0b34fd1c",
-  "./js/menu.js?v=95606d60",
-  "./js/settings.js?v=ad2748e0",
+  "./js/game.js?v=e75363c7",
+  "./js/menu.js?v=07363a33",
+  "./js/settings.js?v=d7e3f5e3",
   "./js/stats.js?v=a54f91d1",
   "./js/sw-update.js?v=3cf9d32b",
   "./menu.css?v=90453bf1",

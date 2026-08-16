@@ -5,6 +5,9 @@
 // Clé localStorage des réglages utilisateur.
 export const SETTINGS_KEY = "larouedelaservitude_settings";
 
+// Clé sessionStorage de la partie en cours (voir js/game.js).
+export const GAME_KEY = "larouedelaservitude_game";
+
 // Chemin de base de l'application (gère le déploiement en sous-dossier,
 // ex. GitHub Pages).
 //

@@ -9,16 +9,19 @@
 // - les données viennent de js/entries.js (cache IndexedDB puis revalidation
 //   réseau sur le champ `version`), donc la page fonctionne hors ligne et se
 //   met à jour toute seule via l'événement `entriesUpdated` ;
-// - les réglages (thème) passent par js/menu.js, seule source de vérité du
-//   localStorage, et s'appliquent par attribut sur <html> ;
+// - la barre d'onglets du bas et ses panneaux (Historique, Réglages) sont ceux
+//   de la roue, construits par js/menu.js : « Données » est un onglet de
+//   l'application, on y arrive et on en repart par la même barre ;
+// - les réglages (thème) passent donc eux aussi par js/menu.js, seule source de
+//   vérité du localStorage, et s'appliquent par attribut sur <html> ;
 // - aucun calcul statistique n'est écrit ici : tout vient de js/stats.js, qui
 //   est testé sous Node.
 //
 // L'état de la vue (recherche, filtres, tri) est reflété dans l'URL : une
 // sélection se partage ou se met en favori telle quelle.
 
-import { loadFullData, formatRecette, getDataVersion } from "./entries.js?v=fbd30d90";
-import { loadSettings, updateSetting, getSetting } from "./menu.js?v=95606d60";
+import { loadFullData, formatRecette, getDataVersion } from "./entries.js?v=5638691f";
+import { initMenu } from "./menu.js?v=07363a33";
 import { initServiceWorker } from "./sw-update.js?v=3cf9d32b";
 import {
   describe,
@@ -1003,13 +1006,12 @@ function attachEvents() {
     );
   });
 
-  elements.themeToggle.addEventListener("click", () => {
-    const next = !getSetting("darkMode");
-    updateSetting("darkMode", next);
-    syncThemeToggle();
-  });
-
   document.addEventListener("keydown", (event) => {
+    // Un panneau de la barre d'onglets est ouvert : il est au-dessus de la
+    // page, les raccourcis du tableau ne le concernent pas. C'est js/menu.js
+    // qui répond à Échap dans ce cas.
+    if (document.documentElement.classList.contains("menu-open")) return;
+
     if (event.key === "Escape" && !elements.detail.hidden) {
       state.selectedId = null;
       renderDetail(null);
@@ -1036,12 +1038,6 @@ function attachEvents() {
       console.log("[DATA] Tableau reconstruit après mise à jour des données");
     });
   });
-}
-
-function syncThemeToggle() {
-  const dark = Boolean(getSetting("darkMode"));
-  elements.themeToggle.setAttribute("aria-pressed", dark ? "true" : "false");
-  elements.themeToggle.textContent = dark ? "☀️ Thème clair" : "🌙 Thème sombre";
 }
 
 // ===============================
@@ -1078,7 +1074,6 @@ async function init() {
   elements.detailCopy = requireElement("detailCopy");
   elements.exportCsv = requireElement("exportCsv");
   elements.exportJson = requireElement("exportJson");
-  elements.themeToggle = requireElement("themeToggle");
   elements.status = requireElement("loadingStatus");
   elements.dataVersion = requireElement("dataVersion");
   elements.filtersPanel = requireElement("filtersPanel");
@@ -1090,8 +1085,10 @@ async function init() {
   // pas défaire son choix.
   elements.filtersPanel.open = window.matchMedia("(min-width: 760px)").matches;
 
-  loadSettings();
-  syncThemeToggle();
+  // Charge les réglages (thème compris, appliqué sur <html>) et construit la
+  // barre du bas : ici « Données » est l'onglet courant, et « Accueil » le lien
+  // qui ramène à la roue.
+  initMenu({ page: "donnees" });
 
   // Le préréglage de tri est déclaré ici plutôt que dans le HTML : la liste des
   // tris disponibles appartient au code, pas au gabarit.

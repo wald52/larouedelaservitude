@@ -12,7 +12,7 @@
 // Quand les données changent, un événement `entriesUpdated` est émis sur
 // window (même motif de découplage que soundModeChange / infiniteModeChange).
 
-import { BASE_PATH } from "./constants.js?v=055839fa";
+import { BASE_PATH } from "./constants.js?v=2713e882";
 
 const DB_NAME = "LaRoueDeLaServitude";
 const DB_VERSION = 1;

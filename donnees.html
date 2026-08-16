@@ -14,7 +14,12 @@
     <link rel="manifest" href="site.webmanifest" />
 
     <link rel="stylesheet" href="buttons.css?v=8e4cf8f9" />
-    <link rel="stylesheet" href="donnees.css?v=e704b99d" />
+    <link rel="stylesheet" href="donnees.css?v=4a3d61a8" />
+    <!-- La même barre d'onglets que la roue : « Données » est un onglet de
+         l'application, pas une sortie. Feuille bloquante ici, contrairement à
+         index.html qui la charge en différé — cette page n'a pas de premier
+         rendu à protéger, et la barre arrive ainsi déjà habillée. -->
+    <link rel="stylesheet" href="menu.css?v=90453bf1" />
 
     <script>
       // Le thème est appliqué avant le premier rendu : chargé plus tard (le module
@@ -36,7 +41,6 @@
     <header class="page-header">
       <div class="page-header__inner">
         <div class="page-header__titles">
-          <a class="btn btn-sm btn-secondary btn-back back-link" href="./">Retour à la roue</a>
           <h1>Données &amp; analyse</h1>
           <p class="page-subtitle">
             Le jeu de données complet des prélèvements obligatoires français : recettes, années de
@@ -44,10 +48,11 @@
             jeu.
           </p>
         </div>
+        <!-- Le thème se règle dans le panneau « Réglages » de la barre, comme
+             sur la roue : un seul contrôle pour un seul réglage. Le bouton qui
+             se trouvait ici affichait son propre état, qui ne se mettait pas à
+             jour quand l'interrupteur du panneau bougeait. -->
         <div class="page-header__actions">
-          <button id="themeToggle" class="btn btn-secondary" type="button" aria-pressed="false">
-            🌙 Thème sombre
-          </button>
           <span id="dataVersion" class="data-version"></span>
         </div>
       </div>
@@ -317,6 +322,6 @@
       >
     </footer>
 
-    <script type="module" src="./js/data-explorer.js?v=e4312de1"></script>
+    <script type="module" src="./js/data-explorer.js?v=0d2c7e6b"></script>
   </body>
 </html>

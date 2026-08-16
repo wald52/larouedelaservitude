@@ -45,6 +45,13 @@
   --chart-grid: rgba(17, 17, 17, 0.1);
   --chart-axis: rgba(17, 17, 17, 0.35);
   --chart-text: #52525b;
+
+  /* Hauteur de la barre d'onglets du bas (menu.css), déclarée ici pour les
+     mêmes raisons que dans index.html : la barre est construite par
+     js/menu.js, la page doit donc réserver sa place dès le premier rendu.
+     --tabbar-room y ajoute l'encoche du bas des iPhone. */
+  --tabbar-h: 62px;
+  --tabbar-room: calc(var(--tabbar-h) + env(safe-area-inset-bottom, 0px));
 }
 
 :root[data-theme="dark"] {
@@ -103,9 +110,12 @@ body {
   line-height: 1.5;
 }
 
-/* Contrairement à la roue, cette page défile : c'est un document, pas un jeu. */
+/* Contrairement à la roue, cette page défile : c'est un document, pas un jeu.
+   Le rembourrage du bas rend sa place à la barre d'onglets, qui est fixée à
+   l'écran et recouvrirait sinon la fin du document. */
 body {
   min-height: 100vh;
+  padding-bottom: var(--tabbar-room);
 }
 
 :focus-visible {
@@ -191,13 +201,6 @@ a {
   max-width: 70ch;
   color: var(--muted);
   font-size: 14px;
-}
-
-/* Apparence dans buttons.css (.btn-back) : ici, seul le placement. La marge
-   négative compense la bordure et le rembourrage du bouton, pour que son
-   libellé s'aligne verticalement sur le titre qui le suit. */
-.back-link {
-  margin-left: -13px;
 }
 
 .page-header__actions {
@@ -425,10 +428,9 @@ a {
     min-height: 44px;
   }
 
-  /* Uniquement les liens nus : .back-link est déjà un .btn-sm, à qui la règle
-     de buttons.css donne ses 44 px. Lui imposer `display: inline-block` casse
-     le `inline-flex` du bouton, et son chevron — un pseudo-élément placé par
-     le flex — se retrouvait affiché comme une barre verticale. */
+  /* Uniquement les liens nus du pied de page : un lien habillé en .btn tient
+     déjà ses 44 px de buttons.css, et lui imposer `display: inline-block`
+     casserait le `inline-flex` du bouton. */
   .page-footer a {
     display: inline-block;
     padding-block: 8px;

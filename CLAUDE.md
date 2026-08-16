@@ -75,7 +75,8 @@ js/menu.js              Bottom tab bar, panels, history, settings; builds its ow
 js/settings.js          Reads the sound setting (data-attribute first, localStorage fallback)
 js/sw-update.js         SW registration, update checks, served version (see §7)
 js/focus-trap.js        Focus stack shared by the modals (app.js) and the menu surfaces (menu.js)
-js/constants.js         SETTINGS_KEY and BASE_PATH — shared by front-end modules
+js/constants.js         SETTINGS_KEY, GAME_KEY and BASE_PATH — shared by front-end modules
+js/game.js              The running game (ids already drawn) in sessionStorage — no DOM
 js/data-explorer.js     Table, filters, multi-key sort, export, URL state for donnees.html
 js/stats.js             Pure descriptive statistics (no DOM) — the only unit-tested front-end module
 js/charts.js            Hand-written SVG charts, themed through CSS variables, no dependency
@@ -98,13 +99,15 @@ shares/                 Runtime artifacts only; share-*.html is gitignored
 `js/stats.js`, `js/charts.js`
 `js/audio.js` → `js/settings.js` → `js/constants.js` ← `js/entries.js`; `js/menu.js` → `js/sw-update.js`
 `js/app.js`, `js/menu.js` → `js/focus-trap.js` (piled surfaces: share sheet, feedback form, panels)
+`js/app.js`, `js/menu.js` → `js/game.js` → `js/constants.js`
 `js/app.js` → `import('../bills.js')` (dynamic, on first spin) → `js/settings.js`, and
 `bills.js` → `import('./js/audio.js')` (dynamic, inside `initBills()`)
 
-Two documents, one shell. `donnees.html` reuses `js/menu.js` only for the settings API (never
-`initMenu()`), which keeps `localStorage` writes in a single place. `BASE_PATH` is derived from
-`import.meta.url` in `js/constants.js` precisely because there is now more than one page — deriving
-it from `location.pathname` would resolve `/donnees.html/data/…`.
+Two documents, one shell — and it really is one shell: both pages call `initMenu()`, which builds
+the same bottom tab bar and the same panels; the only difference is which tab is the current page
+(`initMenu({ page: "donnees" })`). All `localStorage` writes therefore stay in `js/menu.js`.
+`BASE_PATH` is derived from `import.meta.url` in `js/constants.js` precisely because there is now
+more than one page — deriving it from `location.pathname` would resolve `/donnees.html/data/…`.
 
 `bills.js` lives at the repo root but imports from `./js/`. Keep it there — `service-worker.js`,
 `eslint.config.js` and the dynamic import in `app.js` all reference that path.
@@ -289,13 +292,34 @@ The revalidation fetch appends `?fresh=<timestamp>`. That is load-bearing: `inde
 without touching the network — `{cache: 'reload'}` alone does not defeat it. The service worker
 skips any request carrying `fresh` so those URLs never enter the cache.
 
-**The data page is one of the four tabs, and nothing gates it.** It is the only tab rendered as a
-real `<a>` (middle-click and "open in a new tab" have to keep working) — hence the
-`.tabbar-item[data-panel]` selector when wiring panel clicks, which skips it. There is no setting
-behind it: an earlier version hid it behind an `advancedMode` toggle in Réglages, and that was
-removed because a feature nobody can find is a feature nobody uses. Keep the tab visible; the
-separation between game and data is the _page_, not a switch. `donnees.html` has no tab bar of its
-own (it never calls `initMenu()`) — its own « Retour à la roue » link is the way back.
+**The data page is one of the four tabs, and nothing gates it.** There is no setting behind it: an
+earlier version hid it behind an `advancedMode` toggle in Réglages, and that was removed because a
+feature nobody can find is a feature nobody uses. Keep the tab visible; the separation between game
+and data is the _page_, not a switch.
+
+**Which is why both pages carry the same bar.** A tab is where you are, not a way out: `donnees.html`
+calls `initMenu({ page: "donnees" })` and gets the identical four tabs, with « Données » marked
+`aria-current` and « Accueil » as the link home. A tab whose `page` is the current one is a
+`<button>` that only closes what is open; every other tab carrying an `href` is a real `<a>`
+(middle-click and "open in a new tab" have to keep working) — hence the `.tabbar-item[data-panel]`
+selector when wiring panel clicks, which skips them. The data page's own « Retour à la roue » link
+and its header theme button are both gone: the bar replaces the first, and Réglages the second —
+the header button showed its own state and did not follow the panel's switch. `donnees.html` loads
+`menu.css` as a blocking stylesheet (unlike `index.html`, which defers it) and declares
+`--tabbar-h` / `--tabbar-room` in `donnees.css`, which `body` spends as bottom padding so the fixed
+bar never covers the end of the document.
+
+**The game survives a change of page.** Drawn entries are removed from `ENTRIES` in memory, so
+walking over to Données used to put all 371 taxes back on the wheel — the strongest argument
+against having a second document at all. `js/game.js` keeps the drawn ids in **sessionStorage**
+(`GAME_KEY`): the game follows the tab, survives navigation and reload, and does not resurface a
+week later. `applyDrawnEntries()` re-applies it after every `setWheelData()` — before
+`buildColors()`, so the colours follow the list actually shown — and drops ids the dataset no
+longer knows. `js/game.js` is the only writer of that key. Réglages gained « Nouvelle partie »,
+which is now the only way to restart: it clears the key and dispatches `gameReset` on `window`
+(same decoupling as the settings events), which `js/app.js` picks up to rebuild the wheel. The
+button exists on the data page too, where nothing listens — the key is cleared all the same, and
+the wheel finds the game empty on the way back.
 
 **One colour for one series.** Every chart on the data page plots a single series, so they all take
 `--chart-1` and the section reads as one system; `colorIndex` stays at its default. Each chart used
@@ -319,7 +343,8 @@ separate module. Watch out for missing values: 222 of 371 entries have no `recet
 direction only between present values).
 
 **Local storage keys** (`SETTINGS_KEY` in `js/constants.js`,
-`larouedelaservitude_history` in `js/menu.js`) and the two IndexedDB databases
+`larouedelaservitude_history` in `js/menu.js`), the sessionStorage key of the running game
+(`GAME_KEY`, see `js/game.js`) and the two IndexedDB databases
 (`LaRoueDeLaServitude` for data, `LaRoueAudio` for decoded sounds) are user-facing state. Changing a
 key or bumping a DB version orphans existing users' data.
 

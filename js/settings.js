@@ -2,7 +2,7 @@
 //  settings.js — Lecture des réglages utilisateur
 // ===============================
 
-import { SETTINGS_KEY } from "./constants.js?v=055839fa";
+import { SETTINGS_KEY } from "./constants.js?v=2713e882";
 
 // Détermine si le son est activé. La source de vérité est l'attribut
 // data-sound-enabled sur <html> (posé par le menu), avec repli sur le

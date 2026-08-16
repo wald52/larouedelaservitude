@@ -4,23 +4,24 @@ import {
   getEntryById,
   formatEntryForDisplay,
   formatEntryAsText
-} from "./entries.js?v=fbd30d90";
+} from "./entries.js?v=5638691f";
 import {
   initAudio,
   unlockAudio,
   isSoundEnabled,
   playSpinClick,
   playWinSound
-} from "./audio.js?v=98016842";
+} from "./audio.js?v=f32973a2";
 import {
   initMenu,
   loadHistory,
   loadSettings,
   recordSpin,
   isInfiniteMode
-} from "./menu.js?v=95606d60";
+} from "./menu.js?v=07363a33";
 import { initServiceWorker } from "./sw-update.js?v=3cf9d32b";
 import { pushFocusTrap, popFocusTrap, hasFocusTrap } from "./focus-trap.js?v=0b34fd1c";
+import { loadDrawnIds, saveDrawnIds, clearDrawnIds } from "./game.js?v=e75363c7";
 
 function requireElement(id) {
   const element = document.getElementById(id);
@@ -94,6 +95,10 @@ function prefersReducedMotion() {
 let ENTRIES = [];
 let ENTRY_IDS = [];
 let ENTRY_COLORS = [];
+// Les identifiants déjà tirés, c'est-à-dire la partie en cours. Ils sont
+// conservés d'une page à l'autre par js/game.js : « Données » est un onglet de
+// l'application, y passer ne doit pas remettre les 371 taxes en jeu.
+const drawnIds = new Set(loadDrawnIds());
 let angle = -Math.PI / 2;
 let angularVelocity = 0;
 let targetVelocity = 0;
@@ -244,6 +249,56 @@ function syncInstallPromptVisibility() {
 function setWheelData(lightData) {
   ENTRIES = lightData.map((entry) => entry.nom);
   ENTRY_IDS = lightData.map((entry) => entry.id);
+}
+
+// Retire de la roue les taxes déjà sorties. Appelée après chaque garnissage —
+// au démarrage comme après une mise à jour des données — donc toujours avant
+// buildColors(), pour que les couleurs suivent la liste effectivement affichée.
+function applyDrawnEntries() {
+  // En mode sans fin, rien ne quitte jamais la roue : une partie conservée
+  // n'aurait aucun sens, et resterait à retirer au retour en mode normal.
+  if (isInfiniteMode()) {
+    forgetGame();
+    return;
+  }
+
+  if (drawnIds.size === 0) return;
+
+  const available = new Set(ENTRY_IDS);
+
+  for (let i = ENTRIES.length - 1; i >= 0; i--) {
+    if (drawnIds.has(ENTRY_IDS[i])) {
+      ENTRIES.splice(i, 1);
+      ENTRY_IDS.splice(i, 1);
+    }
+  }
+
+  // Une taxe supprimée du jeu de données resterait inscrite dans la partie
+  // pour toujours : on ne garde que ce que la roue connaît encore.
+  let pruned = false;
+  for (const id of drawnIds) {
+    if (!available.has(id)) {
+      drawnIds.delete(id);
+      pruned = true;
+    }
+  }
+  if (pruned) saveDrawnIds([...drawnIds]);
+
+  console.log("[APP] Partie reprise :", drawnIds.size, "taxes déjà tirées");
+}
+
+function rememberDrawn(id) {
+  if (id === null || id === undefined) return;
+
+  drawnIds.add(id);
+  saveDrawnIds([...drawnIds]);
+}
+
+function forgetGame() {
+  if (drawnIds.size === 0) return;
+
+  drawnIds.clear();
+  clearDrawnIds();
 }
 
 function registerCompletedSpin() {
@@ -796,6 +851,7 @@ async function initializeApp() {
 
     const lightData = await initWheel();
     setWheelData(lightData);
+    applyDrawnEntries();
 
     buildColors();
     buildWheelLayers();
@@ -831,20 +887,14 @@ async function initializeApp() {
 // entries.js sert le cache puis revalide contre le réseau ; quand la version
 // des données a changé, il émet `entriesUpdated` et la roue se reconstruit.
 
-function applyEntriesUpdate() {
-  pendingEntriesRefresh = false;
-
-  // Hors mode sans fin, les entrées déjà tirées ont été retirées de la roue :
-  // tout reconstruire annulerait la partie en cours. La prochaine visite
-  // prendra la mise à jour.
-  if (completedSpinCount > 0 && !isInfiniteMode()) {
-    console.log("[APP] Données mises à jour, reconstruction reportée à la prochaine visite");
-    return;
-  }
-
-  initWheel()
+// Recharge les données légères et regarnit la roue de fond en comble. La
+// partie en cours est réappliquée au passage, avant les couleurs et les
+// calques : rien de ce qui a déjà été tiré ne revient sur la roue.
+function rebuildWheel() {
+  return initWheel()
     .then((lightData) => {
       setWheelData(lightData);
+      applyDrawnEntries();
       ENTRY_COLORS.length = 0;
       buildColors();
       buildWheelLayers();
@@ -855,6 +905,20 @@ function applyEntriesUpdate() {
     .catch((error) => {
       console.warn("[APP] Reconstruction de la roue impossible:", error);
     });
+}
+
+function applyEntriesUpdate() {
+  pendingEntriesRefresh = false;
+
+  // Une partie est commencée : la roue changerait sous le joueur, avec des
+  // secteurs qui apparaissent et d'autres qui s'en vont. La mise à jour attend
+  // la prochaine partie.
+  if (drawnIds.size > 0 && !isInfiniteMode()) {
+    console.log("[APP] Données mises à jour, reconstruction reportée à la prochaine partie");
+    return;
+  }
+
+  rebuildWheel();
 }
 
 window.addEventListener("entriesUpdated", (event) => {
@@ -881,7 +945,7 @@ function spawnBillsWhenReady(event, count) {
   }
 
   if (!billsInitPromise) {
-    billsInitPromise = import("../bills.js?v=1416b415")
+    billsInitPromise = import("../bills.js?v=d86bcbd3")
       .then((mod) => {
         if (mod.initBills) {
           mod.initBills();
@@ -1214,6 +1278,7 @@ function finalizeSpinResult(idx) {
     // sa première ouverture, et syncCanvasSize() reconstruit alors les calques
     // une seule fois, avec la liste déjà à jour.
     if (!isInfiniteMode()) {
+      rememberDrawn(ENTRY_IDS[idx]);
       ENTRIES.splice(idx, 1);
       ENTRY_IDS.splice(idx, 1);
       ENTRY_COLORS.splice(idx, 1);
@@ -1630,6 +1695,16 @@ document.addEventListener("keydown", (e) => {
 
 window.addEventListener("infiniteModeChange", () => {
   updateWheelLabel();
+});
+
+// « Nouvelle partie » (Réglages) : toutes les taxes reviennent sur la roue.
+// L'événement passe par window comme les autres réglages — js/menu.js n'importe
+// pas js/app.js, et le bouton existe aussi sur la page « Données », d'où la
+// partie est effacée sans qu'aucune roue n'écoute.
+window.addEventListener("gameReset", () => {
+  forgetGame();
+  hideResult();
+  rebuildWheel();
 });
 
 /* =======================
