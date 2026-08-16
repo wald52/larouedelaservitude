@@ -14,6 +14,7 @@
     <link rel="manifest" href="site.webmanifest" />
 
     <link rel="stylesheet" href="buttons.css?v=8e4cf8f9" />
+    <link rel="stylesheet" href="logo.css?v=fdd8c8b3" />
     <link rel="stylesheet" href="donnees.css?v=e704b99d" />
 
     <script>
@@ -45,6 +46,25 @@
           </p>
         </div>
         <div class="page-header__actions">
+          <!-- Même pastille qu'en page d'accueil (logo.css) : ici le coin
+               haut-droit est celui de l'en-tête, pas de la fenêtre. -->
+          <a
+            class="site-logo"
+            href="https://linktr.ee/lemodelesocialfrancais"
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Le Modèle Social Français — Voir mon Linktree"
+          >
+            <img
+              class="site-logo__img"
+              src="images/le-modele-social-francais.png"
+              alt="Le Modèle Social Français"
+              width="48"
+              height="48"
+              decoding="async"
+            />
+            <span class="site-logo__tip" aria-hidden="true">🔗 Mon Linktree</span>
+          </a>
           <button id="themeToggle" class="btn btn-secondary" type="button" aria-pressed="false">
             🌙 Thème sombre
           </button>

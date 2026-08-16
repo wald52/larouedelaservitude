@@ -66,6 +66,7 @@ const UNSTAMPED = [
   "data/entries-light.json",
   "data/entries-full.json",
   "images/center3.avif",
+  "images/le-modele-social-francais.png",
   "audio/wheel-spin2.mp3",
   "audio/coin4.mp3",
   "audio/frottement-papier2.mp3",
