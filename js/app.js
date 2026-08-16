@@ -38,6 +38,9 @@ const installPromptBanner = document.getElementById("installPrompt");
 const installPromptAction = document.getElementById("installPromptAction");
 const installPromptClose = document.getElementById("installPromptClose");
 const resultCard = requireElement("resultCard");
+// La définition des prélèvements obligatoires, qui occupe la place de la carte
+// tant qu'aucun résultat n'y est affiché (voir setResultOpen).
+const introDef = requireElement("introDef");
 const resultText = requireElement("resultText");
 const resultIntro = requireElement("resultIntro");
 // Seul bloc défilant de la carte : le cadre et les actions restent entiers.
@@ -278,6 +281,10 @@ function closeModal(container) {
 function setResultOpen(open) {
   if (isResultVisible() === open) return;
   resultCard.hidden = !open;
+  // Les deux surfaces se partagent la hauteur réservée par --card-room, et ne
+  // s'affichent donc jamais ensemble : la définition tient la place jusqu'au
+  // premier tirage, et la reprend dès que la carte est refermée.
+  introDef.hidden = open;
 }
 
 function hideResult() {

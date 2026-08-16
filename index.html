@@ -520,6 +520,94 @@
          roue sont à leur place et à leur taille définitives dès le premier
          rendu, la carte occupant la hauteur qui lui était déjà réservée. */
       /* ===============================
+   DÉFINITION D'ATTENTE
+   ===============================
+
+   La place de la carte de résultat est réservée dès le premier rendu
+   (--card-room) : avant le premier tirage, elle était vide. Elle porte
+   désormais la définition des prélèvements obligatoires, citée mot pour mot de
+   l'Insee et sourcée — la page dit ainsi de quoi elle parle avant même d'avoir
+   tourné.
+
+   Les deux surfaces occupent la même place, jamais en même temps : la
+   définition s'efface quand un résultat paraît et revient quand il est fermé
+   (setResultOpen, js/app.js). Elle n'ajoute donc pas un pixel à la colonne, et
+   la roue garde exactement la taille qu'elle avait.
+
+   Même structure que la carte : seul le texte défile, sur un téléphone court
+   où la citation dépasserait la hauteur réservée. */
+      .intro-def {
+        width: 100%;
+        max-width: 560px;
+        max-height: 52svh;
+        box-sizing: border-box;
+        padding: 12px 14px;
+        border: 1px solid var(--ring);
+        border-radius: 12px;
+        background: var(--surface);
+        text-align: left;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        flex: 0 1 auto;
+        min-height: 0;
+      }
+
+      /* Spécificité supérieure à `.intro-def` : sans elle, `display` reprendrait
+         le dessus sur le comportement par défaut de [hidden]. */
+      .intro-def[hidden] {
+        display: none;
+      }
+
+      /* Le libellé de la rubrique, dans la même graisse que les libellés de la
+         carte de résultat : c'est une étiquette, pas un second titre de page. */
+      .intro-def__title {
+        margin: 0;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--legend);
+        flex-shrink: 0;
+      }
+
+      /* La citation, seule partie qui défile — même raison et même réglage que
+         `.result__scroll` : `body` porte `touch-action: none`, sans cette
+         exception le bloc ne défilerait pas au doigt, et l'ascenseur reste
+         masqué pour ne pas barrer la fiche d'un trait gris. */
+      .intro-def__quote {
+        margin: 0;
+        min-height: 0;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        touch-action: pan-y;
+        scrollbar-width: none;
+        font-family: var(--serif);
+        font-size: clamp(14px, 3.5vw, 17px);
+        line-height: 1.45;
+      }
+
+      .intro-def__quote::-webkit-scrollbar {
+        display: none;
+      }
+
+      /* La source est ce qui rend la définition opposable : elle reste visible,
+         hors de la zone défilante, et le lien mène à la fiche de l'Insee. */
+      .intro-def__source {
+        margin: 0;
+        padding-top: 8px;
+        border-top: 1px solid var(--ring);
+        font-size: 12px;
+        color: var(--legend);
+        flex-shrink: 0;
+      }
+
+      .intro-def__source a {
+        color: inherit;
+        text-decoration: underline;
+      }
+
+      /* ===============================
    CARTE DE RÉSULTAT
    ===============================
 
@@ -946,6 +1034,37 @@
             Tourner la roue
           </button>
         </div>
+        <!-- La définition, à la place que la carte de résultat prendra : la
+     colonne réserve cette hauteur dès le premier rendu, et elle était vide
+     tant qu'aucun tirage n'avait eu lieu. La citation est reprise mot pour
+     mot de la définition de l'Insee (fiche c1571, mise à jour le 30 mai
+     2024), `cite` et le lien portant la source — c'est ce qui la rend
+     opposable. Elle s'efface le temps d'un résultat (setResultOpen,
+     js/app.js). -->
+        <aside
+          id="introDef"
+          class="intro-def"
+          aria-label="Définition des prélèvements obligatoires"
+        >
+          <h2 class="intro-def__title">Prélèvements obligatoires</h2>
+          <blockquote
+            class="intro-def__quote"
+            cite="https://www.insee.fr/fr/metadonnees/definition/c1571"
+          >
+            « Les prélèvements obligatoires sont les impôts et cotisations sociales effectives reçus
+            par les administrations publiques et les institutions européennes sans aucune
+            contrepartie directe et immédiate. »
+          </blockquote>
+          <p class="intro-def__source">
+            Source :
+            <a
+              href="https://www.insee.fr/fr/metadonnees/definition/c1571"
+              target="_blank"
+              rel="noopener noreferrer"
+              >Insee, définition officielle</a
+            >
+          </p>
+        </aside>
         <!-- Le résultat du tirage, dans le flux, sous la roue. `hidden` tant
      qu'aucun tirage n'a eu lieu ; sa hauteur lui est réservée d'avance
      (--card-room), la roue ne bouge donc pas quand il paraît. -->
@@ -1223,6 +1342,6 @@
       </form>
     </div>
 
-    <script type="module" src="./js/app.js?v=83118b0e"></script>
+    <script type="module" src="./js/app.js?v=52a6b8e5"></script>
   </body>
 </html>
