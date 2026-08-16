@@ -1,28 +1,29 @@
 // ===============================
-//  data-explorer.js — Page « Données & analyse » (donnees.html)
+//  data-explorer.js — Vue « Données & analyse »
 // ===============================
 // La liste intégrale des 371 prélèvements obligatoires, avec les outils qu'on
 // attend d'un jeu de données — filtres combinables, tri multi-critères,
 // statistiques descriptives, graphiques et export.
 //
+// C'était un second document ; c'est maintenant une vue d'index.html, et ce
+// module n'est plus le point d'entrée d'une page : js/app.js l'importe
+// dynamiquement à la première ouverture de l'onglet « Données » et appelle
+// initDataExplorer(). Le démarrage de la roue ne paie donc ni le tableau, ni
+// les statistiques, ni les graphiques. Tout ce qui appartient à la page —
+// la barre d'onglets, les réglages, le service worker — reste chez app.js.
+//
 // Principes repris de l'application principale :
 // - les données viennent de js/entries.js (cache IndexedDB puis revalidation
-//   réseau sur le champ `version`), donc la page fonctionne hors ligne et se
+//   réseau sur le champ `version`), donc la vue fonctionne hors ligne et se
 //   met à jour toute seule via l'événement `entriesUpdated` ;
-// - la barre d'onglets du bas et ses panneaux (Historique, Réglages) sont ceux
-//   de la roue, construits par js/menu.js : « Données » est un onglet de
-//   l'application, on y arrive et on en repart par la même barre ;
-// - les réglages (thème) passent donc eux aussi par js/menu.js, seule source de
-//   vérité du localStorage, et s'appliquent par attribut sur <html> ;
 // - aucun calcul statistique n'est écrit ici : tout vient de js/stats.js, qui
 //   est testé sous Node.
 //
-// L'état de la vue (recherche, filtres, tri) est reflété dans l'URL : une
-// sélection se partage ou se met en favori telle quelle.
+// L'état de la vue (recherche, filtres, tri) est reflété dans l'URL, à côté du
+// `vue=donnees` qui dit quelle vue est ouverte : une sélection se partage ou se
+// met en favori telle quelle.
 
-import { loadFullData, formatRecette, getDataVersion } from "./entries.js?v=5638691f";
-import { initMenu } from "./menu.js?v=07363a33";
-import { initServiceWorker } from "./sw-update.js?v=3cf9d32b";
+import { loadFullData, formatRecette, getDataVersion } from "./entries.js?v=c56272d2";
 import {
   describe,
   gini,
@@ -31,7 +32,7 @@ import {
   groupByPeriod,
   magnitudeBuckets,
   finiteNumbers
-} from "./stats.js?v=a54f91d1";
+} from "./stats.js?v=4f243f37";
 import {
   renderBarChart,
   renderHorizontalBarChart,
@@ -400,6 +401,10 @@ function parseSortParam(value) {
 function writeStateToUrl() {
   const params = new URLSearchParams();
 
+  // La vue ouverte fait partie de l'adresse : sans elle, un lien vers une
+  // sélection filtrée rouvrirait la roue (voir openView dans js/menu.js).
+  params.set("vue", "donnees");
+
   if (state.search) params.set("q", state.search);
   if (state.recette !== "all") params.set("recette", state.recette);
   if (state.annee !== "all") params.set("annee", state.annee);
@@ -412,9 +417,9 @@ function writeStateToUrl() {
   const sort = state.sort.map((criterion) => `${criterion.key}:${criterion.dir}`).join(",");
   if (sort) params.set("tri", sort);
 
-  const query = params.toString();
-  const url = query ? `${window.location.pathname}?${query}` : window.location.pathname;
-  window.history.replaceState(null, "", url);
+  // L'état d'historique garde la vue : il est relu tel quel par le gestionnaire
+  // de `popstate` de js/menu.js quand on revient en arrière.
+  window.history.replaceState({ view: "donnees" }, "", `${window.location.pathname}?${params}`);
 }
 
 // ===============================
@@ -1007,9 +1012,10 @@ function attachEvents() {
   });
 
   document.addEventListener("keydown", (event) => {
-    // Un panneau de la barre d'onglets est ouvert : il est au-dessus de la
-    // page, les raccourcis du tableau ne le concernent pas. C'est js/menu.js
-    // qui répond à Échap dans ce cas.
+    // Ce module reste chargé une fois la vue refermée : ses raccourcis ne
+    // valent que tant qu'elle est à l'écran. Un panneau ouvert la recouvre, et
+    // c'est js/menu.js qui répond à Échap dans ce cas.
+    if (document.documentElement.dataset.view !== "donnees") return;
     if (document.documentElement.classList.contains("menu-open")) return;
 
     if (event.key === "Escape" && !elements.detail.hidden) {
@@ -1044,7 +1050,7 @@ function attachEvents() {
 //  Démarrage
 // ===============================
 
-async function init() {
+export async function initDataExplorer() {
   elements.search = requireElement("search");
   elements.filterRecette = requireElement("filterRecette");
   elements.filterAnnee = requireElement("filterAnnee");
@@ -1085,11 +1091,6 @@ async function init() {
   // pas défaire son choix.
   elements.filtersPanel.open = window.matchMedia("(min-width: 760px)").matches;
 
-  // Charge les réglages (thème compris, appliqué sur <html>) et construit la
-  // barre du bas : ici « Données » est l'onglet courant, et « Accueil » le lien
-  // qui ramène à la roue.
-  initMenu({ page: "donnees" });
-
   // Le préréglage de tri est déclaré ici plutôt que dans le HTML : la liste des
   // tris disponibles appartient au code, pas au gabarit.
   for (const [value, preset] of Object.entries(SORT_PRESETS)) {
@@ -1117,7 +1118,7 @@ async function init() {
 
   showDataVersion();
   refresh({ updateUrl: false });
-  console.log("[DATA] Explorateur prêt :", state.rows.length, "prélèvements");
+  console.log("[DATA] Vue Données prête :", state.rows.length, "prélèvements");
 }
 
 // La version affichée est celle du jeu de données, pas celle de l'application :
@@ -1128,10 +1129,6 @@ function showDataVersion() {
   elements.dataVersion.textContent = state.dataVersion ? `Jeu de données ${state.dataVersion}` : "";
 }
 
-init();
-
-window.addEventListener("load", () => {
-  // Même service worker que la roue : la page d'analyse est pré-cachée et donc
-  // consultable hors ligne. Il ne recharge jamais la page.
-  initServiceWorker();
-});
+// Aucun appel au chargement : c'est js/app.js qui décide du moment, à la
+// première ouverture de l'onglet « Données ». Le service worker, lui, est
+// enregistré une fois pour la page — la vue est pré-cachée avec elle.

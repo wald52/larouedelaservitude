@@ -3,8 +3,8 @@
 // eventOrCoords can be an Event (mousedown/touchstart) or {x:.., y:..}
 
 // Import du module audio pour le son offline-first
-import { isSoundEnabled } from "./js/settings.js?v=d7e3f5e3";
-import { BASE_PATH } from "./js/constants.js?v=2713e882";
+import { isSoundEnabled } from "./js/settings.js?v=96974e37";
+import { BASE_PATH } from "./js/constants.js?v=b8755637";
 
 // Chemin du son de repli. Il était écrit en dur avec le sous-dossier de GitHub
 // Pages (« /larouedelaservitude/audio/… ») : sur Netlify comme en local, chaque
@@ -21,7 +21,7 @@ export let clearBills = null;
 // Fonction d'initialisation (appelée par index.html)
 export function initBills() {
   // Import dynamique du module audio
-  import("./js/audio.js?v=f32973a2")
+  import("./js/audio.js?v=3679b476")
     .then(({ playBillSound }) => {
       playBillAudio = playBillSound;
       console.log("[BILLS] Module audio chargé pour les sons de billets");

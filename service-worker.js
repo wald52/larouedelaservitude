@@ -43,26 +43,25 @@
  * ℹ️ FONTS : aucune — polices système uniquement.
  */
 /* --- généré par scripts/stamp-assets.mjs — ne pas éditer à la main --- */
-const VERSION = "eebfe25a";
+const VERSION = "41f3fe23";
 const ASSETS = [
   "./",
   "./index.html",
-  "./donnees.html",
   "./bills.css?v=3274a064",
-  "./bills.js?v=d86bcbd3",
+  "./bills.js?v=16598baa",
   "./buttons.css?v=8e4cf8f9",
-  "./donnees.css?v=4a3d61a8",
-  "./js/app.js?v=1da0ed99",
-  "./js/audio.js?v=f32973a2",
+  "./donnees.css?v=7673894b",
+  "./js/app.js?v=5e4d4398",
+  "./js/audio.js?v=3679b476",
   "./js/charts.js?v=9c0905cd",
-  "./js/constants.js?v=2713e882",
-  "./js/data-explorer.js?v=0d2c7e6b",
-  "./js/entries.js?v=5638691f",
+  "./js/constants.js?v=b8755637",
+  "./js/data-explorer.js?v=2017c25f",
+  "./js/entries.js?v=c56272d2",
   "./js/focus-trap.js?v=0b34fd1c",
-  "./js/game.js?v=e75363c7",
-  "./js/menu.js?v=07363a33",
-  "./js/settings.js?v=d7e3f5e3",
-  "./js/stats.js?v=a54f91d1",
+  "./js/game.js?v=73adbd70",
+  "./js/menu.js?v=9baebd62",
+  "./js/settings.js?v=96974e37",
+  "./js/stats.js?v=4f243f37",
   "./js/sw-update.js?v=3cf9d32b",
   "./menu.css?v=90453bf1",
   "./data/entries-light.json",
@@ -94,18 +93,20 @@ const PRECACHE_RETRIES = 2;
 
 const BASE = self.location.pathname.replace(/\/[^/]*$/, "");
 
-// Une page, une entrée de cache : `/`, `/index`, `/index.html` désignent la même
-// coquille, tout comme `/donnees` et `/donnees.html` (certains hébergeurs
-// servent les pages sans leur extension). Sans cette table, la même page
-// pourrait exister en deux copies selon l'URL empruntée.
+// Une page, une entrée de cache : `/`, `/index` et `/index.html` désignent la
+// même coquille (certains hébergeurs servent les pages sans leur extension), et
+// la chaîne de requête n'y change rien — `?vue=donnees` ouvre une vue de cette
+// page, pas une autre page. Sans cette table, la même page pourrait exister en
+// plusieurs copies selon l'URL empruntée.
+//
+// `/donnees` et `/donnees.html` y figuraient tant que les données étaient un
+// second document. Elles ne sont plus qu'une vue : une adresse mise en favori
+// du temps de l'ancienne page ne répond plus, l'onglet « Données » la remplace.
 const INDEX_KEY = "./index.html";
-const DONNEES_KEY = "./donnees.html";
 const PAGE_KEYS_BY_PATH = new Map([
   [`${BASE}/`, INDEX_KEY],
   [`${BASE}/index`, INDEX_KEY],
-  [`${BASE}/index.html`, INDEX_KEY],
-  [`${BASE}/donnees`, DONNEES_KEY],
-  [`${BASE}/donnees.html`, DONNEES_KEY]
+  [`${BASE}/index.html`, INDEX_KEY]
 ]);
 
 /* =====================================================

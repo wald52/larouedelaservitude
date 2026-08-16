@@ -5,8 +5,9 @@ Application web ludique et installable (PWA) qui présente les taxes et prélèv
 ## Structure des fichiers importants
 
 - `index.html` : page principale de l'application. Elle déclare les métadonnées PWA/sociales, charge les feuilles de style, les scripts de la roue et le service worker, puis contient l'interface utilisateur.
-- `donnees.html` / `donnees.css` : page « Données & analyse » (mode avancé), décrite plus bas.
-- `js/data-explorer.js` : moteur de cette page (filtres, tri multi-critères, export, état dans l'URL). Il s'appuie sur `js/stats.js` (statistiques descriptives, sans dépendance au DOM, testé par `tests/stats.test.mjs`) et `js/charts.js` (graphiques SVG, sans bibliothèque externe).
+- `donnees.css` : habillage de la vue « Données & analyse », décrite plus bas. C'est une vue
+  d'`index.html`, plus une page à part.
+- `js/data-explorer.js` : moteur de cette vue (filtres, tri multi-critères, export, état dans l'URL). Il s'appuie sur `js/stats.js` (statistiques descriptives, sans dépendance au DOM, testé par `tests/stats.test.mjs`) et `js/charts.js` (graphiques SVG, sans bibliothèque externe).
 - `js/entries.js` : module de chargement des données. Il récupère d'abord `data/entries-light.json` pour afficher rapidement la roue, puis charge `data/entries-full.json` pour les détails. Il utilise IndexedDB comme cache local.
 - `js/audio.js` : module audio offline-first. Il prépare les sons de rotation/résultat, les met en cache IndexedDB et respecte le réglage utilisateur d'activation du son.
 - `js/menu.js` : module de gestion du menu latéral, des panneaux de navigation, de l'historique, des paramètres et des interactions associées.
@@ -16,12 +17,14 @@ Application web ludique et installable (PWA) qui présente les taxes et prélèv
   - `sharePage.js` génère à la volée la page HTML Open Graph/Twitter Card à partir des paramètres fournis par le flux de partage.
   - `sendFeedback.js` crée une discussion GitHub à partir des retours envoyés par les utilisateurs.
 
-## La page « Données & analyse »
+## La vue « Données & analyse »
 
-La roue reste un jeu. Les visiteurs qui veulent les chiffres disposent d'une page dédiée,
-`donnees.html`, accessible depuis **Menu → Données & analyse**. Rien ne la conditionne : c'est le
-fait d'être une page séparée, et non un réglage, qui garde le tableur hors du chemin de qui vient
-seulement lancer la roue.
+La roue reste un jeu. Les visiteurs qui veulent les chiffres ouvrent l'onglet **Données** de la
+barre du bas : la roue s'efface, le tableau paraît, et la barre reste là pour revenir. C'est une
+vue de la même page — il n'y a qu'un document, donc aucune navigation, et la partie en cours n'est
+jamais remise à zéro en allant voir les chiffres. Rien ne conditionne l'accès : c'est le fait
+d'être une vue qu'on ouvre, et non un réglage caché, qui garde le tableur hors du chemin de qui
+vient seulement lancer la roue.
 
 Elle contient :
 
@@ -38,12 +41,14 @@ Elle contient :
   recette selon l'année, classement des plus gros contributeurs) ;
 - l'export de la sélection en CSV (séparateur `;` et BOM UTF-8, pour Excel en français) ou en JSON,
   ainsi que la fiche détaillée d'un prélèvement avec son JSON brut ;
-- un état de vue entièrement contenu dans l'URL (`?q=…&recette=with&rmin=1000&tri=annee:desc,…`) :
-  une sélection se partage ou se met en favori telle quelle.
+- un état entièrement contenu dans l'URL
+  (`?vue=donnees&q=…&recette=with&rmin=1000&tri=annee:desc,…`) : une sélection se partage ou se met
+  en favori telle quelle, et le lien rouvre directement la vue.
 
-La page consomme les mêmes fichiers de données que la roue, via `js/entries.js` : elle est donc
+Elle consomme les mêmes fichiers de données que la roue, via `js/entries.js` : elle est donc
 pré-cachée, utilisable hors ligne et mise à jour automatiquement quand la `version` des données
-change.
+change. Son module n'est chargé qu'à la première ouverture de l'onglet : le démarrage de la roue ne
+paie ni le tableau, ni les statistiques, ni les graphiques.
 
 ## Prérequis de déploiement Netlify
 

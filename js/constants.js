@@ -12,9 +12,9 @@ export const GAME_KEY = "larouedelaservitude_game";
 // ex. GitHub Pages).
 //
 // Il est déduit de l'URL de ce module (`<base>/js/constants.js`) et non de
-// celle de la page : l'application compte deux documents (index.html et
-// donnees.html), servis en outre aussi bien avec que sans extension selon
-// l'hébergeur. Partir de la page obligerait à connaître toutes ces formes ;
+// celle de la page : celle-ci est servie aussi bien avec que sans son extension
+// selon l'hébergeur, et porte en outre une chaîne de requête (la vue ouverte,
+// les filtres). Partir de la page obligerait à connaître toutes ces formes ;
 // partir du module donne la racine du site à coup sûr.
 function resolveBasePath() {
   const modulePath = new URL(import.meta.url).pathname;

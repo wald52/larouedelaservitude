@@ -56,7 +56,7 @@ function scanHtml(file) {
   while ((match = moduleScriptRe.exec(source))) scanJavaScript(file, match[1]);
 }
 
-const htmlPages = ["index.html", "donnees.html"];
+const htmlPages = ["index.html"];
 
 walk(root);
 for (const file of jsFiles) scanJavaScript(file, readFileSync(file, "utf8"));

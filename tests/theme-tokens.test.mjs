@@ -20,9 +20,11 @@ const ROOT = new URL("../", import.meta.url);
 
 // Les jetons d'une page peuvent être répartis sur plusieurs feuilles : on les
 // met donc en commun page par page, comme le navigateur le fait.
+// Il n'y a plus qu'une page : donnees.css habille désormais une vue de
+// index.html, et ne déclare plus aucun jeton — ce que ce test vérifie aussi,
+// puisque le moindre `:root` qui y réapparaîtrait serait jugé avec les autres.
 const PAGES = {
-  "index.html": ["index.html", "buttons.css", "menu.css", "bills.css"],
-  "donnees.html": ["donnees.html", "donnees.css", "buttons.css"]
+  "index.html": ["index.html", "buttons.css", "menu.css", "bills.css", "donnees.css"]
 };
 
 /** CSS d'un fichier : son contenu s'il est déjà une feuille, ses <style> sinon. */

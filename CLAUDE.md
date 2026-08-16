@@ -21,9 +21,10 @@ _before_ the push, not after a review round. Same for the §10 checklist — it 
 - **Static site, no build step.** `index.html` is served as-is and loads `./js/app.js` as a native
   ES module. There is no bundler, no transpiler, no framework, no TypeScript. What you write is
   what the browser runs.
-- **Two pages.** `index.html` is the wheel (the game); `donnees.html` is the « Données & analyse »
-  page of the advanced mode (§4), same data, same service worker, no game. Anything that "the app"
-  does now has to hold for both.
+- **One page, two views.** `index.html` holds both the wheel (the game) and the « Données &
+  analyse » view (§4) — same data, same shell, no navigation between them. The bottom tab bar
+  swaps them by writing `data-view` on `<html>`. `donnees.html` was a second document until the
+  merge; it is gone, and so is the whole class of bugs that came with leaving the page.
 - **No dev server script.** Serve the repo root over HTTP to test (`python3 -m http.server 8000`
   or `npx serve .`). Opening `index.html` via `file://` breaks ES modules, `fetch` and the service
   worker.
@@ -66,8 +67,7 @@ unformatted: that is how the old backlog started.
 ## 3. Layout
 
 ```
-index.html              Wheel page: PWA/social meta, all app-shell CSS inline, DOM, loads js/app.js
-donnees.html            « Données & analyse » page (advanced mode), loads js/data-explorer.js
+index.html              The page: PWA/social meta, all app-shell CSS inline, both views' DOM, js/app.js
 js/app.js               Wheel rendering, physics, spin cadence, result card, sharing, SW registration
 js/entries.js           Two-tier data loading (light → full) + IndexedDB cache
 js/audio.js             WebAudio, offline-first sound decoding + IndexedDB cache
@@ -77,13 +77,13 @@ js/sw-update.js         SW registration, update checks, served version (see §7)
 js/focus-trap.js        Focus stack shared by the modals (app.js) and the menu surfaces (menu.js)
 js/constants.js         SETTINGS_KEY, GAME_KEY and BASE_PATH — shared by front-end modules
 js/game.js              The running game (ids already drawn) in sessionStorage — no DOM
-js/data-explorer.js     Table, filters, multi-key sort, export, URL state for donnees.html
+js/data-explorer.js     Table, filters, multi-key sort, export, URL state of the Données view
 js/stats.js             Pure descriptive statistics (no DOM) — the only unit-tested front-end module
 js/charts.js            Hand-written SVG charts, themed through CSS variables, no dependency
 bills.js                Banknote particle effect (repo root, lazy-imported by app.js)
-buttons.css             Shared button/switch system — the only place buttons are styled (both pages)
+buttons.css             Shared button/switch system — the only place buttons are styled
 bills.css / menu.css    Styles for those two features (all other index.html CSS is inline)
-donnees.css             Styles + theme tokens for donnees.html (a separate document)
+donnees.css             Styles of the « Données » view — no tokens, no global rule (§4)
 service-worker.js       PWA atomic precache; network-first documents, cache-first stamps (§7)
 data/entries-*.json     The data (see §5)
 netlify/functions/      Serverless endpoints (see §6)
@@ -95,19 +95,20 @@ shares/                 Runtime artifacts only; share-*.html is gitignored
 ### Module graph
 
 `index.html` → `js/app.js` → `js/entries.js`, `js/audio.js`, `js/menu.js`, `js/sw-update.js`
-`donnees.html` → `js/data-explorer.js` → `js/entries.js`, `js/menu.js`, `js/sw-update.js`,
-`js/stats.js`, `js/charts.js`
+`js/app.js` → `import('./data-explorer.js')` (dynamic, on the first « Données » tab) →
+`js/entries.js`, `js/stats.js`, `js/charts.js`
 `js/audio.js` → `js/settings.js` → `js/constants.js` ← `js/entries.js`; `js/menu.js` → `js/sw-update.js`
 `js/app.js`, `js/menu.js` → `js/focus-trap.js` (piled surfaces: share sheet, feedback form, panels)
 `js/app.js`, `js/menu.js` → `js/game.js` → `js/constants.js`
 `js/app.js` → `import('../bills.js')` (dynamic, on first spin) → `js/settings.js`, and
 `bills.js` → `import('./js/audio.js')` (dynamic, inside `initBills()`)
 
-Two documents, one shell — and it really is one shell: both pages call `initMenu()`, which builds
-the same bottom tab bar and the same panels; the only difference is which tab is the current page
-(`initMenu({ page: "donnees" })`). All `localStorage` writes therefore stay in `js/menu.js`.
-`BASE_PATH` is derived from `import.meta.url` in `js/constants.js` precisely because there is now
-more than one page — deriving it from `location.pathname` would resolve `/donnees.html/data/…`.
+One document, one shell. `js/app.js` is the page: it registers the service worker, calls
+`initMenu()`, and owns the view switch — `js/data-explorer.js` is no longer an entry point, it
+exports `initDataExplorer()` and is imported on the first opening of the tab. All `localStorage`
+writes stay in `js/menu.js`. `BASE_PATH` is still derived from `import.meta.url` in
+`js/constants.js` rather than from `location.pathname`: the page is served both with and without
+its extension depending on the host, and the query string now carries a view.
 
 `bills.js` lives at the repo root but imports from `./js/`. Keep it there — `service-worker.js`,
 `eslint.config.js` and the dynamic import in `app.js` all reference that path.
@@ -292,36 +293,65 @@ The revalidation fetch appends `?fresh=<timestamp>`. That is load-bearing: `inde
 without touching the network — `{cache: 'reload'}` alone does not defeat it. The service worker
 skips any request carrying `fresh` so those URLs never enter the cache.
 
-**The data page is one of the four tabs, and nothing gates it.** There is no setting behind it: an
+**The data view is one of the four tabs, and nothing gates it.** There is no setting behind it: an
 earlier version hid it behind an `advancedMode` toggle in Réglages, and that was removed because a
-feature nobody can find is a feature nobody uses. Keep the tab visible; the separation between game
-and data is the _page_, not a switch.
+feature nobody can find is a feature nobody uses. Keep the tab visible.
 
-**Which is why both pages carry the same bar.** A tab is where you are, not a way out: `donnees.html`
-calls `initMenu({ page: "donnees" })` and gets the identical four tabs, with « Données » marked
-`aria-current` and « Accueil » as the link home. A tab whose `page` is the current one is a
-`<button>` that only closes what is open; every other tab carrying an `href` is a real `<a>`
-(middle-click and "open in a new tab" have to keep working) — hence the `.tabbar-item[data-panel]`
-selector when wiring panel clicks, which skips them. The data page's own « Retour à la roue » link
-and its header theme button are both gone: the bar replaces the first, and Réglages the second —
-the header button showed its own state and did not follow the panel's switch. `donnees.html` loads
-`menu.css` as a blocking stylesheet (unlike `index.html`, which defers it) and declares
-`--tabbar-h` / `--tabbar-room` in `donnees.css`, which `body` spends as bottom padding so the fixed
-bar never covers the end of the document.
+**It is a view, not a page — that is the whole point.** It lived in `donnees.html` for a while, and
+the separate document cost more than it was worth: leaving `index.html` threw away everything the
+wheel held in memory. Persisting the game across the navigation papered over it; merging removes
+it. `js/menu.js` now owns two natures of tab — `view` (Accueil, Données) shows one of the page's
+two views, `panel` (Historique, Réglages) opens a bottom sheet over whichever view is showing. All
+four are `<button>`s: no tab navigates any more.
 
-**The game survives a change of page.** Drawn entries are removed from `ENTRIES` in memory, so
-walking over to Données used to put all 371 taxes back on the wheel — the strongest argument
-against having a second document at all. `js/game.js` keeps the drawn ids in **sessionStorage**
-(`GAME_KEY`): the game follows the tab, survives navigation and reload, and does not resurface a
-week later. `applyDrawnEntries()` re-applies it after every `setWheelData()` — before
-`buildColors()`, so the colours follow the list actually shown — and drops ids the dataset no
-longer knows. `js/game.js` is the only writer of that key. Réglages gained « Nouvelle partie »,
-which is now the only way to restart: it clears the key and dispatches `gameReset` on `window`
-(same decoupling as the settings events), which `js/app.js` picks up to rebuild the wheel. The
-button exists on the data page too, where nothing listens — the key is cleared all the same, and
-the wheel finds the game empty on the way back.
+**What shows a view is `data-view` on `<html>`**, written by `openView()` and read by two rules in
+`index.html`'s **blocking** inline CSS — blocking because `donnees.css` is deferred, and the view
+would otherwise flash under the wheel on first paint. `.wrap` and the install banner are hidden
+when the data view is up; the view itself is `position: fixed`, stops above the tab bar, and
+scrolls **in its own box**: the document never scrolls here (`body` is fixed, `touch-action:
+none`), exactly as `.result__scroll` does inside the result card. Modules that care listen for
+`viewChange` on `window` — the same decoupling as the settings events, so `js/menu.js` still
+imports nothing from `js/app.js`.
 
-**One colour for one series.** Every chart on the data page plots a single series, so they all take
+**The view is in the URL (`?vue=donnees`), and so is the Back button.** `openView()` pushes a
+history entry, `popstate` restores one, and `writeStateToUrl()` in `js/data-explorer.js` keeps
+`vue` at the head of its own filter params — a shared or bookmarked link reopens the selection on
+the right view. `viewFromUrl()` is read once at startup by `js/app.js`, before the first draw.
+What was lost in the merge: « Données » was a real `<a>`, so middle-click and "open in a new tab"
+worked on it, and `/donnees.html` was a bookmarkable address. The tab is a button now, and the
+old address 404s — `?vue=donnees` replaces it.
+
+**Nothing of the data view is loaded until it is opened.** `js/app.js` imports
+`js/data-explorer.js` dynamically on the first `viewChange` and calls `initDataExplorer()`; the
+module no longer runs anything at import time, and no longer touches the menu or the service
+worker. Its keyboard shortcuts (`Échap`, `/`) check `data-view` before acting, since the module
+stays loaded once the view is closed. Coming back to the wheel calls `syncCanvasSize(true)`: the
+canvas had no dimensions while it was `display: none`, and the window may have been resized
+meanwhile.
+
+**One document means one set of tokens.** `donnees.css` used to carry its own `:root` /
+`:root[data-theme="dark"]` blocks, a copy of `index.html`'s with the table and chart tokens added.
+In one document those would fight, so the extra tokens (`--muted`, `--accent`, `--row-*`,
+`--code-bg`, `--card-shadow`, `--chart-*`) moved into `index.html`'s `:root` and dark block, and
+`donnees.css` declares none — `tests/theme-tokens.test.mjs` now reads it as part of the page and
+would catch any that came back. Same for global rules: the sheet's `*`, `html`, `body`,
+`:focus-visible`, `a` and `prefers-reduced-motion` rules are gone or scoped under `.data-view`,
+because index.html's own now apply to it. **The trap runs the other way too**: a bare element
+selector in `index.html` reaches the data view. That is how the view's `<h1>` came out in uppercase
+serif — the masthead's rule was written `h1 { … }`. It is `.masthead h1` now; keep new element
+rules scoped.
+
+**The game survives a reload.** Drawn entries are removed from `ENTRIES` in memory, and reloading
+is exactly what the visitor is asked to do to get a new version (§7) — so an update used to cost
+them their game. `js/game.js` keeps the drawn ids in **sessionStorage** (`GAME_KEY`): the game
+belongs to the browser tab, survives a reload, and does not resurface a week later.
+`applyDrawnEntries()` re-applies it after every `setWheelData()` — before `buildColors()`, so the
+colours follow the list actually shown — and drops ids the dataset no longer knows. `js/game.js` is
+the only writer of that key. Réglages gained « Nouvelle partie », the only way to restart: it
+clears the key and dispatches `gameReset` on `window`, which `js/app.js` picks up to rebuild the
+wheel.
+
+**One colour for one series.** Every chart on the data view plots a single series, so they all take
 `--chart-1` and the section reads as one system; `colorIndex` stays at its default. Each chart used
 to pick a different slot, which put a blue histogram next to a green curve, an orange histogram and
 a fuchsia ranking. The six `--chart-*` tokens are a harmonised categorical ramp (equal lightness,
@@ -335,7 +365,7 @@ worth coming for needed a horizontal scroll. Both stay in the detail card and in
 `col-id` is also truncated on one line at every width — that slug reaches fifty characters and used
 to set the height of its whole row.
 
-**The data page computes nothing on its own.** Every figure it displays comes from `js/stats.js`,
+**The data view computes nothing on its own.** Every figure it displays comes from `js/stats.js`,
 which has no DOM access and is covered by `tests/stats.test.mjs` — that is the whole reason it is a
 separate module. Watch out for missing values: 222 of 371 entries have no `recette`, and
 `Number(null)` is `0`, so any new aggregate must go through `finiteNumbers()` rather than a bare
@@ -499,7 +529,7 @@ regenerates the `VERSION` + `ASSETS` block in `service-worker.js`. It is idempot
 would produce. **There is no version number to bump by hand any more** — `CACHE_VERSION` and
 `APP_VERSION` are gone, and the generation is a hash of the published content.
 
-Because it walks the graph from the two documents, **a new module or stylesheet needs no
+Because it walks the graph from the page, **a new module or stylesheet needs no
 registration anywhere**: it is discovered, stamped and precached automatically. What still needs a
 hand is a new _unstamped_ asset (a sound, an image, an icon) — add it to `UNSTAMPED` in
 `scripts/stamp-assets.mjs`, or it will not be precached and the first offline launch will miss it.
@@ -510,10 +540,11 @@ Hashing order matters and is handled: a module that imports others has its own r
 **before** it is hashed, otherwise the hash would not describe what is actually served. The stamper
 topologically sorts the module graph and fails loudly on a cycle.
 
-**One cache entry per page.** `PAGE_KEYS_BY_PATH` maps every URL form of a page (`/`, `/index`,
-`/index.html`, `/donnees`, `/donnees.html`) onto a single cache key, so the same page can never exist
-twice depending on the URL taken. Query strings (share parameters, the data page's filters) map onto
-the same key.
+**One cache entry for the page.** `PAGE_KEYS_BY_PATH` maps every URL form of the page (`/`,
+`/index`, `/index.html`) onto a single cache key, so it can never exist twice depending on the URL
+taken. Query strings map onto that same key — and they matter more than before, since `?vue=donnees`
+and the data view's filters all ride on them. `/donnees` and `/donnees.html` were in that table
+until the merge.
 
 **Install is atomic.** Each URL is fetched with `cache: 'reload'`, retried twice, and one failure
 aborts the whole install and deletes the half-filled cache. A typo'd path costs you the update, not
@@ -584,4 +615,5 @@ this project has — moving or renaming a module will be caught here.
 5. New/renamed modules resolve under `npm run check:imports` and are covered by an
    `eslint.config.js` block.
 6. Front-end changes were exercised in a browser over HTTP, including one offline reload from a
-   cold start and one version bump applied to an already-open tab (§7) — on **both** pages.
+   cold start and one version bump applied to an already-open tab (§7) — in **both views**, and
+   both themes if you touched a colour.

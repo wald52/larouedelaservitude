@@ -59,7 +59,7 @@ const hashOf = (buf) => createHash("sha256").update(buf).digest("hex").slice(0, 
  * ----------------------------------------------------------------------- */
 
 // Points d'entrée : jamais estampillés, ce sont les URLs publiques.
-const DOCUMENTS = ["index.html", "donnees.html"];
+const DOCUMENTS = ["index.html"];
 
 // Précachés mais non estampillés (cf. ci-dessus).
 const UNSTAMPED = [

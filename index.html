@@ -49,9 +49,20 @@
     <link rel="stylesheet" href="buttons.css?v=8e4cf8f9" />
     <link rel="stylesheet" href="bills.css?v=3274a064" media="print" onload="this.media = 'all'" />
     <link rel="stylesheet" href="menu.css?v=90453bf1" media="print" onload="this.media = 'all'" />
+    <!-- La vue « Données » n'est pas visible au premier rendu : sa feuille peut
+         arriver après. Ce qui la cache, en revanche, est dans le CSS bloquant
+         ci-dessous — sans quoi elle s'afficherait sous la roue le temps du
+         chargement. -->
+    <link
+      rel="stylesheet"
+      href="donnees.css?v=7673894b"
+      media="print"
+      onload="this.media = 'all'"
+    />
     <noscript>
       <link rel="stylesheet" href="bills.css?v=3274a064" />
       <link rel="stylesheet" href="menu.css?v=90453bf1" />
+      <link rel="stylesheet" href="donnees.css?v=7673894b" />
     </noscript>
 
     <style>
@@ -123,6 +134,31 @@
           "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia,
           "Times New Roman", serif;
         --masthead-accent: #c00;
+        /* Jetons de la vue « Données » (donnees.css). Ils vivent ici, avec tous
+           les autres : la page est unique, elle n'a donc qu'un seul jeu de
+           jetons. donnees.css les consomme sans jamais en déclarer — c'est ce
+           que vérifie tests/theme-tokens.test.mjs. */
+        --muted: #6b7280;
+        --accent: #c00;
+        --row-hover: rgba(17, 17, 17, 0.06);
+        --row-stripe: rgba(17, 17, 17, 0.025);
+        --row-selected: rgba(204, 0, 0, 0.08);
+        --code-bg: #f4f4f5;
+        --card-shadow: 0 1px 2px rgba(17, 17, 17, 0.04), 0 6px 18px rgba(17, 17, 17, 0.05);
+        /* Palette de séries harmonisée : mêmes clarté et saturation, teintes
+           réparties dans l'ordre du cercle chromatique, et le rouge du site en
+           tête. Tous les graphiques sont à série unique et prennent donc la
+           première ; les suivantes n'existent que pour le jour où un graphique
+           portera plusieurs séries. */
+        --chart-1: #b91c1c;
+        --chart-2: #c2410c;
+        --chart-3: #a16207;
+        --chart-4: #15803d;
+        --chart-5: #1d4ed8;
+        --chart-6: #7e22ce;
+        --chart-grid: rgba(17, 17, 17, 0.1);
+        --chart-axis: rgba(17, 17, 17, 0.35);
+        --chart-text: #52525b;
       }
 
       /* La bannière d'installation prend sa place dans la colonne : la roue lui
@@ -154,6 +190,22 @@
         --install-title: #f3f4f6;
         --focus: #f59e0b;
         --masthead-accent: #dc2626;
+        --muted: #9ca3af;
+        --accent: #f87171;
+        --row-hover: rgba(243, 244, 246, 0.08);
+        --row-stripe: rgba(243, 244, 246, 0.035);
+        --row-selected: rgba(248, 113, 113, 0.14);
+        --code-bg: #0b0e13;
+        --card-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 6px 18px rgba(0, 0, 0, 0.32);
+        --chart-1: #f87171;
+        --chart-2: #fb923c;
+        --chart-3: #fbbf24;
+        --chart-4: #4ade80;
+        --chart-5: #60a5fa;
+        --chart-6: #c084fc;
+        --chart-grid: rgba(243, 244, 246, 0.12);
+        --chart-axis: rgba(243, 244, 246, 0.4);
+        --chart-text: #a1a1aa;
         --pattern-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160' fill='%23f3f4f6'><text x='40' y='40' font-size='50'>☭</text><text x='120' y='120' font-size='50'>☭</text></svg>");
       }
 
@@ -240,6 +292,42 @@
          sa place dans une fenêtre plus haute que l'écran, et le bas de la carte
          finissait sous la barre d'onglets. La première déclaration est le repli
          des navigateurs sans `svh`. */
+      /* ============ Les deux vues ============
+         La page en montre une à la fois : la roue (.wrap) ou les données
+         (.data-view), selon `data-view` posé sur <html> par js/menu.js. Les
+         données ne sont plus un second document : il n'y a plus de navigation
+         entre le jeu et sa source, donc plus rien à conserver au passage — la
+         partie en cours vit simplement dans la page qui ne la quitte pas.
+
+         Ces deux règles sont dans le CSS bloquant, et non dans donnees.css qui
+         est chargé en différé : sinon la vue paraîtrait sous la roue le temps
+         que la feuille arrive.
+
+         La vue des données est une surface fixe qui défile en propre, parce que
+         le corps du document, lui, ne défile jamais (c'est un jeu : `body` est
+         en position fixe, `touch-action: none`). Elle s'arrête au-dessus de la
+         barre d'onglets, qui reste visible et par laquelle on revient. */
+      .data-view {
+        display: none;
+      }
+      :root[data-view="donnees"] .wrap,
+      :root[data-view="donnees"] .install-banner {
+        display: none;
+      }
+      :root[data-view="donnees"] .data-view {
+        display: block;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: var(--tabbar-room);
+        z-index: 2;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        touch-action: pan-y;
+        background: var(--bg);
+      }
+
       .wrap {
         position: relative;
         z-index: 1;
@@ -309,7 +397,10 @@
         pointer-events: none;
         background: radial-gradient(closest-side, var(--bg) 0%, var(--bg) 70%, transparent 100%);
       }
-      h1 {
+      /* Le sélecteur porte sur le bandeau, pas sur `h1` : la page compte
+         désormais deux titres de premier niveau — celui du bandeau et celui de
+         la vue « Données », qui n'a rien à faire en romaine et en capitales. */
+      .masthead h1 {
         margin: 0;
         display: grid;
         gap: 2px;
@@ -1114,6 +1205,299 @@
       </div>
     </div>
 
+    <!-- ============ Vue « Données & analyse » ============
+         La liste complète, les statistiques et les graphiques vivent dans la
+         même page que la roue : l'onglet « Données » montre cette vue et cache
+         la colonne du jeu, sans navigation. Son affichage est décidé par
+         :root[data-view] dans le CSS bloquant ci-dessus, pour qu'elle ne
+         paraisse jamais le temps que donnees.css arrive. -->
+    <section class="data-view" id="dataView" aria-labelledby="dataViewTitle">
+      <header class="page-header">
+        <div class="page-header__inner">
+          <div class="page-header__titles">
+            <h1 id="dataViewTitle">Données &amp; analyse</h1>
+            <p class="page-subtitle">
+              Le jeu de données complet des prélèvements obligatoires français : recettes, années de
+              création, statistiques descriptives et export. C'est la même source que la roue, sans
+              le jeu.
+            </p>
+          </div>
+          <!-- Le thème se règle dans le panneau « Réglages » de la barre, comme
+               sur la roue : un seul contrôle pour un seul réglage. Le bouton qui
+               se trouvait ici affichait son propre état, qui ne se mettait pas à
+               jour quand l'interrupteur du panneau bougeait. -->
+          <div class="page-header__actions">
+            <span id="dataVersion" class="data-version"></span>
+          </div>
+        </div>
+      </header>
+
+      <div class="page">
+        <p id="loadingStatus" class="notice" role="status" aria-live="polite">
+          Chargement du jeu de données…
+        </p>
+
+        <noscript>
+          <p class="notice">
+            Cette page a besoin de JavaScript pour filtrer et analyser les données. Les fichiers
+            bruts restent consultables : <a href="data/entries-full.json">entries-full.json</a>.
+          </p>
+        </noscript>
+
+        <!-- ============ Filtres ============ -->
+        <section class="card" aria-labelledby="filtersTitle">
+          <details id="filtersPanel" class="filters-panel">
+            <summary>
+              <h2 id="filtersTitle">Filtres</h2>
+            </summary>
+            <p class="card-hint">
+              Les filtres se combinent, et se reflètent dans l'adresse de la page : une sélection se
+              partage ou se met en favori telle quelle.
+            </p>
+
+            <div class="filters">
+              <div class="field field--wide">
+                <label for="search">Recherche</label>
+                <input
+                  id="search"
+                  type="search"
+                  placeholder="Nom, intitulé ou identifiant…"
+                  autocomplete="off"
+                  spellcheck="false"
+                />
+                <span class="field-hint"
+                  >Insensible aux accents. Plusieurs mots = tous exigés. Raccourci :
+                  <kbd>/</kbd></span
+                >
+              </div>
+
+              <div class="field">
+                <label for="filterRecette">Recette</label>
+                <select id="filterRecette">
+                  <option value="all">Toutes</option>
+                  <option value="with">Recette connue</option>
+                  <option value="without">Recette inconnue</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label for="filterAnnee">Année de création</label>
+                <select id="filterAnnee">
+                  <option value="all">Toutes</option>
+                  <option value="with">Année connue</option>
+                  <option value="without">Année inconnue</option>
+                </select>
+              </div>
+
+              <div class="field field--range">
+                <span class="field-label" id="recetteRangeLabel">Recette (M€)</span>
+                <div class="range-inputs">
+                  <input
+                    id="recetteMin"
+                    type="number"
+                    step="any"
+                    inputmode="decimal"
+                    placeholder="min"
+                    aria-labelledby="recetteRangeLabel"
+                    aria-label="Recette minimale en millions d'euros"
+                  />
+                  <span aria-hidden="true">→</span>
+                  <input
+                    id="recetteMax"
+                    type="number"
+                    step="any"
+                    inputmode="decimal"
+                    placeholder="max"
+                    aria-labelledby="recetteRangeLabel"
+                    aria-label="Recette maximale en millions d'euros"
+                  />
+                </div>
+              </div>
+
+              <div class="field field--range">
+                <span class="field-label" id="anneeRangeLabel">Période de création</span>
+                <div class="range-inputs">
+                  <input
+                    id="anneeMin"
+                    type="number"
+                    step="1"
+                    inputmode="numeric"
+                    placeholder="1798"
+                    aria-labelledby="anneeRangeLabel"
+                    aria-label="Année de création minimale"
+                  />
+                  <span aria-hidden="true">→</span>
+                  <input
+                    id="anneeMax"
+                    type="number"
+                    step="1"
+                    inputmode="numeric"
+                    placeholder="2025"
+                    aria-labelledby="anneeRangeLabel"
+                    aria-label="Année de création maximale"
+                  />
+                </div>
+              </div>
+
+              <div class="field">
+                <label for="sortPreset">Tri rapide</label>
+                <select id="sortPreset">
+                  <option value="">Choisir un tri…</option>
+                </select>
+              </div>
+
+              <div class="field field--actions">
+                <button id="resetFilters" class="btn btn-secondary" type="button">
+                  Réinitialiser
+                </button>
+                <button id="exportCsv" class="btn btn-secondary" type="button">
+                  Exporter en CSV
+                </button>
+                <button id="exportJson" class="btn btn-secondary" type="button">
+                  Exporter en JSON
+                </button>
+              </div>
+            </div>
+          </details>
+        </section>
+
+        <!-- ============ Statistiques ============ -->
+        <section class="card" aria-labelledby="statsTitle">
+          <div class="card-header">
+            <h2 id="statsTitle">Statistiques de la sélection</h2>
+            <p class="card-hint">
+              Tout est recalculé sur les lignes filtrées. Attention aux trous du jeu de données :
+              222 prélèvements sur 371 n'ont pas de recette renseignée, 200 pas d'année.
+            </p>
+          </div>
+          <div id="statsGrid" class="stats-grid"></div>
+        </section>
+
+        <!-- ============ Graphiques ============ -->
+        <section class="card" aria-labelledby="chartsTitle">
+          <div class="card-header">
+            <h2 id="chartsTitle">Graphiques</h2>
+            <div class="card-controls">
+              <label for="periodSize">Granularité de l'histogramme</label>
+              <select id="periodSize">
+                <option value="5">5 ans</option>
+                <option value="10">10 ans</option>
+                <option value="25">25 ans</option>
+                <option value="50">50 ans</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="charts-grid">
+            <figure class="chart">
+              <figcaption>Créations par période</figcaption>
+              <div id="chartPeriods" class="chart-slot"></div>
+            </figure>
+
+            <figure class="chart">
+              <figcaption>Concentration des recettes (courbe de Lorenz)</figcaption>
+              <div id="chartLorenz" class="chart-slot"></div>
+              <p class="chart-note">
+                Plus la courbe s'éloigne de la diagonale, plus les recettes sont concentrées sur
+                quelques prélèvements.
+              </p>
+            </figure>
+
+            <figure class="chart">
+              <figcaption>Répartition par ordre de grandeur</figcaption>
+              <div id="chartMagnitudes" class="chart-slot"></div>
+            </figure>
+
+            <figure class="chart">
+              <figcaption>Recette selon l'année de création</figcaption>
+              <div id="chartScatter" class="chart-slot"></div>
+            </figure>
+
+            <figure class="chart chart--wide">
+              <figcaption>Les plus gros contributeurs de la sélection</figcaption>
+              <div id="chartTop" class="chart-slot"></div>
+            </figure>
+          </div>
+        </section>
+
+        <!-- ============ Tableau ============ -->
+        <section class="card" id="tableSection" aria-labelledby="tableTitle">
+          <div class="card-header">
+            <h2 id="tableTitle">Liste complète</h2>
+            <p id="resultCount" class="result-count" role="status" aria-live="polite"></p>
+            <p class="card-hint">
+              Cliquez sur un en-tête pour trier, <kbd>Maj</kbd>+clic pour ajouter un critère
+              secondaire. Cliquez sur une ligne pour ouvrir sa fiche.
+            </p>
+            <div id="sortChips" class="sort-chips"></div>
+          </div>
+
+          <div class="table-wrapper">
+            <table class="data-table">
+              <caption class="visually-hidden">
+                Prélèvements obligatoires français : nom, intitulé complet, recette, part du total,
+                année de création et identifiant.
+              </caption>
+              <thead id="tableHead"></thead>
+              <tbody id="tableBody"></tbody>
+            </table>
+            <p id="tableEmpty" class="notice" hidden>
+              Aucun prélèvement ne correspond à ces filtres.
+            </p>
+          </div>
+        </section>
+
+        <!-- ============ Fiche détaillée ============ -->
+        <aside
+          id="detail"
+          class="card detail"
+          aria-labelledby="detailTitle"
+          aria-hidden="true"
+          hidden
+        >
+          <div class="card-header">
+            <h2 id="detailTitle"></h2>
+            <button
+              id="detailClose"
+              class="btn btn-icon btn-secondary btn-close"
+              type="button"
+              aria-label="Fermer la fiche"
+            ></button>
+          </div>
+          <dl id="detailList" class="detail-list"></dl>
+          <pre id="detailJson" class="detail-json"></pre>
+          <button id="detailCopy" class="btn btn-secondary" type="button">Copier le JSON</button>
+        </aside>
+
+        <section class="card card--muted" aria-labelledby="sourceTitle">
+          <h2 id="sourceTitle">À propos de ces données</h2>
+          <ul class="source-list">
+            <li>
+              371 prélèvements obligatoires, servis par les mêmes fichiers que la roue
+              (<code>data/entries-full.json</code>).
+            </li>
+            <li>
+              Les recettes sont exprimées en millions d'euros ; l'exercice auquel elles se
+              rapportent n'est pas documenté dans la source.
+            </li>
+            <li>
+              Un même intitulé peut apparaître plusieurs fois (CSG, cotisation obligatoire…) : ce
+              sont des prélèvements distincts, d'où les suffixes numériques sur certains noms
+              courts.
+            </li>
+            <li>Une erreur, une donnée manquante ? Signalez-la depuis un résultat de la roue.</li>
+          </ul>
+        </section>
+      </div>
+
+      <footer class="page-footer">
+        <a href="./">La roue de la servitude</a> ·
+        <a href="https://github.com/wald52/larouedelaservitude" target="_blank" rel="noopener"
+          >Code source</a
+        >
+      </footer>
+    </section>
+
     <div id="installPrompt" class="install-banner" hidden aria-hidden="true">
       <div class="install-banner__title">Installer l'application</div>
       <div class="install-banner__actions">
@@ -1342,6 +1726,6 @@
       </form>
     </div>
 
-    <script type="module" src="./js/app.js?v=1da0ed99"></script>
+    <script type="module" src="./js/app.js?v=5e4d4398"></script>
   </body>
 </html>

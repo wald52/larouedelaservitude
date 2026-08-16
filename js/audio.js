@@ -6,8 +6,8 @@
 // 2. Décodés et stockés dans IndexedDB
 // 3. Disponibles immédiatement, même hors ligne
 
-import { BASE_PATH } from "./constants.js?v=2713e882";
-import { isSoundEnabled as readStoredSoundSetting } from "./settings.js?v=d7e3f5e3";
+import { BASE_PATH } from "./constants.js?v=b8755637";
+import { isSoundEnabled as readStoredSoundSetting } from "./settings.js?v=96974e37";
 
 const AUDIO_DB_NAME = "LaRoueAudio";
 const AUDIO_DB_VERSION = 1;

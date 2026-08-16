@@ -4,24 +4,26 @@ import {
   getEntryById,
   formatEntryForDisplay,
   formatEntryAsText
-} from "./entries.js?v=5638691f";
+} from "./entries.js?v=c56272d2";
 import {
   initAudio,
   unlockAudio,
   isSoundEnabled,
   playSpinClick,
   playWinSound
-} from "./audio.js?v=f32973a2";
+} from "./audio.js?v=3679b476";
 import {
   initMenu,
   loadHistory,
   loadSettings,
   recordSpin,
-  isInfiniteMode
-} from "./menu.js?v=07363a33";
+  isInfiniteMode,
+  openView,
+  viewFromUrl
+} from "./menu.js?v=9baebd62";
 import { initServiceWorker } from "./sw-update.js?v=3cf9d32b";
 import { pushFocusTrap, popFocusTrap, hasFocusTrap } from "./focus-trap.js?v=0b34fd1c";
-import { loadDrawnIds, saveDrawnIds, clearDrawnIds } from "./game.js?v=e75363c7";
+import { loadDrawnIds, saveDrawnIds, clearDrawnIds } from "./game.js?v=73adbd70";
 
 function requireElement(id) {
   const element = document.getElementById(id);
@@ -95,9 +97,9 @@ function prefersReducedMotion() {
 let ENTRIES = [];
 let ENTRY_IDS = [];
 let ENTRY_COLORS = [];
-// Les identifiants déjà tirés, c'est-à-dire la partie en cours. Ils sont
-// conservés d'une page à l'autre par js/game.js : « Données » est un onglet de
-// l'application, y passer ne doit pas remettre les 371 taxes en jeu.
+// Les identifiants déjà tirés, c'est-à-dire la partie en cours. js/game.js les
+// conserve dans l'onglet du navigateur : la partie survit à un rechargement,
+// qui est justement la façon dont arrive une nouvelle version (§7 du guide).
 const drawnIds = new Set(loadDrawnIds());
 let angle = -Math.PI / 2;
 let angularVelocity = 0;
@@ -842,10 +844,58 @@ function shouldAnimate() {
   );
 }
 
+/* =======================
+   VUES
+   ======================= */
+// La roue et les données partagent la page. js/menu.js décide de la vue
+// affichée (attribut `data-view` sur <html>) et l'annonce ; app.js n'a que deux
+// choses à faire ici : charger l'explorateur à sa première ouverture, et rendre
+// à la roue un canevas mesurable à son retour.
+
+let dataExplorerPromise = null;
+
+function isWheelView() {
+  return document.documentElement.dataset.view !== "donnees";
+}
+
+function loadDataExplorer() {
+  if (!dataExplorerPromise) {
+    // Chargé à la première ouverture seulement : le démarrage de la roue ne
+    // paie ni l'explorateur, ni les statistiques, ni les graphiques.
+    dataExplorerPromise = import("./data-explorer.js?v=2017c25f")
+      .then((mod) => mod.initDataExplorer())
+      .catch((error) => {
+        console.error("[APP] Chargement de la vue Données impossible:", error);
+        dataExplorerPromise = null;
+      });
+  }
+
+  return dataExplorerPromise;
+}
+
+window.addEventListener("viewChange", (event) => {
+  if (event.detail === "donnees") {
+    // Rien à animer derrière une vue qui la recouvre entièrement.
+    stopAnimationFrame();
+    loadDataExplorer();
+    return;
+  }
+
+  // La roue était `display: none` : elle n'avait plus de dimensions, et une
+  // rotation d'écran pendant ce temps-là n'a pas pu être prise. On la remesure.
+  syncCanvasSize(true);
+  drawWheel(angle);
+});
+
 async function initializeApp() {
   try {
     loadHistory();
     loadSettings();
+
+    // Avant tout dessin : un lien « ?vue=donnees » doit ouvrir les données, pas
+    // faire clignoter la roue. La barre d'onglets, elle, n'existe pas encore —
+    // updateTabState la retrouvera au moment où elle sera construite.
+    openView(viewFromUrl(), { push: false });
 
     syncCanvasSize();
 
@@ -945,7 +995,7 @@ function spawnBillsWhenReady(event, count) {
   }
 
   if (!billsInitPromise) {
-    billsInitPromise = import("../bills.js?v=d86bcbd3")
+    billsInitPromise = import("../bills.js?v=16598baa")
       .then((mod) => {
         if (mod.initBills) {
           mod.initBills();
@@ -1676,6 +1726,10 @@ function isAnySurfaceOpen() {
 // ✅ Gère la touche Espace uniquement quand aucune fenêtre n'est ouverte
 document.addEventListener("keydown", (e) => {
   if (e.code !== "Space") return;
+
+  // La vue des données est affichée : Espace y sert à faire défiler, et la roue
+  // qu'il ferait tourner n'est même pas à l'écran.
+  if (!isWheelView()) return;
 
   // Espace appartient d'abord au contrôle qui a le focus : il doit l'activer
   // normalement (bouton, interrupteur des réglages, champ de saisie). Sans cette

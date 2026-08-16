@@ -2,11 +2,11 @@
 // menu.js — Gestion du menu, historique et réglages
 // ===============================
 
-import { SETTINGS_KEY } from "./constants.js?v=2713e882";
+import { SETTINGS_KEY } from "./constants.js?v=b8755637";
 import { getServedVersion } from "./sw-update.js?v=3cf9d32b";
 import { pushFocusTrap, popFocusTrap, topFocusTrap } from "./focus-trap.js?v=0b34fd1c";
-import { formatRecette } from "./entries.js?v=5638691f";
-import { clearDrawnIds } from "./game.js?v=e75363c7";
+import { formatRecette } from "./entries.js?v=c56272d2";
+import { clearDrawnIds } from "./game.js?v=73adbd70";
 
 const HISTORY_KEY = "larouedelaservitude_history";
 const DEFAULT_SETTINGS = {
@@ -277,17 +277,15 @@ const MENU_PANELS = [
   }
 ];
 
-// La barre du bas, dans l'ordre où elle s'affiche. Elle est identique sur les
-// deux documents : seul change l'onglet qui désigne la page où l'on se trouve.
-// Trois natures d'onglet, et c'est la clé présente qui les distingue :
-//   - `page` égale à la page en cours : l'onglet « ici », qui ne navigue pas et
-//     se contente de refermer ce qui est ouvert ;
-//   - `panel` : ouvre le panneau du même identifiant dans MENU_PANELS ;
-//   - `href`  : une navigation ordinaire, vers l'autre document.
+// La barre du bas, dans l'ordre où elle s'affiche. Deux natures d'onglet, et
+// c'est la clé présente qui les distingue :
+//   - `view`  : montre cette vue de la page et cache l'autre ;
+//   - `panel` : ouvre le panneau du même identifiant dans MENU_PANELS, par
+//     dessus la vue courante.
 // Quatre onglets au maximum : au-delà, les libellés ne tiennent plus sur un
 // écran de téléphone sans être tronqués.
 const MENU_TABS = [
-  { id: "accueil", icon: ICONS.accueil, label: "Accueil", page: "roue", href: "./" },
+  { id: "accueil", icon: ICONS.accueil, label: "Accueil", view: "roue" },
   {
     id: "historique",
     icon: ICONS.historique,
@@ -295,27 +293,78 @@ const MENU_TABS = [
     panel: "historique",
     badgeId: "historyBadge"
   },
-  { id: "donnees", icon: ICONS.donnees, label: "Données", page: "donnees", href: "donnees.html" },
+  { id: "donnees", icon: ICONS.donnees, label: "Données", view: "donnees" },
   { id: "reglages", icon: ICONS.reglages, label: "Réglages", panel: "reglages" }
 ];
 
-// La page qui a appelé initMenu : « roue » (index.html) ou « donnees »
-// (donnees.html). C'est la seule chose qui distingue les deux barres.
-let currentPage = "roue";
+// ===============================
+// Les vues
+// ===============================
+//
+// Il n'y a plus qu'un document : la roue et les données sont deux vues de la
+// même page, et « Données » ne navigue plus. C'était la seule façon d'en finir
+// avec la partie perdue au passage d'une page à l'autre — il n'y a plus de
+// passage. Ce qui s'affiche est décidé par `data-view` sur <html>, lu par le
+// CSS bloquant d'index.html ; les modules intéressés écoutent `viewChange`
+// (même découplage que les réglages : personne n'importe app.js).
+//
+// La vue est aussi dans l'URL (`?vue=donnees`), pour trois raisons : un lien
+// vers les données reste partageable et peut se mettre en favori, le bouton
+// « précédent » du navigateur ramène à la roue, et l'explorateur y écrit déjà
+// ses filtres.
+const DEFAULT_VIEW = "roue";
+let currentView = DEFAULT_VIEW;
 
-function isCurrentPage(tab) {
-  return Boolean(tab.page) && tab.page === currentPage;
+export function viewFromUrl() {
+  const wanted = new URLSearchParams(window.location.search).get("vue");
+  return MENU_TABS.some((tab) => tab.view === wanted) ? wanted : DEFAULT_VIEW;
 }
 
-export function initMenu({ page = "roue" } = {}) {
-  currentPage = page;
+export function openView(view, { push = true } = {}) {
+  const next = MENU_TABS.some((tab) => tab.view === view) ? view : DEFAULT_VIEW;
 
+  // Un onglet de vue referme ce qui est ouvert par-dessus, y compris quand on
+  // reclique sur la vue déjà affichée : c'est ce que faisait « Accueil ».
+  closeAllPanels();
+
+  document.documentElement.dataset.view = next;
+
+  if (next !== currentView) {
+    currentView = next;
+    window.dispatchEvent(new CustomEvent("viewChange", { detail: next }));
+  }
+
+  updateTabState(null);
+  if (push) pushViewUrl(next);
+}
+
+function pushViewUrl(view) {
+  const url = new URL(window.location.href);
+
+  if (view === DEFAULT_VIEW) {
+    url.searchParams.delete("vue");
+  } else {
+    url.searchParams.set("vue", view);
+  }
+
+  if (url.href !== window.location.href) {
+    window.history.pushState({ view }, "", url);
+  }
+}
+
+// Le bouton « précédent » revient à la vue précédente au lieu de quitter le
+// site — c'est ce qu'on attend d'une application à onglets.
+window.addEventListener("popstate", (event) => {
+  openView(event.state?.view ?? viewFromUrl(), { push: false });
+});
+
+export function initMenu() {
   loadHistory();
   loadSettings();
   createMenuHTML();
   attachMenuEvents();
 
-  console.log("[MENU] Initialisé sur la page", currentPage);
+  console.log("[MENU] Initialisé");
 }
 
 function panelElementId(id) {
@@ -352,40 +401,34 @@ function createMenuHTML() {
 // Un onglet : icône, badge éventuel posé sur l'icône, libellé dessous. Le
 // libellé est écrit et non seulement suggéré par le pictogramme — une icône
 // seule se devine, elle ne se lit pas.
-function renderTabItem(tab) {
-  const { id, icon, label, badgeId, panel, href } = tab;
+function renderTabItem({ id, icon, label, badgeId, panel, view }) {
   const badge = badgeId ? `<span class="tabbar-item__badge" id="${badgeId}" hidden>0</span>` : "";
   const inner = `
       <span class="tabbar-item__icon">${icon}${badge}</span>
       <span class="tabbar-item__label">${label}</span>`;
 
-  // Les onglets qui quittent la page sont de vrais liens : clic milieu,
-  // ouverture dans un onglet et menu contextuel doivent continuer de
-  // fonctionner. Celui de la page courante, lui, ne va nulle part.
-  if (href && !isCurrentPage(tab)) {
-    return `<a class="tabbar-item" id="${tabElementId(id)}" href="${href}">${inner}</a>`;
-  }
-
-  const panelAttrs = panel
+  // Plus aucun onglet ne quitte la page : ce sont tous des boutons. « Données »
+  // était un vrai <a> tant que c'était un second document ; un lien vers cette
+  // vue reste possible, mais il passe désormais par `?vue=donnees`.
+  const attrs = panel
     ? ` data-panel="${panel}" aria-controls="${panelElementId(panel)}" aria-expanded="false"`
-    : ' data-home="true"';
+    : ` data-view="${view}"`;
 
-  return `<button class="tabbar-item" id="${tabElementId(id)}" type="button"${panelAttrs}>${inner}</button>`;
+  return `<button class="tabbar-item" id="${tabElementId(id)}" type="button"${attrs}>${inner}</button>`;
 }
 
-// `aria-current` désigne l'endroit où l'on se trouve : la page courante tant
+// `aria-current` désigne l'endroit où l'on se trouve : la vue affichée tant
 // qu'aucun panneau n'est ouvert, sinon l'onglet du panneau ouvert. C'est aussi
 // ce que le CSS interroge pour teinter l'onglet actif — pas de classe en
 // double, donc pas d'état visuel qui puisse diverger de l'état annoncé.
 function updateTabState(openPanelId) {
   for (const tab of MENU_TABS) {
-    // Un onglet qui mène ailleurs n'est jamais « ici ».
-    if (tab.href && !isCurrentPage(tab)) continue;
-
     const element = document.getElementById(tabElementId(tab.id));
     if (!element) continue;
 
-    const isCurrent = tab.panel ? tab.panel === openPanelId : openPanelId === null;
+    const isCurrent = tab.panel
+      ? tab.panel === openPanelId
+      : openPanelId === null && tab.view === currentView;
     if (isCurrent) {
       element.setAttribute("aria-current", "page");
     } else {
@@ -492,15 +535,13 @@ function closeAllPanels() {
 function attachMenuEvents() {
   document.getElementById("menuOverlay").addEventListener("click", closeAllPanels);
 
-  // Seuls les onglets porteurs d'un panneau : « Données » est un lien, donc une
-  // navigation ordinaire, et « Accueil » ne fait que ramener à la roue.
   document.querySelectorAll(".tabbar-item[data-panel]").forEach((item) => {
     item.addEventListener("click", () => openPanel(item.dataset.panel));
   });
 
-  document
-    .querySelector(".tabbar-item[data-home]")
-    .addEventListener("click", () => closeAllPanels());
+  document.querySelectorAll(".tabbar-item[data-view]").forEach((item) => {
+    item.addEventListener("click", () => openView(item.dataset.view));
+  });
 
   document.querySelectorAll("[data-close-panel]").forEach((button) => {
     button.addEventListener("click", () => closePanel(button.dataset.closePanel));

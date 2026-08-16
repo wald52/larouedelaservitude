@@ -2,7 +2,7 @@
 //  stats.js — Statistiques descriptives (fonctions pures)
 // ===============================
 // Aucune dépendance, aucun accès au DOM : ce module est le moteur de calcul de
-// la page d'analyse (donnees.html) et il est testé directement sous Node
+// la vue d'analyse (js/data-explorer.js) et il est testé directement sous Node
 // (tests/stats.test.mjs). Toute règle de calcul affichée à l'écran doit vivre
 // ici plutôt que dans le rendu, pour rester vérifiable.
 //

@@ -30,7 +30,7 @@ const NEVER_PRECACHED = new Set([
 // Les deux documents navigables. Tout le reste de ce qu'on analyse (modules,
 // feuilles de style) est déduit de la liste ASSETS elle-même : ajouter un module
 // ne demande donc de le déclarer nulle part.
-const SCANNED_PAGES = ["index.html", "donnees.html"];
+const SCANNED_PAGES = ["index.html"];
 
 function read(relativePath) {
   return readFileSync(path.join(root, relativePath), "utf8");

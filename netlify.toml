@@ -31,13 +31,6 @@
   [headers.values]
     Cache-Control = "no-cache"
 
-# donnees.html suit la même règle qu'index.html : c'est un document, il est servi
-# « réseau d'abord » par le service worker et doit donc être revalidé.
-[[headers]]
-  for = "/donnees.html"
-  [headers.values]
-    Cache-Control = "no-cache"
-
 # Les données sont revalidées par js/entries.js (paramètre ?fresh=) : un cache
 # CDN long les figerait entre deux publications.
 [[headers]]
