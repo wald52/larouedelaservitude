@@ -17,9 +17,9 @@
 // L'état de la vue (recherche, filtres, tri) est reflété dans l'URL : une
 // sélection se partage ou se met en favori telle quelle.
 
-import { loadFullData, formatRecette, getDataVersion } from "./entries.js";
-import { loadSettings, updateSetting, getSetting } from "./menu.js";
-import { initServiceWorker } from "./sw-update.js";
+import { loadFullData, formatRecette, getDataVersion } from "./entries.js?v=fbd30d90";
+import { loadSettings, updateSetting, getSetting } from "./menu.js?v=95606d60";
+import { initServiceWorker } from "./sw-update.js?v=3cf9d32b";
 import {
   describe,
   gini,
@@ -28,13 +28,13 @@ import {
   groupByPeriod,
   magnitudeBuckets,
   finiteNumbers
-} from "./stats.js";
+} from "./stats.js?v=a54f91d1";
 import {
   renderBarChart,
   renderHorizontalBarChart,
   renderLorenzChart,
   renderScatterChart
-} from "./charts.js";
+} from "./charts.js?v=9c0905cd";
 
 function requireElement(id) {
   const element = document.getElementById(id);
@@ -1135,6 +1135,6 @@ init();
 
 window.addEventListener("load", () => {
   // Même service worker que la roue : la page d'analyse est pré-cachée et donc
-  // consultable hors ligne, avec la même bascule de version.
-  initServiceWorker({ canReload: () => elements.detail?.hidden !== false });
+  // consultable hors ligne. Il ne recharge jamais la page.
+  initServiceWorker();
 });

@@ -1,14 +1,26 @@
 import {
   initWheel,
   loadFullData,
-  getEntryDetails,
+  getEntryById,
   formatEntryForDisplay,
   formatEntryAsText
-} from "./entries.js";
-import { initAudio, unlockAudio, isSoundEnabled, playSpinClick, playWinSound } from "./audio.js";
-import { initMenu, loadHistory, loadSettings, recordSpin, isInfiniteMode } from "./menu.js";
-import { initServiceWorker, applyPendingUpdate } from "./sw-update.js";
-import { pushFocusTrap, popFocusTrap, hasFocusTrap } from "./focus-trap.js";
+} from "./entries.js?v=fbd30d90";
+import {
+  initAudio,
+  unlockAudio,
+  isSoundEnabled,
+  playSpinClick,
+  playWinSound
+} from "./audio.js?v=98016842";
+import {
+  initMenu,
+  loadHistory,
+  loadSettings,
+  recordSpin,
+  isInfiniteMode
+} from "./menu.js?v=95606d60";
+import { initServiceWorker } from "./sw-update.js?v=3cf9d32b";
+import { pushFocusTrap, popFocusTrap, hasFocusTrap } from "./focus-trap.js?v=0b34fd1c";
 
 function requireElement(id) {
   const element = document.getElementById(id);
@@ -67,7 +79,17 @@ function prefersReducedMotion() {
 }
 
 /* STATE */
+// Les secteurs de la roue, en deux tableaux parallèles tenus rigoureusement
+// alignés : l'intitulé affiché, et l'identifiant de l'entrée correspondante.
+//
+// L'identifiant est indispensable. L'indice du secteur gagnant est calculé sur
+// ENTRIES, qui rétrécit à chaque tirage (hors mode sans fin) ; la fiche
+// complète, elle, vit dans un tableau qui ne rétrécit jamais. Chercher la
+// seconde par l'indice de la première donnait donc la mauvaise taxe dès le
+// deuxième tirage — la roue retirait un secteur et la carte en annonçait un
+// autre. On passe désormais par l'identifiant, qui ne dépend d'aucun indice.
 let ENTRIES = [];
+let ENTRY_IDS = [];
 let ENTRY_COLORS = [];
 let angle = -Math.PI / 2;
 let angularVelocity = 0;
@@ -214,85 +236,16 @@ function syncInstallPromptVisibility() {
   showInstallPromptBanner();
 }
 
+// Seul point d'entrée pour (re)garnir la roue : les deux tableaux parallèles y
+// sont posés ensemble, ce qui est la meilleure garantie qu'ils le restent.
+function setWheelData(lightData) {
+  ENTRIES = lightData.map((entry) => entry.nom);
+  ENTRY_IDS = lightData.map((entry) => entry.id);
+}
+
 function registerCompletedSpin() {
   completedSpinCount += 1;
   syncInstallPromptVisibility();
-}
-
-/* =======================
-   PARTIE EN COURS : SURVIVRE À UNE BASCULE DE VERSION
-   ======================= */
-// Une mise à jour s'applique en rechargeant la page. Hors mode sans fin, les
-// entrées déjà tirées ont été retirées de la roue : sans précaution, ce
-// rechargement les rendrait toutes, c'est-à-dire annulerait la partie. C'est
-// pour cela que l'application refusait jadis toute mise à jour dès le premier
-// tirage — et donc, en pratique, pour toute la visite.
-//
-// On met donc la partie de côté juste avant le rechargement (js/sw-update.js
-// appelle savePartieEnCours) et on la rétablit au démarrage suivant. La
-// bascule de version devient invisible : même roue, mêmes entrées restantes.
-//
-// sessionStorage et non localStorage : une partie appartient à l'onglet qui la
-// joue et ne doit pas ressusciter à la visite suivante — c'est déjà ce que fait
-// l'application aujourd'hui, on ne change pas la règle du jeu.
-//
-// La clé est *consommée* à la lecture : elle n'est écrite qu'avant un
-// rechargement de mise à jour, et n'y survit pas. Un F5 ordinaire redémarre donc
-// une partie neuve, exactement comme avant.
-const PARTIE_KEY = "larouedelaservitude_partie_en_cours";
-
-// Intitulés retirés de la roue depuis le début de la partie, dans l'ordre des
-// tirages. Ce sont des `nom` du fichier léger, uniques par construction
-// (invariant vérifié par `npm run check:data`), ce qui en fait une clé sûre —
-// et bien plus robuste qu'un indice, que la moindre modification des données
-// décalerait.
-let drawnLabels = [];
-
-function savePartieEnCours() {
-  try {
-    if (!drawnLabels.length && completedSpinCount === 0) return;
-
-    sessionStorage.setItem(
-      PARTIE_KEY,
-      JSON.stringify({ retirees: drawnLabels, tirages: completedSpinCount })
-    );
-  } catch {
-    // Navigation privée ou quota : la mise à jour prime sur la partie.
-  }
-}
-
-/**
- * Rétablit la partie mise de côté avant une bascule de version.
- * @param {string[]} labels Intitulés de la roue neuve.
- * @returns {string[]} Les intitulés restants, entrées déjà tirées ôtées.
- */
-function restorePartieEnCours(labels) {
-  let saved = null;
-
-  try {
-    const raw = sessionStorage.getItem(PARTIE_KEY);
-    // Consommée quoi qu'il arrive : une partie ne se rétablit qu'une fois.
-    sessionStorage.removeItem(PARTIE_KEY);
-    if (raw) saved = JSON.parse(raw);
-  } catch {
-    return labels;
-  }
-
-  if (!saved || !Array.isArray(saved.retirees)) return labels;
-
-  drawnLabels = saved.retirees;
-  completedSpinCount = Number(saved.tirages) || 0;
-
-  // Une entrée disparue des données entre-temps n'est simplement pas trouvée :
-  // la roue neuve fait foi, on ne retire que ce qui s'y trouve encore.
-  const retirees = new Set(drawnLabels);
-  const restant = labels.filter((label) => !retirees.has(label));
-
-  console.log(
-    `[APP] Partie rétablie après mise à jour : ${completedSpinCount} tirage(s), ${restant.length} entrées restantes`
-  );
-
-  return restant;
 }
 
 /* =======================
@@ -331,10 +284,6 @@ function hideResult() {
   if (!isResultVisible()) return;
 
   setResultOpen(false);
-
-  // Moment calme : si une mise à jour attendait que l'utilisateur soit
-  // disponible, c'est ici qu'elle s'applique.
-  applyPendingUpdate();
 }
 
 function showResult(entry) {
@@ -839,10 +788,7 @@ async function initializeApp() {
     syncCanvasSize();
 
     const lightData = await initWheel();
-    // Avant de construire les couleurs et les calques : si ce chargement est
-    // celui qui suit une bascule de version, la roue doit repartir amputée des
-    // entrées déjà tirées, sans quoi la mise à jour annulerait la partie.
-    ENTRIES = restorePartieEnCours(lightData.map((entry) => entry.nom));
+    setWheelData(lightData);
 
     buildColors();
     buildWheelLayers();
@@ -865,6 +811,7 @@ async function initializeApp() {
   } catch (e) {
     console.error("[APP] Erreur initialisation:", e);
     ENTRIES = ["Erreur de chargement", "Veuillez rafraîchir la page"];
+    ENTRY_IDS = [null, null];
     syncCanvasSize(true);
     buildWheelLayers();
     drawWheel(angle);
@@ -890,7 +837,7 @@ function applyEntriesUpdate() {
 
   initWheel()
     .then((lightData) => {
-      ENTRIES = lightData.map((entry) => entry.nom);
+      setWheelData(lightData);
       ENTRY_COLORS.length = 0;
       buildColors();
       buildWheelLayers();
@@ -927,7 +874,7 @@ function spawnBillsWhenReady(event, count) {
   }
 
   if (!billsInitPromise) {
-    billsInitPromise = import("../bills.js")
+    billsInitPromise = import("../bills.js?v=1416b415")
       .then((mod) => {
         if (mod.initBills) {
           mod.initBills();
@@ -1249,7 +1196,7 @@ copyBtn.addEventListener("click", async () => {
    ANIMATION
    ======================= */
 function finalizeSpinResult(idx) {
-  getEntryDetails(idx).then((entry) => {
+  getEntryById(ENTRY_IDS[idx]).then((entry) => {
     if (entry) {
       recordSpin(entry);
     }
@@ -1260,10 +1207,8 @@ function finalizeSpinResult(idx) {
     // sa première ouverture, et syncCanvasSize() reconstruit alors les calques
     // une seule fois, avec la liste déjà à jour.
     if (!isInfiniteMode()) {
-      // Retenu avant le retrait : c'est ce qui permet de rétablir la partie à
-      // l'identique si une mise à jour recharge la page (voir PARTIE_KEY).
-      drawnLabels.push(ENTRIES[idx]);
       ENTRIES.splice(idx, 1);
+      ENTRY_IDS.splice(idx, 1);
       ENTRY_COLORS.splice(idx, 1);
       buildWheelLayers();
       updateWheelLabel();
@@ -1345,15 +1290,7 @@ function animate(now) {
 
   if (shouldAnimate()) {
     scheduleAnimationFrame();
-    return;
   }
-
-  // La boucle se range : l'animation d'ouverture est finie, la roue est
-  // immobile. C'est le moment calme le plus fréquent de l'application, et
-  // longtemps le seul qui n'était pas guetté — une mise à jour prête pendant
-  // les 650 ms de l'intro y restait bloquée jusqu'à la fin de la visite, sur
-  // une page où l'utilisateur n'avait pourtant rien touché.
-  applyPendingUpdate();
 }
 
 /* =======================
@@ -1692,36 +1629,14 @@ window.addEventListener("infiniteModeChange", () => {
    SERVICE WORKER
    ======================= */
 
-// Un rechargement automatique ne doit jamais interrompre l'utilisateur : ni
-// pendant une rotation, ni fenêtre ouverte, ni un résultat sous les yeux. Tant
-// que cette fonction renvoie false, l'ancienne version continue d'être servie
-// *entièrement* : aucun mélange de générations n'est possible pendant l'attente.
-//
-// Les trois refus sont passagers, et c'est ce qui compte : chacun a son moment
-// de rattrapage (fin d'animation, fermeture de la carte, fermeture de la
-// surface), où `applyPendingUpdate()` reprend la bascule mise de côté. Un
-// quatrième refus se tenait ici — « une partie est commencée » — et lui ne
-// passait jamais : dès le premier tirage, plus aucune mise à jour ne pouvait
-// s'appliquer de toute la visite. La partie est désormais mise de côté avant le
-// rechargement et rétablie après (voir PARTIE_KEY), si bien qu'un rechargement
-// ne coûte plus rien à l'utilisateur.
-function canReloadForUpdate() {
-  if (shouldAnimate()) return false;
-  if (isAnySurfaceOpen()) return false;
-  // Un résultat affiché est ce que l'utilisateur est en train de lire : le
-  // rechargement l'effacerait sous ses yeux. Il attend la fermeture de la carte
-  // (hideResult appelle applyPendingUpdate) ou la prochaine visite.
-  if (isResultVisible()) return false;
-  return true;
-}
-
 // Enregistrement après `load` pour ne pas disputer la bande passante au premier
-// affichage : le pré-cache complet de la PWA démarre juste après.
+// affichage : le pré-cache de la PWA démarre juste après.
+//
+// Aucun rappel `canReload` ici, et c'est volontaire : le service worker ne
+// recharge plus jamais la page. La dernière version arrive au prochain
+// rechargement décidé par le visiteur (voir js/sw-update.js).
 window.addEventListener("load", () => {
-  initServiceWorker({
-    canReload: canReloadForUpdate,
-    beforeReload: savePartieEnCours
-  });
+  initServiceWorker();
 });
 
 // L'effet billets est chargé à la première utilisation pour alléger le démarrage.

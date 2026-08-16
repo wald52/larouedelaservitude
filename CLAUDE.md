@@ -40,10 +40,12 @@ _before_ the push, not after a review round. Same for the §10 checklist — it 
 ```bash
 npm ci                  # install tooling (first time)
 
-npm run check           # check:imports + check:data + check:precache — the cheap, fast gate
+npm run check           # check:imports + check:data + check:precache + check:stamp — the fast gate
 npm run check:imports   # scripts/check-imports.mjs: every relative import/script src resolves
 npm run check:data      # scripts/validate-data.mjs: light/full JSON invariants
-npm run check:precache  # scripts/check-precache.mjs: offline coverage + version sync (see §7)
+npm run check:precache  # scripts/check-precache.mjs: offline coverage (see §7)
+npm run check:stamp     # scripts/stamp-assets.mjs --check: the repo matches its stamps (see §7)
+npm run stamp           # scripts/stamp-assets.mjs: re-stamp after touching a precached asset
 npm run lint            # eslint .
 npm test                # node --test (runs tests/*.test.mjs)
 
@@ -71,9 +73,9 @@ js/entries.js           Two-tier data loading (light → full) + IndexedDB cache
 js/audio.js             WebAudio, offline-first sound decoding + IndexedDB cache
 js/menu.js              Bottom tab bar, panels, history, settings; builds its own DOM at runtime
 js/settings.js          Reads the sound setting (data-attribute first, localStorage fallback)
-js/sw-update.js         SW registration + version switchover (see §7)
+js/sw-update.js         SW registration, update checks, served version (see §7)
 js/focus-trap.js        Focus stack shared by the modals (app.js) and the menu surfaces (menu.js)
-js/constants.js         SETTINGS_KEY, BASE_PATH and APP_VERSION — shared by front-end modules
+js/constants.js         SETTINGS_KEY and BASE_PATH — shared by front-end modules
 js/data-explorer.js     Table, filters, multi-key sort, export, URL state for donnees.html
 js/stats.js             Pure descriptive statistics (no DOM) — the only unit-tested front-end module
 js/charts.js            Hand-written SVG charts, themed through CSS variables, no dependency
@@ -81,10 +83,10 @@ bills.js                Banknote particle effect (repo root, lazy-imported by ap
 buttons.css             Shared button/switch system — the only place buttons are styled (both pages)
 bills.css / menu.css    Styles for those two features (all other index.html CSS is inline)
 donnees.css             Styles + theme tokens for donnees.html (a separate document)
-service-worker.js       PWA atomic precache + cache-first app shell (see §7)
+service-worker.js       PWA atomic precache; network-first documents, cache-first stamps (§7)
 data/entries-*.json     The data (see §5)
 netlify/functions/      Serverless endpoints (see §6)
-scripts/                Validation + one-off data conversion tooling
+scripts/                Stamping (stamp-assets.mjs) + validation + one-off data conversion
 tests/                  node:test suites (Netlify handlers, data, precache, stats, theme tokens)
 shares/                 Runtime artifacts only; share-*.html is gitignored
 ```
@@ -94,7 +96,7 @@ shares/                 Runtime artifacts only; share-*.html is gitignored
 `index.html` → `js/app.js` → `js/entries.js`, `js/audio.js`, `js/menu.js`, `js/sw-update.js`
 `donnees.html` → `js/data-explorer.js` → `js/entries.js`, `js/menu.js`, `js/sw-update.js`,
 `js/stats.js`, `js/charts.js`
-`js/audio.js` → `js/settings.js` → `js/constants.js` ← `js/sw-update.js`, `js/entries.js`
+`js/audio.js` → `js/settings.js` → `js/constants.js` ← `js/entries.js`; `js/menu.js` → `js/sw-update.js`
 `js/app.js`, `js/menu.js` → `js/focus-trap.js` (piled surfaces: share sheet, feedback form, panels)
 `js/app.js` → `import('../bills.js')` (dynamic, on first spin) → `js/settings.js`, and
 `bills.js` → `import('./js/audio.js')` (dynamic, inside `initBills()`)
@@ -226,9 +228,8 @@ surface that _is_ allowed to cover the page, and the feedback form carries the i
 itself — it used to be two card buttons opening a form whose title said "complément" either way.
 
 The modal this card replaced covered the wheel it commented on and had to be dismissed before
-spinning again. Two consequences to keep in mind: an automatic SW reload is held while a card is on
-screen (`canReloadForUpdate`), and the install banner — which floats over the same bottom strip —
-waits for the card to be closed.
+spinning again. One consequence to keep in mind: the install banner — which floats over the same
+bottom strip — waits for the card to be closed.
 
 **Navigation is a bottom tab bar, not a hamburger.** `js/menu.js` builds a fixed bar at the bottom
 of `index.html` from two tables: `MENU_TABS` (the four tabs, in display order) and `MENU_PANELS`
@@ -426,92 +427,91 @@ Shares are **not** committed. `shares/share-*.html` is gitignored; the flow is I
 `sharePage` route, deliberately avoiding commits to the repo on user action. Do not reintroduce a
 commit-based share flow.
 
-## 7. Service worker — one generation at a time
+## 7. Service worker — freshness comes from the URLs
 
-Three guarantees, and everything in `service-worker.js` + `js/sw-update.js` exists to hold them:
-**(1)** one load with zero interaction is enough to work fully offline, **(2)** a visitor gets the
-latest published version without waiting 24 h or reloading twice, **(3)** a page never mixes files
-from two versions.
+Three guarantees, and everything in `service-worker.js` + `scripts/stamp-assets.mjs` exists to hold
+them: **(1)** one load with zero interaction is enough to work fully offline, **(2)** reloading while
+online always lands on the latest version — in that very load, with **no automatic reload ever**, and
+**(3)** a page never mixes files from two generations.
 
-**Bump the version in _two_ files whenever you change any precached asset:** `CACHE_VERSION` in
-`service-worker.js` (currently `v53`) and `APP_VERSION` in `js/constants.js`. They must be equal —
-`npm run check:precache` fails otherwise. That pair _is_ the release: nothing reaches returning
-visitors without it.
+**(3) is not solved in the service worker. It is solved in the URLs.** Code and styles are stamped
+with a content hash (`./js/app.js?v=beac5b9e`), so a stamped URL names an _immutable_ content. The
+HTML of generation N only ever references N URLs, so a page is coherent by construction — no matter
+whether each file came from the network or from a cache. That is what makes it safe to serve
+documents network-first (always fresh) _and_ assets cache-first (instant, offline) at the same time.
 
-**Add every new module and asset to `urlsToCache`.** `npm run check:precache` (and
-`tests/precache.test.mjs`) walks both HTML pages, `site.webmanifest`, every `js/` module, `bills.js`
-and every stylesheet, and fails on any local file they reference that is missing from the list — a
-missing entry is the classic "first launch offline is broken" bug. A new page or module must also
-be added to `SCANNED_PAGES` / `SCANNED_SCRIPTS` / `SCANNED_STYLES` in `scripts/check-precache.mjs`
-and to the page list in `scripts/check-imports.mjs`, otherwise nothing checks it.
+**Three fetch rules**, and they follow from that:
+
+1. **Documents → network-first**, falling back to the cache. Reloading online gives the newest HTML,
+   hence the newest set of stamped URLs. Offline, the cache serves the last complete generation's
+   HTML, which references only that generation's URLs — all present.
+2. **Stamped assets (`?v=`) → cache-first, across _all_ generations.** `caches.match` without a cache
+   name searches every generation; since the URL fixes the content, serving from an older cache is
+   exact — and avoids re-downloading what a new generation did not change.
+3. **Everything else → network-first** (data, sounds, images, icons, manifest). Not stamped, but
+   mismatched they cannot break the site — that is precisely the criterion for not stamping. Data
+   additionally has its own freshness (the `version` field + revalidation in `js/entries.js`).
+
+Skipped entirely: `/.netlify/functions/*`, cross-origin, and any URL carrying `fresh`.
+
+**No `skipWaiting()`, and nothing ever reloads the page.** A tab that stays open keeps being served
+by its own service worker and its own cache, including for what it loads late (the full dataset, the
+sounds). The new service worker precaches its generation as soon as it installs — so the offline
+snapshot is ready well before it takes over — and only activates, purging old caches, once no page
+from the previous generation is open. The visitor reloads when they want to.
+
+This replaced a handshake (`SKIP_WAITING` → `controllerchange` → silent `location.reload()`) whose
+premise was that the page had to be _told_ when to switch. Two things were wrong with it. It reloaded
+the page under the visitor, which is what this design set out to stop; and every reason to refuse a
+reload (wheel spinning, panel open, game started) was a reason the visitor could keep an old version
+indefinitely — the bug behind "I have to clear the cache".
+
+**Run `npm run stamp` whenever you change any precached asset**, and commit what it rewrites. It
+hashes each JS/CSS file, rewrites the references to it (in import specifiers, `src=`/`href=`
+attributes and CSS `url()` — never in prose, the repo quotes its own filenames constantly), and
+regenerates the `VERSION` + `ASSETS` block in `service-worker.js`. It is idempotent, and
+`npm run check:stamp` (part of `npm run check`, so of CI) fails if the repo has drifted from what it
+would produce. **There is no version number to bump by hand any more** — `CACHE_VERSION` and
+`APP_VERSION` are gone, and the generation is a hash of the published content.
+
+Because it walks the graph from the two documents, **a new module or stylesheet needs no
+registration anywhere**: it is discovered, stamped and precached automatically. What still needs a
+hand is a new _unstamped_ asset (a sound, an image, an icon) — add it to `UNSTAMPED` in
+`scripts/stamp-assets.mjs`, or it will not be precached and the first offline launch will miss it.
+`npm run check:precache` catches exactly that: it fails on any local resource referenced by the
+pages, the manifest, the modules or the stylesheets that is absent from `ASSETS`.
+
+Hashing order matters and is handled: a module that imports others has its own references rewritten
+**before** it is hashed, otherwise the hash would not describe what is actually served. The stamper
+topologically sorts the module graph and fails loudly on a cycle.
 
 **One cache entry per page.** `PAGE_KEYS_BY_PATH` maps every URL form of a page (`/`, `/index`,
-`/index.html`, `/donnees`, `/donnees.html`) onto a single cache key, so the same page can never
-exist twice in two generations depending on the URL taken. Query strings (share parameters, the
-data page's filters) map onto the same key.
+`/index.html`, `/donnees`, `/donnees.html`) onto a single cache key, so the same page can never exist
+twice depending on the URL taken. Query strings (share parameters, the data page's filters) map onto
+the same key.
 
-**Install is atomic.** Each URL is fetched with `?v=<CACHE_VERSION>` and `cache: 'reload'` (the
-query string is what really defeats the HTTP cache and the CDN; the response is rebuilt before
-`cache.put` so the stored URL stays clean), retried twice, and **one failure aborts the whole
-install** and deletes the half-filled cache. A typo'd path therefore costs you the update, not
+**Install is atomic.** Each URL is fetched with `cache: 'reload'`, retried twice, and one failure
+aborts the whole install and deletes the half-filled cache. A typo'd path costs you the update, not
 offline support: the previous generation keeps serving, intact, and the browser retries later.
 
-**Fetch is cache-first for the entire shell** — `index.html` included, and navigations with query
-strings map onto it. Freshness does _not_ come from per-file network requests: a fresh `index.html`
-combined with cached JS is exactly the version mix that breaks the site. It comes from the update
-cycle below. Skipped entirely: `/.netlify/functions/*`, cross-origin, and any URL carrying `fresh`
-(the data revalidation in `js/entries.js`). Anything not precached goes straight to the network.
+**The version shown in Réglages comes from the service worker**, asked over the `GET_VERSION` message
+(`getServedVersion()` in `js/sw-update.js`). It cannot be a constant in a module: the generation is a
+hash of the published content, so writing it into a stamped module would change that module's hash,
+hence the generation — a snake eating its tail.
 
-**Version switchover is a handshake, not a race** (`js/sw-update.js`):
-
-1. Registration uses `updateViaCache: 'none'` and calls `registration.update()` on load, on tab
-   focus and on `online` — the SW script is never read from the HTTP cache, so there is no 24 h
-   window. `netlify.toml` also sends `no-cache` for `/service-worker.js`.
-2. A new SW precaches its whole generation and then **waits**. While it waits the old one keeps
-   serving _its_ complete generation — that is what makes mixing impossible.
-3. The page decides when to switch: `canReloadForUpdate()` in `js/app.js` (nothing spinning, no
-   modal or panel open, no result card on screen) → `SKIP_WAITING` → `controllerchange`
-   → one silent `location.reload()`, guarded against loops by a 10 s `sessionStorage` marker.
-   **Every refusal is transient, and that is the whole point.** A held update re-applies itself:
-   `activateWaitingWorker()` starts a 2 s retry loop that runs until the switchover lands, on top of
-   the explicit wake-ups (animation loop parking, result card closing, tab focus, `online`). The
-   retry loop is not belt-and-braces — it is what makes "always the latest version" true. Enumerating
-   calm moments by hand is what failed before: an update ready during the 650 ms opening animation
-   hit `shouldAnimate()`, and nothing ever looked again, so the visitor kept the old version for the
-   whole visit however long they waited. That is the bug behind "I have to clear the cache".
-   A fourth refusal used to sit in `canReloadForUpdate()` — "a game has started" (`completedSpinCount
-   > 0` outside infinite mode) — and it never cleared: from the first spin onwards, no update could
-   > apply for the rest of the visit. It is gone, because the reason for it is gone (see below).
-4. Belt and braces: the page asks the controlling SW for its version (`GET_VERSION`) and compares it
-   to `APP_VERSION`. A mismatch means the code and the cache are from different generations — it
-   re-checks for an update and realigns.
-
-**A version switchover must not cost the player their game.** Outside infinite mode the drawn
-entries are spliced out of `ENTRIES`, so a reload used to hand all 371 back — which is exactly why
-updates were vetoed once a game had started. Instead of vetoing, `js/app.js` now saves the game
-across the reload: `sw-update.js` calls the `beforeReload` callback just before `location.reload()`,
-`savePartieEnCours()` writes the drawn labels and the spin count under `PARTIE_KEY`, and
-`restorePartieEnCours()` filters them out of the fresh wheel at startup. Three properties make this
-safe to keep: it stores **labels, not indices** (unique per the light file's invariants, so a data
-change can only fail to match, never mismatch); it uses `sessionStorage`, so a game still belongs to
-its tab and does not resurrect on the next visit; and the key is **consumed on read** and only ever
-written just before an update reload, so an ordinary F5 still starts a fresh game exactly as before.
-
-Pages from **v20 or earlier** don't know the handshake, so a v21+ install that finds only older
-cache names takes over immediately and reloads them itself via `client.navigate()` (fired without
-`await` — awaiting it inside `activate` deadlocks the activation the navigation is waiting for).
-
-`SKIP_WAITING` and `GET_VERSION` are live protocol; `CLEAR_CACHE` is kept for manual troubleshooting
-and no client sends it.
+`js/sw-update.js` is now only registration + update checks (on load, on tab focus, on `online`) with
+`updateViaCache: 'none'` so the SW script is never read from the HTTP cache. Those checks are what
+make the _next_ reload instant: the next generation precaches itself in the background while the
+visitor reads the current one. They never change what the open page is running.
 
 Verify a change in a browser over HTTP: load once without touching anything, kill the server, reload
-(the app must be complete), then publish a version bump and confirm the open tab lands on it by
-itself with a single cache left in `caches.keys()`.
+(the app must be complete), then publish a new generation (`npm run stamp`) and confirm that a single
+manual reload lands on it — and that nothing reloads on its own before that.
 
 ## 8. Tests and linting
 
 `npm test` runs Node's built-in test runner over `tests/*.test.mjs`: the data invariants, the
-precache/version invariants (`tests/precache.test.mjs`, which just runs the §7 checker), the
+precache + stamping invariants (`tests/precache.test.mjs`, which runs both §7 checkers), the
 statistics engine (`tests/stats.test.mjs` — pure functions plus a coherence pass over the real
 dataset), the theme-token invariant (`tests/theme-tokens.test.mjs`: a `:root[…]` rule may only
 _redefine_ a token, never introduce one — a rule accidentally inserted mid-block once split `:root`
@@ -551,8 +551,9 @@ this project has — moving or renaming a module will be caught here.
 ## 10. Checklist before you finish
 
 1. `npm run ci` passes.
-2. Changed a precached asset? Bumped **both** `CACHE_VERSION` (`service-worker.js`) and
-   `APP_VERSION` (`js/constants.js`), and added any new asset to `urlsToCache`.
+2. Changed a precached asset? Ran `npm run stamp` and committed what it rewrote. A new _unstamped_
+   asset (sound, image, icon) also needs its line in `UNSTAMPED` (`scripts/stamp-assets.mjs`).
+   There is no version number to bump by hand — see §7.
 3. Data edits touched both JSON files and bumped `version`.
 4. No repo-wide Prettier reformat in the diff.
 5. New/renamed modules resolve under `npm run check:imports` and are covered by an

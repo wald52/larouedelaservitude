@@ -7,12 +7,14 @@
     "check:imports": "node scripts/check-imports.mjs",
     "check:data": "node scripts/validate-data.mjs",
     "check:precache": "node scripts/check-precache.mjs",
-    "check": "npm run check:imports && npm run check:data && npm run check:precache",
+    "check": "npm run check:imports && npm run check:data && npm run check:precache && npm run check:stamp",
     "lint": "eslint .",
     "format": "prettier --check .",
     "format:write": "prettier --write .",
     "test": "node --test",
-    "ci": "npm run check && npm run lint && npm test"
+    "ci": "npm run check && npm run lint && npm test",
+    "stamp": "node scripts/stamp-assets.mjs",
+    "check:stamp": "node scripts/stamp-assets.mjs --check"
   },
   "devDependencies": {
     "@eslint/js": "^9.15.0",

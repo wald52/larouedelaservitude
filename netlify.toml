@@ -31,9 +31,37 @@
   [headers.values]
     Cache-Control = "no-cache"
 
+# donnees.html suit la même règle qu'index.html : c'est un document, il est servi
+# « réseau d'abord » par le service worker et doit donc être revalidé.
+[[headers]]
+  for = "/donnees.html"
+  [headers.values]
+    Cache-Control = "no-cache"
+
 # Les données sont revalidées par js/entries.js (paramètre ?fresh=) : un cache
 # CDN long les figerait entre deux publications.
 [[headers]]
   for = "/data/*"
   [headers.values]
     Cache-Control = "no-cache"
+
+# 3. Assets estampillés : immuables, donc cachables à vie.
+# Le code et les styles sont demandés avec `?v=<hachage de leur contenu>`
+# (scripts/stamp-assets.mjs). Le cache HTTP distingue les URLs par leur chaîne
+# de requête : une correction produit un nouveau hachage, donc une nouvelle URL,
+# donc une nouvelle entrée de cache. Rien ne peut rester figé — et tout ce qui
+# n'a pas changé n'est jamais retéléchargé.
+[[headers]]
+  for = "/js/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/bills.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"

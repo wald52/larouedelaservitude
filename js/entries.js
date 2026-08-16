@@ -12,7 +12,7 @@
 // Quand les données changent, un événement `entriesUpdated` est émis sur
 // window (même motif de découplage que soundModeChange / infiniteModeChange).
 
-import { BASE_PATH } from "./constants.js";
+import { BASE_PATH } from "./constants.js?v=055839fa";
 
 const DB_NAME = "LaRoueDeLaServitude";
 const DB_VERSION = 1;
@@ -299,39 +299,38 @@ function escapeHtml(value) {
 }
 
 /**
- * Récupère les détails complets d'une entrée par son index
- * @param {number} index - Index dans le tableau light
- * @returns {Promise<{id: string, nom: string, nom_complet: string, recette: string|null, annee: number|null}|null>}
- */
-export async function getEntryDetails(index) {
-  if (!entriesLight || index < 0 || index >= entriesLight.length) {
-    return null;
-  }
-
-  const lightEntry = entriesLight[index];
-  await loadFullData();
-  const fullEntry = entriesFullById?.get(lightEntry.id);
-
-  return (
-    fullEntry || {
-      id: lightEntry.id,
-      nom: lightEntry.nom,
-      nom_complet: lightEntry.nom,
-      recette: null,
-      recette_meur: null,
-      annee: null
-    }
-  );
-}
-
-/**
- * Récupère une entrée par son ID
+ * Récupère une entrée par son ID.
+ *
+ * C'est le seul accès aux détails d'une entrée. Une variante par indice a
+ * existé : elle indexait le tableau léger complet, alors que l'appelant tenait
+ * un indice dans une roue dont les entrées tirées avaient été retirées. Les
+ * deux ne coïncidaient qu'au premier tirage.
+ *
+ * Le repli reconstruit une fiche minimale à partir du fichier léger : si les
+ * données complètes n'ont pas pu être chargées (hors ligne au tout premier
+ * lancement), le tirage doit tout de même s'afficher.
+ *
  * @param {string} id - ID de l'entrée
- * @returns {Promise<{id: string, nom: string, nom_complet: string, recette: string|null, annee: number|null}|null>}
+ * @returns {Promise<{id: string, nom: string, nom_complet: string, recette: string|null, recette_meur: number|null, annee: number|null}|null>}
  */
 export async function getEntryById(id) {
+  if (!id) return null;
+
   await loadFullData();
-  return entriesFullById?.get(id) || null;
+  const fullEntry = entriesFullById?.get(id);
+  if (fullEntry) return fullEntry;
+
+  const lightEntry = entriesLight?.find((entry) => entry.id === id);
+  if (!lightEntry) return null;
+
+  return {
+    id: lightEntry.id,
+    nom: lightEntry.nom,
+    nom_complet: lightEntry.nom,
+    recette: null,
+    recette_meur: null,
+    annee: null
+  };
 }
 
 /**

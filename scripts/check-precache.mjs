@@ -1,14 +1,20 @@
 #!/usr/bin/env node
 // Vérifie que la PWA est réellement utilisable hors ligne après un seul
-// chargement, et qu'une seule version peut être servie à la fois :
+// chargement :
 //
-// 1. CACHE_VERSION (service-worker.js) === APP_VERSION (js/constants.js) ;
-// 2. chaque URL de `urlsToCache` existe bien sur le disque (cache.put échouerait
-//    sinon, et l'installation entière serait abandonnée) ;
-// 3. chaque ressource locale référencée par index.html, le manifeste, les
-//    modules JS et les feuilles de style figure dans `urlsToCache` — sinon elle
-//    n'est téléchargée qu'au premier usage en ligne, et un tout premier
-//    lancement hors ligne échoue.
+// 1. chaque URL de la liste ASSETS (générée dans service-worker.js) existe bien
+//    sur le disque — sinon `cache.put` échoue et l'installation entière est
+//    abandonnée ;
+// 2. chaque ressource locale référencée par les pages, le manifeste, les
+//    modules JS et les feuilles de style figure dans ASSETS — sinon elle n'est
+//    téléchargée qu'au premier usage en ligne, et un tout premier lancement
+//    hors ligne échoue.
+//
+// Ce qui n'est PLUS vérifié ici, parce que ce n'est plus vérifiable : il n'y a
+// plus de numéro de version à tenir synchronisé entre deux fichiers. Le nom de
+// la génération est un hachage du contenu publié, calculé par
+// scripts/stamp-assets.mjs ; c'est `npm run check:stamp` qui garantit qu'il est
+// à jour.
 
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
@@ -21,33 +27,18 @@ const NEVER_PRECACHED = new Set([
   "service-worker.js" // Doit toujours être rechargé depuis le réseau.
 ]);
 
-// Fichiers dont on analyse les références.
+// Les deux documents navigables. Tout le reste de ce qu'on analyse (modules,
+// feuilles de style) est déduit de la liste ASSETS elle-même : ajouter un module
+// ne demande donc de le déclarer nulle part.
 const SCANNED_PAGES = ["index.html", "donnees.html"];
-
-const SCANNED_SCRIPTS = [
-  "js/app.js",
-  "js/entries.js",
-  "js/audio.js",
-  "js/menu.js",
-  "js/constants.js",
-  "js/settings.js",
-  "js/sw-update.js",
-  "js/focus-trap.js",
-  "js/data-explorer.js",
-  "js/stats.js",
-  "js/charts.js",
-  "bills.js"
-];
-
-const SCANNED_STYLES = ["buttons.css", "bills.css", "menu.css", "donnees.css"];
 
 function read(relativePath) {
   return readFileSync(path.join(root, relativePath), "utf8");
 }
 
-// `${BASE}/js/app.js` → `js/app.js`
+// "./js/app.js?v=abc12345" → "js/app.js"
 function normalize(reference, fromFile = "index.html") {
-  let value = reference.trim().replace(/^\$\{BASE\}\//, "");
+  let value = reference.trim();
   if (!value || value.startsWith("#") || value.startsWith("data:")) return null;
   if (/^[a-z]+:/i.test(value) || value.startsWith("//")) return null; // URL absolue
 
@@ -58,35 +49,35 @@ function normalize(reference, fromFile = "index.html") {
   const absolute = path.resolve(base, value.replace(/^\//, ""));
   let relative = path.relative(root, absolute).replaceAll(path.sep, "/");
 
-  if (!relative || relative.startsWith("..")) return null;
+  if (relative.startsWith("..")) return null;
   if (relative.endsWith("/") || value.endsWith("/")) relative += "index.html";
   if (relative === "") relative = "index.html";
 
   return relative;
 }
 
-function extractCacheVersion() {
-  const match = read("service-worker.js").match(/const\s+CACHE_VERSION\s*=\s*['"]([^'"]+)['"]/);
-  return match ? match[1] : null;
-}
+// Le bloc généré de service-worker.js : des chaînes JSON, une par ligne.
+//
+// Les URLs sont rendues telles quelles *et* normalisées. Les deux vues sont
+// nécessaires : « ./ » et « ./index.html » désignent le même fichier — c'est
+// voulu, ce sont deux clés de cache distinctes — mais doivent rester deux
+// entrées distinctes de la liste.
+function extractPrecachedUrls() {
+  const source = read("service-worker.js");
+  const block = source.match(/const\s+ASSETS\s*=\s*\[([\s\S]*?)\n\];/);
+  if (!block) return null;
 
-function extractAppVersion() {
-  const match = read("js/constants.js").match(/APP_VERSION\s*=\s*['"]([^'"]+)['"]/);
-  return match ? match[1] : null;
+  const urls = [];
+  const entryRe = /"([^"]+)"/g;
+  let match;
+  while ((match = entryRe.exec(block[1]))) {
+    urls.push(match[1]);
+  }
+  return urls;
 }
 
 function extractPrecachedPaths() {
-  const source = read("service-worker.js");
-  const block = source.match(/const\s+urlsToCache\s*=\s*\[([\s\S]*?)\n\];/);
-  if (!block) return null;
-
-  const paths = [];
-  const entryRe = /`\$\{BASE\}\/([^`]*)`/g;
-  let match;
-  while ((match = entryRe.exec(block[1]))) {
-    paths.push(match[1]);
-  }
-  return paths;
+  return (extractPrecachedUrls() ?? []).map((url) => normalize(url)).filter(Boolean);
 }
 
 // Références locales d'un document HTML (src, href) et d'un manifeste.
@@ -160,38 +151,31 @@ function collectStyleReferences(file) {
 export function collectPrecacheIssues() {
   const issues = [];
 
-  const cacheVersion = extractCacheVersion();
-  const appVersion = extractAppVersion();
-
-  if (!cacheVersion) issues.push("CACHE_VERSION introuvable dans service-worker.js");
-  if (!appVersion) issues.push("APP_VERSION introuvable dans js/constants.js");
-  if (cacheVersion && appVersion && cacheVersion !== appVersion) {
-    issues.push(
-      `Versions désynchronisées : CACHE_VERSION=${cacheVersion} (service-worker.js) ` +
-        `vs APP_VERSION=${appVersion} (js/constants.js)`
-    );
-  }
-
-  const precached = extractPrecachedPaths();
-  if (!precached) {
-    issues.push("Liste urlsToCache introuvable dans service-worker.js");
+  const urls = extractPrecachedUrls();
+  if (!urls) {
+    issues.push("Liste ASSETS introuvable dans service-worker.js");
     return issues;
   }
 
-  const precachedSet = new Set(precached);
-
-  if (precached.length !== precachedSet.size) {
-    issues.push("urlsToCache contient des doublons");
+  if (urls.length !== new Set(urls).size) {
+    issues.push("ASSETS contient des URLs en double");
   }
+
+  const precached = urls.map((url) => normalize(url)).filter(Boolean);
+  const precachedSet = new Set(precached);
 
   for (const entry of precached) {
     if (!existsSync(path.join(root, entry))) {
-      issues.push(`urlsToCache référence un fichier absent : ${entry}`);
+      issues.push(`ASSETS référence un fichier absent : ${entry}`);
     }
     if (NEVER_PRECACHED.has(entry)) {
       issues.push(`${entry} ne doit jamais être pré-caché`);
     }
   }
+
+  // Les fichiers à analyser sortent de la liste elle-même.
+  const scripts = precached.filter((p) => p.endsWith(".js"));
+  const styles = precached.filter((p) => p.endsWith(".css"));
 
   const referenced = new Map();
   const addAll = (source, list) => {
@@ -202,8 +186,8 @@ export function collectPrecacheIssues() {
 
   for (const page of SCANNED_PAGES) addAll(page, collectHtmlReferences(page));
   addAll("site.webmanifest", collectManifestReferences());
-  for (const file of SCANNED_SCRIPTS) addAll(file, collectScriptReferences(file));
-  for (const file of SCANNED_STYLES) addAll(file, collectStyleReferences(file));
+  for (const file of scripts) addAll(file, collectScriptReferences(file));
+  for (const file of styles) addAll(file, collectStyleReferences(file));
 
   for (const [reference, source] of referenced) {
     if (NEVER_PRECACHED.has(reference)) continue;
@@ -212,7 +196,7 @@ export function collectPrecacheIssues() {
       continue;
     }
     if (!precachedSet.has(reference)) {
-      issues.push(`${reference} (référencé par ${source}) manque dans urlsToCache`);
+      issues.push(`${reference} (référencé par ${source}) manque dans ASSETS`);
     }
   }
 
@@ -229,8 +213,5 @@ if (invokedDirectly) {
     for (const issue of issues) console.error(`- ${issue}`);
     process.exit(1);
   }
-  const count = extractPrecachedPaths().length;
-  console.log(
-    `Vérification du pré-cache réussie (${count} ressources, version ${extractAppVersion()}).`
-  );
+  console.log(`Vérification du pré-cache réussie (${extractPrecachedPaths().length} ressources).`);
 }

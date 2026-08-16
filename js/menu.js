@@ -2,9 +2,10 @@
 // menu.js — Gestion du menu, historique et réglages
 // ===============================
 
-import { SETTINGS_KEY, APP_VERSION } from "./constants.js";
-import { pushFocusTrap, popFocusTrap, topFocusTrap } from "./focus-trap.js";
-import { formatRecette } from "./entries.js";
+import { SETTINGS_KEY } from "./constants.js?v=055839fa";
+import { getServedVersion } from "./sw-update.js?v=3cf9d32b";
+import { pushFocusTrap, popFocusTrap, topFocusTrap } from "./focus-trap.js?v=0b34fd1c";
+import { formatRecette } from "./entries.js?v=fbd30d90";
 
 const HISTORY_KEY = "larouedelaservitude_history";
 const DEFAULT_SETTINGS = {
@@ -254,7 +255,7 @@ const MENU_PANELS = [
         <div class="setting-item">
           <div>
             <div class="setting-label">La roue de la servitude</div>
-            <span class="setting-desc">Version ${APP_VERSION}</span>
+            <span class="setting-desc" id="appVersion">Version —</span>
           </div>
           <a class="btn btn-secondary btn-sm" href="https://github.com/wald52/larouedelaservitude"
              target="_blank" rel="noopener">GitHub</a>
@@ -591,6 +592,25 @@ function renderSettings() {
 
   SETTING_SWITCHES.forEach(({ id, key }) => {
     document.getElementById(id).setAttribute("aria-checked", current[key] ? "true" : "false");
+  });
+
+  renderServedVersion();
+}
+
+// La version affichée est celle de la génération qui sert réellement la page,
+// demandée au service worker. Elle n'est pas une constante du code : le nom de
+// la génération est un hachage du contenu publié, calculé au moment de
+// l'estampillage (scripts/stamp-assets.mjs). L'inscrire dans un module
+// estampillé changerait son propre hachage, donc la génération — un serpent qui
+// se mord la queue.
+function renderServedVersion() {
+  const target = document.getElementById("appVersion");
+  if (!target) return;
+
+  getServedVersion().then((version) => {
+    // Aucun service worker ne contrôle encore la page (toute première visite,
+    // ou navigation privée) : rien de fiable à annoncer.
+    target.textContent = version ? `Version ${version}` : "Version — hors cache";
   });
 }
 

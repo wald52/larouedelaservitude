@@ -20,7 +20,11 @@ function rel(file) {
   return path.relative(root, file).replaceAll(path.sep, "/");
 }
 
-function checkImport(specifier, fromFile) {
+function checkImport(rawSpecifier, fromFile) {
+  // Les références portent une estampille de contenu (`?v=…`, posée par
+  // scripts/stamp-assets.mjs) : elle nomme la génération, pas un fichier sur le
+  // disque, et doit donc être ôtée avant de résoudre.
+  const specifier = rawSpecifier.split("?")[0].split("#")[0];
   if (!specifier.startsWith(".") && !specifier.startsWith("/")) return;
   const base = specifier.startsWith("/") ? root : path.dirname(fromFile);
   const resolved = path.resolve(base, specifier);
