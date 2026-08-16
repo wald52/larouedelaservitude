@@ -1012,11 +1012,10 @@ function attachEvents() {
   });
 
   document.addEventListener("keydown", (event) => {
-    // Ce module reste chargé une fois la vue refermée : ses raccourcis ne
-    // valent que tant qu'elle est à l'écran. Un panneau ouvert la recouvre, et
-    // c'est js/menu.js qui répond à Échap dans ce cas.
+    // Ce module reste chargé une fois la vue quittée : ses raccourcis ne valent
+    // que tant qu'elle est à l'écran. Plus rien ne peut la recouvrir — les
+    // rubriques du menu sont des vues, elles la remplacent.
     if (document.documentElement.dataset.view !== "donnees") return;
-    if (document.documentElement.classList.contains("menu-open")) return;
 
     if (event.key === "Escape" && !elements.detail.hidden) {
       state.selectedId = null;

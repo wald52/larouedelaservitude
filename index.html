@@ -1,5 +1,8 @@
 <!doctype html>
-<html lang="fr">
+<!-- `data-view` porte la vue affichée. Il est écrit ici, et non laissé à
+     js/menu.js : le CSS bloquant s'en sert pour choisir ce qui paraît, et la
+     roue doit être là au premier rendu, sans attendre le moindre script. -->
+<html lang="fr" data-view="roue">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -48,7 +51,7 @@
      apparaîtrait d'abord nu. -->
     <link rel="stylesheet" href="buttons.css?v=8e4cf8f9" />
     <link rel="stylesheet" href="bills.css?v=3274a064" media="print" onload="this.media = 'all'" />
-    <link rel="stylesheet" href="menu.css?v=90453bf1" media="print" onload="this.media = 'all'" />
+    <link rel="stylesheet" href="menu.css?v=88ba9cc4" media="print" onload="this.media = 'all'" />
     <!-- La vue « Données » n'est pas visible au premier rendu : sa feuille peut
          arriver après. Ce qui la cache, en revanche, est dans le CSS bloquant
          ci-dessous — sans quoi elle s'afficherait sous la roue le temps du
@@ -61,7 +64,7 @@
     />
     <noscript>
       <link rel="stylesheet" href="bills.css?v=3274a064" />
-      <link rel="stylesheet" href="menu.css?v=90453bf1" />
+      <link rel="stylesheet" href="menu.css?v=88ba9cc4" />
       <link rel="stylesheet" href="donnees.css?v=7673894b" />
     </noscript>
 
@@ -292,30 +295,28 @@
          sa place dans une fenêtre plus haute que l'écran, et le bas de la carte
          finissait sous la barre d'onglets. La première déclaration est le repli
          des navigateurs sans `svh`. */
-      /* ============ Les deux vues ============
-         La page en montre une à la fois : la roue (.wrap) ou les données
-         (.data-view), selon `data-view` posé sur <html> par js/menu.js. Les
-         données ne sont plus un second document : il n'y a plus de navigation
-         entre le jeu et sa source, donc plus rien à conserver au passage — la
-         partie en cours vit simplement dans la page qui ne la quitte pas.
+      /* ============ Les quatre vues ============
+         La page en montre une à la fois : la roue (.wrap), les données
+         (.data-view) ou l'une des deux vues bâties par js/menu.js (.menu-view),
+         selon `data-view` posé sur <html> — écrit dans le balisage à « roue »
+         pour que le premier rendu n'ait rien à deviner, puis par js/menu.js.
 
-         Ces deux règles sont dans le CSS bloquant, et non dans donnees.css qui
-         est chargé en différé : sinon la vue paraîtrait sous la roue le temps
-         que la feuille arrive.
+         Les quatre onglets se comportent donc de la même façon : chacun montre
+         sa vue, la barre d'onglets reste visible et cliquable, rien ne recouvre
+         rien. Historique et Réglages étaient des feuilles montantes fermées par
+         une croix, qui masquaient justement la barre par laquelle on navigue :
+         la moitié du menu se quittait par un onglet, l'autre par une croix.
 
-         La vue des données est une surface fixe qui défile en propre, parce que
-         le corps du document, lui, ne défile jamais (c'est un jeu : `body` est
-         en position fixe, `touch-action: none`). Elle s'arrête au-dessus de la
-         barre d'onglets, qui reste visible et par laquelle on revient. */
-      .data-view {
+         Ces règles sont dans le CSS bloquant, et non dans donnees.css ou
+         menu.css qui sont chargés en différé : sinon la vue paraîtrait sous la
+         roue le temps que la feuille arrive.
+
+         Une vue est une surface fixe qui défile en propre, parce que le corps
+         du document, lui, ne défile jamais (c'est un jeu : `body` est en
+         position fixe, `touch-action: none`). Elle s'arrête au-dessus de la
+         barre d'onglets, par laquelle on la quitte. */
+      .app-view {
         display: none;
-      }
-      :root[data-view="donnees"] .wrap,
-      :root[data-view="donnees"] .install-banner {
-        display: none;
-      }
-      :root[data-view="donnees"] .data-view {
-        display: block;
         position: fixed;
         top: 0;
         left: 0;
@@ -326,6 +327,16 @@
         overscroll-behavior: contain;
         touch-action: pan-y;
         background: var(--bg);
+      }
+      /* La roue et sa bannière d'installation ne sont là que sur leur vue. */
+      :root:not([data-view="roue"]) .wrap,
+      :root:not([data-view="roue"]) .install-banner {
+        display: none;
+      }
+      :root[data-view="donnees"] #dataView,
+      :root[data-view="historique"] #view-historique,
+      :root[data-view="reglages"] #view-reglages {
+        display: block;
       }
 
       .wrap {
@@ -1211,7 +1222,7 @@
          la colonne du jeu, sans navigation. Son affichage est décidé par
          :root[data-view] dans le CSS bloquant ci-dessus, pour qu'elle ne
          paraisse jamais le temps que donnees.css arrive. -->
-    <section class="data-view" id="dataView" aria-labelledby="dataViewTitle">
+    <section class="app-view data-view" id="dataView" aria-labelledby="dataViewTitle">
       <header class="page-header">
         <div class="page-header__inner">
           <div class="page-header__titles">
@@ -1726,6 +1737,6 @@
       </form>
     </div>
 
-    <script type="module" src="./js/app.js?v=5e4d4398"></script>
+    <script type="module" src="./js/app.js?v=f2bc549b"></script>
   </body>
 </html>

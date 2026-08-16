@@ -4,7 +4,7 @@
 
 import { SETTINGS_KEY } from "./constants.js?v=b8755637";
 import { getServedVersion } from "./sw-update.js?v=3cf9d32b";
-import { pushFocusTrap, popFocusTrap, topFocusTrap } from "./focus-trap.js?v=0b34fd1c";
+import { topFocusTrap } from "./focus-trap.js?v=0b34fd1c";
 import { formatRecette } from "./entries.js?v=c56272d2";
 import { clearDrawnIds } from "./game.js?v=73adbd70";
 
@@ -171,19 +171,23 @@ export function getSettings() {
 // UI du Menu
 // ===============================
 //
-// Une barre d'onglets fixée en bas de l'écran, et un panneau par rubrique qui
-// monte depuis cette barre. Le hamburger et son tiroir latéral ont été
-// remplacés : la navigation principale d'une application tenue à une main vit
-// sous le pouce, pas dans un coin haut de l'écran, et les rubriques sont
-// visibles en permanence au lieu d'être repliées derrière trois traits.
+// Une barre d'onglets fixée en bas de l'écran, et une vue par rubrique. Le
+// hamburger et son tiroir latéral ont été remplacés : la navigation principale
+// d'une application tenue à une main vit sous le pouce, pas dans un coin haut
+// de l'écran, et les rubriques sont visibles en permanence au lieu d'être
+// repliées derrière trois traits.
 //
-// Les panneaux arrivent donc par le bas — d'où ils sont appelés. La règle n'a
-// pas changé, seule son origine : une surface glisse depuis le contrôle qui
-// l'ouvre, sinon la hiérarchie devient illisible.
+// **Les quatre onglets ont le même comportement** : cliquer sur l'un montre sa
+// vue, la barre reste visible et cliquable, aucune surface ne recouvre rien.
+// Historique et Réglages étaient des feuilles montantes qu'il fallait refermer
+// par une croix — elles masquaient la barre, si bien que la moitié du menu se
+// quittait par un onglet et l'autre moitié par une croix. Une barre d'onglets
+// promet que les rubriques sont toujours à un pouce : une surface qui la
+// recouvre rompt cette promesse, et la croix ne faisait que refaire ce que
+// l'onglet « Accueil » fait déjà.
 //
-// Les surfaces passent toutes par openSurface / closeSurface : même animation,
-// même piège à focus, même touche Échap. Rien n'est atteignable au clavier
-// tant que la surface est fermée (visibility, menu.css).
+// Il n'y a donc plus de piège à focus ici : plus rien n'est modal, et une vue
+// cachée est en `display: none`, donc hors de l'ordre de tabulation.
 
 // Icônes de navigation, tracées et monochromes : elles héritent de la couleur
 // du texte et partagent une même épaisseur de trait. Les emojis qu'elles
@@ -217,10 +221,10 @@ const ICONS = {
   )
 };
 
-// Les rubriques qui ouvrent un panneau. Le panneau, son en-tête, son bouton de
-// fermeture et le rendu de son contenu en découlent tous : ajouter une
-// rubrique, c'est ajouter une ligne ici puis une ligne dans MENU_TABS.
-const MENU_PANELS = [
+// Les rubriques dont la vue est bâtie ici, à l'exécution. La section, son
+// en-tête et le rendu de son contenu en découlent tous : ajouter une rubrique,
+// c'est ajouter une ligne ici puis une ligne dans MENU_TABS.
+const MENU_VIEWS = [
   {
     id: "historique",
     label: "Historique",
@@ -277,39 +281,36 @@ const MENU_PANELS = [
   }
 ];
 
-// La barre du bas, dans l'ordre où elle s'affiche. Deux natures d'onglet, et
-// c'est la clé présente qui les distingue :
-//   - `view`  : montre cette vue de la page et cache l'autre ;
-//   - `panel` : ouvre le panneau du même identifiant dans MENU_PANELS, par
-//     dessus la vue courante.
-// Quatre onglets au maximum : au-delà, les libellés ne tiennent plus sur un
-// écran de téléphone sans être tronqués.
+// La barre du bas, dans l'ordre où elle s'affiche. Une seule nature d'onglet :
+// chacun montre sa vue. Quatre au maximum — au-delà, les libellés ne tiennent
+// plus sur un écran de téléphone sans être tronqués.
 const MENU_TABS = [
   { id: "accueil", icon: ICONS.accueil, label: "Accueil", view: "roue" },
   {
     id: "historique",
     icon: ICONS.historique,
     label: "Historique",
-    panel: "historique",
+    view: "historique",
     badgeId: "historyBadge"
   },
   { id: "donnees", icon: ICONS.donnees, label: "Données", view: "donnees" },
-  { id: "reglages", icon: ICONS.reglages, label: "Réglages", panel: "reglages" }
+  { id: "reglages", icon: ICONS.reglages, label: "Réglages", view: "reglages" }
 ];
 
 // ===============================
 // Les vues
 // ===============================
 //
-// Il n'y a plus qu'un document : la roue et les données sont deux vues de la
-// même page, et « Données » ne navigue plus. C'était la seule façon d'en finir
-// avec la partie perdue au passage d'une page à l'autre — il n'y a plus de
-// passage. Ce qui s'affiche est décidé par `data-view` sur <html>, lu par le
-// CSS bloquant d'index.html ; les modules intéressés écoutent `viewChange`
-// (même découplage que les réglages : personne n'importe app.js).
+// Il n'y a plus qu'un document, et quatre vues d'une même page : la roue, les
+// données, l'historique et les réglages. Aucun onglet ne navigue, aucun ne
+// recouvre. C'était la seule façon d'en finir avec la partie perdue au passage
+// d'une page à l'autre — il n'y a plus de passage. Ce qui s'affiche est décidé
+// par `data-view` sur <html>, lu par le CSS bloquant d'index.html ; les modules
+// intéressés écoutent `viewChange` (même découplage que les réglages : personne
+// n'importe app.js).
 //
 // La vue est aussi dans l'URL (`?vue=donnees`), pour trois raisons : un lien
-// vers les données reste partageable et peut se mettre en favori, le bouton
+// vers une rubrique reste partageable et peut se mettre en favori, le bouton
 // « précédent » du navigateur ramène à la roue, et l'explorateur y écrit déjà
 // ses filtres.
 const DEFAULT_VIEW = "roue";
@@ -323,9 +324,9 @@ export function viewFromUrl() {
 export function openView(view, { push = true } = {}) {
   const next = MENU_TABS.some((tab) => tab.view === view) ? view : DEFAULT_VIEW;
 
-  // Un onglet de vue referme ce qui est ouvert par-dessus, y compris quand on
-  // reclique sur la vue déjà affichée : c'est ce que faisait « Accueil ».
-  closeAllPanels();
+  // Le contenu est rafraîchi avant d'être montré : l'historique et les
+  // interrupteurs ont pu changer depuis le dernier passage.
+  renderView(next);
 
   document.documentElement.dataset.view = next;
 
@@ -334,8 +335,18 @@ export function openView(view, { push = true } = {}) {
     window.dispatchEvent(new CustomEvent("viewChange", { detail: next }));
   }
 
-  updateTabState(null);
+  updateTabState();
   if (push) pushViewUrl(next);
+}
+
+// Le rendu d'une vue bâtie ici. Au démarrage, app.js ouvre la vue de l'URL
+// avant que le menu n'existe (il est construit en différé) : il n'y a alors
+// rien à rendre, et createMenuHTML s'en charge dès que la section est là.
+function renderView(id) {
+  const view = MENU_VIEWS.find((entry) => entry.id === id);
+  if (!view || !document.getElementById(viewElementId(id))) return;
+
+  view.render();
 }
 
 function pushViewUrl(view) {
@@ -367,8 +378,8 @@ export function initMenu() {
   console.log("[MENU] Initialisé");
 }
 
-function panelElementId(id) {
-  return `panel-${id}`;
+function viewElementId(id) {
+  return `view-${id}`;
 }
 
 function tabElementId(id) {
@@ -376,13 +387,9 @@ function tabElementId(id) {
 }
 
 function createMenuHTML() {
-  const overlay = document.createElement("div");
-  overlay.className = "menu-overlay";
-  overlay.id = "menuOverlay";
-  document.body.appendChild(overlay);
-
   // La barre du bas est la navigation principale : elle reste affichée en
-  // permanence, contrairement au tiroir qu'il fallait d'abord déplier.
+  // permanence, contrairement au tiroir qu'il fallait d'abord déplier — et
+  // désormais quelle que soit la vue, plus rien ne passe par-dessus.
   const tabbar = document.createElement("nav");
   tabbar.className = "menu-tabbar";
   tabbar.id = "menuTabbar";
@@ -390,53 +397,48 @@ function createMenuHTML() {
   tabbar.innerHTML = MENU_TABS.map(renderTabItem).join("");
   document.body.appendChild(tabbar);
 
-  for (const panel of MENU_PANELS) {
-    document.body.appendChild(createPanelElement(panel));
+  for (const view of MENU_VIEWS) {
+    document.body.appendChild(createViewElement(view));
   }
 
-  updateTabState(null);
+  // La vue demandée par l'URL a pu être ouverte avant que ces sections
+  // n'existent : c'est ici qu'elle reçoit son contenu.
+  renderView(currentView);
+  updateTabState();
   updateHistoryBadge();
 }
 
 // Un onglet : icône, badge éventuel posé sur l'icône, libellé dessous. Le
 // libellé est écrit et non seulement suggéré par le pictogramme — une icône
 // seule se devine, elle ne se lit pas.
-function renderTabItem({ id, icon, label, badgeId, panel, view }) {
+function renderTabItem({ id, icon, label, badgeId, view }) {
   const badge = badgeId ? `<span class="tabbar-item__badge" id="${badgeId}" hidden>0</span>` : "";
   const inner = `
       <span class="tabbar-item__icon">${icon}${badge}</span>
       <span class="tabbar-item__label">${label}</span>`;
 
-  // Plus aucun onglet ne quitte la page : ce sont tous des boutons. « Données »
-  // était un vrai <a> tant que c'était un second document ; un lien vers cette
-  // vue reste possible, mais il passe désormais par `?vue=donnees`.
-  const attrs = panel
-    ? ` data-panel="${panel}" aria-controls="${panelElementId(panel)}" aria-expanded="false"`
-    : ` data-view="${view}"`;
-
-  return `<button class="tabbar-item" id="${tabElementId(id)}" type="button"${attrs}>${inner}</button>`;
+  // Plus aucun onglet ne quitte la page : ce sont tous des boutons, et ils font
+  // tous la même chose. « Données » était un vrai <a> tant que c'était un
+  // second document ; un lien vers une vue reste possible, mais il passe
+  // désormais par `?vue=…`.
+  return (
+    `<button class="tabbar-item" id="${tabElementId(id)}" type="button"` +
+    ` data-view="${view}">${inner}</button>`
+  );
 }
 
-// `aria-current` désigne l'endroit où l'on se trouve : la vue affichée tant
-// qu'aucun panneau n'est ouvert, sinon l'onglet du panneau ouvert. C'est aussi
-// ce que le CSS interroge pour teinter l'onglet actif — pas de classe en
+// `aria-current` désigne l'endroit où l'on se trouve : la vue affichée. C'est
+// aussi ce que le CSS interroge pour teinter l'onglet actif — pas de classe en
 // double, donc pas d'état visuel qui puisse diverger de l'état annoncé.
-function updateTabState(openPanelId) {
+function updateTabState() {
   for (const tab of MENU_TABS) {
     const element = document.getElementById(tabElementId(tab.id));
     if (!element) continue;
 
-    const isCurrent = tab.panel
-      ? tab.panel === openPanelId
-      : openPanelId === null && tab.view === currentView;
-    if (isCurrent) {
+    if (tab.view === currentView) {
       element.setAttribute("aria-current", "page");
     } else {
       element.removeAttribute("aria-current");
-    }
-
-    if (tab.panel) {
-      element.setAttribute("aria-expanded", String(tab.panel === openPanelId));
     }
   }
 }
@@ -465,86 +467,30 @@ function renderSettingSwitch({ id, group, label, description }) {
   `;
 }
 
-function createPanelElement({ id, label, content }) {
-  const panel = document.createElement("div");
-  panel.className = "menu-panel";
-  panel.id = panelElementId(id);
-  // Un panneau recouvre la page et retient le focus : c'est un dialogue.
-  panel.setAttribute("role", "dialog");
-  panel.setAttribute("aria-modal", "true");
-  panel.setAttribute("aria-labelledby", `${panelElementId(id)}-title`);
-  // La poignée est le signe convenu d'une feuille qu'on tire depuis le bas :
-  // purement décorative, d'où aria-hidden.
-  panel.innerHTML = `
-    <div class="panel-grabber" aria-hidden="true"></div>
-    <div class="panel-header">
-      <h3 class="panel-title" id="${panelElementId(id)}-title">${label}</h3>
-      <button class="btn btn-icon btn-secondary btn-close" data-close-panel="${id}" type="button"
-              aria-label="Fermer ${label.toLowerCase()}"></button>
+// Une vue, pas une feuille : ni voile, ni poignée, ni croix. Elle occupe la
+// page jusqu'à la barre d'onglets (CSS bloquant d'index.html), et c'est par la
+// barre qu'on la quitte, comme pour la vue « Données ».
+function createViewElement({ id, label, content }) {
+  const view = document.createElement("section");
+  view.className = "app-view menu-view";
+  view.id = viewElementId(id);
+  view.setAttribute("aria-labelledby", `${viewElementId(id)}-title`);
+  view.innerHTML = `
+    <div class="menu-view__inner">
+      <h1 class="menu-view__title" id="${viewElementId(id)}-title">${label}</h1>
+      ${content}
     </div>
-    <div class="panel-content">${content}</div>
   `;
-  return panel;
+  return view;
 }
 
 // ===============================
-// Ouverture / fermeture des surfaces
+// Événements
 // ===============================
-
-function openSurface(element, initialFocus) {
-  element.classList.add("active");
-  pushFocusTrap(element, { initialFocus });
-}
-
-function closeSurface(element) {
-  element.classList.remove("active");
-  popFocusTrap(element);
-}
-
-// Un seul panneau à la fois : ouvrir depuis la barre referme celui qui l'était.
-// Ils ne s'empilent pas — deux feuilles montées du même bord se recouvriraient
-// sans que rien ne dise laquelle est laquelle.
-function openPanel(panelId) {
-  const panel = MENU_PANELS.find((entry) => entry.id === panelId);
-  if (!panel) return;
-
-  closeAllPanels();
-
-  const element = document.getElementById(panelElementId(panelId));
-  panel.render();
-  document.getElementById("menuOverlay").classList.add("active");
-  document.documentElement.classList.add("menu-open");
-  updateTabState(panelId);
-  openSurface(element, element.querySelector("[data-close-panel]"));
-}
-
-function closePanel(panelId) {
-  const element = document.getElementById(panelElementId(panelId));
-  if (!element || !element.classList.contains("active")) return;
-
-  closeSurface(element);
-  document.getElementById("menuOverlay").classList.remove("active");
-  document.documentElement.classList.remove("menu-open");
-  updateTabState(null);
-}
-
-function closeAllPanels() {
-  for (const panel of MENU_PANELS) closePanel(panel.id);
-}
 
 function attachMenuEvents() {
-  document.getElementById("menuOverlay").addEventListener("click", closeAllPanels);
-
-  document.querySelectorAll(".tabbar-item[data-panel]").forEach((item) => {
-    item.addEventListener("click", () => openPanel(item.dataset.panel));
-  });
-
   document.querySelectorAll(".tabbar-item[data-view]").forEach((item) => {
     item.addEventListener("click", () => openView(item.dataset.view));
-  });
-
-  document.querySelectorAll("[data-close-panel]").forEach((button) => {
-    button.addEventListener("click", () => closePanel(button.dataset.closePanel));
   });
 
   // Actions historique
@@ -573,12 +519,12 @@ function attachMenuEvents() {
   });
 
   // Nouvelle partie. La roue se regarnit sur l'événement, comme pour les
-  // réglages : menu.js n'importe pas app.js. Sur la page « Données » personne
-  // n'écoute, mais la partie est bien effacée — la roue la retrouvera vide.
+  // réglages : menu.js n'importe pas app.js. On revient à la roue dans la
+  // foulée — c'est elle qu'on vient de regarnir, il faut la voir.
   document.getElementById("newGame").addEventListener("click", () => {
     clearDrawnIds();
     window.dispatchEvent(new CustomEvent("gameReset"));
-    closeAllPanels();
+    openView(DEFAULT_VIEW);
   });
 
   // Reset app
@@ -592,22 +538,24 @@ function attachMenuEvents() {
       history = [];
       settings = { ...DEFAULT_SETTINGS };
       applySettingsToDocument();
-      closeAllPanels();
-      window.location.reload();
+      // Rechargement sur la roue, et non sur `?vue=reglages` : après une remise
+      // à zéro on veut retrouver l'application dans son état de départ.
+      const url = new URL(window.location.href);
+      url.searchParams.delete("vue");
+      window.location.replace(url);
     }
   });
 
-  // Échap ne ferme que la surface du dessus. On ne réagit pas si c'est une
-  // modale de la roue qui est au premier plan — app.js s'en charge.
+  // Échap ramène à la roue depuis les vues bâties ici — l'équivalent de la
+  // croix qu'elles n'ont plus. Sur la vue « Données », c'est data-explorer.js
+  // qui répond (il referme sa fiche de détail) ; et si une modale de la roue
+  // est au premier plan, elle a la priorité — app.js s'en charge.
   document.addEventListener("keydown", (event) => {
     if (event.key !== "Escape") return;
+    if (topFocusTrap()) return;
+    if (!MENU_VIEWS.some((view) => view.id === currentView)) return;
 
-    const top = topFocusTrap();
-    if (!top) return;
-
-    if (top.classList.contains("menu-panel")) {
-      closePanel(top.id.replace("panel-", ""));
-    }
+    openView(DEFAULT_VIEW);
   });
 }
 

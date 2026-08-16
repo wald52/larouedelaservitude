@@ -8,7 +8,6 @@
 :root {
   --menu-bg: var(--surface, #111);
   --menu-text: var(--fg, #fff);
-  --menu-panel-bg: var(--surface-alt, #1a1a1a);
   --menu-border: var(--ring, #333);
   --menu-muted: var(--legend, #888);
 }
@@ -146,122 +145,44 @@
   }
 }
 
-/* Le fond ne défile plus derrière un panneau. Remplace le
-   `document.body.style.overflow` que posait js/menu.js : l'état visuel reste
-   dans la feuille de style. */
-.menu-open,
-.menu-open body {
-  overflow: hidden;
-}
-
-/* Voile sombre. Ne bloque jamais les clics quand il est inactif. */
-.menu-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.45);
-  z-index: 9998;
-  opacity: 0;
-  visibility: hidden;
-  transition:
-    opacity 0.3s ease,
-    visibility 0.3s ease;
-  pointer-events: none;
-}
-
-.menu-overlay.active {
-  opacity: 1;
-  visibility: visible;
-  pointer-events: auto;
-}
-
 /* ===============================
-   Panneaux (feuilles montantes)
+   Vues de l'historique et des réglages
    ===============================
 
-   Un panneau monte depuis le bas, c'est-à-dire depuis la barre d'onglets qui
-   l'a ouvert : une surface glisse depuis le contrôle qui l'appelle, sinon on ne
-   voit plus d'où elle vient ni où elle retourne. (Du temps du tiroir latéral,
-   c'était la gauche, pour la même raison.)
+   Ce sont des vues, pas des feuilles montantes : elles occupent la page comme
+   la vue « Données », s'arrêtent au-dessus de la barre d'onglets et se quittent
+   par cette barre. Elles n'ont ni voile, ni poignée, ni croix.
 
-   L'animation porte sur `transform` (composée par le GPU) et non sur `top` /
-   `bottom`, qui forceraient un recalcul de mise en page à chaque image.
+   Elles étaient des feuilles glissées depuis le bas, à refermer par une croix,
+   et qui recouvraient la barre : deux des quatre onglets se comportaient
+   autrement que les deux autres, et la barre — dont tout l'intérêt est de tenir
+   les rubriques à un pouce — disparaissait dès qu'on en ouvrait une. La croix
+   ne faisait d'ailleurs que refaire ce que l'onglet « Accueil » fait déjà.
 
-   `visibility: hidden` est la pièce maîtresse : sans elle, une surface fermée
-   reste dans l'ordre de tabulation. Douze contrôles du menu étaient encore
-   atteignables au clavier alors que le menu était fermé. */
-.menu-panel {
-  position: fixed;
-  left: 50%;
-  bottom: 0;
-  z-index: 10001;
-  width: min(560px, 100vw);
-  /* Une feuille, pas une page : le voile reste visible au-dessus, ce qui dit
-     que la roue est toujours là, derrière. */
-  max-height: min(78dvh, 680px);
-  display: flex;
-  flex-direction: column;
-  background: var(--menu-panel-bg);
-  border-radius: 20px 20px 0 0;
-  visibility: hidden;
-  transform: translate(-50%, 100%);
-  /* `visibility` bascule d'un coup (durée nulle), et non progressivement : à la
-     fermeture elle attend la fin du glissement, à l'ouverture elle s'applique
-     immédiatement. Une vraie transition sur `visibility` laissait la surface
-     encore « hidden » au moment où le focus devait y entrer, et focus() était
-     alors ignoré en silence. */
-  transition:
-    transform 0.3s cubic-bezier(0.2, 0.7, 0.3, 1),
-    visibility 0s linear 0.3s;
-  box-shadow: 0 -6px 28px rgba(0, 0, 0, 0.28);
-}
-
-.menu-panel.active {
-  visibility: visible;
-  transform: translate(-50%, 0);
-  transition:
-    transform 0.3s cubic-bezier(0.2, 0.7, 0.3, 1),
-    visibility 0s linear 0s;
-}
-
-/* ===============================
-   En-tête d'un panneau
-   =============================== */
-
-/* La poignée : le signe convenu qu'on a affaire à une feuille venue du bas. */
-.panel-grabber {
-  width: 40px;
-  height: 4px;
-  margin: 8px auto 0;
-  border-radius: 999px;
-  background: var(--menu-border);
-  flex-shrink: 0;
-}
-
-.panel-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-height: 56px;
-  padding: 8px 12px 8px 20px;
-  border-bottom: 1px solid var(--menu-border);
-  box-sizing: border-box;
-}
-
-.panel-title {
-  flex: 1;
-  margin: 0;
-  font-size: 18px;
-  font-weight: 700;
+   Le cadre (position fixe, défilement propre, arrêt sur --tabbar-room) vient de
+   `.app-view`, dans le CSS bloquant d'index.html — il est commun aux trois vues
+   et doit valoir dès le premier rendu. Ici, seul l'habillage. */
+.menu-view {
   color: var(--menu-text);
 }
 
-/* Le rembourrage bas tient compte du menu système iOS : la feuille touche le
-   bord de l'écran, le dernier bouton de la liste ne doit pas s'y perdre. */
-.panel-content {
-  flex: 1;
-  overflow-y: auto;
-  padding: 16px 16px calc(16px + env(safe-area-inset-bottom, 0px));
-  overscroll-behavior: contain;
+/* Une colonne de la largeur de la bande d'onglets : sur un écran large, les
+   interrupteurs étalés sur toute la fenêtre laissaient un libellé à gauche et
+   sa commande à l'autre bout de l'écran.
+   Le rembourrage bas tient compte du menu système iOS. */
+.menu-view__inner {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 20px 16px calc(24px + env(safe-area-inset-bottom, 0px));
+  box-sizing: border-box;
+}
+
+.menu-view__title {
+  margin: 0 0 20px;
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--menu-text);
 }
 
 /* Liste d'historique */
@@ -351,12 +272,4 @@
 }
 
 /* L'interrupteur (.switch) et les boutons (.btn) viennent de buttons.css :
-   ils sont communs aux deux pages du site. */
-
-/* Responsive : sur un téléphone la feuille peut monter plus haut, il n'y a rien
-   d'autre à regarder derrière. */
-@media (max-width: 480px) {
-  .menu-panel {
-    max-height: 82dvh;
-  }
-}
+   c'est le seul endroit où un bouton est habillé. */

@@ -21,9 +21,10 @@ _before_ the push, not after a review round. Same for the §10 checklist — it 
 - **Static site, no build step.** `index.html` is served as-is and loads `./js/app.js` as a native
   ES module. There is no bundler, no transpiler, no framework, no TypeScript. What you write is
   what the browser runs.
-- **One page, two views.** `index.html` holds both the wheel (the game) and the « Données &
-  analyse » view (§4) — same data, same shell, no navigation between them. The bottom tab bar
-  swaps them by writing `data-view` on `<html>`. `donnees.html` was a second document until the
+- **One page, four views.** `index.html` holds the wheel (the game) and the « Données & analyse »
+  view (§4); `js/menu.js` builds the two others (Historique, Réglages) at runtime. Same data, same
+  shell, no navigation between them: the bottom tab bar swaps them by writing `data-view` on
+  `<html>`, and all four tabs work the same way. `donnees.html` was a second document until the
   merge; it is gone, and so is the whole class of bugs that came with leaving the page.
 - **No dev server script.** Serve the repo root over HTTP to test (`python3 -m http.server 8000`
   or `npx serve .`). Opening `index.html` via `file://` breaks ES modules, `fetch` and the service
@@ -67,14 +68,14 @@ unformatted: that is how the old backlog started.
 ## 3. Layout
 
 ```
-index.html              The page: PWA/social meta, all app-shell CSS inline, both views' DOM, js/app.js
+index.html              The page: PWA/social meta, all app-shell CSS inline, wheel + data views, js/app.js
 js/app.js               Wheel rendering, physics, spin cadence, result card, sharing, SW registration
 js/entries.js           Two-tier data loading (light → full) + IndexedDB cache
 js/audio.js             WebAudio, offline-first sound decoding + IndexedDB cache
-js/menu.js              Bottom tab bar, panels, history, settings; builds its own DOM at runtime
+js/menu.js              Bottom tab bar, Historique/Réglages views, settings; builds its own DOM at runtime
 js/settings.js          Reads the sound setting (data-attribute first, localStorage fallback)
 js/sw-update.js         SW registration, update checks, served version (see §7)
-js/focus-trap.js        Focus stack shared by the modals (app.js) and the menu surfaces (menu.js)
+js/focus-trap.js        Focus stack of the modals piled over the wheel (app.js)
 js/constants.js         SETTINGS_KEY, GAME_KEY and BASE_PATH — shared by front-end modules
 js/game.js              The running game (ids already drawn) in sessionStorage — no DOM
 js/data-explorer.js     Table, filters, multi-key sort, export, URL state of the Données view
@@ -98,7 +99,8 @@ shares/                 Runtime artifacts only; share-*.html is gitignored
 `js/app.js` → `import('./data-explorer.js')` (dynamic, on the first « Données » tab) →
 `js/entries.js`, `js/stats.js`, `js/charts.js`
 `js/audio.js` → `js/settings.js` → `js/constants.js` ← `js/entries.js`; `js/menu.js` → `js/sw-update.js`
-`js/app.js`, `js/menu.js` → `js/focus-trap.js` (piled surfaces: share sheet, feedback form, panels)
+`js/app.js` → `js/focus-trap.js` (piled surfaces: share sheet, feedback form); `js/menu.js` only
+reads its top, to leave `Escape` to them
 `js/app.js`, `js/menu.js` → `js/game.js` → `js/constants.js`
 `js/app.js` → `import('../bills.js')` (dynamic, on first spin) → `js/settings.js`, and
 `bills.js` → `import('./js/audio.js')` (dynamic, inside `initBills()`)
@@ -236,28 +238,24 @@ spinning again. One consequence to keep in mind: the install banner — which fl
 bottom strip — waits for the card to be closed.
 
 **Navigation is a bottom tab bar, not a hamburger.** `js/menu.js` builds a fixed bar at the bottom
-of `index.html` from two tables: `MENU_TABS` (the four tabs, in display order) and `MENU_PANELS`
-(the surfaces they open — one entry produces the panel, its header, its close button and the render
-call). A tab's nature is read off the keys it carries: neither `panel` nor `href` is Accueil, which
-just closes what is open; `panel` opens the matching entry of `MENU_PANELS`; `href` is an ordinary
-link out of the page (Données). Keep it at four — beyond that the labels no longer fit on a phone,
+of `index.html` from two tables: `MENU_TABS` (the four tabs, in display order, each carrying the
+`view` it shows) and `MENU_VIEWS` (the two views built at runtime — one entry produces the section,
+its title and the render call). Keep it at four — beyond that the labels no longer fit on a phone,
 and the labels stay written out, an icon alone is guessed rather than read.
 
 The active tab is marked by `aria-current="page"` and **nothing else**: the CSS keys off that same
 attribute, so what is shown can't drift from what is announced. `updateTabState()` is the only
 writer.
 
-**The panels are bottom sheets, and they obey the same three rules the drawer did.** (1) They slide
-in **from the bottom** via `transform`, never `top`/`bottom` — a surface arrives from the control
-that summons it (the drawer's panels came from the left for the same reason), and animating layout
-properties janked. (2) A closed surface is `visibility: hidden`, which is what keeps its controls
-out of the tab order; twelve menu controls used to stay reachable by `Tab` with the menu shut. The
-`visibility` transition must stay at duration `0s` (delayed on close, immediate on open) — a real
-transition on it leaves the surface still hidden when the focus trap fires, and `focus()` is then
-silently ignored. (3) Opening and closing go through `openSurface()` / `closeSurface()`, which push
-and pop `js/focus-trap.js`; `Escape` closes only the topmost surface. Only one panel is open at a
-time — `openPanel()` closes the others first, since two sheets risen from the same edge would
-overlap with nothing to say which is which.
+**The four tabs behave identically: each one shows a view, and nothing ever covers the bar.**
+Historique and Réglages were bottom sheets closed by a cross, and they covered the very bar the app
+navigates by: half the menu was left through a tab and the other half through a cross, and the
+cross only repeated what Accueil already does. A tab bar promises the sections are always one thumb
+away — a surface that hides it breaks that promise. So there is no overlay, no sheet, no
+`aria-modal` and no focus trap in `js/menu.js` any more; a hidden view is `display: none`, which is
+what keeps its controls out of the tab order (twelve menu controls used to stay reachable by `Tab`
+with the menu shut). Do not reintroduce a surface that covers the tab bar — `Escape` returning to
+the wheel from a menu view is what replaced the cross.
 
 **The bar's height is a token declared in `index.html`, not in `menu.css`.** `--tabbar-h` (and
 `--tabbar-room`, which adds the iOS home-indicator inset) sits in the blocking inline CSS because
@@ -300,18 +298,20 @@ feature nobody can find is a feature nobody uses. Keep the tab visible.
 **It is a view, not a page — that is the whole point.** It lived in `donnees.html` for a while, and
 the separate document cost more than it was worth: leaving `index.html` threw away everything the
 wheel held in memory. Persisting the game across the navigation papered over it; merging removes
-it. `js/menu.js` now owns two natures of tab — `view` (Accueil, Données) shows one of the page's
-two views, `panel` (Historique, Réglages) opens a bottom sheet over whichever view is showing. All
-four are `<button>`s: no tab navigates any more.
+it. All four tabs are `view` tabs now, and all four are `<button>`s: no tab navigates any more, and
+none opens a surface over another.
 
-**What shows a view is `data-view` on `<html>`**, written by `openView()` and read by two rules in
-`index.html`'s **blocking** inline CSS — blocking because `donnees.css` is deferred, and the view
-would otherwise flash under the wheel on first paint. `.wrap` and the install banner are hidden
-when the data view is up; the view itself is `position: fixed`, stops above the tab bar, and
-scrolls **in its own box**: the document never scrolls here (`body` is fixed, `touch-action:
-none`), exactly as `.result__scroll` does inside the result card. Modules that care listen for
-`viewChange` on `window` — the same decoupling as the settings events, so `js/menu.js` still
-imports nothing from `js/app.js`.
+**What shows a view is `data-view` on `<html>`**, written in the markup as `roue` and rewritten by
+`openView()`, read by the `.app-view` rules in `index.html`'s **blocking** inline CSS — blocking
+because `donnees.css` and `menu.css` are deferred, and a view would otherwise flash under the wheel
+on first paint; in the markup because the wheel has to be there on the first paint, before any
+script. `.wrap` and the install banner are hidden on any view but `roue`; a view is `position:
+fixed`, stops above the tab bar (`--tabbar-room`), and scrolls **in its own box**: the document
+never scrolls here (`body` is fixed, `touch-action: none`), exactly as `.result__scroll` does
+inside the result card. `.app-view` carries that frame for all three (`#dataView`,
+`#view-historique`, `#view-reglages`); `menu.css` only dresses its own two. Modules that care
+listen for `viewChange` on `window` — the same decoupling as the settings events, so `js/menu.js`
+still imports nothing from `js/app.js`.
 
 **The view is in the URL (`?vue=donnees`), and so is the Back button.** `openView()` pushes a
 history entry, `popstate` restores one, and `writeStateToUrl()` in `js/data-explorer.js` keeps
@@ -387,7 +387,7 @@ it a screen reader sees nothing there — and that label is also the only place 
 remaining entries is written. The result (`#resultText`) and the feedback status are
 `role="status" aria-live="polite"` regions — that is the only way a spin
 result gets announced, since the result card never takes focus. Every surface that _covers_ the
-page — the share sheet, the feedback form and the menu panels — goes through `js/focus-trap.js`: it moves focus in,
+page — the share sheet and the feedback form — goes through `js/focus-trap.js`: it moves focus in,
 traps `Tab` inside, and hands focus back on close. `prefers-reduced-motion`
 is honoured for real — the wheel damps
 much faster (`REDUCED_MOTION_DAMPING`) and `bills.js` is never invoked — on top of its older use as
@@ -518,7 +518,7 @@ from the previous generation is open. The visitor reloads when they want to.
 This replaced a handshake (`SKIP_WAITING` → `controllerchange` → silent `location.reload()`) whose
 premise was that the page had to be _told_ when to switch. Two things were wrong with it. It reloaded
 the page under the visitor, which is what this design set out to stop; and every reason to refuse a
-reload (wheel spinning, panel open, game started) was a reason the visitor could keep an old version
+reload (wheel spinning, a menu view open, game started) was a reason the visitor could keep an old version
 indefinitely — the bug behind "I have to clear the cache".
 
 **Run `npm run stamp` whenever you change any precached asset**, and commit what it rewrites. It

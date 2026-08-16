@@ -20,7 +20,7 @@ import {
   isInfiniteMode,
   openView,
   viewFromUrl
-} from "./menu.js?v=9baebd62";
+} from "./menu.js?v=0bf2c387";
 import { initServiceWorker } from "./sw-update.js?v=3cf9d32b";
 import { pushFocusTrap, popFocusTrap, hasFocusTrap } from "./focus-trap.js?v=0b34fd1c";
 import { loadDrawnIds, saveDrawnIds, clearDrawnIds } from "./game.js?v=73adbd70";
@@ -847,22 +847,22 @@ function shouldAnimate() {
 /* =======================
    VUES
    ======================= */
-// La roue et les données partagent la page. js/menu.js décide de la vue
-// affichée (attribut `data-view` sur <html>) et l'annonce ; app.js n'a que deux
-// choses à faire ici : charger l'explorateur à sa première ouverture, et rendre
-// à la roue un canevas mesurable à son retour.
+// Les quatre rubriques sont quatre vues d'une même page. js/menu.js décide de
+// celle qui est affichée (attribut `data-view` sur <html>) et l'annonce ;
+// app.js n'a que deux choses à faire ici : charger l'explorateur à la première
+// ouverture des données, et rendre à la roue un canevas mesurable à son retour.
 
 let dataExplorerPromise = null;
 
 function isWheelView() {
-  return document.documentElement.dataset.view !== "donnees";
+  return document.documentElement.dataset.view === "roue";
 }
 
 function loadDataExplorer() {
   if (!dataExplorerPromise) {
     // Chargé à la première ouverture seulement : le démarrage de la roue ne
     // paie ni l'explorateur, ni les statistiques, ni les graphiques.
-    dataExplorerPromise = import("./data-explorer.js?v=2017c25f")
+    dataExplorerPromise = import("./data-explorer.js?v=58f87ca0")
       .then((mod) => mod.initDataExplorer())
       .catch((error) => {
         console.error("[APP] Chargement de la vue Données impossible:", error);
@@ -874,10 +874,10 @@ function loadDataExplorer() {
 }
 
 window.addEventListener("viewChange", (event) => {
-  if (event.detail === "donnees") {
-    // Rien à animer derrière une vue qui la recouvre entièrement.
+  if (event.detail !== "roue") {
+    // La roue n'est plus à l'écran : rien à animer.
     stopAnimationFrame();
-    loadDataExplorer();
+    if (event.detail === "donnees") loadDataExplorer();
     return;
   }
 
@@ -1713,10 +1713,12 @@ addEventListener("orientationchange", scheduleResizeRecalculation);
 updateBg();
 initializeApp();
 
-// Vrai dès qu'une surface recouvre la roue : formulaire de retour, menu ou
-// panneau. Toutes passent par le piège à focus, donc une seule question suffit —
-// avant, la touche Espace et canReloadForUpdate répétaient chacune la liste des
-// sélecteurs du menu, et l'oubli d'un cas passait inaperçu.
+// Vrai dès qu'une surface recouvre la roue : feuille de partage ou formulaire
+// de retour. Toutes passent par le piège à focus, donc une seule question
+// suffit — avant, la touche Espace répétait la liste des sélecteurs du menu, et
+// l'oubli d'un cas passait inaperçu. (Les rubriques du menu, elles, ne
+// recouvrent plus rien : ce sont des vues, et la roue n'est alors pas affichée
+// du tout — c'est isWheelView() qui répond.)
 // La carte de résultat n'en fait pas partie : elle ne recouvre rien, et la roue
 // doit rester actionnable pendant qu'on la lit.
 function isAnySurfaceOpen() {
@@ -1727,8 +1729,8 @@ function isAnySurfaceOpen() {
 document.addEventListener("keydown", (e) => {
   if (e.code !== "Space") return;
 
-  // La vue des données est affichée : Espace y sert à faire défiler, et la roue
-  // qu'il ferait tourner n'est même pas à l'écran.
+  // Une autre vue est affichée (données, historique, réglages) : Espace y sert
+  // à faire défiler, et la roue qu'il ferait tourner n'est même pas à l'écran.
   if (!isWheelView()) return;
 
   // Espace appartient d'abord au contrôle qui a le focus : il doit l'activer

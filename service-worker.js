@@ -43,7 +43,7 @@
  * ℹ️ FONTS : aucune — polices système uniquement.
  */
 /* --- généré par scripts/stamp-assets.mjs — ne pas éditer à la main --- */
-const VERSION = "41f3fe23";
+const VERSION = "6c72b29e";
 const ASSETS = [
   "./",
   "./index.html",
@@ -51,19 +51,19 @@ const ASSETS = [
   "./bills.js?v=16598baa",
   "./buttons.css?v=8e4cf8f9",
   "./donnees.css?v=7673894b",
-  "./js/app.js?v=5e4d4398",
+  "./js/app.js?v=f2bc549b",
   "./js/audio.js?v=3679b476",
   "./js/charts.js?v=9c0905cd",
   "./js/constants.js?v=b8755637",
-  "./js/data-explorer.js?v=2017c25f",
+  "./js/data-explorer.js?v=58f87ca0",
   "./js/entries.js?v=c56272d2",
   "./js/focus-trap.js?v=0b34fd1c",
   "./js/game.js?v=73adbd70",
-  "./js/menu.js?v=9baebd62",
+  "./js/menu.js?v=0bf2c387",
   "./js/settings.js?v=96974e37",
   "./js/stats.js?v=4f243f37",
   "./js/sw-update.js?v=3cf9d32b",
-  "./menu.css?v=90453bf1",
+  "./menu.css?v=88ba9cc4",
   "./data/entries-light.json",
   "./data/entries-full.json",
   "./images/center3.avif",
