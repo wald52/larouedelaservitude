@@ -1,0 +1,258 @@
+{
+  "schema_version": 1,
+  "verification_date": "2026-09-01",
+  "sources": [
+    {
+      "id": "insee-definition-po",
+      "title": "Prélèvements obligatoires — définition officielle",
+      "publisher": "Insee",
+      "url": "https://www.insee.fr/fr/metadonnees/definition/c1571",
+      "publication_date": "2024-05-30",
+      "retrieved_at": "2026-09-01",
+      "kind": "official_definition",
+      "authority": "primary",
+      "supports": [
+        "definition"
+      ],
+      "notes": "Définit les prélèvements obligatoires comme les impôts et cotisations sociales effectives reçus par les administrations publiques et les institutions européennes, sans contrepartie directe et immédiate."
+    },
+    {
+      "id": "insee-po-annual-2025",
+      "title": "Prélèvements obligatoires — séries annuelles 1959-2025",
+      "publisher": "Insee",
+      "url": "https://www.insee.fr/fr/statistiques/2381412",
+      "publication_date": "2026-08-28",
+      "retrieved_at": "2026-09-01",
+      "kind": "official_statistics",
+      "authority": "primary",
+      "supports": [
+        "aggregate_consistency"
+      ],
+      "notes": "Série macroéconomique ; ne constitue pas un inventaire juridique ligne par ligne."
+    },
+    {
+      "id": "ec-taxation-trends-2026",
+      "title": "Data on Taxation Trends — édition 2026",
+      "publisher": "Commission européenne, DG TAXUD",
+      "url": "https://taxation-customs.ec.europa.eu/taxation/economic-analysis/data-taxation-trends_en",
+      "publication_date": "2026-03-31",
+      "retrieved_at": "2026-09-01",
+      "kind": "official_statistics_portal",
+      "authority": "primary",
+      "supports": [
+        "statistical_methodology",
+        "reference_inventory"
+      ],
+      "notes": "Produit avec le groupe d’experts des ministères nationaux des finances ; données de recettes jusqu’en 2024."
+    },
+    {
+      "id": "ec-ntl-2026-france",
+      "title": "Data on Taxation Trends — National tax list 2026, feuille France",
+      "publisher": "Commission européenne, DG TAXUD / Eurostat",
+      "url": "https://taxation-customs.ec.europa.eu/document/download/600d56d1-ea6e-416e-9981-1c8b9c603b6b_en?filename=NTL%20edition%202026%20web.xlsx",
+      "publication_date": "2026-03-30",
+      "data_through": "2024",
+      "retrieved_at": "2026-09-01",
+      "sha256": "1a09d2fec191bc517f3fc1f35b380a1fb50c885253284a4ef4ae5cfd4d3f27c2",
+      "kind": "official_statistical_inventory",
+      "authority": "primary",
+      "supports": [
+        "po_classification",
+        "revenue"
+      ],
+      "limitations": [
+        "La granularité est celle de la comptabilité nationale, pas nécessairement celle d’une unité juridique.",
+        "La dernière recette détaillée est 2024 : une ligne positive ne prouve pas à elle seule que le prélèvement est encore en vigueur au 1er septembre 2026.",
+        "Certaines lignes génériques ou atypiques exigent un contrôle juridique supplémentaire."
+      ]
+    },
+    {
+      "id": "ec-methodology-2026",
+      "title": "Tax Trends Indicators Methodology 2026",
+      "publisher": "Commission européenne, DG TAXUD",
+      "url": "https://taxation-customs.ec.europa.eu/document/download/9392a0fe-fc17-4cb6-b9c9-56e71f21caec_en?filename=Methodology2026.pdf",
+      "publication_date": "2026-04-01",
+      "retrieved_at": "2026-09-01",
+      "sha256": "8455525e68f0e6dce878be701a8565aa5cee68d3ac4d11f779e50ef6244037c0",
+      "kind": "official_methodology",
+      "authority": "primary",
+      "supports": [
+        "po_classification",
+        "institutional_sector",
+        "esa_code"
+      ],
+      "locators": {
+        "scope_formula": "PDF p. 6 (page physique 6), section A — Definitions",
+        "private_funds_warning": "PDF p. 8 (page physique 8), Box A.1 and following paragraph"
+      }
+    },
+    {
+      "id": "legifrance-cibs-2026-09-01",
+      "title": "Code des impositions sur les biens et services — version au 1er septembre 2026",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/codes/texte_lc/LEGITEXT000044595989/2026-09-01",
+      "effective_date": "2026-09-01",
+      "retrieved_at": "2026-09-01",
+      "kind": "current_law",
+      "authority": "primary",
+      "supports": [
+        "legal_status",
+        "legal_basis"
+      ],
+      "notes": "Source pivot pour les accises et les impositions sectorielles codifiées ; la classification en prélèvement obligatoire doit encore être recoupée avec la comptabilité nationale."
+    },
+    {
+      "id": "legifrance-cgi-2026-09-01",
+      "title": "Code général des impôts — version au 1er septembre 2026",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/codes/texte_lc/LEGITEXT000006069577/2026-09-01",
+      "effective_date": "2026-09-01",
+      "retrieved_at": "2026-09-01",
+      "kind": "current_law",
+      "authority": "primary",
+      "supports": [
+        "legal_status",
+        "legal_basis"
+      ]
+    },
+    {
+      "id": "legifrance-css-2026-09-01",
+      "title": "Code de la sécurité sociale — version au 1er septembre 2026",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/codes/texte_lc/LEGITEXT000006073189/2026-09-01",
+      "effective_date": "2026-09-01",
+      "retrieved_at": "2026-09-01",
+      "kind": "current_law",
+      "authority": "primary",
+      "supports": [
+        "legal_status",
+        "legal_basis"
+      ]
+    },
+    {
+      "id": "legifrance-lfi-2026-article-135",
+      "title": "Loi de finances pour 2026 — article 135, impositions affectées",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/loda/article_lc/LEGIARTI000053511577/2026-09-01",
+      "effective_date": "2026-09-01",
+      "retrieved_at": "2026-09-01",
+      "kind": "current_law_inventory",
+      "authority": "primary",
+      "supports": [
+        "legal_status",
+        "beneficiary",
+        "legal_context"
+      ],
+      "limitations": [
+        "Le tableau des impositions affectées ne couvre pas les impôts d’État non affectés ni l’ensemble des cotisations sociales."
+      ]
+    },
+    {
+      "id": "lfss-2026-page",
+      "title": "Loi de financement de la Sécurité sociale — exercice 2026",
+      "publisher": "Direction de la Sécurité sociale",
+      "url": "https://www.securite-sociale.fr/la-secu-en-detail/loi-de-financement/annee-en-cours",
+      "publication_date": "2025-12-31",
+      "retrieved_at": "2026-09-01",
+      "kind": "official_financing_document_portal",
+      "authority": "primary",
+      "supports": [
+        "legal_context",
+        "revenue"
+      ],
+      "notes": "La page indique la promulgation de la LFSS 2026 le 31 décembre 2025 et donne accès aux annexes."
+    },
+    {
+      "id": "lfss-2026-annexe-3",
+      "title": "PLFSS 2026 — Annexe 3, équilibre des finances sociales",
+      "publisher": "Direction de la Sécurité sociale",
+      "url": "https://www.securite-sociale.fr/files/live/sites/SSFR/files/medias/PLFSS/2026/PLFSS2026-Annexe3-20251015-103900-55-4_avec%20couverture.pdf",
+      "publication_date": "2025-10-23",
+      "retrieved_at": "2026-09-01",
+      "kind": "official_financing_annex",
+      "authority": "primary",
+      "supports": [
+        "legal_context",
+        "revenue",
+        "beneficiary"
+      ],
+      "limitations": [
+        "Document annexé au projet ; les mesures ponctuelles doivent être contrôlées dans la loi promulguée et le droit en vigueur."
+      ]
+    },
+    {
+      "id": "lfss-2026-annexe-8",
+      "title": "PLFSS 2026 — Annexe 8, assurance chômage et retraites complémentaires",
+      "publisher": "Direction de la Sécurité sociale",
+      "url": "https://www.securite-sociale.fr/files/live/sites/SSFR/files/medias/PLFSS/2026/PLFSS2026-Annexe8-20251011-23h24_avec%20couverture.pdf",
+      "publication_date": "2025-10-23",
+      "retrieved_at": "2026-09-01",
+      "kind": "official_financing_annex",
+      "authority": "primary",
+      "supports": [
+        "legal_context",
+        "social_scheme_scope"
+      ],
+      "limitations": [
+        "Le caractère obligatoire d’un versement à un organisme privé ne suffit pas : son traitement S.13 ou son reroutage doit être établi."
+      ]
+    },
+    {
+      "id": "collectivites-fiscalite-locale-2025",
+      "title": "La fiscalité directe locale en 2025 — BIS n° 209",
+      "publisher": "DGCL / DGFiP",
+      "url": "https://www.collectivites-locales.gouv.fr/actualites/bis-209-la-fiscalite-directe-locale-en-2025",
+      "publication_date": "2026-05-06",
+      "retrieved_at": "2026-09-01",
+      "kind": "official_current_statistics",
+      "authority": "primary",
+      "supports": [
+        "legal_status",
+        "revenue"
+      ],
+      "notes": "Confirme notamment des produits 2025 pour TFPB, CFE, IFER, TASCOM, TEOM et GEMAPI."
+    },
+    {
+      "id": "collectivites-fiscalite-directe-locale",
+      "title": "Fiscalité directe locale — liste et documentation",
+      "publisher": "DGFiP / portail des collectivités locales",
+      "url": "https://www.collectivites-locales.gouv.fr/gerer-les-finances-publiques-locales/fiscalite-locale/fiscalite-directe-locale",
+      "retrieved_at": "2026-09-01",
+      "kind": "official_current_inventory",
+      "authority": "primary",
+      "supports": [
+        "legal_status",
+        "legal_context"
+      ]
+    },
+    {
+      "id": "urssaf-employer-contributions",
+      "title": "Les cotisations — employeur",
+      "publisher": "Urssaf",
+      "url": "https://www.urssaf.fr/accueil/employeur/cotisations.html",
+      "retrieved_at": "2026-09-01",
+      "kind": "official_current_guidance",
+      "authority": "primary",
+      "supports": [
+        "legal_status",
+        "collection_scope"
+      ],
+      "limitations": [
+        "Guide de collecte : la classification de comptabilité nationale doit être vérifiée séparément."
+      ]
+    },
+    {
+      "id": "shared-discussion-context",
+      "title": "Discussion de recherche fournie par le mainteneur",
+      "publisher": "ChatGPT — lien partagé par le mainteneur",
+      "url": "https://chatgpt.com/share/6a96b3f0-0e28-83eb-85a5-514f97797078?ogimg=plain",
+      "retrieved_at": "2026-09-01",
+      "kind": "research_context",
+      "authority": "non_evidentiary",
+      "supports": [
+        "candidate_discovery"
+      ],
+      "notes": "Employée comme liste de pistes et d’exclusions possibles ; jamais comme preuve juridique ou statistique."
+    }
+  ]
+}

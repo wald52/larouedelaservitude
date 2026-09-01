@@ -10,6 +10,21 @@ Le champ `version` identifie une publication technique du jeu de données. Il ne
 
 Le jeu contient 371 entrées, avec de nombreux champs inconnus. Une valeur `null` signifie « non renseignée dans cette publication », et non nécessairement « inexistante » ou « nulle ». Les agrégats de recettes portent uniquement sur les montants connus et ne représentent donc pas la totalité des prélèvements obligatoires français.
 
+## Audit 2026 en cours
+
+La liste utilisée par l'application reste un **brouillon historique**. Elle n'est pas encore une liste exhaustive et juridiquement validée des seuls prélèvements obligatoires actuellement en vigueur.
+
+La première phase de l'audit est conservée séparément afin de pouvoir reprendre le travail sans modifier prématurément les données servies par la roue :
+
+- [`../docs/prelevements-obligatoires-methodologie.md`](../docs/prelevements-obligatoires-methodologie.md) définit le périmètre, les critères d'inclusion et les motifs d'exclusion ;
+- [`../docs/audit-prelevements-obligatoires-2026.md`](../docs/audit-prelevements-obligatoires-2026.md) présente les résultats et les limites de la première phase ;
+- [`audit/draft-2026-08-05.json`](audit/draft-2026-08-05.json) contient une décision de travail pour chacune des 371 entrées ;
+- [`audit/summary-2026-09-01.json`](audit/summary-2026-09-01.json) résume l'état d'avancement ;
+- [`audit/reason-codes.json`](audit/reason-codes.json) documente le vocabulaire de décision ;
+- [`reference/`](reference/) archive les référentiels officiels et leur provenance utilisés pour les rapprochements.
+
+Ces fichiers d'audit ne sont pas consommés par l'application et ne remplacent pas `entries-full.json`. Une entrée ne devra rejoindre le futur référentiel canonique qu'après vérification de son existence juridique, de son appartenance au périmètre des prélèvements obligatoires, de son statut en vigueur et de ses sources datées.
+
 ## Provenance à ajouter
 
 Toute nouvelle collecte devrait conserver, pour chaque entrée, au minimum :

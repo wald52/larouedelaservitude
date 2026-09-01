@@ -1,0 +1,219 @@
+{
+  "audit_date": "2026-09-01",
+  "source_version": "2026-08-05",
+  "counts": {
+    "po_status": {
+      "unresolved": 251,
+      "excluded": 14,
+      "confirmed": 106
+    },
+    "legal_status": {
+      "unknown": 253,
+      "repealed": 13,
+      "active": 79,
+      "replaced": 26
+    },
+    "resolution": {
+      "review": 192,
+      "remove": 26,
+      "keep": 48,
+      "split": 40,
+      "merge": 65
+    },
+    "membership_status": {
+      "blocked": 325,
+      "ready": 46
+    },
+    "publication_status": {
+      "blocked": 371
+    },
+    "top_reason_codes": [
+      [
+        "classification-unverified",
+        239
+      ],
+      [
+        "legal-status-unverified",
+        239
+      ],
+      [
+        "source-needed",
+        239
+      ],
+      [
+        "receipt-year-missing",
+        149
+      ],
+      [
+        "statistical-classification-confirmed",
+        72
+      ],
+      [
+        "current-law-confirmed",
+        70
+      ],
+      [
+        "recipient-sector-unverified",
+        60
+      ],
+      [
+        "ntl-match-only",
+        53
+      ],
+      [
+        "canonical-record-incomplete",
+        46
+      ],
+      [
+        "split-required",
+        40
+      ],
+      [
+        "aggregate-not-legal-unit",
+        38
+      ],
+      [
+        "territorial-scope-to-check",
+        28
+      ],
+      [
+        "replaced-by-current-levy",
+        26
+      ],
+      [
+        "duplicate",
+        21
+      ],
+      [
+        "repealed",
+        13
+      ],
+      [
+        "allocation-or-beneficiary-split",
+        10
+      ],
+      [
+        "malformed-draft-entry",
+        10
+      ],
+      [
+        "direct-individual-consideration",
+        9
+      ],
+      [
+        "rate-or-threshold-split",
+        9
+      ],
+      [
+        "non-fiscal-revenue",
+        3
+      ]
+    ]
+  },
+  "membership_ready_ids": [
+    "contribution-sur-les-avantages-de-preretraite-d-entreprise",
+    "contribution-sur-les-regimes-de-retraite-conditionnant-la-co",
+    "contribution-sur-les-indemnites-de-mise-a-la-retraite",
+    "forfait-social",
+    "contribution-vente-en-gros",
+    "contribution-sur-les-depenses-de-promotion-des-medicaments",
+    "cotisation-speciale-sur-les-boissons-alcooliques",
+    "contribution-sociale-de-solidarite-des-societes-c3s",
+    "taxe-sur-les-salaires",
+    "taxe-sur-la-valeur-ajoutee-tva",
+    "taxe-sur-les-services-numeriques",
+    "droit-de-consommation-sur-les-produits-intermediaires",
+    "droits-de-consommation-sur-les-alcools",
+    "droit-de-circulation-sur-les-vins-cidres-poires-et-hydromels",
+    "droit-de-consommation-sur-les-tabacs-manufactures",
+    "taxe-speciale-sur-les-conventions-d-assurances",
+    "taxe-fonciere-sur-les-proprietes-baties-if-tfb",
+    "taxe-fonciere-sur-les-proprietes-non-baties-if-tfnb",
+    "cotisation-fonciere-des-entreprises-if-cfe",
+    "imposition-forfaitaire-sur-les-pylones-tfp-pyl",
+    "taxe-pour-la-gestion-des-milieux-aquatiques-et-la-prevention",
+    "taxe-departementale-additionnelle-aux-droits-d-enregistremen",
+    "taxe-pour-frais-de-chambres-de-commerce-et-d-industrie-if-au",
+    "contribution-sociale-generalisee-csg",
+    "contribution-pour-le-remboursement-de-la-dette-sociale-crds",
+    "taxe-pour-frais-de-chambres-de-metiers-et-de-l-artisanat-if-",
+    "taxe-pour-frais-de-chambres-d-agriculture-if-aut-30",
+    "taxe-sur-les-boissons-premix",
+    "contribution-percue-sur-les-boissons-et-preparations-liquide",
+    "imposition-forfaitaire-sur-les-entreprises-de-reseaux-tfp-if",
+    "taxe-sur-les-surfaces-commerciales-tfp-tsc",
+    "contribution-tarifaire-d-acheminement-cta",
+    "taxe-fixe-due-a-chaque-delivrance-de-ci-ais-mob-10-20-20",
+    "taxe-sur-les-emissions-de-dioxyde-de-carbone",
+    "taxe-sur-la-masse-en-ordre-de-marche",
+    "taxe-annuelle-sur-les-emissions-de-dioxyde-de-carbone",
+    "taxe-annuelle-sur-les-emissions-de-polluants-atmospherique",
+    "taxe-sur-l-affectation-des-vehicules-lourds-de-transport-de-",
+    "taxe-sur-l-exploitation-des-infrastructures-de-transport-de-",
+    "taxe-sur-les-services-de-communications-electroniques-ais-cc",
+    "cotisation-sur-la-valeur-ajoutee-des-entreprises-cvae",
+    "contribution-solidarite-autonomie",
+    "assurance-maladie-maternite-invalidite-deces",
+    "allocations-familiales",
+    "accidents-du-travail",
+    "fonds-national-de-garantie-des-salaires-ags"
+  ],
+  "publication_ready_ids": [],
+  "excluded_ids": [
+    "redevance-pour-la-remuneration-pour-copie-privee",
+    "redevance-percue-sur-formalites-de-l-institut-national-de-la",
+    "droit-departemental-de-passage-sur-les-ouvrages-d-art-relian",
+    "contribution-forfaitaire-representative-des-frais-de-reachem",
+    "redevance-percue-a-l-occasion-de-l-introduction-des-familles",
+    "fraction-des-produits-annuels-de-la-vente-de-biens-confisque",
+    "peage-plaisance",
+    "droit-d-examen-du-permis-de-chasse",
+    "redevance-pour-frais-d-envoi-des-certificats-d-immatriculati",
+    "fraction-du-produit-des-successions-en-desherence",
+    "redevances-lors-du-lancement-de-certains-materiels-aeronauti",
+    "redevance-pour-droit-de-construire-epad",
+    "taxe-d-atterrissage",
+    "assurance-deces-cadre-adhesion-obligatoire-pour-les-cadres-q"
+  ],
+  "replaced_or_repealed_ids": [
+    "taxe-a-la-production-sur-le-quota-de-sucre-le-quota-d-isoglu",
+    "participation-pour-voirie-et-reseaux",
+    "droit-de-francisation-et-de-navigation-en-corse-droit-de-pas",
+    "droit-de-francisation-et-de-navigation",
+    "droit-de-passeport",
+    "taxe-interieure-de-consommation-sur-les-produits-energetique",
+    "contribution-au-service-public-de-l-electricite-cspe",
+    "taxe-interieure-sur-les-houilles-les-lignites-et-les-cokes-t",
+    "taxe-speciale-sur-certains-vehicules-routiers",
+    "participation-au-financement-des-conges-individuels-de-forma",
+    "taxe-dans-le-domaine-funeraire",
+    "versement-transport",
+    "taxe-de-l-aviation-civile-tac",
+    "taxe-sur-les-vehicules-de-societes-tvs",
+    "taxe-sur-les-vehicules-de-tourisme-les-plus-polluants",
+    "malus-ou-ecopastille",
+    "malus-annuel",
+    "prelevement-social-sur-les-revenus-du-patrimoine-et-les-prod",
+    "prelevement-de-solidarite-de-2-sur-les-revenus-du-patrimoine",
+    "contribution-a-l-audiovisuel-public-due-par-les-professionne",
+    "droits-affectes-au-fonds-d-indemnisation-de-la-profession-d-",
+    "taxe-communale-sur-la-consommation-finale-d-electricite-tcfe",
+    "taxe-departementale-des-espaces-naturels-sensibles-tdens",
+    "prelevements-sur-les-benefices-tires-de-la-construction-immo",
+    "participation-des-employeurs-au-financement-de-la-formation-",
+    "taxe-exceptionnelle-sur-la-reserve-de-capitalisation-des-ent",
+    "taxe-professionnelle-de-la-poste-et-de-france-telecom",
+    "droits-d-apport-des-societes",
+    "contributions-au-fonds-national-de-l-emploi-fne",
+    "contribution-des-institutions-financieres",
+    "taxe-sur-les-stations-et-liaisons-radio-privees",
+    "participation-depassement-du-cos",
+    "taxe-locale-d-equipement",
+    "taxe-complementaire-a-la-tle-idf",
+    "taxe-sur-les-fournitures-d-electricite",
+    "taxe-sur-les-syndicats-d-energie",
+    "taxe-et-prelevement-sur-les-sommes-encaissees-par-les-societ",
+    "eco-contribution-sur-la-taxe-de-solidarite-sur-les-billets-d",
+    "taxe-d-aeroport"
+  ]
+}
