@@ -44,14 +44,25 @@ jobs:
         shell: bash
         run: |
           set -euxo pipefail
-          curl -fL --retry 8 --retry-all-errors --retry-delay 3 \
+
+          # budget.gouv.fr protège parfois ses fichiers fid-download par un défi
+          # anti-bot. Leur absence ne doit pas bloquer les autres sources : les
+          # mêmes impositions seront recoupées dans la LFI consolidée.
+          if ! curl -fL --retry 2 --retry-all-errors --retry-delay 2 \
             -A "Mozilla/5.0 (compatible; LaRoueDeLaServitudeResearch/1.0)" \
+            -e "https://www.budget.gouv.fr/documentation/documents-budgetaires-lois/exercice-2026" \
             "https://www.budget.gouv.fr/documentation/fid-download/80134" \
-            -o research/raw/plf-2026-taxes-affectees.xls
-          curl -fL --retry 8 --retry-all-errors --retry-delay 3 \
+            -o research/raw/plf-2026-taxes-affectees.xls; then
+            rm -f research/raw/plf-2026-taxes-affectees.xls
+          fi
+          if ! curl -fL --retry 2 --retry-all-errors --retry-delay 2 \
             -A "Mozilla/5.0 (compatible; LaRoueDeLaServitudeResearch/1.0)" \
+            -e "https://www.budget.gouv.fr/documentation/documents-budgetaires-lois/exercice-2026" \
             "https://www.budget.gouv.fr/documentation/fid-download/80398" \
-            -o research/raw/plf-2026-recettes-budget-general.xlsx
+            -o research/raw/plf-2026-recettes-budget-general.xlsx; then
+            rm -f research/raw/plf-2026-recettes-budget-general.xlsx
+          fi
+
           curl -fL --retry 8 --retry-all-errors --retry-delay 3 \
             -A "Mozilla/5.0 (compatible; LaRoueDeLaServitudeResearch/1.0)" \
             "https://www.securite-sociale.fr/files/live/sites/SSFR/files/medias/PLFSS/2026/Annexe%203%20PLFSS%202026%20Tableaux%20donn%C3%A9es%20.xlsx" \
@@ -60,7 +71,10 @@ jobs:
             -A "Mozilla/5.0 (compatible; LaRoueDeLaServitudeResearch/1.0)" \
             "https://www.securite-sociale.fr/files/live/sites/SSFR/files/medias/PLFSS/2026/PLFSS2026-Annexe3-20251015-103900-55-4_avec%20couverture.pdf" \
             -o research/raw/plfss-2026-annexe-3.pdf
-          sha256sum research/raw/* > research/raw/SHA256SUMS
+
+          find research/raw -maxdepth 1 -type f ! -name SHA256SUMS -print0 \
+            | sort -z \
+            | xargs -0 sha256sum > research/raw/SHA256SUMS
 
       - name: Fetch the shared discussion for research context
         shell: bash
