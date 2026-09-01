@@ -1,0 +1,116 @@
+name: Research compulsory levies sources
+
+on:
+  push:
+    branches: ["data/audit-prelevements-obligatoires-2026"]
+    paths:
+      - ".github/workflows/research-po-sources.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install workbook tooling
+        run: python -m pip install --disable-pip-version-check openpyxl
+
+      - name: Download authoritative European sources
+        shell: bash
+        run: |
+          set -euxo pipefail
+          mkdir -p research/raw research/extracted
+          curl -fL --retry 8 --retry-all-errors --retry-delay 3 \
+            -A "Mozilla/5.0 (compatible; LaRoueDeLaServitudeResearch/1.0)" \
+            "https://taxation-customs.ec.europa.eu/document/download/600d56d1-ea6e-416e-9981-1c8b9c603b6b_en?filename=NTL%20edition%202026%20web.xlsx" \
+            -o research/raw/national-tax-list-2026.xlsx
+          curl -fL --retry 8 --retry-all-errors --retry-delay 3 \
+            -A "Mozilla/5.0 (compatible; LaRoueDeLaServitudeResearch/1.0)" \
+            "https://taxation-customs.ec.europa.eu/document/download/9392a0fe-fc17-4cb6-b9c9-56e71f21caec_en?filename=Methodology2026.pdf" \
+            -o research/raw/taxation-trends-methodology-2026.pdf
+          sha256sum research/raw/* > research/raw/SHA256SUMS
+
+      - name: Fetch the shared discussion for research context
+        shell: bash
+        continue-on-error: true
+        run: |
+          set -x
+          for url in \
+            "https://chatgpt.com/share/6a96b3f0-0e28-83eb-85a5-514f97797078?ogimg=plain" \
+            "https://chatgpt.com/backend-api/share/6a96b3f0-0e28-83eb-85a5-514f97797078" \
+            "https://chat.openai.com/backend-api/share/6a96b3f0-0e28-83eb-85a5-514f97797078"
+          do
+            name=$(printf '%s' "$url" | sha256sum | cut -c1-12)
+            curl -L --retry 3 --retry-all-errors \
+              -A "Mozilla/5.0" -D "research/raw/chat-${name}.headers" \
+              "$url" -o "research/raw/chat-${name}.body" || true
+          done
+
+      - name: Profile every workbook sheet and extract France candidates
+        run: |
+          python - <<'PY'
+          import csv
+          import json
+          from pathlib import Path
+          from openpyxl import load_workbook
+
+          source = Path("research/raw/national-tax-list-2026.xlsx")
+          out = Path("research/extracted")
+          out.mkdir(parents=True, exist_ok=True)
+          wb = load_workbook(source, read_only=True, data_only=True)
+          profile = {"sheets": []}
+
+          for ws in wb.worksheets:
+              preview = []
+              france_hits = []
+              csv_path = out / ("sheet-" + "".join(c if c.isalnum() else "-" for c in ws.title).strip("-") + ".csv")
+              with csv_path.open("w", encoding="utf-8", newline="") as handle:
+                  writer = csv.writer(handle)
+                  for row_number, row in enumerate(ws.iter_rows(values_only=True), start=1):
+                      values = ["" if value is None else value for value in row]
+                      writer.writerow(values)
+                      if row_number <= 30:
+                          preview.append(values[:30])
+                      joined = " | ".join(str(value) for value in values).casefold()
+                      if "france" in joined or any(str(value).strip().upper() == "FR" for value in values):
+                          france_hits.append({"row": row_number, "values": values[:30]})
+              profile["sheets"].append({
+                  "title": ws.title,
+                  "max_row": ws.max_row,
+                  "max_column": ws.max_column,
+                  "preview": preview,
+                  "france_hits": france_hits[:100]
+              })
+
+          (out / "workbook-profile.json").write_text(
+              json.dumps(profile, ensure_ascii=False, indent=2, default=str),
+              encoding="utf-8"
+          )
+          print(json.dumps({
+              "sheet_names": wb.sheetnames,
+              "dimensions": {ws.title: [ws.max_row, ws.max_column] for ws in wb.worksheets}
+          }, ensure_ascii=False, indent=2))
+          PY
+
+      - name: Package repository draft alongside official sources
+        run: |
+          cp data/entries-full.json research/extracted/current-entries-full.json
+          cp data/entries-light.json research/extracted/current-entries-light.json
+
+      - name: Upload research bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: compulsory-levies-research
+          path: research/
+          retention-days: 7
