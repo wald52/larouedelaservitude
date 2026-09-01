@@ -1,0 +1,73 @@
+name: Apply compulsory-levies phase-one controls
+
+on:
+  push:
+    branches: ["data/referentiel-po-2026-phase-1"]
+    paths:
+      - ".github/workflows/apply-po-phase1-final.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  apply-and-validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout the working branch
+        uses: actions/checkout@v6
+        with:
+          ref: data/referentiel-po-2026-phase-1
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Reassemble and extract the reviewed files
+        run: |
+          set -euxo pipefail
+          cat .github/po-final-*.b64 > /tmp/po-phase1-final.b64
+          printf '%s  %s\n' \
+            '4428e40a9a6a3ec52ab1282462f3b721e271a4c1b4a867b70216c2ce950761a9' \
+            /tmp/po-phase1-final.b64 | sha256sum -c -
+          base64 --decode /tmp/po-phase1-final.b64 > /tmp/po-phase1-final.tar.gz
+          printf '%s  %s\n' \
+            'b31ac0b0637e26a15ad8250232f7e2606db07f5b56215916fb38f7452a3bd6e9' \
+            /tmp/po-phase1-final.tar.gz | sha256sum -c -
+          tar -xzf /tmp/po-phase1-final.tar.gz -C .
+
+      - name: Format and validate the phase-one corpus
+        run: |
+          npx prettier --write \
+            package.json \
+            data/README.md \
+            data/schema/prelevement-obligatoire.schema.json \
+            data/audit/ntl-coverage-2026.json \
+            data/audit/lfss-coverage-2026.json \
+            docs/prelevements-obligatoires-methodologie.md \
+            docs/audit-prelevements-obligatoires-2026.md \
+            scripts/report-data-audit.mjs \
+            scripts/validate-data.mjs \
+            tests/data-audit.test.mjs
+          npm run check:data
+          node --test tests/data-audit.test.mjs
+          npm run lint
+          npm run audit:data
+
+      - name: Commit only durable files
+        run: |
+          set -euxo pipefail
+          rm -f .github/po-final-*.b64
+          rm -f .github/workflows/apply-po-phase1-final.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git status --short
+          git commit -m "Ajouter le contrat canonique et les contrôles de données"
+          git push origin HEAD:data/referentiel-po-2026-phase-1
