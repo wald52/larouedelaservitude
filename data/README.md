@@ -23,6 +23,11 @@ La première phase de l'audit est conservée séparément afin de pouvoir repren
 - [`audit/reason-codes.json`](audit/reason-codes.json) documente le vocabulaire de décision ;
 - [`reference/`](reference/) archive les référentiels officiels et leur provenance utilisés pour les rapprochements.
 
+La reprise ligne par ligne est ensuite publiée par lots autonomes :
+
+- [`audit/financement-social-2026-09-01.json`](audit/financement-social-2026-09-01.json) rassemble cinq fiches canoniques prêtes à relire — CSG, CRDS, C3S, forfait social et taxe sur les salaires ;
+- [`../docs/audit-prelevements-obligatoires-2026-lot-financement-social.md`](../docs/audit-prelevements-obligatoires-2026-lot-financement-social.md) documente les choix, corrections et limites de ce premier lot de reprise.
+
 Ces fichiers d'audit ne sont pas consommés par l'application et ne remplacent pas `entries-full.json`. Une entrée ne devra rejoindre le futur référentiel canonique qu'après vérification de son existence juridique, de son appartenance au périmètre des prélèvements obligatoires, de son statut en vigueur et de ses sources datées.
 
 ## Provenance à ajouter

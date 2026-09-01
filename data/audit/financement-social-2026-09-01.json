@@ -1,0 +1,503 @@
+{
+  "schema_version": 1,
+  "batch_id": "financement-social-2026-09-01",
+  "title": "Lot de reprise — prélèvements de financement social",
+  "audit_date": "2026-09-01",
+  "status": "ready_for_review",
+  "production_dataset_changed": false,
+  "source_draft": {
+    "path": "data/audit/draft-2026-08-05.json",
+    "source_version": "2026-08-05",
+    "draft_indices": [
+      17,
+      27,
+      99,
+      174,
+      176
+    ]
+  },
+  "scope": {
+    "description": "Cinq prélèvements affectés au financement social, déjà confirmés par la première phase, repris jusqu'à une fiche canonique sourcée et datée.",
+    "canonical_record_count": 5,
+    "canonical_ids": [
+      "csg",
+      "crds",
+      "c3s",
+      "forfait-social",
+      "taxe-salaires"
+    ]
+  },
+  "measurement_policy": {
+    "unit": "millions_euros",
+    "observed_revenue": "Recette constatée en comptabilité nationale dans la National tax list 2026, dernière année disponible : 2024.",
+    "forecast_revenue": "Prévision 2026 du PLFSS 2026, annexe 3. Elle reste distincte de la recette observée et ne la remplace pas.",
+    "partial_forecasts": "Les lignes CSG et CRDS de l'annexe 3 ne couvrent que certaines assiettes du capital. Elles sont conservées comme composantes et ne sont jamais présentées comme un total.",
+    "duplicate_rows": "Les répétitions fonctionnelles de la NTL ne sont pas additionnées lorsqu'elles portent exactement le même montant et le même prélèvement."
+  },
+  "sources": [
+    {
+      "id": "ec-ntl-2026-france",
+      "title": "Data on Taxation Trends — National tax list 2026, feuille France",
+      "publisher": "Commission européenne, DG TAXUD / Eurostat",
+      "url": "https://taxation-customs.ec.europa.eu/document/download/600d56d1-ea6e-416e-9981-1c8b9c603b6b_en?filename=NTL%20edition%202026%20web.xlsx",
+      "publication_date": "2026-03-30",
+      "data_through": 2024,
+      "retrieved_at": "2026-09-01",
+      "local_path": "data/reference/ntl-france-2026.json",
+      "supports": [
+        "po_classification",
+        "observed_revenue"
+      ]
+    },
+    {
+      "id": "lfss-2026-annexe-3",
+      "title": "PLFSS 2026 — Annexe 3, équilibre des finances sociales",
+      "publisher": "Direction de la Sécurité sociale",
+      "url": "https://www.securite-sociale.fr/files/live/sites/SSFR/files/medias/PLFSS/2026/PLFSS2026-Annexe3-20251015-103900-55-4_avec%20couverture.pdf",
+      "publication_date": "2025-10-23",
+      "retrieved_at": "2026-09-01",
+      "local_path": "data/reference/lfss-2026-annexe-3-impositions.json",
+      "supports": [
+        "forecast_revenue",
+        "beneficiary",
+        "legal_context"
+      ],
+      "limitation": "Document annexé au projet : le droit positif est vérifié séparément sur Légifrance."
+    },
+    {
+      "id": "legifrance-css-2026-09-01",
+      "title": "Code de la sécurité sociale — version au 1er septembre 2026",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/codes/texte_lc/LEGITEXT000006073189/2026-09-01",
+      "effective_date": "2026-09-01",
+      "retrieved_at": "2026-09-01",
+      "supports": [
+        "legal_status",
+        "legal_basis"
+      ]
+    },
+    {
+      "id": "legifrance-cgi-2026-09-01",
+      "title": "Code général des impôts — version au 1er septembre 2026",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/codes/texte_lc/LEGITEXT000006069577/2026-09-01",
+      "effective_date": "2026-09-01",
+      "retrieved_at": "2026-09-01",
+      "supports": [
+        "legal_status",
+        "legal_basis"
+      ]
+    },
+    {
+      "id": "legifrance-crds-ordonnance-96-50",
+      "title": "Ordonnance n° 96-50 du 24 janvier 1996 relative au remboursement de la dette sociale — chapitre II",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/codes/section_lc/JORFTEXT000000190291/LEGISCTA000006106400/",
+      "publication_date": "1996-01-25",
+      "retrieved_at": "2026-09-01",
+      "supports": [
+        "legal_status",
+        "legal_basis",
+        "creation_year"
+      ]
+    },
+    {
+      "id": "legifrance-csg-creation-1990",
+      "title": "Loi n° 90-1168 du 29 décembre 1990 de finances pour 1991 — article 127",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/loda/article_lc/LEGIARTI000006318055",
+      "publication_date": "1990-12-30",
+      "retrieved_at": "2026-09-01",
+      "supports": [
+        "creation_year"
+      ]
+    },
+    {
+      "id": "legifrance-c3s-creation-1970",
+      "title": "Décret n° 70-368 du 29 avril 1970 pris pour l'application de la loi n° 70-13 du 3 janvier 1970",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/loda/id/JORFTEXT000000303573",
+      "publication_date": "1970-04-30",
+      "retrieved_at": "2026-09-01",
+      "supports": [
+        "creation_year"
+      ]
+    },
+    {
+      "id": "legifrance-c3s-renumbering-2018",
+      "title": "Ordonnance n° 2018-470 du 12 juin 2018 — article 3",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/jorf/article_jo/JORFARTI000037051004",
+      "publication_date": "2018-06-14",
+      "retrieved_at": "2026-09-01",
+      "supports": [
+        "legal_basis",
+        "source_discrepancy"
+      ]
+    },
+    {
+      "id": "legifrance-forfait-social-creation-2008",
+      "title": "Loi n° 2008-1330 du 17 décembre 2008 de financement de la sécurité sociale pour 2009 — article 13",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/loda/article_lc/LEGIARTI000019945358",
+      "publication_date": "2008-12-18",
+      "retrieved_at": "2026-09-01",
+      "supports": [
+        "creation_year"
+      ]
+    },
+    {
+      "id": "legifrance-taxe-salaires-origin-1948",
+      "title": "Conseil d'État, avis n° 197839 du 23 novembre 1998 — historique de l'article 231 du CGI",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/ceta/id/CETATEXT000007965755/",
+      "publication_date": "1998-11-23",
+      "retrieved_at": "2026-09-01",
+      "supports": [
+        "creation_year",
+        "historical_context"
+      ]
+    }
+  ],
+  "records": [
+    {
+      "canonical_id": "csg",
+      "draft_entry": {
+        "index": 174,
+        "id": "contribution-sociale-generalisee-csg"
+      },
+      "nom": "CSG",
+      "nom_complet": "Contribution sociale généralisée (CSG)",
+      "annee_creation": 1991,
+      "creation_evidence": {
+        "source_id": "legifrance-csg-creation-1990",
+        "locator": "Article 127 — revenus perçus à compter du 1er février 1991"
+      },
+      "po_status": "confirmed",
+      "legal_status": "active",
+      "legal_basis": [
+        {
+          "source_id": "legifrance-css-2026-09-01",
+          "locator": "CSS, chapitre 6 du titre III du livre Ier, articles L. 136-1 à L. 136-8"
+        }
+      ],
+      "classification": {
+        "source_id": "ec-ntl-2026-france",
+        "source_row": 139,
+        "esa_code": "D51M",
+        "national_detail_code": "C04",
+        "recipient_scope": "S.13 + S.212",
+        "locator": "FR row 139 — Contribution sociale généralisée"
+      },
+      "revenues": {
+        "observed": [
+          {
+            "year": 2024,
+            "amount_meur": 153131,
+            "source_id": "ec-ntl-2026-france",
+            "locator": "FR row 139 (D51M C04)"
+          }
+        ],
+        "forecast_total": null,
+        "forecast_components": [
+          {
+            "year": 2026,
+            "label": "CSG sur les produits de placement",
+            "amount_meur": 11045,
+            "source_id": "lfss-2026-annexe-3",
+            "locator": "Annexe 3, p. 52"
+          },
+          {
+            "year": 2026,
+            "label": "CSG sur les revenus du patrimoine",
+            "amount_meur": 6845,
+            "source_id": "lfss-2026-annexe-3",
+            "locator": "Annexe 3, p. 52"
+          }
+        ]
+      },
+      "warnings": [
+        "La ligne NTL 148 répète le même total 2024 dans une ventilation fonctionnelle : ne pas l'additionner à la ligne 139.",
+        "Les deux prévisions du PLFSS portent uniquement sur des revenus du capital et ne constituent pas la recette totale de CSG."
+      ],
+      "research_status": "complete",
+      "publication_status": "ready_for_review",
+      "production_status": "not_integrated"
+    },
+    {
+      "canonical_id": "crds",
+      "draft_entry": {
+        "index": 176,
+        "id": "contribution-pour-le-remboursement-de-la-dette-sociale-crds"
+      },
+      "nom": "CRDS",
+      "nom_complet": "Contribution pour le remboursement de la dette sociale (CRDS)",
+      "annee_creation": 1996,
+      "creation_evidence": {
+        "source_id": "legifrance-crds-ordonnance-96-50",
+        "locator": "Ordonnance du 24 janvier 1996, chapitre II ; perception à compter du 1er février 1996"
+      },
+      "po_status": "confirmed",
+      "legal_status": "active",
+      "legal_basis": [
+        {
+          "source_id": "legifrance-crds-ordonnance-96-50",
+          "locator": "Articles 14 à 19 ; l'article 19 fixe à 0,5 % le taux des contributions des articles 14 à 17"
+        }
+      ],
+      "classification": {
+        "source_id": "ec-ntl-2026-france",
+        "source_row": 138,
+        "esa_code": "D51M",
+        "national_detail_code": "C03",
+        "recipient_scope": "S.13 + S.212",
+        "locator": "FR row 138 — Contribution pour le remboursement de la dette sociale"
+      },
+      "revenues": {
+        "observed": [
+          {
+            "year": 2024,
+            "amount_meur": 9084,
+            "source_id": "ec-ntl-2026-france",
+            "locator": "FR row 138 (D51M C03)"
+          }
+        ],
+        "forecast_total": null,
+        "forecast_components": [
+          {
+            "year": 2026,
+            "label": "CRDS sur les produits de placement",
+            "amount_meur": 602,
+            "source_id": "lfss-2026-annexe-3",
+            "locator": "Annexe 3, p. 52"
+          },
+          {
+            "year": 2026,
+            "label": "CRDS sur les revenus du patrimoine",
+            "amount_meur": 372,
+            "source_id": "lfss-2026-annexe-3",
+            "locator": "Annexe 3, p. 52"
+          }
+        ]
+      },
+      "warnings": [
+        "La ligne NTL 147 répète le même total 2024 dans une ventilation fonctionnelle : ne pas l'additionner à la ligne 138.",
+        "Les deux prévisions du PLFSS portent uniquement sur des revenus du capital et ne constituent pas la recette totale de CRDS."
+      ],
+      "research_status": "complete",
+      "publication_status": "ready_for_review",
+      "production_status": "not_integrated"
+    },
+    {
+      "canonical_id": "c3s",
+      "draft_entry": {
+        "index": 27,
+        "id": "contribution-sociale-de-solidarite-des-societes-c3s"
+      },
+      "nom": "C3S",
+      "nom_complet": "Contribution sociale de solidarité des sociétés (C3S)",
+      "annee_creation": 1970,
+      "draft_correction": {
+        "field": "annee_creation",
+        "draft_value": 1992,
+        "canonical_value": 1970,
+        "explanation": "La loi n° 70-13 du 3 janvier 1970 porte création de la contribution ; le décret n° 70-368 en fixe les conditions d'application.",
+        "source_id": "legifrance-c3s-creation-1970"
+      },
+      "po_status": "confirmed",
+      "legal_status": "active",
+      "legal_basis": [
+        {
+          "source_id": "legifrance-css-2026-09-01",
+          "locator": "CSS, articles L. 137-30 à L. 137-39"
+        }
+      ],
+      "classification": {
+        "source_id": "ec-ntl-2026-france",
+        "source_row": 128,
+        "esa_code": "D29H",
+        "national_detail_code": "C02",
+        "recipient_scope": "S.13 + S.212",
+        "locator": "FR row 128 — Contribution sociale de solidarité des sociétés"
+      },
+      "revenues": {
+        "observed": [
+          {
+            "year": 2024,
+            "amount_meur": 5228,
+            "source_id": "ec-ntl-2026-france",
+            "locator": "FR row 128 (D29H C02)"
+          }
+        ],
+        "forecast_total": {
+          "year": 2026,
+          "amount_meur": 5452,
+          "source_id": "lfss-2026-annexe-3",
+          "locator": "Annexe 3, p. 49"
+        }
+      },
+      "beneficiary": {
+        "year": 2026,
+        "name": "Caisse nationale d'assurance vieillesse (CNAV)",
+        "source_id": "lfss-2026-annexe-3",
+        "locator": "Annexe 3, p. 49"
+      },
+      "source_discrepancy": {
+        "source_id": "lfss-2026-annexe-3",
+        "printed_legal_reference": "CSS, article L. 651-5",
+        "current_legal_reference": "CSS, articles L. 137-30 à L. 137-39 ; l'ancien article L. 651-5 est devenu l'article L. 137-33",
+        "renumbering_source_id": "legifrance-c3s-renumbering-2018",
+        "locator": "Ordonnance n° 2018-470, article 3",
+        "treatment": "La référence imprimée est conservée comme information de provenance mais n'est pas reprise comme droit positif."
+      },
+      "warnings": [
+        "La référence juridique imprimée dans l'annexe 3 est antérieure à la renumérotation de 2018.",
+        "L'année 1992 du brouillon est corrigée en 1970."
+      ],
+      "research_status": "complete",
+      "publication_status": "ready_for_review",
+      "production_status": "not_integrated"
+    },
+    {
+      "canonical_id": "forfait-social",
+      "draft_entry": {
+        "index": 17,
+        "id": "forfait-social"
+      },
+      "nom": "Forfait social",
+      "nom_complet": "Forfait social",
+      "annee_creation": 2009,
+      "creation_evidence": {
+        "source_id": "legifrance-forfait-social-creation-2008",
+        "locator": "LFSS pour 2009, article 13 — applicable aux sommes versées à compter du 1er janvier 2009"
+      },
+      "po_status": "confirmed",
+      "legal_status": "active",
+      "legal_basis": [
+        {
+          "source_id": "legifrance-css-2026-09-01",
+          "locator": "CSS, articles L. 137-15 à L. 137-17"
+        }
+      ],
+      "classification": {
+        "source_id": "ec-ntl-2026-france",
+        "source_row": 115,
+        "esa_code": "D29C",
+        "national_detail_code": "C09",
+        "recipient_scope": "S.13 + S.212",
+        "locator": "FR row 115 — Forfait social"
+      },
+      "revenues": {
+        "observed": [
+          {
+            "year": 2024,
+            "amount_meur": 6300,
+            "source_id": "ec-ntl-2026-france",
+            "locator": "FR row 115 (D29C C09)"
+          }
+        ],
+        "forecast_total": {
+          "year": 2026,
+          "amount_meur": 7640,
+          "source_id": "lfss-2026-annexe-3",
+          "locator": "Annexe 3, p. 49"
+        }
+      },
+      "beneficiary": {
+        "year": 2026,
+        "name": "Caisse nationale d'assurance vieillesse (CNAV)",
+        "source_id": "lfss-2026-annexe-3",
+        "locator": "Annexe 3, p. 49"
+      },
+      "research_status": "complete",
+      "publication_status": "ready_for_review",
+      "production_status": "not_integrated"
+    },
+    {
+      "canonical_id": "taxe-salaires",
+      "draft_entry": {
+        "index": 99,
+        "id": "taxe-sur-les-salaires"
+      },
+      "nom": "Taxe sur les salaires",
+      "nom_complet": "Taxe sur les salaires",
+      "annee_creation": 1948,
+      "creation_evidence": {
+        "source_id": "legifrance-taxe-salaires-origin-1948",
+        "locator": "Avis du Conseil d'État, point 3 a — origine dans l'article 70 du décret n° 48-1986 du 9 décembre 1948",
+        "note": "La fiche retient l'origine du prélèvement ; son caractère permanent et son appellation actuelle sont postérieurs."
+      },
+      "po_status": "confirmed",
+      "legal_status": "active",
+      "legal_basis": [
+        {
+          "source_id": "legifrance-cgi-2026-09-01",
+          "locator": "CGI, article 231"
+        }
+      ],
+      "classification": {
+        "source_id": "ec-ntl-2026-france",
+        "source_row": 109,
+        "esa_code": "D29C",
+        "national_detail_code": "C03",
+        "recipient_scope": "S.13 + S.212",
+        "locator": "FR row 109 — Taxes sur les salaires"
+      },
+      "revenues": {
+        "observed": [
+          {
+            "year": 2024,
+            "amount_meur": 17315,
+            "source_id": "ec-ntl-2026-france",
+            "locator": "FR row 109 (D29C C03)"
+          }
+        ],
+        "forecast_total": {
+          "year": 2026,
+          "amount_meur": 17877,
+          "source_id": "lfss-2026-annexe-3",
+          "locator": "Annexe 3, p. 49"
+        }
+      },
+      "beneficiary_allocation": {
+        "year": 2026,
+        "source_id": "lfss-2026-annexe-3",
+        "locator": "Annexe 3, p. 49",
+        "shares_percent": [
+          {
+            "beneficiary": "CNAV",
+            "share": 62.73
+          },
+          {
+            "beneficiary": "CNAF",
+            "share": 10.74
+          },
+          {
+            "beneficiary": "CNAM",
+            "share": 20.39
+          },
+          {
+            "beneficiary": "CNSA",
+            "share": 6.14
+          }
+        ]
+      },
+      "research_status": "complete",
+      "publication_status": "ready_for_review",
+      "production_status": "not_integrated"
+    }
+  ],
+  "quality_checks": {
+    "all_records_have_current_legal_basis": true,
+    "all_records_have_observed_revenue_with_year": true,
+    "all_records_have_creation_year_with_source": true,
+    "forecast_and_observed_series_are_separate": true,
+    "ntl_duplicate_rows_are_not_summed": true,
+    "beneficiary_shares_sum_to_100": true,
+    "canonical_ids_are_unique": true,
+    "production_files_left_unchanged": [
+      "data/entries-full.json",
+      "data/entries-light.json"
+    ]
+  }
+}
