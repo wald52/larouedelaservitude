@@ -62,6 +62,7 @@ jobs:
       - name: Reassemble and run the reviewed generator
         run: |
           set -euxo pipefail
+          mkdir -p data/reference data/audit data/schema docs scripts tests
           cat .github/po-phase1-part-*.b64 > /tmp/po-phase1-generator.b64
           printf '%s  %s\n' \
             '23d2db83c46c2c133e7f81e9b1ae9937a875d251c5518da52295ac31b866f803' \
