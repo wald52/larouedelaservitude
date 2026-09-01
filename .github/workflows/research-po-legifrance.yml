@@ -1,0 +1,92 @@
+name: Research current tax law inventories
+
+on:
+  push:
+    branches: ["data/audit-prelevements-obligatoires-2026"]
+    paths:
+      - ".github/workflows/research-po-legifrance.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install parsers
+        run: python -m pip install --disable-pip-version-check beautifulsoup4 lxml pandas
+
+      - name: Download dated official pages
+        shell: bash
+        run: |
+          set -euxo pipefail
+          mkdir -p research-law/raw research-law/extracted
+          UA="Mozilla/5.0 (compatible; LaRoueDeLaServitudeResearch/1.0)"
+          curl -fL --retry 5 --retry-all-errors -A "$UA" \
+            "https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000053511577/2026-07-12" \
+            -o research-law/raw/lfi-2026-article-135.html
+          curl -fL --retry 5 --retry-all-errors -A "$UA" \
+            "https://www.legifrance.gouv.fr/codes/texte_lc/LEGITEXT000044595989/2026-09-01" \
+            -o research-law/raw/cibs-2026-09-01.html
+          curl -fL --retry 5 --retry-all-errors -A "$UA" \
+            "https://www.legifrance.gouv.fr/codes/texte_lc/LEGITEXT000006069577/2026-09-01" \
+            -o research-law/raw/cgi-2026-09-01.html
+          curl -fL --retry 5 --retry-all-errors -A "$UA" \
+            "https://www.legifrance.gouv.fr/codes/texte_lc/LEGITEXT000006073189/2026-09-01" \
+            -o research-law/raw/css-2026-09-01.html
+          sha256sum research-law/raw/* > research-law/raw/SHA256SUMS
+
+      - name: Extract headings, links and Article 135 table
+        run: |
+          python - <<'PY'
+          import json
+          import re
+          from pathlib import Path
+          import pandas as pd
+          from bs4 import BeautifulSoup
+
+          root = Path("research-law")
+          output = root / "extracted"
+          output.mkdir(parents=True, exist_ok=True)
+
+          for source in sorted((root / "raw").glob("*.html")):
+              soup = BeautifulSoup(source.read_text(encoding="utf-8"), "lxml")
+              items = []
+              for heading in soup.find_all(re.compile(r"^h[1-6]$")):
+                  text = " ".join(heading.get_text(" ", strip=True).split())
+                  if text:
+                      items.append({"tag": heading.name, "text": text})
+              links = []
+              for anchor in soup.find_all("a", href=True):
+                  text = " ".join(anchor.get_text(" ", strip=True).split())
+                  href = anchor["href"]
+                  if text and ("Article" in text or "Titre" in text or "Chapitre" in text or "Section" in text):
+                      links.append({"text": text, "href": href})
+              (output / f"{source.stem}-structure.json").write_text(
+                  json.dumps({"headings": items, "links": links}, ensure_ascii=False, indent=2),
+                  encoding="utf-8"
+              )
+
+          article = root / "raw/lfi-2026-article-135.html"
+          tables = pd.read_html(article)
+          for index, table in enumerate(tables):
+              table.to_csv(output / f"lfi-2026-article-135-table-{index}.csv", index=False)
+          print({"article_135_tables": [list(table.shape) for table in tables]})
+          PY
+
+      - name: Upload research bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: current-tax-law-research
+          path: research-law/
+          retention-days: 7
