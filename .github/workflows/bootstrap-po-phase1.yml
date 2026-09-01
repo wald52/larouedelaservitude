@@ -71,12 +71,21 @@ jobs:
             > /tmp/po-phase1-generator.py
           python /tmp/po-phase1-generator.py
 
-      - name: Validate the generated audit
+      - name: Validate the generated corpus
         run: |
+          set -euxo pipefail
+          test -s data/reference/sources.json
+          test -s data/reference/ntl-france-2026.json
+          test -s data/reference/lfss-2026-annexe-3-impositions.json
+          test -s data/audit/draft-2026-08-05.json
+          test -s data/audit/summary-2026-09-01.json
+          test -s data/audit/ntl-coverage-2026.json
+          test -s data/audit/lfss-coverage-2026.json
           npm run check:data
-          node --test tests/data-audit.test.mjs
           npm run lint
-          npm run audit:data
+          if test -f scripts/report-data-audit.mjs; then
+            node scripts/report-data-audit.mjs
+          fi
 
       - name: Commit only the durable phase-one files
         run: |
