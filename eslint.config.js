@@ -31,7 +31,7 @@ module.exports = [
     }
   },
   {
-    // Fonctions serverless Netlify (CommonJS, runtime Node)
+    // Fonctions Netlify historiques au format CommonJS.
     files: ["netlify/functions/**/*.js"],
     languageOptions: {
       ecmaVersion: 2022,
@@ -40,12 +40,15 @@ module.exports = [
     }
   },
   {
-    // Scripts d'outillage et de test (ESM Node)
-    files: ["scripts/**/*.mjs", "tests/**/*.mjs"],
+    // Fonctions Netlify modernes, scripts d'outillage et tests ESM Node.
+    files: ["netlify/functions/**/*.mjs", "scripts/**/*.mjs", "tests/**/*.mjs"],
     languageOptions: {
       ecmaVersion: 2022,
       sourceType: "module",
       globals: { ...globals.node }
+    },
+    rules: {
+      "no-console": "off"
     }
   },
   {

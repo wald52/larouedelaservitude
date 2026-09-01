@@ -1,26 +1,30 @@
 [build]
   functions = "netlify/functions"
 
-# 1. Forcer la version de Node pour avoir accès à 'fetch' natif
+[functions]
+  node_bundler = "esbuild"
+
+# Runtime des fonctions modernes et adresse canonique vers laquelle les pages
+# sociales doivent rediriger. PUBLIC_SITE_URL n'est pas un secret : la définir
+# ici évite qu'un partage commencé sur GitHub Pages bascule l'utilisateur vers
+# un second stockage local sur le domaine Netlify.
 [build.environment]
   NODE_VERSION = "20"
+  PUBLIC_SITE_URL = "https://wald52.github.io/larouedelaservitude/"
 
-# Les en-têtes CORS ne sont plus forcés au niveau du CDN : chaque fonction
-# renvoie sa propre origine autorisée (allow-list dans _shared/cors.js) et
-# répond elle-même aux requêtes OPTIONS. Un wildcard "*" ici écraserait
-# l'allow-list applicative.
+# Les fonctions appliquent elles-mêmes leur allow-list CORS, leur validation
+# d'origine et leurs limites natives Netlify. Ne pas ajouter de wildcard CORS
+# ici : il écraserait la politique applicative.
 
-# 2. Fraîcheur des mises à jour
-# Le script du service worker est le point d'entrée de toute mise à jour : s'il
-# est resservi depuis un cache, la nouvelle version n'arrive jamais. Il doit
-# être revalidé à chaque vérification.
+# Le script du service worker doit être revalidé à chaque vérification, sans
+# quoi une nouvelle génération pourrait rester invisible au navigateur.
 [[headers]]
   for = "/service-worker.js"
   [headers.values]
     Cache-Control = "no-cache, no-store, must-revalidate"
 
-# index.html est servi depuis le cache du service worker ; cet en-tête ne
-# concerne que le tout premier chargement (et les navigateurs sans SW).
+# index.html est servi depuis le cache du service worker ; ces en-têtes
+# concernent surtout le premier chargement et les navigateurs sans SW.
 [[headers]]
   for = "/index.html"
   [headers.values]
@@ -31,19 +35,14 @@
   [headers.values]
     Cache-Control = "no-cache"
 
-# Les données sont revalidées par js/entries.js (paramètre ?fresh=) : un cache
-# CDN long les figerait entre deux publications.
+# Les données sont revalidées par js/entries.js avec le paramètre ?fresh=.
 [[headers]]
   for = "/data/*"
   [headers.values]
     Cache-Control = "no-cache"
 
-# 3. Assets estampillés : immuables, donc cachables à vie.
-# Le code et les styles sont demandés avec `?v=<hachage de leur contenu>`
-# (scripts/stamp-assets.mjs). Le cache HTTP distingue les URLs par leur chaîne
-# de requête : une correction produit un nouveau hachage, donc une nouvelle URL,
-# donc une nouvelle entrée de cache. Rien ne peut rester figé — et tout ce qui
-# n'a pas changé n'est jamais retéléchargé.
+# Les assets portant ?v=<hachage> sont immuables. Une correction produit une
+# nouvelle URL, tandis qu'un fichier inchangé reste en cache.
 [[headers]]
   for = "/js/*"
   [headers.values]
