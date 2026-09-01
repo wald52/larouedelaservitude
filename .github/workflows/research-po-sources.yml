@@ -13,7 +13,7 @@ permissions:
 jobs:
   collect:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -24,7 +24,7 @@ jobs:
           python-version: "3.12"
 
       - name: Install workbook tooling
-        run: python -m pip install --disable-pip-version-check openpyxl
+        run: python -m pip install --disable-pip-version-check openpyxl xlrd
 
       - name: Download authoritative European sources
         shell: bash
@@ -39,6 +39,27 @@ jobs:
             -A "Mozilla/5.0 (compatible; LaRoueDeLaServitudeResearch/1.0)" \
             "https://taxation-customs.ec.europa.eu/document/download/9392a0fe-fc17-4cb6-b9c9-56e71f21caec_en?filename=Methodology2026.pdf" \
             -o research/raw/taxation-trends-methodology-2026.pdf
+
+      - name: Download authoritative French budget and social-security sources
+        shell: bash
+        run: |
+          set -euxo pipefail
+          curl -fL --retry 8 --retry-all-errors --retry-delay 3 \
+            -A "Mozilla/5.0 (compatible; LaRoueDeLaServitudeResearch/1.0)" \
+            "https://www.budget.gouv.fr/documentation/fid-download/80134" \
+            -o research/raw/plf-2026-taxes-affectees.xls
+          curl -fL --retry 8 --retry-all-errors --retry-delay 3 \
+            -A "Mozilla/5.0 (compatible; LaRoueDeLaServitudeResearch/1.0)" \
+            "https://www.budget.gouv.fr/documentation/fid-download/80398" \
+            -o research/raw/plf-2026-recettes-budget-general.xlsx
+          curl -fL --retry 8 --retry-all-errors --retry-delay 3 \
+            -A "Mozilla/5.0 (compatible; LaRoueDeLaServitudeResearch/1.0)" \
+            "https://www.securite-sociale.fr/files/live/sites/SSFR/files/medias/PLFSS/2026/Annexe%203%20PLFSS%202026%20Tableaux%20donn%C3%A9es%20.xlsx" \
+            -o research/raw/plfss-2026-annexe-3.xlsx
+          curl -fL --retry 8 --retry-all-errors --retry-delay 3 \
+            -A "Mozilla/5.0 (compatible; LaRoueDeLaServitudeResearch/1.0)" \
+            "https://www.securite-sociale.fr/files/live/sites/SSFR/files/medias/PLFSS/2026/PLFSS2026-Annexe3-20251015-103900-55-4_avec%20couverture.pdf" \
+            -o research/raw/plfss-2026-annexe-3.pdf
           sha256sum research/raw/* > research/raw/SHA256SUMS
 
       - name: Fetch the shared discussion for research context
@@ -57,49 +78,79 @@ jobs:
               "$url" -o "research/raw/chat-${name}.body" || true
           done
 
-      - name: Profile every workbook sheet and extract France candidates
+      - name: Extract every workbook as UTF-8 CSV
         run: |
           python - <<'PY'
           import csv
           import json
+          import re
           from pathlib import Path
+          import xlrd
           from openpyxl import load_workbook
 
-          source = Path("research/raw/national-tax-list-2026.xlsx")
+          raw = Path("research/raw")
           out = Path("research/extracted")
           out.mkdir(parents=True, exist_ok=True)
-          wb = load_workbook(source, read_only=True, data_only=True)
-          profile = {"sheets": []}
+          profile = {"workbooks": []}
 
-          for ws in wb.worksheets:
+          def slug(value):
+              return re.sub(r"[^a-z0-9]+", "-", value.casefold()).strip("-") or "sheet"
+
+          def write_sheet(workbook_name, sheet_name, rows, max_row, max_column):
+              path = out / f"{slug(workbook_name)}--{slug(sheet_name)}.csv"
               preview = []
-              france_hits = []
-              csv_path = out / ("sheet-" + "".join(c if c.isalnum() else "-" for c in ws.title).strip("-") + ".csv")
-              with csv_path.open("w", encoding="utf-8", newline="") as handle:
+              with path.open("w", encoding="utf-8", newline="") as handle:
                   writer = csv.writer(handle)
-                  for row_number, row in enumerate(ws.iter_rows(values_only=True), start=1):
-                      values = ["" if value is None else value for value in row]
+                  for row_number, values in enumerate(rows, start=1):
+                      values = ["" if value is None else value for value in values]
                       writer.writerow(values)
                       if row_number <= 30:
-                          preview.append(values[:30])
-                      joined = " | ".join(str(value) for value in values).casefold()
-                      if "france" in joined or any(str(value).strip().upper() == "FR" for value in values):
-                          france_hits.append({"row": row_number, "values": values[:30]})
-              profile["sheets"].append({
-                  "title": ws.title,
-                  "max_row": ws.max_row,
-                  "max_column": ws.max_column,
-                  "preview": preview,
-                  "france_hits": france_hits[:100]
-              })
+                          preview.append(values[:40])
+              return {
+                  "title": sheet_name,
+                  "max_row": max_row,
+                  "max_column": max_column,
+                  "csv": str(path),
+                  "preview": preview
+              }
+
+          for source in sorted(raw.glob("*.xlsx")):
+              workbook = load_workbook(source, read_only=True, data_only=True)
+              item = {"file": source.name, "sheets": []}
+              for sheet in workbook.worksheets:
+                  item["sheets"].append(write_sheet(
+                      source.stem,
+                      sheet.title,
+                      sheet.iter_rows(values_only=True),
+                      sheet.max_row,
+                      sheet.max_column
+                  ))
+              profile["workbooks"].append(item)
+
+          for source in sorted(raw.glob("*.xls")):
+              workbook = xlrd.open_workbook(source)
+              item = {"file": source.name, "sheets": []}
+              for sheet in workbook.sheets():
+                  rows = (sheet.row_values(index) for index in range(sheet.nrows))
+                  item["sheets"].append(write_sheet(
+                      source.stem,
+                      sheet.name,
+                      rows,
+                      sheet.nrows,
+                      sheet.ncols
+                  ))
+              profile["workbooks"].append(item)
 
           (out / "workbook-profile.json").write_text(
               json.dumps(profile, ensure_ascii=False, indent=2, default=str),
               encoding="utf-8"
           )
           print(json.dumps({
-              "sheet_names": wb.sheetnames,
-              "dimensions": {ws.title: [ws.max_row, ws.max_column] for ws in wb.worksheets}
+              workbook["file"]: {
+                  sheet["title"]: [sheet["max_row"], sheet["max_column"]]
+                  for sheet in workbook["sheets"]
+              }
+              for workbook in profile["workbooks"]
           }, ensure_ascii=False, indent=2))
           PY
 
