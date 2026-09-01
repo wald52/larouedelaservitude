@@ -1,4 +1,4 @@
-name: Research current tax law inventories
+name: Research current compulsory-levy inventories
 
 on:
   push:
@@ -13,79 +13,237 @@ permissions:
 jobs:
   collect:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 25
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
         with:
-          python-version: "3.12"
+          node-version: "20"
+          cache: "npm"
 
-      - name: Install parsers
-        run: python -m pip install --disable-pip-version-check beautifulsoup4 lxml pandas
+      - name: Install dependencies
+        run: npm ci
 
-      - name: Download dated official pages
-        shell: bash
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Extract dated official pages and linked datasets
+        env:
+          PLAYWRIGHT_BROWSERS_PATH: "0"
         run: |
-          set -euxo pipefail
-          mkdir -p research-law/raw research-law/extracted
-          UA="Mozilla/5.0 (compatible; LaRoueDeLaServitudeResearch/1.0)"
-          curl -fL --retry 5 --retry-all-errors -A "$UA" \
-            "https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000053511577/2026-07-12" \
-            -o research-law/raw/lfi-2026-article-135.html
-          curl -fL --retry 5 --retry-all-errors -A "$UA" \
-            "https://www.legifrance.gouv.fr/codes/texte_lc/LEGITEXT000044595989/2026-09-01" \
-            -o research-law/raw/cibs-2026-09-01.html
-          curl -fL --retry 5 --retry-all-errors -A "$UA" \
-            "https://www.legifrance.gouv.fr/codes/texte_lc/LEGITEXT000006069577/2026-09-01" \
-            -o research-law/raw/cgi-2026-09-01.html
-          curl -fL --retry 5 --retry-all-errors -A "$UA" \
-            "https://www.legifrance.gouv.fr/codes/texte_lc/LEGITEXT000006073189/2026-09-01" \
-            -o research-law/raw/css-2026-09-01.html
-          sha256sum research-law/raw/* > research-law/raw/SHA256SUMS
+          node --input-type=module <<'NODE'
+          import { chromium } from "@playwright/test";
+          import { mkdir, writeFile } from "node:fs/promises";
+          import { createHash } from "node:crypto";
+          import { extname } from "node:path";
 
-      - name: Extract headings, links and Article 135 table
-        run: |
-          python - <<'PY'
-          import json
-          import re
-          from pathlib import Path
-          import pandas as pd
-          from bs4 import BeautifulSoup
+          const root = "research-law";
+          const raw = `${root}/raw`;
+          const extracted = `${root}/extracted`;
+          await mkdir(raw, { recursive: true });
+          await mkdir(extracted, { recursive: true });
 
-          root = Path("research-law")
-          output = root / "extracted"
-          output.mkdir(parents=True, exist_ok=True)
+          const targets = [
+            {
+              slug: "lfi-2026-article-135",
+              url: "https://www.legifrance.gouv.fr/loda/article_lc/LEGIARTI000053511577"
+            },
+            {
+              slug: "cibs-2026-09-01",
+              url: "https://www.legifrance.gouv.fr/codes/texte_lc/LEGITEXT000044595989/2026-09-01"
+            },
+            {
+              slug: "cgi-2026-09-01",
+              url: "https://www.legifrance.gouv.fr/codes/texte_lc/LEGITEXT000006069577/2026-09-01"
+            },
+            {
+              slug: "css-2026-09-01",
+              url: "https://www.legifrance.gouv.fr/codes/texte_lc/LEGITEXT000006073189/2026-09-01"
+            },
+            {
+              slug: "budget-exercice-2026",
+              url: "https://www.budget.gouv.fr/documentation/documents-budgetaires-lois/exercice-2026"
+            },
+            {
+              slug: "lfss-annee-en-cours",
+              url: "https://www.securite-sociale.fr/la-secu-en-detail/loi-de-financement/annee-en-cours"
+            },
+            {
+              slug: "collectivites-fiscalite-locale",
+              url: "https://www.collectivites-locales.gouv.fr/finances-locales/la-fiscalite-locale"
+            },
+            {
+              slug: "urssaf-cotisations",
+              url: "https://www.urssaf.fr/accueil/employeur/cotisations.html"
+            }
+          ];
 
-          for source in sorted((root / "raw").glob("*.html")):
-              soup = BeautifulSoup(source.read_text(encoding="utf-8"), "lxml")
-              items = []
-              for heading in soup.find_all(re.compile(r"^h[1-6]$")):
-                  text = " ".join(heading.get_text(" ", strip=True).split())
-                  if text:
-                      items.append({"tag": heading.name, "text": text})
-              links = []
-              for anchor in soup.find_all("a", href=True):
-                  text = " ".join(anchor.get_text(" ", strip=True).split())
-                  href = anchor["href"]
-                  if text and ("Article" in text or "Titre" in text or "Chapitre" in text or "Section" in text):
-                      links.append({"text": text, "href": href})
-              (output / f"{source.stem}-structure.json").write_text(
-                  json.dumps({"headings": items, "links": links}, ensure_ascii=False, indent=2),
-                  encoding="utf-8"
-              )
+          const browser = await chromium.launch({ headless: true });
+          const context = await browser.newContext({
+            locale: "fr-FR",
+            userAgent:
+              "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/140 Safari/537.36 LaRoueDeLaServitudeResearch/1.0"
+          });
+          const index = [];
 
-          article = root / "raw/lfi-2026-article-135.html"
-          tables = pd.read_html(article)
-          for index, table in enumerate(tables):
-              table.to_csv(output / f"lfi-2026-article-135-table-{index}.csv", index=False)
-          print({"article_135_tables": [list(table.shape) for table in tables]})
-          PY
+          function clean(value) {
+            return String(value || "").replace(/\s+/g, " ").trim();
+          }
+
+          function safeName(value) {
+            return String(value)
+              .normalize("NFD")
+              .replace(/[\u0300-\u036f]/g, "")
+              .replace(/[^A-Za-z0-9._-]+/g, "-")
+              .replace(/^-+|-+$/g, "")
+              .slice(0, 120);
+          }
+
+          for (const target of targets) {
+            const page = await context.newPage();
+            const responses = [];
+            page.on("response", (response) => {
+              const type = response.headers()["content-type"] || "";
+              if (/json|csv|spreadsheet|excel|pdf/i.test(type)) {
+                responses.push({
+                  status: response.status(),
+                  contentType: type,
+                  url: response.url()
+                });
+              }
+            });
+
+            let status = null;
+            let error = null;
+            try {
+              const response = await page.goto(target.url, {
+                waitUntil: "domcontentloaded",
+                timeout: 60_000
+              });
+              status = response?.status() ?? null;
+              await page.waitForTimeout(4_000);
+
+              for (const label of ["Tout accepter", "Accepter", "Continuer sans accepter"]) {
+                const button = page.getByRole("button", { name: label, exact: true });
+                if (await button.count()) {
+                  await button.first().click({ timeout: 2_000 }).catch(() => {});
+                  break;
+                }
+              }
+
+              const snapshot = await page.evaluate(() => {
+                const cleanText = (value) => String(value || "").replace(/\s+/g, " ").trim();
+                const tables = Array.from(document.querySelectorAll("table")).map((table, tableIndex) => ({
+                  tableIndex,
+                  caption: cleanText(table.querySelector("caption")?.textContent),
+                  rows: Array.from(table.querySelectorAll("tr")).map((row) =>
+                    Array.from(row.querySelectorAll("th,td")).map((cell) => cleanText(cell.textContent))
+                  )
+                }));
+                const links = Array.from(document.querySelectorAll("a[href]")).map((anchor) => ({
+                  text: cleanText(anchor.textContent),
+                  href: anchor.href
+                }));
+                const headings = Array.from(document.querySelectorAll("h1,h2,h3,h4,h5,h6")).map(
+                  (heading) => ({ tag: heading.tagName.toLowerCase(), text: cleanText(heading.textContent) })
+                );
+                return {
+                  title: document.title,
+                  canonical: document.querySelector('link[rel="canonical"]')?.href || null,
+                  text: document.body?.innerText || "",
+                  headings,
+                  links,
+                  tables
+                };
+              });
+
+              await writeFile(`${raw}/${target.slug}.html`, await page.content(), "utf8");
+              await writeFile(`${raw}/${target.slug}.txt`, snapshot.text, "utf8");
+              await writeFile(
+                `${extracted}/${target.slug}.json`,
+                JSON.stringify({
+                  requestedUrl: target.url,
+                  finalUrl: page.url(),
+                  status,
+                  title: snapshot.title,
+                  canonical: snapshot.canonical,
+                  headings: snapshot.headings,
+                  links: snapshot.links,
+                  tables: snapshot.tables,
+                  observedDataResponses: responses
+                }, null, 2),
+                "utf8"
+              );
+
+              const interesting = snapshot.links.filter(({ text, href }) => {
+                const haystack = `${text} ${href}`.toLocaleLowerCase("fr");
+                return (
+                  /\.pdf(?:$|\?)/i.test(href) ||
+                  /\.xlsx?(?:$|\?)/i.test(href) ||
+                  /\.csv(?:$|\?)/i.test(href) ||
+                  haystack.includes("voies et moyens") ||
+                  haystack.includes("taxes affect") ||
+                  haystack.includes("annexe 1") ||
+                  haystack.includes("annexe 3") ||
+                  haystack.includes("annexe 8") ||
+                  haystack.includes("données chiffrées")
+                );
+              });
+
+              for (const link of interesting.slice(0, 80)) {
+                try {
+                  const download = await context.request.get(link.href, {
+                    timeout: 60_000,
+                    failOnStatusCode: false
+                  });
+                  if (!download.ok()) continue;
+                  const body = await download.body();
+                  if (!body.length || body.length > 30 * 1024 * 1024) continue;
+                  const contentType = download.headers()["content-type"] || "";
+                  let suffix = extname(new URL(link.href).pathname);
+                  if (!suffix) {
+                    if (/pdf/i.test(contentType)) suffix = ".pdf";
+                    else if (/spreadsheet|excel/i.test(contentType)) suffix = ".xlsx";
+                    else if (/csv/i.test(contentType)) suffix = ".csv";
+                    else suffix = ".bin";
+                  }
+                  const digest = createHash("sha256").update(link.href).digest("hex").slice(0, 12);
+                  const name = `${target.slug}-${safeName(clean(link.text) || "document")}-${digest}${suffix}`;
+                  await writeFile(`${raw}/${name}`, body);
+                } catch (downloadError) {
+                  responses.push({ url: link.href, error: downloadError.message });
+                }
+              }
+            } catch (caught) {
+              error = caught.stack || caught.message;
+            }
+
+            index.push({
+              ...target,
+              finalUrl: page.url(),
+              status,
+              error,
+              title: await page.title().catch(() => "")
+            });
+            await page.close();
+          }
+
+          await browser.close();
+          await writeFile(`${extracted}/index.json`, JSON.stringify(index, null, 2), "utf8");
+          console.log(JSON.stringify(index, null, 2));
+          if (index.some((entry) => entry.error)) process.exitCode = 1;
+          NODE
+
+      - name: Inventory collected files
+        if: always()
+        run: find research-law -type f -printf '%p %s bytes\n' | sort
 
       - name: Upload research bundle
-        uses: actions/upload-artifact@v4
+        if: always()
+        uses: actions/upload-artifact@v6
         with:
           name: current-tax-law-research
           path: research-law/
