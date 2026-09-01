@@ -1,62 +1,79 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { createRequire } from "node:module";
 
-const require = createRequire(import.meta.url);
-const sharePage = require("../netlify/functions/sharePage.js");
+import handler, { config, normalizeRedirectUrl } from "../netlify/functions/sharePage.mjs";
+import { normalizeText } from "../netlify/functions/_shared/share.mjs";
 
-const eventWithHost = (host, query, method = "GET") => ({
-  httpMethod: method,
-  headers: { host },
-  queryStringParameters: query
+const ENDPOINT = "https://larouedelaservitude.netlify.app/.netlify/functions/sharePage";
+
+function request(query = {}, method = "GET") {
+  const url = new URL(ENDPOINT);
+  for (const [key, value] of Object.entries(query)) url.searchParams.set(key, value);
+  return new Request(url, { method });
+}
+
+test("la page de partage conserve l'ancienne route et expose /share", () => {
+  assert.deepEqual(config.path, ["/share", "/.netlify/functions/sharePage"]);
 });
 
 test("normalizeText compacte les espaces et tronque", () => {
-  assert.equal(sharePage.normalizeText("  a\n  b   c  ", 100), "a b c");
-  assert.equal(sharePage.normalizeText("abcdef", 3), "abc");
-  assert.equal(sharePage.normalizeText(null, 10), "");
+  assert.equal(normalizeText("  a\n  b   c  ", 100), "a b c");
+  assert.equal(normalizeText("abcdef", 3), "abc");
+  assert.equal(normalizeText(null, 10), "");
 });
 
-test("normalizeRedirectUrl garde une URL du même hôte", () => {
-  const event = { headers: { host: "larouedelaservitude.netlify.app" } };
+test("normalizeRedirectUrl autorise uniquement le site public et son sous-chemin", () => {
+  const publicSite = "https://wald52.github.io/larouedelaservitude/";
   assert.equal(
-    sharePage.normalizeRedirectUrl("https://larouedelaservitude.netlify.app/page", event),
-    "https://larouedelaservitude.netlify.app/page"
+    normalizeRedirectUrl("https://wald52.github.io/larouedelaservitude/?vue=donnees", publicSite),
+    "https://wald52.github.io/larouedelaservitude/?vue=donnees"
   );
-});
-
-test("normalizeRedirectUrl bloque un open-redirect vers un autre hôte", () => {
-  const event = { headers: { host: "larouedelaservitude.netlify.app" } };
   assert.equal(
-    sharePage.normalizeRedirectUrl("https://evil.example/steal", event),
-    "https://larouedelaservitude.netlify.app"
+    normalizeRedirectUrl("https://wald52.github.io/autre-projet/", publicSite),
+    publicSite
   );
+  assert.equal(normalizeRedirectUrl("https://evil.example/steal", publicSite), publicSite);
 });
 
 test("handler POST -> 405", async () => {
-  const res = await sharePage.handler(eventWithHost("host.example", {}, "POST"));
-  assert.equal(res.statusCode, 405);
+  const response = await handler(request({}, "POST"));
+  assert.equal(response.status, 405);
 });
 
 test("handler image invalide -> 400", async () => {
-  const res = await sharePage.handler(
-    eventWithHost("host.example", { image: "https://evil.example/x" })
-  );
-  assert.equal(res.statusCode, 400);
+  const response = await handler(request({ image: "https://evil.example/x" }));
+  assert.equal(response.status, 400);
 });
 
-test("handler échappe le titre (pas de XSS) et redirige vers l'hôte de la requête", async () => {
-  const res = await sharePage.handler(
-    eventWithHost("host.example", {
+test("le HTML échappe le titre et redirige vers le domaine canonique", async () => {
+  const response = await handler(
+    request({
       image: "https://i.ibb.co/abc/x.png",
       title: "<script>alert(1)</script>",
+      description: "un résultat",
       redirect: "https://evil.example/steal"
     })
   );
-  assert.equal(res.statusCode, 200);
-  assert.ok(!res.body.includes("<script>alert(1)</script>"));
-  assert.ok(res.body.includes("&lt;script&gt;"));
-  // Le méta-refresh ne doit pas pointer vers l'hôte attaquant
-  assert.ok(!res.body.includes("evil.example"));
-  assert.ok(res.body.includes("host.example"));
+
+  assert.equal(response.status, 200);
+  const body = await response.text();
+  assert.ok(!body.includes("<script>alert(1)</script>"));
+  assert.ok(body.includes("&lt;script&gt;"));
+  assert.ok(!body.includes("evil.example"));
+  assert.ok(body.includes("wald52.github.io/larouedelaservitude/"));
+  assert.ok(body.includes("larouedelaservitude.netlify.app"));
+});
+
+test("la page de partage envoie des en-têtes de sécurité", async () => {
+  const response = await handler(request({ image: "https://i.ibb.co/abc/x.png" }));
+  assert.match(response.headers.get("content-security-policy"), /default-src 'none'/);
+  assert.equal(response.headers.get("x-frame-options"), "DENY");
+  assert.equal(response.headers.get("referrer-policy"), "no-referrer");
+  assert.match(response.headers.get("x-robots-tag"), /noindex/);
+});
+
+test("HEAD ne renvoie aucun corps", async () => {
+  const response = await handler(request({ image: "https://i.ibb.co/abc/x.png" }, "HEAD"));
+  assert.equal(response.status, 200);
+  assert.equal(await response.text(), "");
 });
