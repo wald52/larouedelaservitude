@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "PWA ludique présentant les taxes et prélèvements obligatoires français sous forme de roue à lancer.",
   "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "check:imports": "node scripts/check-imports.mjs",
     "check:data": "node scripts/validate-data.mjs",
@@ -12,12 +15,15 @@
     "format": "prettier --check .",
     "format:write": "prettier --write .",
     "test": "node --test",
+    "test:e2e": "playwright test",
+    "serve:e2e": "node scripts/serve-e2e.mjs",
     "ci": "npm run check && npm run lint && npm test",
     "stamp": "node scripts/stamp-assets.mjs",
     "check:stamp": "node scripts/stamp-assets.mjs --check"
   },
   "devDependencies": {
     "@eslint/js": "^9.15.0",
+    "@playwright/test": "1.62.1",
     "eslint": "^9.15.0",
     "eslint-config-prettier": "^9.1.0",
     "globals": "^15.12.0",

@@ -40,12 +40,29 @@ module.exports = [
     }
   },
   {
-    // Fonctions Netlify modernes, scripts d'outillage et tests ESM Node.
-    files: ["netlify/functions/**/*.mjs", "scripts/**/*.mjs", "tests/**/*.mjs"],
+    // Fonctions Netlify modernes, scripts d'outillage, configuration et tests ESM Node.
+    files: [
+      "netlify/functions/**/*.mjs",
+      "scripts/**/*.mjs",
+      "tests/**/*.mjs",
+      "playwright.config.mjs"
+    ],
     languageOptions: {
       ecmaVersion: 2022,
       sourceType: "module",
       globals: { ...globals.node }
+    },
+    rules: {
+      "no-console": "off"
+    }
+  },
+  {
+    // Les fonctions passées à page.evaluate s'exécutent dans le navigateur.
+    files: ["tests/e2e/**/*.mjs"],
+    languageOptions: {
+      ecmaVersion: 2022,
+      sourceType: "module",
+      globals: { ...globals.node, ...globals.browser }
     },
     rules: {
       "no-console": "off"
