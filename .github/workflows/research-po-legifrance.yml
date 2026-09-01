@@ -31,8 +31,6 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: Extract dated official pages and linked datasets
-        env:
-          PLAYWRIGHT_BROWSERS_PATH: "0"
         run: |
           node --input-type=module <<'NODE'
           import { chromium } from "@playwright/test";
