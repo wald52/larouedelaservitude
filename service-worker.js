@@ -43,19 +43,19 @@
  * ℹ️ FONTS : aucune — polices système uniquement.
  */
 /* --- généré par scripts/stamp-assets.mjs — ne pas éditer à la main --- */
-const VERSION = "6c72b29e";
+const VERSION = "a9727e0e";
 const ASSETS = [
   "./",
   "./index.html",
   "./bills.css?v=3274a064",
   "./bills.js?v=16598baa",
   "./buttons.css?v=8e4cf8f9",
-  "./donnees.css?v=7673894b",
-  "./js/app.js?v=f2bc549b",
+  "./donnees.css?v=af54389e",
+  "./js/app.js?v=673324aa",
   "./js/audio.js?v=3679b476",
   "./js/charts.js?v=9c0905cd",
   "./js/constants.js?v=b8755637",
-  "./js/data-explorer.js?v=58f87ca0",
+  "./js/data-explorer.js?v=f37f2024",
   "./js/entries.js?v=c56272d2",
   "./js/focus-trap.js?v=0b34fd1c",
   "./js/game.js?v=73adbd70",
@@ -75,7 +75,6 @@ const ASSETS = [
   "./icons/apple-touch-icon.png",
   "./icons/icon-192x192.png",
   "./icons/icon-512x512.png",
-  "./icons/og-image.png",
   "./site.webmanifest"
 ];
 /* --- fin du bloc généré --- */
@@ -129,16 +128,43 @@ async function precacheOne(cache, url, attempt = 0) {
   }
 }
 
+function isOptionalPrecacheAsset(url) {
+  return (
+    url.startsWith("./audio/") ||
+    url === "./icons/favicon.ico" ||
+    url === "./icons/apple-touch-icon.png" ||
+    url === "./icons/icon-512x512.png"
+  );
+}
+
 async function precacheAll() {
   const cache = await caches.open(CACHE);
-  const results = await Promise.allSettled(ASSETS.map((url) => precacheOne(cache, url)));
-  const failures = results.filter((result) => result.status === "rejected");
+  const requiredAssets = ASSETS.filter((url) => !isOptionalPrecacheAsset(url));
+  const optionalAssets = ASSETS.filter(isOptionalPrecacheAsset);
+  const requiredResults = await Promise.allSettled(
+    requiredAssets.map((url) => precacheOne(cache, url))
+  );
+  const failures = requiredResults.filter((result) => result.status === "rejected");
 
   if (failures.length) {
-    // Cache incomplet = hors ligne cassé : on préfère échouer et laisser la
-    // génération précédente en place, intacte. Le navigateur retentera.
+    // Cache essentiel incomplet = hors ligne cassé : on préfère échouer et
+    // laisser la génération précédente en place, intacte.
     await caches.delete(CACHE);
-    throw new Error(`Pré-cache incomplet : ${failures.map((f) => f.reason.message).join(", ")}`);
+    throw new Error(
+      `Pré-cache essentiel incomplet : ${failures.map((failure) => failure.reason.message).join(", ")}`
+    );
+  }
+
+  // Sons et icônes secondaires enrichissent l'expérience, mais leur panne
+  // temporaire ne doit plus empêcher l'installation de toute une génération.
+  const optionalResults = await Promise.allSettled(
+    optionalAssets.map((url) => precacheOne(cache, url))
+  );
+  const optionalFailures = optionalResults
+    .filter((result) => result.status === "rejected")
+    .map((failure) => failure.reason.message);
+  if (optionalFailures.length) {
+    console.warn("[SW] Ressources facultatives non précachées :", optionalFailures);
   }
 }
 

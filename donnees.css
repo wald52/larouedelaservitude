@@ -642,6 +642,26 @@
   min-width: 160px;
 }
 
+.table-detail-button {
+  max-width: 100%;
+  margin: -6px;
+  padding: 6px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.table-detail-button:hover {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 .data-table .col-nom_complet {
   min-width: 280px;
   color: var(--legend);

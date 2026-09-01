@@ -666,9 +666,6 @@ function renderTable(rows) {
   rows.forEach((row, index) => {
     const tr = document.createElement("tr");
     tr.dataset.id = row.id;
-    tr.tabIndex = 0;
-    tr.setAttribute("role", "button");
-    tr.setAttribute("aria-label", `Détails de ${row.nom_complet}`);
     if (row.id === state.selectedId) tr.classList.add("is-selected");
 
     const rank = document.createElement("td");
@@ -679,7 +676,19 @@ function renderTable(rows) {
     for (const column of COLUMNS) {
       const td = document.createElement("td");
       td.className = `col-${column.key}${column.type === "number" ? " is-number" : ""}`;
-      td.textContent = column.render(row);
+
+      if (column.key === "nom") {
+        const detailButton = document.createElement("button");
+        detailButton.type = "button";
+        detailButton.className = "table-detail-button";
+        detailButton.dataset.entryId = row.id;
+        detailButton.textContent = column.render(row);
+        detailButton.setAttribute("aria-label", `Détails de ${row.nom_complet}`);
+        td.appendChild(detailButton);
+      } else {
+        td.textContent = column.render(row);
+      }
+
       tr.appendChild(td);
     }
 
@@ -952,16 +961,10 @@ function attachEvents() {
   });
 
   elements.tableBody.addEventListener("click", (event) => {
+    const detailButton = event.target.closest(".table-detail-button");
     const row = event.target.closest("tr");
-    if (row?.dataset.id) selectRow(row.dataset.id);
-  });
-
-  elements.tableBody.addEventListener("keydown", (event) => {
-    if (event.key !== "Enter" && event.key !== " ") return;
-    const row = event.target.closest("tr");
-    if (!row?.dataset.id) return;
-    event.preventDefault();
-    selectRow(row.dataset.id);
+    const id = detailButton?.dataset.entryId || row?.dataset.id;
+    if (id) selectRow(id);
   });
 
   elements.detailClose.addEventListener("click", () => {

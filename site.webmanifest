@@ -1,13 +1,12 @@
 {
   "name": "La roue de la servitude",
-  "short_name": "La roue de la servitude",
-  "description": "La roue de la servitude",
+  "short_name": "Roue fiscale",
+  "description": "Roue interactive et jeu de données sur les taxes et prélèvements obligatoires français.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "background_color": "#f7f7f7",
   "theme_color": "#f7f7f7",
-
   "icons": [
     {
       "src": "icons/icon-512x512.png",
@@ -22,5 +21,8 @@
       "purpose": "any maskable"
     }
   ],
-  "prefer_related_applications": false
+  "prefer_related_applications": false,
+  "id": "./",
+  "lang": "fr",
+  "dir": "ltr"
 }

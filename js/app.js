@@ -36,6 +36,7 @@ function requireElement(id) {
 const canvas = requireElement("wheelCanvas");
 const ctx = canvas.getContext("2d");
 const wheelArea = requireElement("wheelArea");
+const wheelCurrentLabel = requireElement("wheelCurrentLabel");
 const btn = requireElement("spinBtn");
 const installPromptBanner = document.getElementById("installPrompt");
 const installPromptAction = document.getElementById("installPromptAction");
@@ -138,6 +139,7 @@ let spinResetTimer = 0;
 let installPromptHideTimer = 0;
 // Mise à jour de données reçue pendant une rotation, appliquée à l'arrêt.
 let pendingEntriesRefresh = false;
+let currentSectorLabelText = "";
 
 const introState = {
   active: false,
@@ -342,6 +344,7 @@ function setResultOpen(open) {
   // s'affichent donc jamais ensemble : la définition tient la place jusqu'au
   // premier tirage, et la reprend dès que la carte est refermée.
   introDef.hidden = open;
+  updateCurrentSectorLabel(angle);
 }
 
 function hideResult() {
@@ -775,6 +778,7 @@ function drawWheel(a, now = performance.now()) {
 
   drawCenterLayer(now);
   ctx.restore();
+  updateCurrentSectorLabel(a);
 }
 
 function ensureAudioInitialized() {
@@ -862,7 +866,7 @@ function loadDataExplorer() {
   if (!dataExplorerPromise) {
     // Chargé à la première ouverture seulement : le démarrage de la roue ne
     // paie ni l'explorateur, ni les statistiques, ni les graphiques.
-    dataExplorerPromise = import("./data-explorer.js?v=58f87ca0")
+    dataExplorerPromise = import("./data-explorer.js?v=f37f2024")
       .then((mod) => mod.initDataExplorer())
       .catch((error) => {
         console.error("[APP] Chargement de la vue Données impossible:", error);
@@ -1157,6 +1161,22 @@ function getSelectedIndex(a) {
   let theta = (-Math.PI / 2 - a) % (Math.PI * 2);
   if (theta < 0) theta += Math.PI * 2;
   return Math.floor(theta / step);
+}
+
+function updateCurrentSectorLabel(a = angle) {
+  const selectedIndex = getSelectedIndex(a);
+  const selectedName = selectedIndex >= 0 ? ENTRIES[selectedIndex] : "";
+  let nextText = selectedName || "Aucun élément disponible";
+
+  if (Math.abs(angularVelocity) > 0.06) {
+    nextText = "La roue tourne…";
+  } else if (isResultVisible() && currentEntry && showedResult) {
+    nextText = currentEntry.nom || currentEntry.nom_complet || nextText;
+  }
+
+  if (nextText === currentSectorLabelText) return;
+  currentSectorLabelText = nextText;
+  wheelCurrentLabel.textContent = nextText;
 }
 
 // Les trois boutons vivent dans le balisage : plus de délégation, un écouteur

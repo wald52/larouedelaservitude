@@ -11,6 +11,9 @@
       content="La roue de la servitude - Découvrez les 371 taxes et prélèvements obligatoires français de manière ludique. Une application web progressive (PWA) utilisable hors ligne."
     />
     <title>La roue de la servitude</title>
+    <link rel="canonical" href="https://wald52.github.io/larouedelaservitude/" />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f7f7f7" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0f1115" />
 
     <!-- 🚀 Préchargement ultra-agressif des ressources critiques -->
     <link
@@ -41,9 +44,29 @@
     <link rel="manifest" href="site.webmanifest" />
 
     <!-- Meta pour les réseaux sociaux (Open Graph / Twitter) -->
-    <meta property="og:image" content="icons/og-image.png" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="fr_FR" />
+    <meta property="og:title" content="La roue de la servitude" />
+    <meta
+      property="og:description"
+      content="Explorez 371 taxes et prélèvements obligatoires français avec une roue interactive, puis consultez le jeu de données et ses statistiques."
+    />
+    <meta property="og:url" content="https://wald52.github.io/larouedelaservitude/" />
+    <meta
+      property="og:image"
+      content="https://wald52.github.io/larouedelaservitude/icons/og-image.png"
+    />
+    <meta property="og:image:alt" content="Aperçu de La roue de la servitude" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:image" content="icons/og-image.png" />
+    <meta name="twitter:title" content="La roue de la servitude" />
+    <meta
+      name="twitter:description"
+      content="Explorez les prélèvements obligatoires français avec une roue interactive et un jeu de données consultable."
+    />
+    <meta
+      name="twitter:image"
+      content="https://wald52.github.io/larouedelaservitude/icons/og-image.png"
+    />
 
     <!-- Styles critiques (priorité haute) -->
     <!-- buttons.css est bloquant, contrairement aux deux suivants : il habille le
@@ -58,14 +81,14 @@
          chargement. -->
     <link
       rel="stylesheet"
-      href="donnees.css?v=7673894b"
+      href="donnees.css?v=af54389e"
       media="print"
       onload="this.media = 'all'"
     />
     <noscript>
       <link rel="stylesheet" href="bills.css?v=3274a064" />
       <link rel="stylesheet" href="menu.css?v=88ba9cc4" />
-      <link rel="stylesheet" href="donnees.css?v=7673894b" />
+      <link rel="stylesheet" href="donnees.css?v=af54389e" />
     </noscript>
 
     <style>
@@ -121,7 +144,7 @@
         --column-room: calc(117px + var(--tabbar-room));
         /* La première déclaration est le repli des navigateurs sans `svh`. */
         --wheel-cap: 52vh;
-        --wheel-cap: min(52svh, calc(100svh - var(--card-room) - var(--column-room)));
+        --wheel-cap: max(148px, min(52svh, calc(100svh - var(--card-room) - var(--column-room))));
         /* La trame de fond, une image par thème. Le SVG est un document
            indépendant : `currentColor` n'y a pas cours et son glyphe est noir
            par défaut, ce qui l'éteignait sur le fond sombre. La couleur est donc
@@ -253,7 +276,7 @@
         padding: 0;
         overflow: hidden;
         overscroll-behavior: contain; /* bloque l'effet "rebond" sur mobile */
-        touch-action: none; /* empêche le scroll tactile */
+        touch-action: pan-x pan-y pinch-zoom; /* conserve le zoom et les gestes natifs */
         font-family:
           system-ui,
           -apple-system,
@@ -313,7 +336,7 @@
 
          Une vue est une surface fixe qui défile en propre, parce que le corps
          du document, lui, ne défile jamais (c'est un jeu : `body` est en
-         position fixe, `touch-action: none`). Elle s'arrête au-dessus de la
+         position fixe, tout en conservant le zoom natif). Elle s'arrête au-dessus de la
          barre d'onglets, par laquelle on la quitte. */
       .app-view {
         display: none;
@@ -325,7 +348,7 @@
         z-index: 2;
         overflow-y: auto;
         overscroll-behavior: contain;
-        touch-action: pan-y;
+        touch-action: pan-y pinch-zoom;
         background: var(--bg);
       }
       /* La roue et sa bannière d'installation ne sont là que sur leur vue. */
@@ -600,6 +623,53 @@
         border-right: var(--w) solid transparent;
         border-top: var(--h) solid var(--pointer);
       }
+      /* Le nom sous le pointeur reste lisible même lorsque les 371 secteurs
+         sont trop étroits pour porter leur propre libellé. Le texte est décoratif
+         pour les lecteurs d'écran : le résultat final est déjà annoncé dans la
+         région aria-live de la carte, et une annonce à chaque secteur serait
+         inutilisable pendant la rotation. */
+      .wheel-current-label {
+        position: absolute;
+        z-index: 7;
+        top: 28px;
+        left: 50%;
+        translate: -50% 0;
+        width: min(76%, 360px);
+        margin: 0;
+        padding: 6px 10px;
+        box-sizing: border-box;
+        border: 1px solid color-mix(in srgb, var(--ring) 72%, transparent);
+        border-radius: 999px;
+        background: color-mix(in srgb, var(--surface) 88%, transparent);
+        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.12);
+        color: var(--fg);
+        font-size: clamp(11px, 2.8vw, 14px);
+        font-weight: 700;
+        line-height: 1.2;
+        text-align: center;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        pointer-events: none;
+        backdrop-filter: blur(4px);
+      }
+
+      .wheel-current-label::before {
+        content: "Sous le pointeur · ";
+        color: var(--legend);
+        font-size: 0.78em;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+
+      @supports not (background: color-mix(in srgb, white, transparent)) {
+        .wheel-current-label {
+          background: var(--surface);
+          border-color: var(--ring);
+        }
+      }
+
       /* La roue est bornée par la largeur *et* par la hauteur : le corps de la
          page ne défile pas, ce qui ne tient pas dans l'écran est perdu.
          `svh` plutôt que `dvh` : la petite hauteur de vue est stable, alors que
@@ -618,6 +688,40 @@
         background: var(--surface-alt);
         box-shadow: inset 0 0 0 5px var(--surface-inset);
       }
+      /* Une fenêtre très courte (téléphone en paysage, clavier logiciel ou
+         fort agrandissement) doit rester utilisable. La colonne peut alors
+         défiler et la roue garde un diamètre minimal au lieu de retomber sur
+         une largeur devenue trop grande après un calcul négatif. */
+      @media (max-height: 520px) and (orientation: landscape) {
+        :root {
+          --card-room: 164px;
+          --column-room: calc(70px + var(--tabbar-room));
+          --wheel-size: clamp(148px, 44svh, 240px);
+        }
+
+        .wrap {
+          min-height: 100svh;
+          height: auto;
+          overflow-y: auto;
+          touch-action: pan-y pinch-zoom;
+          padding-top: 6px;
+        }
+
+        .masthead {
+          display: none;
+        }
+
+        .container {
+          margin-top: 4px;
+          gap: 8px;
+        }
+
+        .intro-def,
+        .result {
+          max-height: 164px;
+        }
+      }
+
       /* Rien ne bouge quand un résultat s'affiche : le titre, le bouton et la
          roue sont à leur place et à leur taille définitives dès le premier
          rendu, la carte occupant la hauteur qui lui était déjà réservée. */
@@ -674,7 +778,7 @@
       }
 
       /* La citation, seule partie qui défile — même raison et même réglage que
-         `.result__scroll` : `body` porte `touch-action: none`, sans cette
+         `.result__scroll` : le corps ne défile pas, mais sans cette
          exception le bloc ne défilerait pas au doigt, et l'ascenseur reste
          masqué pour ne pas barrer la fiche d'un trait gris. */
       .intro-def__quote {
@@ -682,7 +786,7 @@
         min-height: 0;
         overflow-y: auto;
         overscroll-behavior: contain;
-        touch-action: pan-y;
+        touch-action: pan-y pinch-zoom;
         scrollbar-width: none;
         font-family: var(--serif);
         font-size: clamp(14px, 3.5vw, 17px);
@@ -747,8 +851,7 @@
         min-height: 0;
       }
 
-      /* Le texte du résultat, seule partie qui défile. `touch-action` : body
-         porte `none` pour neutraliser le défilement de la page, sans cette
+      /* Le texte du résultat, seule partie qui défile. Le corps ne défile pas ; sans cette
          exception le bloc ne défilerait pas au doigt.
 
          Sans ascenseur visible : la roue rend à la carte de quoi tout afficher
@@ -760,7 +863,7 @@
         min-height: 0;
         overflow-y: auto;
         overscroll-behavior: contain;
-        touch-action: pan-y;
+        touch-action: pan-y pinch-zoom;
         scrollbar-width: none;
       }
 
@@ -1116,6 +1219,7 @@
       <div class="container">
         <div class="wheel-area" id="wheelArea">
           <div class="pointer"></div>
+          <p id="wheelCurrentLabel" class="wheel-current-label" aria-hidden="true"></p>
           <!-- aria-label est réactualisé par updateWheelLabel() (js/app.js) : il
                porte le décompte des entrées restantes, qui n'est plus écrit
                nulle part ailleurs. -->
@@ -1309,7 +1413,6 @@
                     step="any"
                     inputmode="decimal"
                     placeholder="min"
-                    aria-labelledby="recetteRangeLabel"
                     aria-label="Recette minimale en millions d'euros"
                   />
                   <span aria-hidden="true">→</span>
@@ -1319,7 +1422,6 @@
                     step="any"
                     inputmode="decimal"
                     placeholder="max"
-                    aria-labelledby="recetteRangeLabel"
                     aria-label="Recette maximale en millions d'euros"
                   />
                 </div>
@@ -1334,7 +1436,6 @@
                     step="1"
                     inputmode="numeric"
                     placeholder="1798"
-                    aria-labelledby="anneeRangeLabel"
                     aria-label="Année de création minimale"
                   />
                   <span aria-hidden="true">→</span>
@@ -1344,7 +1445,6 @@
                     step="1"
                     inputmode="numeric"
                     placeholder="2025"
-                    aria-labelledby="anneeRangeLabel"
                     aria-label="Année de création maximale"
                   />
                 </div>
@@ -1737,6 +1837,6 @@
       </form>
     </div>
 
-    <script type="module" src="./js/app.js?v=f2bc549b"></script>
+    <script type="module" src="./js/app.js?v=673324aa"></script>
   </body>
 </html>
