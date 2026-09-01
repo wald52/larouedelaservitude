@@ -77,15 +77,13 @@ jobs:
           test -s data/reference/sources.json
           test -s data/reference/ntl-france-2026.json
           test -s data/reference/lfss-2026-annexe-3-impositions.json
+          test -s data/audit/reason-codes.json
           test -s data/audit/draft-2026-08-05.json
           test -s data/audit/summary-2026-09-01.json
-          test -s data/audit/ntl-coverage-2026.json
-          test -s data/audit/lfss-coverage-2026.json
+          test -s docs/prelevements-obligatoires-methodologie.md
+          test -s docs/audit-prelevements-obligatoires-2026.md
           npm run check:data
           npm run lint
-          if test -f scripts/report-data-audit.mjs; then
-            node scripts/report-data-audit.mjs
-          fi
 
       - name: Commit only the durable phase-one files
         run: |
