@@ -1,0 +1,297 @@
+{
+  "schema_version": 1,
+  "source_id": "lfss-2026-annexe-3",
+  "table": "Tableau 31 — impositions affectées à la sécurité sociale",
+  "unit": "millions_euros",
+  "extraction_note": "Transcription contrôlée des pages imprimées 48 à 52. La présence dans l’annexe confirme une recette/affectation documentée, mais la vigueur et la classification PO restent contrôlées séparément.",
+  "items": [
+    {
+      "id": "droit-licence-debitants-tabac",
+      "name": "Droit de licence sur la rémunération des débitants de tabacs",
+      "legal_basis": "CGI art. 568",
+      "forecast_2026_meur": 330,
+      "forecast_2025_meur": 340,
+      "pdf_printed_page": 48
+    },
+    {
+      "id": "droit-consommation-tabacs",
+      "name": "Droit de consommation sur les tabacs",
+      "legal_basis": "CGI art. 575",
+      "forecast_2026_meur": 11423,
+      "forecast_2025_meur": 12086,
+      "pdf_printed_page": 48
+    },
+    {
+      "id": "droit-consommation-alcools",
+      "name": "Droit de consommation sur les alcools",
+      "legal_basis": "CGI art. 403",
+      "forecast_2026_meur": 2173,
+      "forecast_2025_meur": 2175,
+      "pdf_printed_page": 48
+    },
+    {
+      "id": "droit-circulation-vins-cidres-hydromels",
+      "name": "Droit de circulation sur les vins, poirés, cidres et hydromels",
+      "legal_basis": "CGI art. 438",
+      "forecast_2026_meur": 98,
+      "forecast_2025_meur": 101,
+      "pdf_printed_page": 48
+    },
+    {
+      "id": "cotisation-alcools-plus-18",
+      "name": "Cotisation sur les alcools de plus de 18°",
+      "legal_basis": "CSS art. L. 245-7 à L. 245-11",
+      "forecast_2026_meur": 734,
+      "forecast_2025_meur": 732,
+      "pdf_printed_page": 48
+    },
+    {
+      "id": "droit-circulation-bieres",
+      "name": "Droit de circulation sur les bières",
+      "legal_basis": null,
+      "forecast_2026_meur": 1081,
+      "forecast_2025_meur": 1067,
+      "pdf_printed_page": 48
+    },
+    {
+      "id": "taxe-boissons-non-alcoolisees",
+      "name": "Taxe sur les boissons non alcoolisées",
+      "legal_basis": "CGI art. 520 A",
+      "forecast_2026_meur": 92,
+      "forecast_2025_meur": 85,
+      "pdf_printed_page": 48
+    },
+    {
+      "id": "droit-consommation-produits-intermediaires",
+      "name": "Droit de consommation sur les produits intermédiaires",
+      "legal_basis": "CGI art. 402 bis",
+      "forecast_2026_meur": 54,
+      "forecast_2025_meur": 56,
+      "pdf_printed_page": 48
+    },
+    {
+      "id": "contribution-boissons-sucrees",
+      "name": "Contribution sur les boissons sucrées",
+      "legal_basis": "CGI art. 1613 ter",
+      "forecast_2026_meur": 967,
+      "forecast_2025_meur": 817,
+      "pdf_printed_page": 48
+    },
+    {
+      "id": "contribution-boissons-edulcorees",
+      "name": "Contribution sur les boissons édulcorées",
+      "legal_basis": "CGI art. 1613 quater",
+      "forecast_2026_meur": 70,
+      "forecast_2025_meur": 48,
+      "pdf_printed_page": 48
+    },
+    {
+      "id": "taxe-premix",
+      "name": "Taxe Premix",
+      "legal_basis": "CGI art. 1613 bis",
+      "forecast_2026_meur": 0,
+      "forecast_2025_meur": 0,
+      "pdf_printed_page": 48
+    },
+    {
+      "id": "c3s",
+      "name": "Contribution sociale de solidarité des sociétés",
+      "legal_basis": "CSS art. L. 651-5",
+      "forecast_2026_meur": 5452,
+      "forecast_2025_meur": 5337,
+      "pdf_printed_page": 49
+    },
+    {
+      "id": "contribution-preretraite",
+      "name": "Contribution sur les avantages de préretraite d'entreprise",
+      "legal_basis": "CSS art. L. 137-10",
+      "forecast_2026_meur": 34,
+      "forecast_2025_meur": 38,
+      "pdf_printed_page": 49
+    },
+    {
+      "id": "contribution-indemnites-retraite",
+      "name": "Contribution sur les indemnités de mise à la retraite",
+      "legal_basis": "CSS art. L. 137-12",
+      "forecast_2026_meur": 1155,
+      "forecast_2025_meur": 873,
+      "pdf_printed_page": 49
+    },
+    {
+      "id": "contribution-patronale-options-actions-gratuites",
+      "name": "Contribution patronale sur les options de souscription ou d'achat d'actions et les actions gratuites",
+      "legal_basis": "CSS art. L. 137-13",
+      "forecast_2026_meur": 1592,
+      "forecast_2025_meur": 1570,
+      "pdf_printed_page": 49
+    },
+    {
+      "id": "forfait-social",
+      "name": "Forfait social",
+      "legal_basis": "CSS art. L. 137-15",
+      "forecast_2026_meur": 7640,
+      "forecast_2025_meur": 6569,
+      "pdf_printed_page": 49
+    },
+    {
+      "id": "contribution-retraites-prestations-definies",
+      "name": "Contribution sur les régimes de retraite à prestations définies",
+      "legal_basis": "CSS art. L. 137-11",
+      "forecast_2026_meur": 179,
+      "forecast_2025_meur": 179,
+      "pdf_printed_page": 49
+    },
+    {
+      "id": "taxe-salaires",
+      "name": "Taxe sur les salaires",
+      "legal_basis": "CGI art. 231",
+      "forecast_2026_meur": 17877,
+      "forecast_2025_meur": 17561,
+      "pdf_printed_page": 49
+    },
+    {
+      "id": "contribution-salariale-options-actions",
+      "name": "Contribution salariale sur les options de souscription ou d'achat d'actions",
+      "legal_basis": "CSS art. L. 137-14",
+      "forecast_2026_meur": 77,
+      "forecast_2025_meur": 81,
+      "pdf_printed_page": 49
+    },
+    {
+      "id": "contribution-pharma-ventes-gros",
+      "name": "Contribution due par les laboratoires et grossistes répartiteurs sur les ventes en gros",
+      "legal_basis": "CSS art. L. 138-1 à L. 138-9",
+      "forecast_2026_meur": 271,
+      "forecast_2025_meur": 261,
+      "pdf_printed_page": 50
+    },
+    {
+      "id": "contribution-pharma-publicite-medicaments",
+      "name": "Contribution due par les laboratoires sur leurs dépenses de publicité",
+      "legal_basis": "CSS art. L. 245-1 à L. 245-5-1 A",
+      "forecast_2026_meur": 130,
+      "forecast_2025_meur": 125,
+      "pdf_printed_page": 50
+    },
+    {
+      "id": "contribution-dispositifs-medicaux-publicite",
+      "name": "Contribution due par les entreprises de dispositifs médicaux sur leurs dépenses de publicité",
+      "legal_basis": "CSS art. L. 245-5-1 à L. 245-5-6",
+      "forecast_2026_meur": 48,
+      "forecast_2025_meur": 46,
+      "pdf_printed_page": 50
+    },
+    {
+      "id": "contribution-exploitants-medicaments-amm",
+      "name": "Contribution due par les entreprises exploitant des médicaments bénéficiant d'une AMM",
+      "legal_basis": "CSS art. L. 245-6",
+      "forecast_2026_meur": 659,
+      "forecast_2025_meur": 634,
+      "pdf_printed_page": 50
+    },
+    {
+      "id": "tsca-vtm",
+      "name": "Taxe sur les conventions d'assurances sur les véhicules terrestres à moteur",
+      "legal_basis": "CGI art. 1001, 5° quater",
+      "forecast_2026_meur": 1759,
+      "forecast_2025_meur": 1452,
+      "pdf_printed_page": 50
+    },
+    {
+      "id": "tsa-complementaires-sante",
+      "name": "Taxe de solidarité additionnelle aux cotisations d'assurance santé",
+      "legal_basis": "CSS art. L. 862-4",
+      "forecast_2026_meur": 6655,
+      "forecast_2025_meur": 6490,
+      "pdf_printed_page": 50
+    },
+    {
+      "id": "contrats-assurance-vie-desherence",
+      "name": "Contrats d'assurance sur la vie en déshérence",
+      "legal_basis": "CGPPP art. L. 1126-1, 5°",
+      "forecast_2026_meur": 36,
+      "forecast_2025_meur": 36,
+      "pdf_printed_page": 50
+    },
+    {
+      "id": "contribution-organismes-complementaires-medecins",
+      "name": "Contribution des organismes complémentaires au financement forfaitaire des médecins traitants",
+      "legal_basis": null,
+      "forecast_2026_meur": 1515,
+      "forecast_2025_meur": 405,
+      "pdf_printed_page": 50
+    },
+    {
+      "id": "tva-nette-affectee-securite-sociale",
+      "name": "TVA nette affectée à la sécurité sociale",
+      "legal_basis": null,
+      "forecast_2026_meur": 54820,
+      "forecast_2025_meur": 56057,
+      "pdf_printed_page": 51
+    },
+    {
+      "id": "prelevements-jeux-paris",
+      "name": "Prélèvements sur les jeux et paris en ligne et hors ligne",
+      "legal_basis": "CSS art. L. 137-20 à L. 137-26",
+      "forecast_2026_meur": 460,
+      "forecast_2025_meur": 406,
+      "pdf_printed_page": 51
+    },
+    {
+      "id": "cta",
+      "name": "Contribution tarifaire d'acheminement",
+      "legal_basis": "Loi du 9 août 2004, art. 18",
+      "forecast_2026_meur": 2163,
+      "forecast_2025_meur": 2152,
+      "pdf_printed_page": 51
+    },
+    {
+      "id": "taxe-emoluments-notaires",
+      "name": "Taxe sur le montant des émoluments et honoraires des notaires",
+      "legal_basis": "Loi du 12 juillet 1937, art. 3",
+      "forecast_2026_meur": 376,
+      "forecast_2025_meur": 365,
+      "pdf_printed_page": 51
+    },
+    {
+      "id": "taxes-vehicules-tourisme-fins-economiques",
+      "name": "Taxes sur les véhicules de tourisme affectés à des fins économiques",
+      "legal_basis": "CIBS art. L. 421-93, L. 421-121 et L. 421-167",
+      "forecast_2026_meur": 1276,
+      "forecast_2025_meur": 1090,
+      "pdf_printed_page": 51
+    },
+    {
+      "id": "csg-produits-placement",
+      "name": "CSG sur les produits de placement",
+      "legal_basis": "CSS art. L. 136-7 et CGI art. 1600-0 D",
+      "forecast_2026_meur": 11045,
+      "forecast_2025_meur": 10159,
+      "pdf_printed_page": 52
+    },
+    {
+      "id": "crds-produits-placement",
+      "name": "CRDS sur les produits de placement",
+      "legal_basis": "CGI art. 1600-0 I et ordonnance n° 96-50, art. 16",
+      "forecast_2026_meur": 602,
+      "forecast_2025_meur": 554,
+      "pdf_printed_page": 52
+    },
+    {
+      "id": "csg-revenus-patrimoine",
+      "name": "CSG sur les revenus du patrimoine",
+      "legal_basis": "CSS art. L. 136-6 et CGI art. 1600-0 C",
+      "forecast_2026_meur": 6845,
+      "forecast_2025_meur": 7415,
+      "pdf_printed_page": 52
+    },
+    {
+      "id": "crds-revenus-patrimoine",
+      "name": "CRDS sur les revenus du patrimoine",
+      "legal_basis": "CGI art. 1600-0 G et ordonnance n° 96-50, art. 15",
+      "forecast_2026_meur": 372,
+      "forecast_2025_meur": 403,
+      "pdf_printed_page": 52
+    }
+  ]
+}

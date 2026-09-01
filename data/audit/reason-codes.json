@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "reason_codes": [
+    {
+      "id": "statistical-classification-confirmed",
+      "meaning": "Une source de comptabilité nationale rattache explicitement le prélèvement aux impôts ou cotisations sociales obligatoires reçus par S.13/S.212."
+    },
+    {
+      "id": "current-law-confirmed",
+      "meaning": "Une source officielle datée confirme l’existence juridique ou la perception pendant la période auditée."
+    },
+    {
+      "id": "direct-individual-consideration",
+      "meaning": "Le versement paraît rémunérer directement un service, une autorisation, un usage ou une prestation individualisable ; il est exclu tant qu’un traitement fiscal contraire n’est pas établi."
+    },
+    {
+      "id": "non-fiscal-revenue",
+      "meaning": "L’entrée décrit un produit, une cession, une recette domaniale ou un transfert plutôt qu’un prélèvement."
+    },
+    {
+      "id": "private-recipient-outside-apu",
+      "meaning": "Le destinataire paraît extérieur aux administrations publiques ; un éventuel reroutage de comptabilité nationale doit être prouvé."
+    },
+    {
+      "id": "recipient-sector-unverified",
+      "meaning": "Le secteur institutionnel du bénéficiaire final n’est pas établi."
+    },
+    {
+      "id": "repealed",
+      "meaning": "Le prélèvement n’est plus en vigueur à la date d’audit."
+    },
+    {
+      "id": "replaced-by-current-levy",
+      "meaning": "Le mécanisme ou le libellé historique a été remplacé par une imposition actuelle."
+    },
+    {
+      "id": "duplicate",
+      "meaning": "Une autre entrée du brouillon décrit le même prélèvement."
+    },
+    {
+      "id": "rate-or-threshold-split",
+      "meaning": "Le brouillon transforme un taux, une tranche, un seuil ou une part employeur/salarié en prélèvement autonome."
+    },
+    {
+      "id": "allocation-or-beneficiary-split",
+      "meaning": "Le brouillon transforme une fraction affectée ou un bénéficiaire en prélèvement autonome."
+    },
+    {
+      "id": "aggregate-not-legal-unit",
+      "meaning": "Le libellé regroupe plusieurs impositions juridiquement distinctes."
+    },
+    {
+      "id": "malformed-draft-entry",
+      "meaning": "Le libellé est tronqué, générique ou issu d’une mauvaise découpe de source."
+    },
+    {
+      "id": "legal-status-unverified",
+      "meaning": "La vigueur juridique au 1er septembre 2026 n’est pas encore établie."
+    },
+    {
+      "id": "classification-unverified",
+      "meaning": "Le rattachement à la définition officielle des prélèvements obligatoires n’est pas encore établi."
+    },
+    {
+      "id": "source-needed",
+      "meaning": "Une source primaire ligne par ligne doit encore être ajoutée."
+    },
+    {
+      "id": "receipt-year-missing",
+      "meaning": "Le montant du brouillon ne porte pas d’année de référence explicite."
+    },
+    {
+      "id": "territorial-scope-to-check",
+      "meaning": "Le périmètre géographique et son inclusion dans le champ France doivent être vérifiés."
+    },
+    {
+      "id": "split-required",
+      "meaning": "Une future entrée canonique doit être divisée en plusieurs prélèvements juridiquement distincts."
+    },
+    {
+      "id": "obsolete-label-or-mechanism",
+      "meaning": "Le libellé ou le mécanisme paraît historique et doit être rapproché du droit actuel avant décision."
+    },
+    {
+      "id": "canonical-record-incomplete",
+      "meaning": "L’appartenance au périmètre peut être établie, mais la future fiche canonique n’a pas encore toutes ses sources, dates et métadonnées de recette."
+    },
+    {
+      "id": "ntl-match-only",
+      "meaning": "La correspondance NTL aide à rechercher mais ne suffit pas, seule, à prouver la vigueur juridique en 2026."
+    }
+  ]
+}
