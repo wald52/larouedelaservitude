@@ -1,0 +1,92 @@
+name: Bootstrap compulsory-levies phase 1
+
+on:
+  push:
+    branches: ["data/referentiel-po-2026-phase-1"]
+    paths:
+      - ".github/workflows/bootstrap-po-phase1.yml"
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  build-reference:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout the working branch
+        uses: actions/checkout@v6
+        with:
+          ref: data/referentiel-po-2026-phase-1
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install repository dependencies
+        run: npm ci
+
+      - name: Download the dated research archives
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euxo pipefail
+          mkdir -p research/po research/law
+          curl -fL --retry 5 --retry-all-errors \
+            -H "Authorization: Bearer ${GH_TOKEN}" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/artifacts/9798137570/zip" \
+            -o /tmp/compulsory-levies-research.zip
+          curl -fL --retry 5 --retry-all-errors \
+            -H "Authorization: Bearer ${GH_TOKEN}" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/artifacts/9800622436/zip" \
+            -o /tmp/current-tax-law-research.zip
+          unzip -q /tmp/compulsory-levies-research.zip -d research/po
+          unzip -q /tmp/current-tax-law-research.zip -d research/law
+          test -f research/po/extracted/current-entries-full.json
+          test -f research/po/extracted/sheet-FR.csv
+          test -f research/law/extracted/index.json
+
+      - name: Reassemble and run the reviewed generator
+        run: |
+          set -euxo pipefail
+          cat .github/po-phase1-part-*.b64 > /tmp/po-phase1-generator.b64
+          printf '%s  %s\n' \
+            '23d2db83c46c2c133e7f81e9b1ae9937a875d251c5518da52295ac31b866f803' \
+            /tmp/po-phase1-generator.b64 | sha256sum -c -
+          base64 --decode /tmp/po-phase1-generator.b64 | gzip --decompress --stdout \
+            > /tmp/po-phase1-generator.py
+          python /tmp/po-phase1-generator.py
+
+      - name: Validate the generated audit
+        run: |
+          npm run check:data
+          node --test tests/data-audit.test.mjs
+          npm run lint
+          npm run audit:data
+
+      - name: Commit only the durable phase-one files
+        run: |
+          set -euxo pipefail
+          rm -rf research
+          rm -f .github/po-phase1-generator.*.b64
+          rm -f .github/po-phase1-part-*.b64
+          rm -f .github/workflows/bootstrap-po-phase1.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git status --short
+          git commit -m "Établir le référentiel PO 2026 — phase 1"
+          git push origin HEAD:data/referentiel-po-2026-phase-1
