@@ -8,16 +8,21 @@ Ce dossier conserve les sources officielles et les extractions normalisées util
 | --- | --- |
 | [`sources.json`](sources.json) | Registre de provenance des sources déjà mobilisées comme preuves ou contexte de recherche |
 | [`bulk-sources.json`](bulk-sources.json) | Registre opérationnel principal des sources exploitables en masse, avec priorité, couverture, accès, limites et prochaine action |
-| [`bulk-sources-supplement-2026-09-02.json`](bulk-sources-supplement-2026-09-02.json) | Complément de recherche vérifié le 2 septembre 2026 : nouvelles sources à prototyper ou promouvoir dans le registre principal |
+| [`bulk-sources-supplement-2026-09-02.json`](bulk-sources-supplement-2026-09-02.json) | Première recherche complémentaire vérifiée le 2 septembre 2026 : tableurs budgétaires, CTP, BOFiP, DSN, comptabilité et contrôles statistiques |
+| [`bulk-sources-supplement-2-2026-09-02.json`](bulk-sources-supplement-2-2026-09-02.json) | Troisième passe ciblée du 2 septembre 2026 : recettes DGFiP, référentiels locaux nationaux, JORF, calculateurs fiscaux et MSA |
 | [`ntl-france-2026.json`](ntl-france-2026.json) | Extraction des 141 lignes françaises de détail de la National tax list 2026 |
 | [`lfss-2026-annexe-3-impositions.json`](lfss-2026-annexe-3-impositions.json) | Transcription contrôlée du tableau 31 de l’annexe 3 du PLFSS 2026 |
 
 La méthode générale d’exploitation des sources massives est décrite dans
 [`docs/sources-massives-prelevements-obligatoires.md`](../../docs/sources-massives-prelevements-obligatoires.md).
 
-La recherche complémentaire sur les tableurs budgétaires, les CTP, le BOFiP, la DSN,
-les balances comptables et les contrôles statistiques est décrite dans
+La première recherche complémentaire sur les tableurs budgétaires, les CTP, le BOFiP, la
+DSN, les balances comptables et les contrôles statistiques est décrite dans
 [`docs/sources-massives-recherche-complementaire.md`](../../docs/sources-massives-recherche-complementaire.md).
+
+La passe ciblée sur les recettes administratives, les référentiels territoriaux, JORF,
+les calculateurs fiscaux et la MSA est décrite dans
+[`docs/sources-massives-recherche-complementaire-2.md`](../../docs/sources-massives-recherche-complementaire-2.md).
 
 ## Deux registres complémentaires
 
@@ -28,10 +33,10 @@ les balances comptables et les contrôles statistiques est décrite dans
 
 Une source peut apparaître dans les deux fichiers. Lorsqu’elle possède déjà un identifiant dans `sources.json`, le champ `source_record_id` de `bulk-sources.json` le reprend. Une source encore en phase d’évaluation peut rester uniquement dans le registre massif avec `source_record_id: null`.
 
-Le fichier daté `bulk-sources-supplement-2026-09-02.json` est un registre de recherche
-intermédiaire. Les sources qui passent avec succès leur prototype ou leur première
+Les fichiers datés `bulk-sources-supplement-*.json` sont des registres de recherche
+intermédiaires. Les sources qui passent avec succès leur prototype ou leur première
 ingestion doivent ensuite être intégrées à `bulk-sources.json`, sans perdre la date et les
-preuves de cette évaluation.
+preuves de leur évaluation.
 
 ## Principes de stockage
 
