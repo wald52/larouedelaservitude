@@ -1,0 +1,596 @@
+{
+  "schema_version": 1,
+  "batch_id": "permis-bateau-passagers-maritimes-2026-09-02",
+  "title": "Lot de reprise — permis bateau et taxes maritimes de passagers",
+  "audit_date": "2026-09-02",
+  "status": "documented_with_blocked_candidate_historical_exclusions_and_non_po_charge",
+  "production_dataset_changed": false,
+  "stacked_on": {
+    "branch": "audit/navigation-maritime-2026-09-02",
+    "pull_request": 53,
+    "reason": "Le lot est empilé afin de conserver les mises à jour documentaires des PR #52 et #53 sans conflit avant leur fusion."
+  },
+  "source_draft": {
+    "path": "data/audit/draft-2026-08-05.json",
+    "source_version": "2026-08-05",
+    "draft_indices": [
+      63,
+      64,
+      172
+    ],
+    "draft_entry_count": 3,
+    "aggregate_indices": [
+      63,
+      172
+    ],
+    "adjacent_entries_reviewed": [
+      {
+        "index": 170,
+        "id": "taxe-sur-les-permis-de-conduire",
+        "treatment": "not_mapped_to_boat_permit_tax",
+        "reason": "Le libellé générique ne nomme pas les bateaux de plaisance et peut viser les permis routiers. Il est réservé à un audit distinct."
+      }
+    ]
+  },
+  "inventory_additions": {
+    "count": 1,
+    "canonical_ids": [
+      "taxe-permis-bateaux-plaisance-moteur"
+    ],
+    "description": "La taxe sur le permis de conduire des bateaux de plaisance à moteur est juridiquement active mais ne dispose pas d'une ligne autonome identifiable dans le brouillon. Elle est documentée comme charge à contrepartie directe hors du périmètre des prélèvements obligatoires retenu par le projet."
+  },
+  "scope": {
+    "description": "Reprise des deux lignes mixtes de transport aérien et maritime, de la taxe sur les passagers à destination d'espaces naturels protégés et de la taxe sur le permis bateau. Les composantes maritimes territoriales historiques sont séparées des majorations aériennes toujours actives. La ligne statistique mixte D29B C05 n'est attribuée à aucune taxe maritime actuelle.",
+    "ready_record_count": 0,
+    "blocked_candidate_count": 1,
+    "blocked_candidate_ids": [
+      "taxe-passagers-maritimes-espaces-naturels-proteges"
+    ],
+    "active_non_po_charge_count": 1,
+    "active_non_po_charge_ids": [
+      "taxe-permis-bateaux-plaisance-moteur"
+    ],
+    "historical_exclusion_count": 2,
+    "historical_exclusion_ids": [
+      "ancienne-taxe-transport-maritime-outre-mer",
+      "ancienne-taxe-transport-maritime-corse"
+    ],
+    "aggregate_resolution_count": 2
+  },
+  "measurement_policy": {
+    "unit": "millions_euros",
+    "observed_revenue": "Une recette de comptabilité nationale n'est attribuée que lorsque le libellé statistique ou une table de passage permet d'identifier la créance courante.",
+    "forecast_revenue": "Le rendement prévisionnel de la loi de finances pour 2026 reste une prévision et ne devient pas une recette observée.",
+    "mixed_mode_statistics": "Une ligne statistique mêlant transport aérien et maritime n'est pas attribuée à un mode particulier lorsque son libellé n'a pas été mis à jour après l'abrogation des composantes maritimes.",
+    "aggregate_draft_entry": "Une ligne du brouillon combinant des modes de transport et des territoires est scindée avant toute décision canonique.",
+    "direct_consideration": "Une taxe exigée lors de la délivrance d'un titre ou de l'inscription à un examen individualisé est traitée comme paiement à contrepartie directe par la méthodologie du projet, sous réserve d'un classement statistique contraire explicite.",
+    "academic_or_calendar_period": "Sans objet pour ce lot ; tous les montants de recettes ou prévisions conservés portent une année civile.",
+    "draft_amounts": "Les montants du brouillon dépourvus d'année explicite ne sont ni additionnés ni repris comme recettes canoniques.",
+    "tariffs": "Un tarif par titre, candidature ou passager n'est pas une recette."
+  },
+  "sources": [
+    {
+      "id": "ec-ntl-2026-france",
+      "title": "Data on Taxation Trends — National tax list 2026, feuille France",
+      "publisher": "Commission européenne, DG TAXUD / Eurostat",
+      "url": "https://taxation-customs.ec.europa.eu/document/download/600d56d1-ea6e-416e-9981-1c8b9c603b6b_en?filename=NTL%20edition%202026%20web.xlsx",
+      "publication_date": "2026-03-30",
+      "data_through": 2024,
+      "retrieved_at": "2026-09-01",
+      "local_path": "data/reference/ntl-france-2026.json",
+      "supports": [
+        "statistical_envelope",
+        "classification_search"
+      ]
+    },
+    {
+      "id": "legifrance-cibs-permis-bateau-2026",
+      "title": "CIBS — taxe sur le permis de conduire des bateaux de plaisance à moteur, articles L. 423-38 à L. 423-46",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/codes/section_lc/LEGITEXT000044595989/LEGISCTA000044599695/2026-09-01/",
+      "effective_date": "2026-09-01",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "legal_status",
+        "legal_basis",
+        "taxable_title",
+        "chargeable_events",
+        "tariffs",
+        "territorial_reduction",
+        "liable_person",
+        "payment_process"
+      ]
+    },
+    {
+      "id": "legifrance-ordonnance-2021-1843",
+      "title": "Ordonnance n° 2021-1843 du 22 décembre 2021 portant partie législative du CIBS",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000044559685",
+      "publication_date": "2021-12-29",
+      "effective_from": "2022-01-01",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "current_levy_creation",
+        "first_effective_date",
+        "recodification"
+      ]
+    },
+    {
+      "id": "legifrance-cibs-passagers-proteges-2026",
+      "title": "CIBS — taxe sur le transport maritime de passagers à destination d'espaces naturels protégés, articles L. 423-47 à L. 423-56",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/codes/section_lc/LEGITEXT000044595989/LEGISCTA000044599715/2026-09-01/",
+      "effective_date": "2026-09-01",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "legal_status",
+        "legal_basis",
+        "taxable_event",
+        "rate",
+        "same_day_reduction",
+        "exemption",
+        "liable_person",
+        "collection"
+      ]
+    },
+    {
+      "id": "legifrance-cibs-a423-16-2026",
+      "title": "CIBS — article A. 423-16, plafond 2026 de la taxe sur les passagers vers les espaces protégés",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000053330498",
+      "effective_from": "2026-01-01",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "maximum_amount_2026"
+      ]
+    },
+    {
+      "id": "legifrance-environnement-l321-12-2026",
+      "title": "Code de l'environnement — article L. 321-12",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000044872940",
+      "effective_from": "2022-01-01",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "beneficiaries",
+        "public_purpose",
+        "allocation"
+      ]
+    },
+    {
+      "id": "legifrance-lf-2026-art-135",
+      "title": "Loi n° 2026-103 du 19 février 2026 de finances pour 2026 — article 135",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/loda/article_lc/LEGIARTI000053511577/2026-02-21",
+      "publication_date": "2026-02-20",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "forecast_revenue",
+        "beneficiary"
+      ]
+    },
+    {
+      "id": "legifrance-loi-1995-101-art-48",
+      "title": "Loi n° 95-101 du 2 février 1995 relative au renforcement de la protection de l'environnement — article 48",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000000551804",
+      "publication_date": "1995-02-03",
+      "effective_from": "1995-02-03",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "creation_year",
+        "historical_legal_basis"
+      ]
+    },
+    {
+      "id": "legifrance-cibs-corse-maritime-inapplicable",
+      "title": "CIBS — taxe sur le transport maritime de passagers dans certains territoires côtiers, articles L. 423-57 à L. 423-63",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/codes/id/LEGISCTA000044602483",
+      "effective_date": "2026-09-02",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "historical_corsica_scope",
+        "non_applicability_since_2022",
+        "historical_tariff_cap",
+        "historical_beneficiary"
+      ]
+    },
+    {
+      "id": "legifrance-ancien-douanes-285-ter-maritime",
+      "title": "Ancien code des douanes — article 285 ter, version incluant le transport maritime outre-mer",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/codes/section_lc/LEGITEXT000006071570/LEGISCTA000006099256/2010-12-19/",
+      "effective_to": "2011-12-30",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "historical_overseas_maritime_scope",
+        "historical_beneficiaries",
+        "historical_tariff_cap"
+      ]
+    },
+    {
+      "id": "legifrance-ancien-douanes-285-ter-air-only",
+      "title": "Ancien code des douanes — article 285 ter, dernière version limitée au transport aérien",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/loda/article_lc/LEGIARTI000027978393/2020-09-24",
+      "effective_from": "2013-09-21",
+      "effective_to": "2022-01-01",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "air_only_scope_after_maritime_component",
+        "historical_transition"
+      ]
+    },
+    {
+      "id": "legifrance-cibs-air-passengers-2026",
+      "title": "CIBS — taxe sur le transport aérien de passagers, majorations en Corse et en outre-mer",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/codes/section_lc/LEGITEXT000044595989/LEGISCTA000044599467/2026-09-01/",
+      "effective_date": "2026-09-01",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "current_air_components",
+        "beneficiary_continuity"
+      ]
+    }
+  ],
+  "statistical_envelopes": [
+    {
+      "id": "ntl-transport-public-aerien-maritime-corse-dom-2024",
+      "source_id": "ec-ntl-2026-france",
+      "source_row": 105,
+      "esa_code": "D29B",
+      "national_detail_code": "C05",
+      "name": "Taxe due par les entreprises de transport public aérien et maritime (Corse, DOM)",
+      "economic_function": "KS",
+      "recipient_scope": "S.13 + S.212",
+      "year": 2024,
+      "amount_meur": 47,
+      "assigned_to_maritime_records": false,
+      "reason": "Le libellé statistique conserve les modes aérien et maritime alors que la composante maritime outre-mer a cessé en 2011 et la taxe maritime corse n'est plus applicable depuis 2022. Le montant 2024 est réservé à l'audit de la taxe aérienne et de ses majorations."
+    }
+  ],
+  "aggregate_resolutions": [
+    {
+      "draft_index": 63,
+      "draft_id": "taxe-due-par-les-entreprises-de-transport-public-aerien-et-m",
+      "draft_name": "Taxe due par les entreprises de transport public aérien et maritime (Outre-Mer)",
+      "treatment": "split_air_current_and_maritime_historical",
+      "reason_codes": [
+        "aggregate-not-legal-unit",
+        "split-required",
+        "obsolete-label-or-mechanism",
+        "receipt-year-missing"
+      ],
+      "current_component": {
+        "canonical_id": "taxe-transport-aerien-passagers",
+        "profile": "majoration en outre-mer",
+        "status": "deferred_to_aviation_batch",
+        "source_id": "legifrance-cibs-air-passengers-2026"
+      },
+      "historical_component": {
+        "canonical_id": "ancienne-taxe-transport-maritime-outre-mer",
+        "status": "historical_only"
+      },
+      "draft_amount_meur": 9.4,
+      "canonical_amount_meur": null,
+      "explanation": "Le montant n'a pas d'année et ne peut être réparti entre modes ou territoires."
+    },
+    {
+      "draft_index": 172,
+      "draft_id": "taxe-due-par-les-entreprises-de-transport-public-aerien-et-m-2",
+      "draft_name": "Taxe due par les entreprises de transport public aérien et maritime (Corse)",
+      "treatment": "split_air_current_and_maritime_historical",
+      "reason_codes": [
+        "aggregate-not-legal-unit",
+        "split-required",
+        "obsolete-label-or-mechanism",
+        "receipt-year-missing"
+      ],
+      "current_component": {
+        "canonical_id": "taxe-transport-aerien-passagers",
+        "profile": "majoration en Corse",
+        "status": "deferred_to_aviation_batch",
+        "source_id": "legifrance-cibs-air-passengers-2026"
+      },
+      "historical_component": {
+        "canonical_id": "ancienne-taxe-transport-maritime-corse",
+        "status": "historical_only"
+      },
+      "draft_amount_meur": 47.4,
+      "canonical_amount_meur": null,
+      "explanation": "Le montant n'a pas d'année et le libellé agrège deux modes dont le statut actuel diffère."
+    }
+  ],
+  "blocked_candidates": [
+    {
+      "canonical_id": "taxe-passagers-maritimes-espaces-naturels-proteges",
+      "draft_entries": [
+        {
+          "index": 64,
+          "id": "taxe-sur-les-passagers-maritimes-embarques-a-destination-d-e",
+          "treatment": "keep_if_classification_confirmed"
+        }
+      ],
+      "nom": "Taxe passagers espaces protégés",
+      "nom_complet": "Taxe sur le transport maritime de passagers à destination d'espaces naturels protégés",
+      "annee_creation": 1995,
+      "first_effective_date": "1995-02-03",
+      "current_codification_since": "2022-01-01",
+      "po_status": "unresolved",
+      "legal_status": "active",
+      "obligation_status": "confirmed",
+      "membership_status": "blocked",
+      "publication_status": "blocked",
+      "reason_codes": [
+        "current-law-confirmed",
+        "classification-unverified",
+        "source-needed",
+        "receipt-year-missing"
+      ],
+      "creation_evidence": {
+        "source_id": "legifrance-loi-1995-101-art-48",
+        "locator": "Article 48 — création de l'ancien article 285 quater du code des douanes"
+      },
+      "legal_basis": [
+        {
+          "source_id": "legifrance-cibs-passagers-proteges-2026",
+          "locator": "CIBS, articles L. 423-47 à L. 423-56"
+        },
+        {
+          "source_id": "legifrance-cibs-a423-16-2026",
+          "locator": "CIBS, article A. 423-16"
+        }
+      ],
+      "taxable_event": "Embarquement d'un passager à bord d'un navire exploité à titre professionnel à destination d'un espace naturel protégé ou d'un port le desservant, au moment du départ programmé.",
+      "liable_person": "Entreprise ou personne qui arme le navire réalisant le transport taxable.",
+      "rate_2026": {
+        "percent_of_transport_price_excluding_vat": 6.542,
+        "maximum_eur_per_passenger": 1.96,
+        "same_day_subsequent_embarkment_reduction_percent": 50
+      },
+      "exemption": "Embarquement ayant pour objet de rejoindre la résidence principale ou le lieu de travail du passager.",
+      "beneficiaries": {
+        "description": "Personnes publiques gestionnaires des espaces protégés désignées par le code de l'environnement ou, pour la fraction résiduelle, communes d'implantation.",
+        "source_id": "legifrance-environnement-l321-12-2026"
+      },
+      "classification": {
+        "status": "unverified",
+        "ntl_direct_line": null,
+        "required_evidence": "Ligne NTL, table de passage Insee/Eurostat ou document de comptes nationaux nommant explicitement la taxe et son code SEC."
+      },
+      "revenues": {
+        "observed": [],
+        "forecast": [
+          {
+            "year": 2026,
+            "amount_meur": 4.5,
+            "source_id": "legifrance-lf-2026-art-135",
+            "locator": "Article 135, ligne d'affectation n° 125",
+            "measure": "forecast_yield"
+          }
+        ]
+      },
+      "draft_corrections": [
+        {
+          "field": "recette",
+          "draft_value_meur": 2.6,
+          "canonical_value_meur": null,
+          "explanation": "Le montant historique n'avait pas d'année. La prévision 2026 de 4,5 M€ reste dans une série distincte."
+        }
+      ],
+      "warnings": [
+        "Le plafond de 1,96 € par passager est un maximum tarifaire pour 2026, pas une recette.",
+        "Le bénéficiaire public et l'absence de contrepartie individualisée équivalente sont documentés, mais le classement SEC individuel n'est pas retrouvé.",
+        "La taxe ne doit pas être confondue avec l'ancienne taxe maritime corse, qui n'est plus applicable depuis 2022."
+      ],
+      "research_status": "complete_except_statistical_classification_and_observed_revenue",
+      "production_status": "not_integrated",
+      "counterpart_test": {
+        "status": "no_direct_individual_consideration_supported",
+        "reason": "Le prélèvement est ajouté au prix du transport afin de financer la préservation collective de l'espace naturel ; il ne rémunère pas une prestation individualisée fournie au passager par l'affectataire."
+      }
+    }
+  ],
+  "active_non_po_charges": [
+    {
+      "canonical_id": "taxe-permis-bateaux-plaisance-moteur",
+      "draft_entries": [],
+      "inventory_status": "missing_from_draft_as_identifiable_maritime_charge",
+      "nom": "Taxe permis bateau",
+      "nom_complet": "Taxe sur le permis de conduire des bateaux de plaisance à moteur",
+      "annee_creation": 2021,
+      "first_effective_date": "2022-01-01",
+      "po_status": "excluded",
+      "legal_status": "active",
+      "obligation_status": "confirmed_for_title_or_exam",
+      "membership_status": "excluded_from_po_inventory",
+      "publication_status": "non_po_charge",
+      "reason_codes": [
+        "current-law-confirmed",
+        "direct-individual-consideration",
+        "non-fiscal-revenue"
+      ],
+      "legal_basis": [
+        {
+          "source_id": "legifrance-cibs-permis-bateau-2026",
+          "locator": "CIBS, articles L. 423-38 à L. 423-46"
+        }
+      ],
+      "taxable_events": [
+        "délivrance d'un titre taxable de conduite des bateaux de plaisance à moteur",
+        "inscription à une candidature taxable à l'examen"
+      ],
+      "liable_person": "Titulaire du titre délivré ou candidat à l'examen taxable.",
+      "tariffs_2026_eur": [
+        {
+          "event": "délivrance du titre",
+          "amount": 78
+        },
+        {
+          "event": "candidature taxable",
+          "amount": 38
+        }
+      ],
+      "territorial_reduction": {
+        "territory": "Guyane",
+        "amount_percent": 50
+      },
+      "payment": "Paiement au stade de la demande au moyen du procédé prévu pour le timbre dématérialisé.",
+      "classification": {
+        "status": "excluded_by_project_counterpart_test",
+        "ntl_direct_line": null,
+        "statistical_override_possible": true,
+        "required_for_reconsideration": "Source officielle de comptes nationaux classant explicitement cette taxe comme impôt malgré la contrepartie individualisée."
+      },
+      "counterpart_test": {
+        "status": "direct_individual_consideration",
+        "reason": "Les faits générateurs sont la délivrance individuelle d'un titre et l'inscription individuelle à un examen. Le paiement est exigé au stade de la demande correspondante."
+      },
+      "revenues": {
+        "observed": [],
+        "forecast": []
+      },
+      "warnings": [
+        "La dénomination juridique française « taxe » ne suffit pas, à elle seule, à déterminer le traitement SEC retenu par le projet.",
+        "Les montants de 78 € et 38 € sont des tarifs unitaires, pas des recettes.",
+        "La ligne générique #170 du brouillon n'est pas réaffectée sans preuve qu'elle couvre les bateaux de plaisance."
+      ],
+      "research_status": "complete_for_project_scope_exclusion_subject_to_statistical_override",
+      "production_status": "not_integrated"
+    }
+  ],
+  "historical_exclusions": [
+    {
+      "canonical_id": "ancienne-taxe-transport-maritime-outre-mer",
+      "draft_entries": [
+        {
+          "index": 63,
+          "id": "taxe-due-par-les-entreprises-de-transport-public-aerien-et-m",
+          "treatment": "historical_maritime_component_only"
+        }
+      ],
+      "nom": "Ancienne taxe maritime outre-mer",
+      "nom_complet": "Ancienne composante maritime de la taxe sur le transport public en Guadeloupe, Guyane, Martinique et à La Réunion",
+      "annee_creation": null,
+      "effective_to": "2011-12-30",
+      "po_status": "historically_confirmed",
+      "legal_status": "repealed_or_scope_removed",
+      "membership_status": "excluded_from_current_inventory",
+      "publication_status": "historical_only",
+      "reason_codes": [
+        "repealed",
+        "obsolete-label-or-mechanism",
+        "receipt-year-missing"
+      ],
+      "historical_legal_basis": [
+        {
+          "source_id": "legifrance-ancien-douanes-285-ter-maritime",
+          "locator": "Ancien code des douanes, article 285 ter, version jusqu'au 30 décembre 2011"
+        }
+      ],
+      "historical_scope": "Passagers embarquant dans les régions de Guadeloupe, Guyane, Martinique et La Réunion, avec tarifs modulables selon le mode et la distance dans la limite de 4,57 € par passager.",
+      "current_successor_for_air_component": {
+        "canonical_id": "taxe-transport-aerien-passagers",
+        "profile": "majoration en outre-mer",
+        "source_id": "legifrance-cibs-air-passengers-2026",
+        "status": "deferred"
+      },
+      "revenues": {
+        "observed": [],
+        "forecast": []
+      },
+      "warning": "Après la suppression du mode maritime, le dispositif a subsisté pour le transport aérien avant sa recodification. La présente fiche historique ne couvre que la composante maritime.",
+      "research_status": "complete_for_current_inventory",
+      "production_status": "not_integrated"
+    },
+    {
+      "canonical_id": "ancienne-taxe-transport-maritime-corse",
+      "draft_entries": [
+        {
+          "index": 172,
+          "id": "taxe-due-par-les-entreprises-de-transport-public-aerien-et-m-2",
+          "treatment": "historical_maritime_component_only"
+        }
+      ],
+      "nom": "Ancienne taxe maritime Corse",
+      "nom_complet": "Ancienne composante maritime de la taxe sur le transport public de passagers en Corse",
+      "annee_creation": 1991,
+      "first_effective_date": "1991-05-14",
+      "effective_to": "2022-01-01",
+      "po_status": "historically_confirmed",
+      "legal_status": "no_longer_applicable",
+      "membership_status": "excluded_from_current_inventory",
+      "publication_status": "historical_only",
+      "reason_codes": [
+        "repealed",
+        "obsolete-label-or-mechanism",
+        "receipt-year-missing"
+      ],
+      "historical_legal_basis": [
+        {
+          "source_id": "legifrance-cibs-corse-maritime-inapplicable",
+          "locator": "CIBS, articles L. 423-57 à L. 423-63 — taxe non applicable depuis le 1er janvier 2022"
+        }
+      ],
+      "historical_scope": "Embarquements et débarquements de passagers en Corse à bord de navires armés à titre professionnel, hors escales temporaires, avec tarif plafonné à 4,57 € par passager.",
+      "current_successor_for_air_component": {
+        "canonical_id": "taxe-transport-aerien-passagers",
+        "profile": "majoration en Corse",
+        "source_id": "legifrance-cibs-air-passengers-2026",
+        "status": "deferred"
+      },
+      "revenues": {
+        "observed": [],
+        "forecast": []
+      },
+      "warning": "La majoration aérienne en Corse reste active dans la taxe sur le transport aérien de passagers ; seule la composante maritime est historique.",
+      "research_status": "complete_for_current_inventory",
+      "production_status": "not_integrated"
+    }
+  ],
+  "related_follow_up": [
+    {
+      "canonical_id": "taxe-transport-aerien-passagers-majorations-territoriales",
+      "draft_indices": [
+        63,
+        172
+      ],
+      "status": "next_batch_candidate",
+      "note": "Auditer les majorations aériennes en Corse et en outre-mer et résoudre la ligne NTL 105 de 47 M€ en 2024."
+    },
+    {
+      "canonical_id": "taxe-sur-les-permis-de-conduire-routiers",
+      "draft_index": 170,
+      "status": "deferred",
+      "note": "La ligne générique du brouillon doit être auditée avec les taxes et droits relatifs aux permis routiers ; elle ne constitue pas une preuve de présence du permis bateau."
+    },
+    {
+      "canonical_id": "classification-taxe-passagers-espaces-proteges",
+      "status": "source_needed",
+      "note": "Rechercher une table de passage Insee/Eurostat ou une exécution des comptes publics nommant la taxe de l'article L. 423-47 et son code SEC."
+    }
+  ],
+  "quality_checks": {
+    "canonical_ids_are_unique": true,
+    "draft_indices_covered": [
+      63,
+      64,
+      172
+    ],
+    "mixed_air_maritime_entries_are_split": true,
+    "current_air_components_are_deferred_not_deleted": true,
+    "historical_maritime_components_are_excluded_from_current_inventory": true,
+    "ntl_row_105_is_not_assigned_to_maritime_records": true,
+    "protected_spaces_forecast_has_year_and_source": true,
+    "protected_spaces_forecast_is_not_observed_revenue": true,
+    "boat_permit_tariffs_are_not_revenues": true,
+    "boat_permit_generic_draft_line_is_not_inherited": true,
+    "undated_draft_amounts_are_not_promoted": true,
+    "production_files_left_unchanged": [
+      "data/entries-full.json",
+      "data/entries-light.json"
+    ]
+  }
+}
