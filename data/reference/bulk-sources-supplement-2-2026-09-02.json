@@ -1,0 +1,635 @@
+{
+  "schema_version": 1,
+  "verification_date": "2026-09-02",
+  "extends": [
+    "data/reference/bulk-sources.json",
+    "data/reference/bulk-sources-supplement-2026-09-02.json"
+  ],
+  "purpose": "Troisième passe de recherche ciblée sur les recettes administratives observées, les référentiels nationaux de fiscalité locale, les accises, les textes non codifiés et le régime agricole.",
+  "key_findings": [
+    {
+      "finding": "La DGFiP publie deux classeurs nationaux de recettes fiscales brutes, annuels depuis 2010 et mensuels depuis 2012.",
+      "impact": "Ils offrent un contrôle administratif observé et fréquent, distinct des prévisions budgétaires et des comptes nationaux."
+    },
+    {
+      "finding": "Plusieurs familles locales disposent de référentiels nationaux complets : taxe de séjour, versement mobilité, taxe d'aménagement et droits de mutation.",
+      "impact": "Le périmètre territorial, les taux et les dates peuvent être documentés en masse sans interroger chaque collectivité."
+    },
+    {
+      "finding": "La DGFiP publie des tableaux détaillés par impôt, notamment pour la TVA, la taxe sur les salaires, l'impôt sur les sociétés, la TGAP et les accises énergétiques.",
+      "impact": "Ces fichiers apportent des assiettes, quantités, nombres de déclarants et montants dus, absents des seules lignes budgétaires."
+    },
+    {
+      "finding": "La base JORF est téléchargeable sous forme d'une archive globale et de flux quotidiens.",
+      "impact": "Elle complète LEGI pour les lois, décrets et arrêtés non codifiés, les dates de publication et les dispositions transitoires."
+    },
+    {
+      "finding": "La MSA publie les données chiffrées de son panorama national 2026 au format XLSX.",
+      "impact": "Le régime agricole peut désormais disposer d'un contrôle agrégé reproductible, même si aucun équivalent public à la table historique CTP n'a été identifié."
+    }
+  ],
+  "sources": [
+    {
+      "id": "dgfip-gross-tax-receipts",
+      "source_record_id": null,
+      "title": "Recettes fiscales brutes annuelles et mensuelles — récapitulation nationale détaillée",
+      "publisher": "Direction générale des Finances publiques, Département des études et statistiques fiscales",
+      "url": "https://www.impots.gouv.fr/recettes-fiscales",
+      "evidence_urls": [
+        "https://www.impots.gouv.fr/sites/default/files/media/9_statistiques/0_etudes_et_stats/1_statistiques/4_autres/recettes_fiscales_brutes.xls",
+        "https://www.impots.gouv.fr/sites/default/files/media/9_statistiques/0_etudes_et_stats/1_statistiques/4_autres/recettes_fiscales_mensuelles.xls"
+      ],
+      "priority": 1,
+      "status": "ready_to_ingest",
+      "authority_level": "official_administrative_statistics",
+      "family": "tax_collection",
+      "coverage": {
+        "geography": "France, récapitulation nationale",
+        "period": "annuel depuis 2010 ; mensuel depuis 2012",
+        "source_updates_seen": {
+          "annual": "2026-03-10",
+          "monthly": "2026-08-11"
+        },
+        "scope": "Recettes fiscales brutes détaillées collectées par la DGFiP."
+      },
+      "access": {
+        "formats": [
+          "xls"
+        ],
+        "machine_readability": "structured_spreadsheets_to_profile",
+        "bulk_download": true,
+        "api": false,
+        "authentication": "none",
+        "refresh": "annual_and_monthly"
+      },
+      "supports": [
+        "candidate_discovery",
+        "administrative_revenue_observed",
+        "monthly_monitoring",
+        "historical_series",
+        "budget_reconciliation"
+      ],
+      "unit_of_observation": "ligne nationale de recette fiscale et période",
+      "fields_expected": [
+        "tax_or_collection_line",
+        "period",
+        "gross_receipt_amount",
+        "unit",
+        "source_sheet",
+        "source_row"
+      ],
+      "stable_keys": [
+        "workbook_version",
+        "sheet_name",
+        "source_row",
+        "period"
+      ],
+      "limitations": [
+        "Une recette brute administrative n'est ni une recette budgétaire nette ni une recette de comptabilité nationale.",
+        "Les remboursements, dégrèvements, admissions en non-valeur et décalages d'encaissement peuvent expliquer des écarts avec d'autres sources.",
+        "Une ligne de collecte peut agréger plusieurs créances ou changer de libellé et de périmètre.",
+        "Les feuilles, unités, notes et éventuelles ruptures de série doivent être profilées avant ingestion."
+      ],
+      "next_action": "Archiver les deux classeurs, inventorier feuilles et lignes, conserver séparément les séries annuelles et mensuelles et produire une table de passage vers les Voies et moyens, les balances de l'État et la NTL."
+    },
+    {
+      "id": "dgfip-tax-specific-statistical-tables",
+      "source_record_id": null,
+      "title": "Tableaux statistiques détaillés par impôt",
+      "publisher": "Direction générale des Finances publiques, Département des études et statistiques fiscales",
+      "url": "https://www.data.gouv.fr/datasets/tableaux-statistiques-de-la-direction-generale-des-finances-publiques-dgfip",
+      "evidence_urls": [
+        "https://www.impots.gouv.fr/taxe-sur-la-valeur-ajoutee-et-taxe-sur-les-salaires",
+        "https://www.impots.gouv.fr/taxe-generale-sur-les-activites-polluantes-et-accises-sur-les-energies",
+        "https://www.impots.gouv.fr/recettes-fiscales"
+      ],
+      "priority": 1,
+      "status": "ready_to_ingest",
+      "authority_level": "official_tax_statistics",
+      "family": "tax_specific_statistics",
+      "coverage": {
+        "geography": "France, avec ventilations sectorielles, territoriales ou par taille selon l'impôt",
+        "period": "variable selon le tableau ; collection historique refondue à compter de 2022",
+        "scope": "Fiscalités personnelle, professionnelle et directe locale, moyens de paiement, contrôle fiscal, contentieux, foncier, domaine et amendes.",
+        "notable_tax_tables": [
+          "TVA : déclarants, assiette et taxe par secteur et taux",
+          "taxe sur les salaires : déclarants, assiette, taxe brute et nette",
+          "impôt sur les sociétés : bénéfice fiscal, IS brut et net",
+          "impôt sur le revenu : foyers, montants, tranches, revenus et crédits",
+          "CFE, IFER et CVAE : données territoriales et sectorielles",
+          "TGAP : déclarants, quantités et montants dus depuis 2020",
+          "accises sur l'électricité, le gaz naturel et le charbon : déclarants, quantités, taux et montants dus depuis 2022",
+          "IFI et ISF : données nationales et locales"
+        ]
+      },
+      "access": {
+        "formats": [
+          "xls",
+          "xlsx",
+          "zip"
+        ],
+        "machine_readability": "structured_spreadsheets_to_profile",
+        "bulk_download": true,
+        "api": false,
+        "authentication": "none",
+        "refresh": "table_specific"
+      },
+      "supports": [
+        "candidate_discovery",
+        "tax_base",
+        "published_rate_dimension",
+        "number_of_declarants",
+        "amount_due",
+        "gross_and_net_tax",
+        "quantity_declared",
+        "sector_distribution",
+        "territorial_distribution"
+      ],
+      "unit_of_observation": "cellule ou ligne d'un tableau statistique par impôt, millésime et dimension",
+      "stable_keys": [
+        "tax_family",
+        "workbook_version",
+        "sheet_name",
+        "source_row",
+        "period",
+        "dimension_values"
+      ],
+      "limitations": [
+        "Le catalogue data.gouv.fr historique n'est pas toujours mis à jour au même rythme que les pages courantes d'impots.gouv.fr.",
+        "Les montants dus, bruts, nets, déclarés et encaissés ont des sémantiques différentes et ne doivent pas être fusionnés.",
+        "Les ventilations par taux, taille, secteur ou territoire créent plusieurs lignes pour un même prélèvement.",
+        "La refonte de la collection à partir de 2022 nécessite une table de continuité avec les anciens annuaires statistiques.",
+        "Ces tableaux ne prouvent pas à eux seuls la vigueur juridique ou le classement SEC."
+      ],
+      "next_action": "Créer un manifeste des classeurs courants par impôt, télécharger d'abord TVA, taxe sur les salaires, TGAP et accises énergétiques, puis normaliser le type de montant et les dimensions sans agréger les taux ou populations."
+    },
+    {
+      "id": "dgfip-delta-tourist-tax",
+      "source_record_id": null,
+      "title": "Tarifs de taxe de séjour issus de DELTA à partir de 2024",
+      "publisher": "Direction générale des Finances publiques",
+      "url": "https://www.data.gouv.fr/datasets/tarifs-taxe-de-sejour-delta-a-partir-de-2024",
+      "evidence_urls": [
+        "https://taxesejour.impots.gouv.fr/"
+      ],
+      "priority": 1,
+      "status": "ready_to_ingest",
+      "authority_level": "official_local_tax_deliberations",
+      "family": "tourist_tax",
+      "coverage": {
+        "geography": "commune, avec délibération communale ou intercommunale applicable",
+        "period": "tarifs à partir de 2024 ; publication annuelle des tarifs N et N+1",
+        "source_update_seen": "2026-06-29",
+        "scope": "Régime réel ou forfaitaire, tarifs par nature et catégorie d'hébergement, périodes de perception, loyer minimum, abattements et taxes additionnelles."
+      },
+      "access": {
+        "formats": [
+          "csv",
+          "json",
+          "xml"
+        ],
+        "machine_readability": "structured_table",
+        "bulk_download": true,
+        "api": true,
+        "authentication": "none",
+        "refresh": "annual"
+      },
+      "supports": [
+        "candidate_discovery",
+        "local_applicability",
+        "beneficiary_territory",
+        "tax_regime",
+        "published_rates",
+        "effective_year",
+        "additional_tax",
+        "abatement"
+      ],
+      "unit_of_observation": "commune × année d'effet × catégorie d'hébergement",
+      "fields_available": [
+        "commune",
+        "deliberating_authority",
+        "effective_year",
+        "accommodation_category",
+        "real_or_flat_regime",
+        "base_tariff_or_rate",
+        "collection_period",
+        "minimum_rent",
+        "abatement",
+        "departmental_additional_rate",
+        "regional_or_project_additional_rates",
+        "total_tariff"
+      ],
+      "stable_keys": [
+        "effective_year",
+        "commune_code",
+        "accommodation_category",
+        "regime"
+      ],
+      "limitations": [
+        "Une ligne commune-catégorie n'est pas un prélèvement autonome.",
+        "Le fichier décrit les délibérations et tarifs, pas les nuitées, déclarations, encaissements ou recettes.",
+        "En l'absence d'un nouveau vote, les éléments antérieurs peuvent rester applicables ; l'historique doit être reconstruit selon les règles de reconduction.",
+        "Les taxes additionnelles départementales, franciliennes et liées à des infrastructures doivent rester des composantes juridiquement distinctes.",
+        "L'absence d'une commune ne vaut absence de taxe que pour les années couvertes par la publication considérée."
+      ],
+      "next_action": "Ingérer CSV, JSON et schéma XML, construire une table d'applicabilité par commune et année, et produire des entités séparées pour la taxe de base et chaque taxe additionnelle sans dupliquer le tarif total."
+    },
+    {
+      "id": "urssaf-vm-vma-vmrr-rates",
+      "source_record_id": null,
+      "title": "Table des taux de versement mobilité, versement mobilité additionnel et versement mobilité régional et rural",
+      "publisher": "Urssaf Caisse nationale",
+      "url": "https://www.data.gouv.fr/datasets/table-taux-vm-vma-vmrr",
+      "evidence_urls": [
+        "https://open.urssaf.fr/"
+      ],
+      "priority": 1,
+      "status": "ready_to_ingest",
+      "authority_level": "official_collection_reference",
+      "family": "mobility_contributions",
+      "coverage": {
+        "geography": "communes concernées",
+        "period": "historique des taux et dates d'effet publié dans le jeu courant",
+        "source_update_seen": "2026-07-23",
+        "scope": "Taux territoriaux de VM, VMA et VMRR et dates d'effet."
+      },
+      "access": {
+        "formats": [
+          "csv",
+          "json",
+          "api"
+        ],
+        "machine_readability": "structured_table",
+        "bulk_download": true,
+        "api": true,
+        "authentication": "none",
+        "refresh": "operational"
+      },
+      "supports": [
+        "candidate_discovery",
+        "local_applicability",
+        "published_rates",
+        "effective_dates",
+        "collection_territory",
+        "mobility_authority"
+      ],
+      "unit_of_observation": "commune × type de versement × période de validité",
+      "stable_keys": [
+        "commune_code",
+        "contribution_type",
+        "effective_date"
+      ],
+      "limitations": [
+        "Le taux territorial ne fournit ni assiette, ni recette, ni classement SEC.",
+        "Une ligne par commune ne constitue pas un prélèvement distinct : plusieurs communes peuvent relever de la même autorité et du même taux.",
+        "Le jeu est un référentiel opérationnel de recouvrement ; la création et la légalité du taux doivent être reliées aux textes et délibérations.",
+        "Les trois familles VM, VMA et VMRR ne doivent pas être fusionnées sous un seul identifiant juridique."
+      ],
+      "next_action": "Ingérer toutes les versions de taux, reconstruire les intervalles de validité et grouper les communes par autorité, type et taux avant rapprochement avec les CTP et les bases juridiques."
+    },
+    {
+      "id": "dila-jorf-bulk",
+      "source_record_id": null,
+      "title": "Base JORF — archive globale et flux quotidiens",
+      "publisher": "Direction de l'information légale et administrative",
+      "url": "https://echanges.dila.gouv.fr/OPENDATA/JORF/",
+      "priority": 1,
+      "status": "candidate",
+      "authority_level": "official_legal_publication_corpus",
+      "family": "legal_corpus",
+      "relationship_to_existing_registry": "Complète la base LEGI pour les textes non codifiés, les versions de publication, les arrêtés de taux et les dispositions transitoires.",
+      "coverage": {
+        "geography": "France",
+        "period": "corpus JORF historique et flux jusqu'au jour de collecte",
+        "global_snapshot_seen": "Freemium_jorf_global_20250713-140000.tar.gz",
+        "latest_increment_seen": "JORF_20260902-210756.tar.gz",
+        "scope": "Textes publiés au Journal officiel, métadonnées et versions de publication."
+      },
+      "access": {
+        "formats": [
+          "tar.gz",
+          "xml"
+        ],
+        "machine_readability": "structured_archives",
+        "bulk_download": true,
+        "api": false,
+        "authentication": "none",
+        "refresh": "daily",
+        "global_snapshot_size_seen": "1.6 GiB"
+      },
+      "supports": [
+        "candidate_discovery",
+        "creation_text",
+        "publication_date",
+        "effective_date_evidence",
+        "uncodified_text",
+        "implementing_order",
+        "transitional_measure",
+        "historical_name"
+      ],
+      "unit_of_observation": "objet ou version de texte publié au Journal officiel",
+      "stable_keys": [
+        "jorf_identifier",
+        "text_identifier",
+        "version_or_publication_identifier"
+      ],
+      "limitations": [
+        "L'archive globale observée est datée du 13 juillet 2025 ; tous les flux ultérieurs doivent être rejoués dans l'ordre et sans double application.",
+        "Le volume initial est élevé et nécessite une indexation sélective ou incrémentale.",
+        "Une recherche sur les mots taxe, cotisation ou contribution produit des faux positifs et ne repère pas toutes les créances.",
+        "JORF ne fournit ni recettes, ni bénéficiaire économique normalisé, ni classement SEC.",
+        "Pour le droit consolidé à une date donnée, LEGI reste nécessaire."
+      ],
+      "next_action": "Prototyper l'application idempotente du snapshot et des flux sur un index limité aux textes cités par les 371 lignes, aux lois financières et aux arrêtés fixant taux, tarifs ou répartitions."
+    },
+    {
+      "id": "dgfip-delta-development-tax",
+      "source_record_id": null,
+      "title": "Taxe d'aménagement — éléments de taxation votés par les collectivités à partir de 2022",
+      "publisher": "Direction générale des Finances publiques",
+      "url": "https://data.economie.gouv.fr/explore/assets/delta_deliberation_tam_17_01_23/",
+      "priority": 2,
+      "status": "ready_to_ingest",
+      "authority_level": "official_local_tax_deliberations",
+      "family": "development_tax",
+      "coverage": {
+        "geography": "collectivités et zones concernées",
+        "period": "délibérations et éléments de taxation à partir de 2022",
+        "scope": "Éléments votés et transmis via DELTA pour l'application territoriale de la taxe d'aménagement."
+      },
+      "access": {
+        "formats": [
+          "csv",
+          "json",
+          "api"
+        ],
+        "machine_readability": "structured_table",
+        "bulk_download": true,
+        "api": true,
+        "authentication": "none",
+        "refresh": "annual_or_deliberation_cycle"
+      },
+      "supports": [
+        "local_applicability",
+        "published_rates",
+        "effective_year",
+        "deliberating_authority",
+        "zoning",
+        "exemption_or_adjustment"
+      ],
+      "unit_of_observation": "collectivité ou zone × délibération × année d'effet",
+      "stable_keys": [
+        "collectivity_identifier",
+        "zone_identifier",
+        "deliberation_identifier_or_date",
+        "effective_year"
+      ],
+      "limitations": [
+        "Le jeu décrit des délibérations et éléments de taxation, pas des autorisations d'urbanisme, liquidations ou recettes.",
+        "Plusieurs zones et taux d'une même collectivité ne constituent pas plusieurs prélèvements autonomes.",
+        "La part communale ou intercommunale, la part départementale et les prélèvements liés à l'archéologie doivent rester distingués.",
+        "Les règles nationales de base forfaitaire et les changements de recouvrement doivent être ajoutés depuis les textes et statistiques fiscales."
+      ],
+      "next_action": "Profiler le schéma, reconstruire les taux applicables par territoire, zone et année et rapprocher les délibérations des bases nationales sans produire de recette estimée."
+    },
+    {
+      "id": "dgfip-dmto-monthly-rates",
+      "source_record_id": null,
+      "title": "Tarifs, abattements, réductions et exonérations des droits de mutation à titre onéreux",
+      "publisher": "Direction générale des Finances publiques",
+      "url": "https://www.impots.gouv.fr/droits-denregistrement",
+      "priority": 2,
+      "status": "ready_to_ingest",
+      "authority_level": "official_current_rate_reference",
+      "family": "property_transfer_taxes",
+      "coverage": {
+        "geography": "départements et communes selon les options recensées",
+        "period": "instantanés mensuels ; publications disponibles du 1er janvier au 1er juin 2026 lors de la vérification",
+        "scope": "Droits d'enregistrement, taxe de publicité foncière et taxe communale additionnelle applicables aux mutations à titre onéreux."
+      },
+      "access": {
+        "formats": [
+          "pdf"
+        ],
+        "machine_readability": "document_tables",
+        "bulk_download": true,
+        "api": false,
+        "authentication": "none",
+        "refresh": "monthly_when_changed_or_published"
+      },
+      "supports": [
+        "published_rates",
+        "territorial_option",
+        "abatement",
+        "reduction",
+        "exemption",
+        "effective_date",
+        "local_additional_tax"
+      ],
+      "unit_of_observation": "département ou option territoriale × date d'effet × disposition",
+      "stable_keys": [
+        "snapshot_date",
+        "department_code",
+        "legal_option_or_article"
+      ],
+      "limitations": [
+        "Les tableaux sont publiés en PDF et nécessitent une extraction contrôlée avec conservation de la page et du texte brut.",
+        "Ils ne contiennent ni nombre de mutations, ni assiette, ni recette.",
+        "Les taux départementaux et la taxe communale additionnelle sont des composantes distinctes d'une opération de mutation.",
+        "Les droits de mutation à titre gratuit et d'autres droits d'enregistrement ne sont pas couverts par cette série."
+      ],
+      "next_action": "Archiver chaque instantané 2026, extraire les tableaux avec double contrôle visuel, puis construire des intervalles de validité par département et option juridique."
+    },
+    {
+      "id": "dgfip-tax-calculator-source-code",
+      "source_record_id": null,
+      "title": "Codes sources et algorithmes des principaux calculs fiscaux",
+      "publisher": "Direction générale des Finances publiques",
+      "url": "https://www.impots.gouv.fr/ouverture-des-donnees-publiques-de-la-dgfip",
+      "priority": 2,
+      "status": "candidate",
+      "authority_level": "official_implementation_source",
+      "family": "tax_calculation_models",
+      "coverage": {
+        "geography": "France",
+        "period": "variable selon l'impôt",
+        "scope": "Codes et algorithmes pour l'IR, le PAS, l'ISF, l'IFI, la CFE, l'IFER, la CVAE, l'IS, la taxe d'habitation et la taxe foncière.",
+        "years_explicitly_documented": {
+          "income_tax_and_pas_income_years": "2010-2024",
+          "isf": "2011-2017",
+          "ifi": "2018-2024",
+          "housing_tax_partial_source": "2020",
+          "property_tax_partial_source": "2020"
+        }
+      },
+      "access": {
+        "formats": [
+          "source_code",
+          "xml",
+          "documentation"
+        ],
+        "machine_readability": "versioned_code_repositories",
+        "bulk_download": true,
+        "api": true,
+        "authentication": "none_for_public_repositories",
+        "refresh": "tax_specific"
+      },
+      "supports": [
+        "formula_reconstruction",
+        "parameter_discovery",
+        "rate_history",
+        "calculation_components",
+        "regression_tests",
+        "alias_discovery"
+      ],
+      "unit_of_observation": "version de fichier, règle ou paramètre de calcul",
+      "stable_keys": [
+        "tax_family",
+        "repository",
+        "commit_or_release",
+        "file_path"
+      ],
+      "limitations": [
+        "Un programme de calcul est une mise en œuvre administrative et non la source normative du prélèvement.",
+        "La couverture et les millésimes diffèrent fortement selon les impôts.",
+        "Certaines branches locales ne couvrent qu'un ancien millésime et ne décrivent pas le droit courant de 2026.",
+        "Le code ne fournit ni recette, ni bénéficiaire économique, ni classement SEC.",
+        "Des règles rares ou traitées hors du calculateur peuvent ne pas apparaître."
+      ],
+      "next_action": "Créer un manifeste des dépôts, versions et millésimes, puis utiliser les sources uniquement pour valider des formules et paramètres déjà reliés à une base juridique."
+    },
+    {
+      "id": "msa-national-key-figures-2026",
+      "source_record_id": null,
+      "title": "Chiffres utiles — édition nationale 2026",
+      "publisher": "Mutualité sociale agricole",
+      "url": "https://statistiques.msa.fr/publication/chiffres-utiles-edition-nationale-2026/",
+      "priority": 3,
+      "status": "support_only",
+      "authority_level": "official_regime_statistics",
+      "family": "agricultural_social_finance",
+      "coverage": {
+        "geography": "régime agricole national",
+        "period": "millésimes 2024 et 2025",
+        "publication_date": "2026-06-25",
+        "scope": "Portrait statistique du régime agricole, financement, cotisations émises, prestations et populations salariées et non salariées."
+      },
+      "access": {
+        "formats": [
+          "xlsx",
+          "pdf"
+        ],
+        "machine_readability": "companion_spreadsheet_to_profile",
+        "bulk_download": true,
+        "api": false,
+        "authentication": "none",
+        "refresh": "annual"
+      },
+      "supports": [
+        "agricultural_regime_scope",
+        "aggregate_contributions_issued",
+        "salaried_and_non_salaried_split",
+        "aggregate_financing_control",
+        "population_denominator"
+      ],
+      "unit_of_observation": "indicateur agrégé du régime agricole et millésime",
+      "stable_keys": [
+        "edition",
+        "sheet_name",
+        "indicator",
+        "year",
+        "population_group"
+      ],
+      "limitations": [
+        "Les cotisations émises comprennent des montants payés, exonérés, pris en charge par l'État ou compensés par des recettes fiscales.",
+        "Les agrégats ne permettent pas d'identifier une contribution juridique individuelle.",
+        "Le champ MSA ne se confond pas avec celui de l'Urssaf ni avec les seuls prélèvements obligatoires.",
+        "Aucun référentiel public MSA équivalent à la table historique CTP n'a été identifié pendant cette passe."
+      ],
+      "next_action": "Archiver le XLSX, inventorier les feuilles de financement et cotisations, conserver les catégories de montant et rapprocher uniquement les agrégats avec la DREES, la LFSS et la NTL."
+    }
+  ],
+  "research_gaps": [
+    {
+      "gap": "Recettes observées des taxes locales gérées dans DELTA",
+      "finding": "Les jeux de taxe de séjour et de taxe d'aménagement donnent les délibérations, taux et territoires, mais pas les bases liquidées ni les encaissements.",
+      "consequence": "Le produit doit être recherché dans les balances locales, les comptes de gestion, les statistiques fiscales ou des sources sectorielles séparées."
+    },
+    {
+      "gap": "Référentiel déclaratif détaillé du régime agricole",
+      "finding": "La MSA publie des agrégats et un classeur annuel, mais aucune table publique historique comparable au référentiel CTP Urssaf n'a été trouvée.",
+      "consequence": "Le rapprochement individuel agricole reste dépendant des tables DSN, des textes et de recherches MSA ciblées."
+    },
+    {
+      "gap": "Snapshot JORF consolidé au jour de référence",
+      "finding": "Le snapshot global observé date du 13 juillet 2025 et les mises à jour sont diffusées en nombreux flux quotidiens jusqu'au 2 septembre 2026.",
+      "consequence": "Une ingestion correcte exige un journal d'application, un ordre strict, de l'idempotence et un contrôle des flux manquants."
+    },
+    {
+      "gap": "Continuité des tableaux statistiques DGFiP",
+      "finding": "La collection a été refondue à compter de 2022 et les pages courantes ne partagent pas toujours le calendrier du catalogue historique data.gouv.fr.",
+      "consequence": "Chaque série doit conserver son millésime, son schéma et une table explicite de correspondance avec l'ancien annuaire."
+    },
+    {
+      "gap": "Fichiers globaux historiques des collectivités",
+      "finding": "Plusieurs anciens liens de fichiers globaux pointent vers des jeux archivés ou des millésimes isolés.",
+      "consequence": "Le pipeline courant doit privilégier les balances publiées par niveau de collectivité et le portail OFGL, puis documenter séparément l'archive historique."
+    }
+  ],
+  "recommended_ingestion_order": [
+    {
+      "rank": 1,
+      "source_id": "dgfip-gross-tax-receipts",
+      "deliverable": "data/reference/dgfip-gross-tax-receipts.json",
+      "reason": "deux séries nationales observées, annuelles et mensuelles, immédiatement rapprochables des lignes budgétaires"
+    },
+    {
+      "rank": 2,
+      "source_id": "dgfip-delta-tourist-tax",
+      "deliverable": "data/reference/tourist-tax-rates-and-additions.json",
+      "reason": "couverture nationale d'une famille locale et de plusieurs taxes additionnelles"
+    },
+    {
+      "rank": 3,
+      "source_id": "urssaf-vm-vma-vmrr-rates",
+      "deliverable": "data/reference/mobility-contribution-rates.json",
+      "reason": "référentiel territorial officiel, structuré et à jour du champ mobilité"
+    },
+    {
+      "rank": 4,
+      "source_id": "dgfip-tax-specific-statistical-tables",
+      "deliverable": "manifeste et premières extractions TVA, taxe sur les salaires, TGAP et accises énergétiques",
+      "reason": "assiettes, déclarants, quantités et montants dus complètent les seules recettes"
+    },
+    {
+      "rank": 5,
+      "source_id": "dgfip-delta-development-tax",
+      "deliverable": "data/reference/development-tax-deliberations.json",
+      "reason": "couverture nationale des taux et zones votés depuis 2022"
+    },
+    {
+      "rank": 6,
+      "source_id": "dila-jorf-bulk",
+      "deliverable": "prototype d'index JORF ciblé sur les prélèvements et lois financières",
+      "reason": "complète LEGI pour les textes non codifiés et arrêtés de paramètres"
+    },
+    {
+      "rank": 7,
+      "source_id": "dgfip-dmto-monthly-rates",
+      "deliverable": "data/reference/dmto-rates-2026.json",
+      "reason": "instantanés nationaux des options et taux départementaux"
+    },
+    {
+      "rank": 8,
+      "source_id": "dgfip-tax-calculator-source-code",
+      "deliverable": "manifeste versionné des calculateurs fiscaux",
+      "reason": "validation en masse des formules et paramètres lorsque la base juridique est déjà identifiée"
+    },
+    {
+      "rank": 9,
+      "source_id": "msa-national-key-figures-2026",
+      "deliverable": "data/reference/msa-financing-aggregates-2024-2025.json",
+      "reason": "contrôle du champ agricole et préparation d'une recherche plus fine"
+    }
+  ]
+}
