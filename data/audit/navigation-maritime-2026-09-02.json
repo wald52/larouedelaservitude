@@ -1,0 +1,460 @@
+{
+  "schema_version": 1,
+  "batch_id": "navigation-maritime-2026-09-02",
+  "title": "Lot de reprise — taxe annuelle sur les engins maritimes à usage personnel",
+  "audit_date": "2026-09-02",
+  "status": "ready_for_review",
+  "production_dataset_changed": false,
+  "stacked_on": {
+    "branch": "audit/hydroelectricite-chasse-2026-09-02",
+    "pull_request": 52,
+    "reason": "Le lot est empilé afin de conserver la mise à jour du README du lot précédent sans conflit avant sa fusion."
+  },
+  "source_draft": {
+    "path": "data/audit/draft-2026-08-05.json",
+    "source_version": "2026-08-05",
+    "draft_indices": [
+      51,
+      52,
+      53
+    ],
+    "draft_entry_count": 3,
+    "merge_indices": [
+      51,
+      52,
+      53
+    ]
+  },
+  "scope": {
+    "description": "Fusion de trois anciennes lignes — droit de francisation et de navigation, droit de passeport et variante corse — dans la taxe annuelle sur les engins maritimes à usage personnel prévue par le CIBS. Le pavillon français, le pavillon étranger et la Corse deviennent des profils d'une même créance, non des prélèvements autonomes.",
+    "ready_record_count": 1,
+    "ready_canonical_ids": [
+      "taxe-annuelle-engins-maritimes-usage-personnel"
+    ],
+    "historical_predecessor_count": 3
+  },
+  "measurement_policy": {
+    "unit": "millions_euros",
+    "observed_revenue": "Recette constatée en comptabilité nationale dans la National tax list 2026, dernière année disponible : 2024.",
+    "statistical_label_lag": "La ligne NTL conserve le libellé historique DAFN alors que la créance juridique est la TAEMUP depuis 2022. La table de concordance officielle permet le rapprochement.",
+    "legacy_amounts": "Les trois montants du brouillon sont dépourvus d'année. Ils ne sont ni additionnés ni repris comme recettes canoniques.",
+    "territorial_profile": "Une minoration ou une affectation propre à la Corse ne crée pas une taxe distincte.",
+    "flag_profile": "Les fractions pavillon français et pavillon étranger restent des modalités d'une seule taxe.",
+    "tariffs": "Un tarif de coque, de puissance, de VNM ou de grande plaisance n'est pas une recette.",
+    "future_law": "Les dispositions applicables à compter du 1er janvier 2027 sont documentées séparément et ne sont pas utilisées pour calculer la taxe 2026."
+  },
+  "sources": [
+    {
+      "id": "ec-ntl-2026-france",
+      "title": "Data on Taxation Trends — National tax list 2026, feuille France",
+      "publisher": "Commission européenne, DG TAXUD / Eurostat",
+      "url": "https://taxation-customs.ec.europa.eu/document/download/600d56d1-ea6e-416e-9981-1c8b9c603b6b_en?filename=NTL%20edition%202026%20web.xlsx",
+      "publication_date": "2026-03-30",
+      "data_through": 2024,
+      "retrieved_at": "2026-09-01",
+      "local_path": "data/reference/ntl-france-2026.json",
+      "supports": [
+        "po_classification",
+        "observed_revenue"
+      ]
+    },
+    {
+      "id": "legifrance-cibs-navigation-2026-09-01",
+      "title": "CIBS — chapitre III : navigations, version au 1er septembre 2026",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/codes/section_lc/LEGITEXT000044595989/LEGISCTA000044599589/2026-09-01/",
+      "effective_date": "2026-09-01",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "legal_status",
+        "legal_basis",
+        "taxable_craft",
+        "territorial_attachment",
+        "formalities",
+        "liable_person",
+        "tariffs",
+        "reductions",
+        "collection",
+        "allocation"
+      ]
+    },
+    {
+      "id": "legifrance-ordonnance-2021-1843-concordance",
+      "title": "Ordonnance n° 2021-1843 du 22 décembre 2021 — article 4, table de concordance",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/loda/article_lc/LEGIARTI000044595088/2023-07-13",
+      "effective_date": "2022-01-01",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "legacy_mapping",
+        "canonical_granularity",
+        "creation_year",
+        "first_effective_date"
+      ]
+    },
+    {
+      "id": "mer-taemup-2026",
+      "title": "La taxe annuelle sur les engins maritimes à usage personnel",
+      "publisher": "Ministère chargé de la mer",
+      "url": "https://www.mer.gouv.fr/la-taxe-annuelle-sur-les-engins-maritimes-usage-personnel-taemup",
+      "updated_at": "2026-06-08",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "operational_2026_criteria",
+        "operational_2026_tariffs",
+        "corsica_2026_reduction",
+        "payment_process",
+        "future_2027_context"
+      ]
+    },
+    {
+      "id": "legifrance-lf-2026-art-66",
+      "title": "Loi n° 2026-103 du 19 février 2026 de finances pour 2026 — article 66",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/jorf/article_jo/JORFARTI000053508504",
+      "publication_date": "2026-02-20",
+      "effective_from": "2027-01-01",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "future_2027_scope",
+        "future_2027_tariffs",
+        "future_2027_reductions"
+      ]
+    },
+    {
+      "id": "legifrance-env-l322-15-2026",
+      "title": "Code de l'environnement — article L. 322-15",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000048848944",
+      "effective_date": "2026-09-02",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "conservatoire_allocation"
+      ]
+    },
+    {
+      "id": "legifrance-env-l541-10-25-1-2026",
+      "title": "Code de l'environnement — article L. 541-10-25-1",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000046196401",
+      "effective_date": "2026-09-02",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "eco_organism_allocation"
+      ]
+    },
+    {
+      "id": "legifrance-csi-l742-11-2-2026",
+      "title": "Code de la sécurité intérieure — article L. 742-11-2",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000048848919",
+      "effective_date": "2026-09-02",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "maritime_rescue_allocation"
+      ]
+    }
+  ],
+  "records": [
+    {
+      "canonical_id": "taxe-annuelle-engins-maritimes-usage-personnel",
+      "draft_entries": [
+        {
+          "index": 51,
+          "id": "droit-de-francisation-et-de-navigation-en-corse-droit-de-pas",
+          "treatment": "merge_legacy_territorial_and_flag_profiles"
+        },
+        {
+          "index": 52,
+          "id": "droit-de-francisation-et-de-navigation",
+          "treatment": "merge_as_legacy_french_flag_fraction"
+        },
+        {
+          "index": 53,
+          "id": "droit-de-passeport",
+          "treatment": "merge_as_legacy_foreign_flag_fraction"
+        }
+      ],
+      "nom": "Taxe annuelle engins maritimes",
+      "nom_complet": "Taxe annuelle sur les engins maritimes à usage personnel",
+      "sigle": "TAEMUP",
+      "annee_creation": 2021,
+      "first_effective_date": "2022-01-01",
+      "current_wording_since": "2026-09-01",
+      "creation_evidence": {
+        "source_id": "legifrance-ordonnance-2021-1843-concordance",
+        "locator": "Article 4 — le DAFN devient la fraction pavillon français et le droit de passeport la fraction pavillon étranger de la TAEMUP"
+      },
+      "po_status": "confirmed",
+      "legal_status": "active",
+      "obligation_status": "confirmed",
+      "membership_status": "ready",
+      "publication_status": "ready_for_review",
+      "reason_codes": [
+        "current-law-confirmed",
+        "statistical-classification-confirmed",
+        "replaced-by-current-levy",
+        "allocation-or-beneficiary-split"
+      ],
+      "legal_basis": [
+        {
+          "source_id": "legifrance-cibs-navigation-2026-09-01",
+          "locator": "CIBS, articles L. 423-4 à L. 423-37"
+        }
+      ],
+      "canonical_granularity": {
+        "treatment": "single_tax_with_flag_territorial_and_craft_profiles",
+        "reason": "La table de concordance transforme l'ancien DAFN et le droit de passeport en fractions d'une seule taxe. Le régime corse est une minoration et une affectation territoriales de la même créance.",
+        "separate_record_for_french_flag": false,
+        "separate_record_for_foreign_flag": false,
+        "separate_record_for_corsica": false,
+        "separate_records_for_hull_power_vnm_or_yacht": false
+      },
+      "taxable_craft_2026": [
+        {
+          "category": "navire",
+          "criteria": [
+            "longueur de coque supérieure ou égale à 7 mètres",
+            "ou longueur inférieure à 7 mètres et puissance administrative supérieure ou égale à 22 CV"
+          ]
+        },
+        {
+          "category": "véhicule nautique à moteur",
+          "criteria": [
+            "longueur de coque inférieure à 4 mètres",
+            "propulsion principale par moteur à combustion interne entraînant une turbine",
+            "puissance propulsive nette maximale supérieure ou égale à 90 kW",
+            "conception pour une conduite sur la coque"
+          ]
+        },
+        {
+          "category": "grande plaisance",
+          "criteria": [
+            "longueur de coque supérieure ou égale à 30 mètres",
+            "puissance propulsive nette maximale supérieure ou égale à 750 kW"
+          ],
+          "treatment": "barème forfaitaire dérogatoire"
+        }
+      ],
+      "territorial_attachment": [
+        {
+          "profile": "pavillon français",
+          "rule": "Engin rattaché au territoire de taxation sauf immatriculation en dehors de ce territoire.",
+          "tax_formality": "enregistrement du navire"
+        },
+        {
+          "profile": "pavillon étranger",
+          "rule": "Engin rattaché lorsque le propriétaire ou la personne qui en a la disposition réside, a son siège ou est contrôlé dans le territoire de taxation, sous l'exception de crédit-bail ou location avec option d'achat prévue par le code.",
+          "tax_formality": "obtention du passeport"
+        }
+      ],
+      "liable_persons": [
+        "propriétaire de l'engin flottant",
+        "personne ayant la disposition d'un engin ne battant pas pavillon français"
+      ],
+      "fact_and_proration": {
+        "annual_reference": "premier jour de l'année où les conditions de taxation sont réunies",
+        "first_formality_proration": "diminution d'un douzième par mois révolu avant la première formalité taxable"
+      },
+      "tariffs_2026": {
+        "navire_hull_eur": [
+          {"length_m": "< 7", "amount": 0},
+          {"length_m": "7 à < 8", "amount": 77},
+          {"length_m": "8 à < 9", "amount": 105},
+          {"length_m": "9 à < 10", "amount": 178},
+          {"length_m": "10 à < 11", "amount": 240},
+          {"length_m": "11 à < 12", "amount": 274},
+          {"length_m": "12 à < 15", "amount": 458},
+          {"length_m": ">= 15", "amount": 886}
+        ],
+        "navire_power_eur_per_cv": [
+          {"administrative_power_cv": "<= 5", "amount": 0},
+          {"administrative_power_cv": "6 à 8", "amount": 14},
+          {"administrative_power_cv": "9 à 10", "amount": 16},
+          {"administrative_power_cv": "11 à 20", "amount": 35},
+          {"administrative_power_cv": "21 à 25", "amount": 40},
+          {"administrative_power_cv": "26 à 50", "amount": 44},
+          {"administrative_power_cv": "51 à 99", "amount": 50},
+          {"administrative_power_cv": ">= 100", "amount": 64}
+        ],
+        "navire_power_formula": "Tarif unitaire multiplié par la puissance administrative, diminuée de 5 CV lorsqu'elle est inférieure à 100 CV, sous les adaptations pour moteurs amovibles.",
+        "vnm_eur_per_kw": [
+          {"power_kw": "90 à 159", "amount": 3},
+          {"power_kw": ">= 160", "amount": 4}
+        ],
+        "large_yacht_eur": {
+          "minimum": 30000,
+          "maximum": 200000,
+          "dimensions": "barème croisant les longueurs de 30 mètres ou plus et les puissances de 750 kW ou plus"
+        }
+      },
+      "reductions_and_adjustments_2026": {
+        "age_reduction_percent": [
+          {"construction": "avant 1993", "amount": 80},
+          {"construction": "1993 à 1997", "amount": 55},
+          {"construction": "1998 à 2007", "amount": 33}
+        ],
+        "age_reduction_power_limitation": "Pour un navire autre qu'un VNM dépassant 100 CV, la minoration ne porte que sur le terme coque.",
+        "corsica": {
+          "amount_percent": 10,
+          "tax_year": 2026,
+          "conditions": [
+            "port d'enregistrement en Corse ou passeport délivré en Corse",
+            "au moins un stationnement dans un port corse pendant l'année précédente"
+          ],
+          "source_id": "mer-taemup-2026"
+        },
+        "non_cooperative_flag_multiplier": [
+          {"length_m": "< 15", "coefficient": 3},
+          {"length_m": ">= 15", "coefficient": 5}
+        ],
+        "minimum_payment_eur": 76,
+        "large_yacht_reductions_apply": false
+      },
+      "allocation_profiles": [
+        {
+          "profile": "pavillon français hors tarif corse",
+          "recipients": [
+            "Conservatoire de l'espace littoral et des rivages lacustres",
+            "éco-organismes agréés de la filière des navires et bateaux de plaisance ou de sport",
+            "Société nationale de sauvetage en mer selon les fractions prévues par le code"
+          ],
+          "source_ids": [
+            "legifrance-env-l322-15-2026",
+            "legifrance-env-l541-10-25-1-2026",
+            "legifrance-csi-l742-11-2-2026"
+          ]
+        },
+        {
+          "profile": "tarif propre à la Corse",
+          "recipient": "Collectivité de Corse",
+          "source_id": "legifrance-cibs-navigation-2026-09-01"
+        },
+        {
+          "profile": "grande plaisance sous pavillon étranger",
+          "recipient": "Société nationale de sauvetage en mer selon la fraction prévue par le code",
+          "source_id": "legifrance-csi-l742-11-2-2026"
+        }
+      ],
+      "classification": {
+        "source_id": "ec-ntl-2026-france",
+        "source_row": 193,
+        "esa_code": "D59D",
+        "national_detail_code": "C02",
+        "name": "Droit annuel de francisation et de navigation",
+        "economic_function": "C",
+        "environmental_tag": "T",
+        "recipient_scope": "S.13 + S.212",
+        "granularity": "direct_legacy_named_line_mapped_by_official_concordance",
+        "amount_attributable_to_record": true,
+        "label_status": "historical_name_retained_by_statistical_source"
+      },
+      "revenues": {
+        "observed": [
+          {
+            "year": 2024,
+            "amount_meur": 44,
+            "source_id": "ec-ntl-2026-france",
+            "locator": "FR row 193 (D59D C02)"
+          }
+        ],
+        "forecast": []
+      },
+      "draft_corrections": [
+        {
+          "field": "granularite",
+          "draft_values": [
+            "DAFN et passeport en Corse",
+            "DAFN",
+            "droit de passeport"
+          ],
+          "canonical_value": "TAEMUP",
+          "explanation": "La table de concordance qualifie le DAFN et le passeport de fractions pavillon français et pavillon étranger d'une même taxe ; la Corse est un profil territorial."
+        },
+        {
+          "field": "recette",
+          "draft_values_meur": [
+            3,
+            39.2,
+            2.2
+          ],
+          "canonical_observed_2024_meur": 44,
+          "explanation": "Les montants du brouillon ne sont pas additionnés : ils n'ont pas d'année et leur périmètre peut se chevaucher. La valeur canonique provient de la NTL 2024."
+        },
+        {
+          "field": "annee_creation",
+          "draft_values": [
+            1994,
+            1967,
+            1967
+          ],
+          "canonical_value": 2021,
+          "first_effective_date": "2022-01-01",
+          "explanation": "Les dates du brouillon concernent des prédécesseurs. La fiche canonique date la création de la TAEMUP actuelle et conserve les prédécesseurs dans la provenance."
+        }
+      ],
+      "future_legal_context_2027": {
+        "effective_date": "2027-01-01",
+        "source_id": "legifrance-lf-2026-art-66",
+        "changes": [
+          "seuil moteur des navires de moins de 7 mètres exprimé à 120 kW au lieu de 22 CV administratifs",
+          "nouveau barème coque allant de 80 à 1 200 euros",
+          "barème moteur progressif en kilowatts de 3 à 6 euros par fraction de puissance",
+          "nouvelles minorations de vétusté, notamment 70 %, 50 % et 25 % pour les VNM"
+        ],
+        "treatment": "Ces règles ne sont pas appliquées à l'année de taxation 2026."
+      },
+      "warnings": [
+        "Le passeport demeure une formalité pour le pavillon étranger, pas une taxe autonome.",
+        "Le régime corse demeure une minoration et une affectation de la TAEMUP, pas une taxe séparée.",
+        "Le libellé NTL est historique mais la recette 2024 est rapprochée de la TAEMUP grâce à la table de concordance officielle.",
+        "La valeur de 44 M€ n'est pas ventilée entre pavillons, Corse, coque, puissance, VNM, yachts ou bénéficiaires.",
+        "Les règles 2027 sont volontairement séparées du droit applicable en 2026."
+      ],
+      "research_status": "complete_except_revenue_breakdown_and_historical_predecessor_origins",
+      "production_status": "not_integrated"
+    }
+  ],
+  "related_follow_up": [
+    {
+      "canonical_id": "taxe-permis-bateaux-plaisance-moteur",
+      "status": "deferred",
+      "note": "Le permis et l'examen relèvent d'une autre taxe du chapitre navigations et ne doivent pas être absorbés dans la TAEMUP."
+    },
+    {
+      "canonical_id": "taxes-transport-maritime-passagers",
+      "draft_indices": [
+        63,
+        64
+      ],
+      "status": "deferred",
+      "note": "Les taxes sur le transport maritime de passagers en Corse, outre-mer et vers des espaces naturels protégés feront l'objet d'un lot séparé."
+    },
+    {
+      "canonical_id": "ventilation-taemup-beneficiaires",
+      "status": "source_needed",
+      "note": "Rechercher une exécution budgétaire ventilant les 44 M€ entre pavillon français, pavillon étranger, Corse et bénéficiaires affectataires."
+    }
+  ],
+  "quality_checks": {
+    "canonical_ids_are_unique": true,
+    "draft_indices_covered": [
+      51,
+      52,
+      53
+    ],
+    "all_three_legacy_entries_merge_into_one_tax": true,
+    "passport_is_not_a_separate_tax": true,
+    "corsica_is_not_a_separate_tax": true,
+    "french_and_foreign_flag_fractions_are_not_duplicate_records": true,
+    "ntl_row_193_is_mapped_by_official_concordance": true,
+    "observed_revenue_has_year_and_source": true,
+    "legacy_draft_amounts_are_not_summed": true,
+    "tariffs_and_thresholds_are_not_revenues": true,
+    "future_2027_law_is_not_applied_to_2026": true,
+    "production_files_left_unchanged": [
+      "data/entries-full.json",
+      "data/entries-light.json"
+    ]
+  }
+}
