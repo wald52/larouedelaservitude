@@ -7,12 +7,17 @@ Ce dossier conserve les sources officielles et les extractions normalisées util
 | Fichier | Rôle |
 | --- | --- |
 | [`sources.json`](sources.json) | Registre de provenance des sources déjà mobilisées comme preuves ou contexte de recherche |
-| [`bulk-sources.json`](bulk-sources.json) | Registre opérationnel des sources exploitables en masse, avec priorité, couverture, accès, limites et prochaine action |
+| [`bulk-sources.json`](bulk-sources.json) | Registre opérationnel principal des sources exploitables en masse, avec priorité, couverture, accès, limites et prochaine action |
+| [`bulk-sources-supplement-2026-09-02.json`](bulk-sources-supplement-2026-09-02.json) | Complément de recherche vérifié le 2 septembre 2026 : nouvelles sources à prototyper ou promouvoir dans le registre principal |
 | [`ntl-france-2026.json`](ntl-france-2026.json) | Extraction des 141 lignes françaises de détail de la National tax list 2026 |
 | [`lfss-2026-annexe-3-impositions.json`](lfss-2026-annexe-3-impositions.json) | Transcription contrôlée du tableau 31 de l’annexe 3 du PLFSS 2026 |
 
-La méthode complète d’exploitation des sources massives est décrite dans
+La méthode générale d’exploitation des sources massives est décrite dans
 [`docs/sources-massives-prelevements-obligatoires.md`](../../docs/sources-massives-prelevements-obligatoires.md).
+
+La recherche complémentaire sur les tableurs budgétaires, les CTP, le BOFiP, la DSN,
+les balances comptables et les contrôles statistiques est décrite dans
+[`docs/sources-massives-recherche-complementaire.md`](../../docs/sources-massives-recherche-complementaire.md).
 
 ## Deux registres complémentaires
 
@@ -22,6 +27,11 @@ La méthode complète d’exploitation des sources massives est décrite dans
 - `bulk-sources.json` décrit **comment l’exploiter à grande échelle**, ce qu’elle couvre, ses clés de rapprochement et ses limites.
 
 Une source peut apparaître dans les deux fichiers. Lorsqu’elle possède déjà un identifiant dans `sources.json`, le champ `source_record_id` de `bulk-sources.json` le reprend. Une source encore en phase d’évaluation peut rester uniquement dans le registre massif avec `source_record_id: null`.
+
+Le fichier daté `bulk-sources-supplement-2026-09-02.json` est un registre de recherche
+intermédiaire. Les sources qui passent avec succès leur prototype ou leur première
+ingestion doivent ensuite être intégrées à `bulk-sources.json`, sans perdre la date et les
+preuves de cette évaluation.
 
 ## Principes de stockage
 

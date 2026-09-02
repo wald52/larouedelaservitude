@@ -1,0 +1,992 @@
+{
+  "schema_version": 1,
+  "verification_date": "2026-09-02",
+  "extends": "data/reference/bulk-sources.json",
+  "purpose": "Complément de recherche sur les référentiels exploitables en masse pour inventorier, dater, qualifier et contrôler les prélèvements obligatoires français.",
+  "promotion_policy": "Les sources de ce fichier doivent être intégrées au registre principal après un prototype d'accès ou une première ingestion. Une source secondaire ne devient jamais une preuve canonique sans recoupement avec une source publique faisant autorité.",
+  "key_findings": [
+    {
+      "finding": "La table historique des codes types de personnel de l'Urssaf est un référentiel social de premier rang.",
+      "impact": "Elle permet de remplacer une recherche ponctuelle des CTP par une ingestion historique des codes, libellés, dates et taux publiés."
+    },
+    {
+      "finding": "Le BOFiP est disponible sous forme de stock mensuel et de flux hebdomadaire structurés.",
+      "impact": "Il devient possible d'indexer en masse la doctrine fiscale, ses métadonnées, ses références croisées et ses versions courantes."
+    },
+    {
+      "finding": "Les pages budgétaires 2026 publient des classeurs officiels directement exploitables.",
+      "impact": "Les taxes affectées, l'évolution des recettes, la TVA toutes APU, les dépenses fiscales et l'annexe 4 du PLFSS peuvent être extraites depuis des tableaux plutôt que depuis les PDF."
+    },
+    {
+      "finding": "Les balances comptables de l'État et des collectivités fournissent des recettes observées à une granularité comptable.",
+      "impact": "Elles complètent les prévisions budgétaires, mais exigent une table de passage des comptes vers les prélèvements."
+    },
+    {
+      "finding": "Les nomenclatures DSN, les comptes de la protection sociale et les contrôles Eurostat/OECD couvrent des dimensions absentes du registre initial.",
+      "impact": "Ils permettent d'industrialiser les bénéficiaires, organismes, assiettes, agrégats sociaux et contrôles de cohérence."
+    }
+  ],
+  "sources": [
+    {
+      "id": "urssaf-ctp-history",
+      "source_record_id": null,
+      "title": "Table des codes types de personnel avec historique",
+      "publisher": "Urssaf Caisse nationale",
+      "url": "https://open.urssaf.fr/explore/dataset/histocodestypescsv/",
+      "evidence_urls": [
+        "https://www.data.gouv.fr/datasets/table-ctp-avec-historique",
+        "https://fichierdirect.declaration.urssaf.fr/TablesReference.htm"
+      ],
+      "priority": 1,
+      "status": "ready_to_ingest",
+      "authority_level": "official_operational_reference",
+      "family": "social_collection_reference",
+      "relationship_to_existing_registry": "Spécialise l'entrée générale urssaf-open-data et justifie de relever la priorité du volet Urssaf.",
+      "coverage": {
+        "geography": "France, champ Urssaf",
+        "period": "historique publié, snapshot vérifié le 2026-09-02",
+        "source_update_seen": "2026-07-06 sur data.gouv.fr",
+        "scope": "Codes types de personnel utilisés pour déclarer et recouvrer des cotisations et contributions auprès de l'Urssaf, avec historique."
+      },
+      "access": {
+        "formats": [
+          "csv",
+          "json",
+          "api"
+        ],
+        "machine_readability": "structured_table",
+        "bulk_download": true,
+        "api": true,
+        "authentication": "none",
+        "refresh": "irregular_or_operational",
+        "license": "ODbL"
+      },
+      "supports": [
+        "candidate_discovery",
+        "social_collection_code",
+        "historical_name",
+        "effective_dates",
+        "published_rates",
+        "operational_scope"
+      ],
+      "unit_of_observation": "version historique d'un code type de personnel",
+      "fields_available": [
+        "code",
+        "libelle",
+        "libelle_court",
+        "specificite",
+        "taux_plafonne",
+        "taux_deplafonne",
+        "taux_at",
+        "date_effet",
+        "date_fin"
+      ],
+      "stable_keys": [
+        "code",
+        "date_effet",
+        "date_fin",
+        "specificite"
+      ],
+      "limitations": [
+        "Un CTP est un code de déclaration et de recouvrement, pas nécessairement une créance juridique autonome.",
+        "Un CTP peut représenter une exonération, une régularisation, une catégorie de population ou plusieurs composantes de taux.",
+        "La table ne fournit pas le classement SEC, le bénéficiaire économique final ni une recette.",
+        "Les taux publiés doivent être interprétés avec l'assiette, le plafond, la période et les règles juridiques applicables."
+      ],
+      "next_action": "Ingérer les CSV et JSON, conserver toutes les versions, contrôler l'unicité des clés composites et produire une file de rapprochement CTP vers fiches canoniques, blocs DSN et références juridiques."
+    },
+    {
+      "id": "dgfip-bofip-open-data",
+      "source_record_id": null,
+      "title": "BOFiP-Impôts — stock mensuel, flux hebdomadaire et publications en vigueur",
+      "publisher": "Direction générale des Finances publiques",
+      "url": "https://www.data.gouv.fr/datasets/bofip-impots-publications-en-vigueur",
+      "evidence_urls": [
+        "https://data.economie.gouv.fr/explore/dataset/bofip-vigueur/",
+        "https://data.economie.gouv.fr/explore/dataset/bofip-impots/",
+        "https://data.economie.gouv.fr/api/explore/v2.1/catalog/datasets/bofip-impots/attachments/bofip_documentation_pdf",
+        "https://bofip.impots.gouv.fr/plan-de-classement"
+      ],
+      "priority": 1,
+      "status": "ready_to_ingest",
+      "authority_level": "official_tax_doctrine",
+      "family": "tax_doctrine",
+      "relationship_to_existing_registry": "Complète LEGI : BOFiP apporte le vocabulaire administratif, les règles de calcul, les exonérations, les barèmes et les renvois utilisés en pratique.",
+      "coverage": {
+        "geography": "France",
+        "period": "doctrine fiscale courante et archives publiées",
+        "source_update_seen": "2026-08-27 pour les jeux de publications consultés",
+        "scope": "Doctrine fiscale de la DGFiP, commentaires, barèmes, formulaires, lettres types, annexes, métadonnées et relations entre documents."
+      },
+      "access": {
+        "formats": [
+          "tar.gz",
+          "xml",
+          "html",
+          "csv",
+          "json",
+          "api"
+        ],
+        "machine_readability": "structured_archives_and_api",
+        "bulk_download": true,
+        "api": true,
+        "authentication": "none",
+        "refresh": "monthly_stock_and_weekly_flow",
+        "integrity": "empreintes MD5 publiées pour les archives",
+        "technical_naming": [
+          "bofip_stock_live_AAAAMMJJ",
+          "bofip_flux_live_AAAAMMJJ_BBBBNNKK"
+        ]
+      },
+      "supports": [
+        "candidate_discovery",
+        "tax_aliases",
+        "legal_references",
+        "tax_base",
+        "published_rates",
+        "exemptions",
+        "doctrine_history",
+        "cross_reference_resolution"
+      ],
+      "unit_of_observation": "document doctrinal BOFiP et ses métadonnées",
+      "fields_available": [
+        "document_identifier",
+        "permalink",
+        "title",
+        "publication_date",
+        "classification_subjects",
+        "document_type",
+        "relations",
+        "html_content",
+        "source_files"
+      ],
+      "stable_keys": [
+        "document_identifier",
+        "content_identifier",
+        "publication_date"
+      ],
+      "limitations": [
+        "La doctrine administrative n'est pas la loi et ne prouve pas seule la vigueur juridique d'un prélèvement.",
+        "Le corpus ne fournit ni classement SEC ni recettes.",
+        "Une recherche lexicale produit de nombreux faux positifs : exonérations, procédures, redevances et citations historiques.",
+        "Le stock mensuel contient les versions en cours ; une histoire complète suppose d'archiver les stocks et d'appliquer les flux sans perte."
+      ],
+      "next_action": "Télécharger le dernier stock mensuel, vérifier son empreinte, parser document.xml et data.html, indexer d'abord les séries relatives aux impôts, taxes et contributions du brouillon, puis appliquer les flux hebdomadaires."
+    },
+    {
+      "id": "budget-plf-2026-open-data-tables",
+      "source_record_id": null,
+      "title": "PLF 2026 — tableaux chiffrés des Voies et moyens en formats tableur",
+      "publisher": "Direction du Budget",
+      "url": "https://www.budget.gouv.fr/documentation/documents-budgetaires-lois/exercice-2026/plf-2026",
+      "evidence_urls": [
+        "https://www.budget.gouv.fr/documentation/fid-download/80398",
+        "https://www.budget.gouv.fr/documentation/fid-download/80134",
+        "https://www.budget.gouv.fr/documentation/fid-download/79324",
+        "https://www.budget.gouv.fr/documentation/fid-download/79327",
+        "https://www.budget.gouv.fr/documentation/fid-download/80059"
+      ],
+      "priority": 1,
+      "status": "ready_to_ingest",
+      "authority_level": "official_budget_data",
+      "family": "state_budget_companion_tables",
+      "relationship_to_existing_registry": "Renforce l'entrée assemblee-plf-2026-voies-moyens-tome-1 en remplaçant l'extraction PDF par les classeurs officiels lorsqu'ils couvrent le même tableau.",
+      "coverage": {
+        "geography": "France",
+        "period": "PLF 2026, avec exécution et prévisions selon les tableaux",
+        "publication_date": "2025-10-14",
+        "scope": "Évolution des recettes du budget général, taxes affectées, TVA toutes administrations publiques, principales dépenses fiscales et liste complète des dépenses fiscales."
+      },
+      "access": {
+        "formats": [
+          "xlsx",
+          "xls"
+        ],
+        "machine_readability": "structured_spreadsheets_to_profile",
+        "bulk_download": true,
+        "api": false,
+        "authentication": "none",
+        "refresh": "annual_budget_cycle"
+      },
+      "supports": [
+        "state_budget_revenue",
+        "affected_tax",
+        "beneficiary",
+        "vat_all_government",
+        "tax_expenditure",
+        "revenue_observed",
+        "revenue_revised",
+        "revenue_forecast"
+      ],
+      "unit_of_observation": "ligne de tableau budgétaire officiel",
+      "fields_available": [
+        "budget_revenue_line",
+        "affected_tax_line",
+        "beneficiary",
+        "vat_government_allocation",
+        "tax_expenditure_identifier",
+        "amounts_by_budget_year"
+      ],
+      "stable_keys": [
+        "workbook_id",
+        "sheet_name",
+        "source_row",
+        "budget_year"
+      ],
+      "limitations": [
+        "Les fichiers accompagnent le projet de loi de finances et ne prouvent pas à eux seuls le droit promulgué.",
+        "Les dépenses fiscales sont des mesures dérogatoires et non des prélèvements autonomes.",
+        "La TVA toutes APU et certaines lignes de recettes sont agrégées.",
+        "Les classeurs ne disposent pas nécessairement d'un schéma publié ; feuilles, cellules fusionnées et unités doivent être profilées."
+      ],
+      "next_action": "Archiver les cinq fichiers, inventorier feuilles et dimensions, vérifier les sommes contre les PDF, puis privilégier ces tables comme source d'extraction des recettes et taxes affectées."
+    },
+    {
+      "id": "lfss-2026-annexe-4-open-data",
+      "source_record_id": null,
+      "title": "PLFSS 2026 — Annexe 4 et données chiffrées sur les réductions et exonérations",
+      "publisher": "Direction de la Sécurité sociale",
+      "url": "https://www.securite-sociale.fr/la-secu-en-detail/loi-de-financement/annee-en-cours",
+      "evidence_urls": [
+        "https://www.securite-sociale.fr/files/live/sites/SSFR/files/medias/PLFSS/2026/Tableaux%20Annexe%204%20PLFSS%202026.xlsx"
+      ],
+      "priority": 1,
+      "status": "ready_to_ingest",
+      "authority_level": "official_social_budget_data",
+      "family": "social_exemptions_and_compensation",
+      "relationship_to_existing_registry": "Complète l'annexe 3 du PLFSS par les mesures de réduction et d'exonération de cotisations et contributions, leur compensation et des tableaux chiffrés téléchargeables.",
+      "coverage": {
+        "geography": "France",
+        "period": "PLFSS 2026, avec historique ou prévisions selon les tableaux",
+        "scope": "Mesures de réduction et d'exonération de cotisations et contributions sociales, compensation et données chiffrées associées."
+      },
+      "access": {
+        "formats": [
+          "xlsx",
+          "pdf"
+        ],
+        "machine_readability": "structured_spreadsheet_to_profile",
+        "bulk_download": true,
+        "api": false,
+        "authentication": "none",
+        "refresh": "annual_social_budget_cycle"
+      },
+      "supports": [
+        "candidate_discovery",
+        "social_contribution_family",
+        "exemption_measure",
+        "reduction_measure",
+        "compensation",
+        "collected_contribution_context",
+        "forecast_amount"
+      ],
+      "unit_of_observation": "ligne de mesure ou de tableau chiffré de l'annexe 4",
+      "fields_available": [
+        "measure_name",
+        "legal_reference",
+        "contribution_family",
+        "affected_population",
+        "amount_by_year",
+        "compensation_status",
+        "collecting_body"
+      ],
+      "stable_keys": [
+        "sheet_name",
+        "source_row",
+        "measure_name",
+        "year"
+      ],
+      "limitations": [
+        "L'annexe porte d'abord sur des réductions et exonérations, pas sur un inventaire canonique des prélèvements.",
+        "Les montants peuvent être estimés ou prévisionnels et plusieurs cotisations peuvent être regroupées dans une mesure.",
+        "Le document accompagne le projet de loi ; les changements doivent être contrôlés dans la loi promulguée et les textes d'application.",
+        "Le classeur doit être profilé avant de considérer les colonnes et unités comme stables."
+      ],
+      "next_action": "Archiver le classeur, inventorier toutes les feuilles et unités, extraire les mesures avec leurs références et montants, puis les relier aux CTP, codes DSN et fiches de cotisations."
+    },
+    {
+      "id": "dgfip-state-general-ledger",
+      "source_record_id": null,
+      "title": "Données de comptabilité générale de l'État sur dix ans",
+      "publisher": "Direction générale des Finances publiques",
+      "url": "https://data.economie.gouv.fr/explore/dataset/balances_des_comptes_etat/",
+      "priority": 2,
+      "status": "ready_to_ingest",
+      "authority_level": "official_accounting_data",
+      "family": "state_accounting",
+      "relationship_to_existing_registry": "Complète les Voies et moyens avec des balances comptables ayant servi au Compte général de l'État.",
+      "coverage": {
+        "geography": "État français",
+        "period": "2016-2025",
+        "scope": "Balances générales des comptes utilisées pour produire le Compte général de l'État, avec guide de lecture et états financiers associés."
+      },
+      "access": {
+        "formats": [
+          "csv",
+          "json",
+          "api",
+          "xlsx",
+          "pdf"
+        ],
+        "machine_readability": "structured_table",
+        "bulk_download": true,
+        "api": true,
+        "authentication": "none",
+        "refresh": "annual"
+      },
+      "supports": [
+        "revenue_observed",
+        "state_account",
+        "historical_control",
+        "budget_to_accounting_reconciliation"
+      ],
+      "unit_of_observation": "solde ou mouvement d'un compte de l'État par exercice",
+      "fields_available": [
+        "exercise",
+        "account_code",
+        "account_label",
+        "opening_balance",
+        "debit",
+        "credit",
+        "closing_balance"
+      ],
+      "stable_keys": [
+        "exercise",
+        "account_code",
+        "accounting_perimeter"
+      ],
+      "limitations": [
+        "Un compte peut agréger plusieurs prélèvements ou enregistrer remboursements, dégrèvements et opérations de rattachement.",
+        "La nomenclature comptable ne correspond ni à l'unité juridique ni au code SEC de la NTL.",
+        "Les changements de plan de comptes et de périmètre doivent être versionnés.",
+        "La balance ne fournit pas directement l'assiette, le taux, le bénéficiaire économique final ou la vigueur juridique."
+      ],
+      "next_action": "Ingérer le guide et les balances 2016-2025, isoler les comptes de produits fiscaux, puis construire une table de passage vers les lignes des Voies et moyens et de la NTL sans ventiler les comptes agrégés sans preuve."
+    },
+    {
+      "id": "netentreprises-dsn-p26v01",
+      "source_record_id": null,
+      "title": "Tables de référence de la norme DSN — P26V01",
+      "publisher": "GIP-MDS / Net-entreprises",
+      "url": "https://www.net-entreprises.fr/nomenclatures-dsn-p26v01/",
+      "priority": 2,
+      "status": "ready_to_ingest",
+      "authority_level": "official_declaration_reference",
+      "family": "social_declaration_nomenclatures",
+      "relationship_to_existing_registry": "Complète la table CTP par les codes d'organismes, contrats, bases, cotisations individuelles et référentiels externes utilisés dans la DSN.",
+      "coverage": {
+        "geography": "France",
+        "period": "norme applicable en production en 2026",
+        "version_seen": "P26V01 v12 du 2026-07-23",
+        "scope": "Tables NEODeS téléchargeables individuellement ou globalement, avec journal des changements et dates de validité."
+      },
+      "access": {
+        "formats": [
+          "csv",
+          "zip",
+          "xlsx"
+        ],
+        "machine_readability": "structured_reference_tables",
+        "bulk_download": true,
+        "api": false,
+        "authentication": "none",
+        "refresh": "regular_during_norm_lifecycle"
+      },
+      "supports": [
+        "declaration_code",
+        "collecting_body",
+        "beneficiary_identifier",
+        "social_contract_reference",
+        "assessment_base_code",
+        "individual_contribution_code",
+        "effective_dates",
+        "pas_rate_reference"
+      ],
+      "unit_of_observation": "version d'un code dans une table de nomenclature DSN",
+      "fields_available": [
+        "table_id",
+        "code",
+        "label",
+        "valid_from",
+        "valid_to",
+        "supplier",
+        "dsn_fields"
+      ],
+      "stable_keys": [
+        "norm_version",
+        "table_id",
+        "code",
+        "valid_from",
+        "valid_to"
+      ],
+      "limitations": [
+        "Une nomenclature déclarative n'est ni un inventaire juridique exhaustif ni une preuve de classement SEC.",
+        "Les codes peuvent désigner des organismes, contrats, catégories ou modalités techniques plutôt que des prélèvements.",
+        "Les tables changent au cours d'une même norme : le numéro de version et la date de publication sont indispensables.",
+        "Les montants déclarés ne sont pas publiés dans ces référentiels."
+      ],
+      "next_action": "Archiver le fichier global, la release note et l'index de P26V01 v12, extraire les tables liées aux bases et cotisations, puis construire des liens vers CTP, organismes et fiches canoniques."
+    },
+    {
+      "id": "drees-protection-social-accounts",
+      "source_record_id": null,
+      "title": "Comptes de la protection sociale",
+      "publisher": "DREES",
+      "url": "https://data.drees.solidarites-sante.gouv.fr/explore/dataset/305_les-comptes-de-la-protection-sociale/",
+      "priority": 2,
+      "status": "ready_to_ingest",
+      "authority_level": "official_statistics",
+      "family": "social_finance_accounts",
+      "relationship_to_existing_registry": "Complète l'annexe du PLFSS et la NTL par une longue série des ressources de la protection sociale.",
+      "coverage": {
+        "geography": "France",
+        "period": "depuis 1959",
+        "scope": "Dépenses, opérations et ressources de l'ensemble des régimes de protection sociale, utilisées pour le système européen ESSPROS."
+      },
+      "access": {
+        "formats": [
+          "xlsx",
+          "csv",
+          "json",
+          "api"
+        ],
+        "machine_readability": "mixed_structured_files",
+        "bulk_download": true,
+        "api": true,
+        "authentication": "none",
+        "refresh": "annual"
+      },
+      "supports": [
+        "social_revenue_observed",
+        "resource_category",
+        "protection_scheme",
+        "historical_series",
+        "esspros_consistency"
+      ],
+      "unit_of_observation": "agrégat annuel de ressource, opération ou prestation par régime",
+      "fields_available": [
+        "year",
+        "scheme",
+        "risk",
+        "operation",
+        "resource_category",
+        "amount",
+        "data_status"
+      ],
+      "stable_keys": [
+        "year",
+        "scheme",
+        "operation",
+        "resource_category",
+        "data_status"
+      ],
+      "limitations": [
+        "Le champ de la protection sociale inclut des régimes privés et des ressources qui ne sont pas toutes des prélèvements obligatoires.",
+        "Les catégories de ressources sont plus agrégées que les créances juridiques.",
+        "Les données récentes peuvent être provisoires ou semi-définitives et doivent conserver leur statut.",
+        "Le jeu ouvert fin porte surtout sur les prestations ; les ressources détaillées sont dans le classeur joint."
+      ],
+      "next_action": "Ingérer les feuilles de ressources du classeur historique, conserver le statut des millésimes et rapprocher les catégories de financement de l'annexe PLFSS, des CTP et des lignes NTL sans allocation arbitraire."
+    },
+    {
+      "id": "dgfip-local-accounting-balances",
+      "source_record_id": null,
+      "title": "Balances comptables des collectivités locales",
+      "publisher": "Direction générale des Finances publiques / OFGL",
+      "url": "https://data.economie.gouv.fr/explore/assets/balances-comptables-des-communes-en-2025/",
+      "evidence_urls": [
+        "https://data.ofgl.fr/pages/accueil/",
+        "https://data.economie.gouv.fr/explore/assets/balances-comptables-des-communes-en-2025/export/"
+      ],
+      "priority": 2,
+      "status": "ready_to_ingest",
+      "authority_level": "official_accounting_data",
+      "family": "local_accounting",
+      "relationship_to_existing_registry": "Complète le REI par les comptes réellement enregistrés chez les bénéficiaires locaux et par les recettes non couvertes par la seule fiscalité directe locale.",
+      "coverage": {
+        "geography": "communes ; extensions à rechercher pour EPCI, départements et régions",
+        "period": "2025 pour le millésime courant vérifié ; séries antérieures publiées séparément",
+        "scope": "Balances des budgets principaux et annexes des collectivités."
+      },
+      "access": {
+        "formats": [
+          "csv",
+          "json",
+          "xlsx",
+          "api"
+        ],
+        "machine_readability": "structured_accounting_tables",
+        "bulk_download": true,
+        "api": true,
+        "authentication": "none",
+        "refresh": "annual"
+      },
+      "supports": [
+        "local_revenue_observed",
+        "beneficiary_side_control",
+        "local_account_code",
+        "territorial_coverage",
+        "rei_reconciliation"
+      ],
+      "unit_of_observation": "ligne de compte d'un budget local et d'un exercice",
+      "fields_available": [
+        "collectivity_identifier",
+        "budget_identifier",
+        "account_code",
+        "account_label",
+        "debit",
+        "credit",
+        "balance",
+        "exercise"
+      ],
+      "stable_keys": [
+        "exercise",
+        "collectivity_identifier",
+        "budget_identifier",
+        "account_code"
+      ],
+      "limitations": [
+        "Un compte de recette peut regrouper plusieurs taxes, fractions ou reversements.",
+        "Les budgets annexes et mouvements internes peuvent créer des doubles comptes sans règles de consolidation.",
+        "Les nomenclatures M14, M57 et autres référentiels comptables évoluent dans le temps.",
+        "Les balances ne fournissent ni base juridique, ni classement SEC individuel, ni assiette."
+      ],
+      "next_action": "Ingérer les balances 2025 et leurs fichiers de structure pour chaque niveau disponible, identifier les comptes fiscaux, consolider les budgets et produire un contrôle national par compte et bénéficiaire face au REI."
+    },
+    {
+      "id": "eurostat-gov-10a-taxag",
+      "source_record_id": null,
+      "title": "Main national accounts tax aggregates — gov_10a_taxag",
+      "publisher": "Eurostat",
+      "url": "https://ec.europa.eu/eurostat/databrowser/view/gov_10a_taxag/default/table",
+      "evidence_urls": [
+        "https://ec.europa.eu/eurostat/cache/metadata/en/gov_10a_taxag_esms.htm"
+      ],
+      "priority": 2,
+      "status": "ready_to_ingest",
+      "authority_level": "official_european_statistics",
+      "family": "national_accounts_aggregate",
+      "relationship_to_existing_registry": "Contrôle agrégé de la NTL par type d'opération SEC, secteur bénéficiaire et unité.",
+      "coverage": {
+        "geography": "France et autres pays européens",
+        "period": "annuel depuis 1995 ; millésime 2025 disponible lors de la vérification",
+        "scope": "Impôts et cotisations sociales par type et sous-secteur destinataire des administrations publiques, plus institutions de l'Union européenne."
+      },
+      "access": {
+        "formats": [
+          "tsv",
+          "csv",
+          "sdmx",
+          "api"
+        ],
+        "machine_readability": "structured_multidimensional_dataset",
+        "bulk_download": true,
+        "api": true,
+        "authentication": "none",
+        "refresh": "annual"
+      },
+      "supports": [
+        "aggregate_revenue_observed",
+        "esa_transaction",
+        "government_subsector",
+        "ntl_reconciliation",
+        "international_consistency"
+      ],
+      "unit_of_observation": "observation annuelle pays × transaction SEC × secteur × unité",
+      "fields_available": [
+        "geo",
+        "time",
+        "sector",
+        "esa_transaction",
+        "unit",
+        "value",
+        "status_flag"
+      ],
+      "stable_keys": [
+        "geo",
+        "time",
+        "sector",
+        "esa_transaction",
+        "unit"
+      ],
+      "limitations": [
+        "La granularité est beaucoup plus agrégée que celle de la National Tax List.",
+        "La source ne fournit pas les bases juridiques, appellations nationales détaillées ou dates de vigueur.",
+        "Les révisions de comptes nationaux peuvent déplacer les séries et doivent être historisées.",
+        "Un contrôle agrégé ne permet pas d'allouer un écart à une fiche individuelle."
+      ],
+      "next_action": "Extraire la France pour toutes les transactions, secteurs et unités utiles, conserver les flags et construire une réconciliation annuelle avec la somme des lignes NTL et les agrégats Insee."
+    },
+    {
+      "id": "ec-tedb",
+      "source_record_id": null,
+      "title": "Taxes in Europe Database",
+      "publisher": "Commission européenne, DG TAXUD",
+      "url": "https://ec.europa.eu/taxation_customs/tedb/",
+      "evidence_urls": [
+        "https://data.europa.eu/data/datasets/taxes-in-europe-database?locale=en"
+      ],
+      "priority": 2,
+      "status": "candidate",
+      "authority_level": "member_state_supplied_comparative_database",
+      "family": "comparative_tax_inventory",
+      "relationship_to_existing_registry": "Peut fournir une seconde liste structurée des principaux impôts français avec bases, taux, exonérations, dates et classifications.",
+      "coverage": {
+        "geography": "États membres de l'Union européenne",
+        "period": "base courante et versions selon les fiches",
+        "scope": "Principaux impôts en vigueur communiqués à la Commission par les États membres."
+      },
+      "access": {
+        "formats": [
+          "web_database",
+          "download_to_be_prototyped"
+        ],
+        "machine_readability": "unknown_current_export",
+        "bulk_download": false,
+        "api": false,
+        "authentication": "none_for_web_search",
+        "refresh": "member_state_updates",
+        "bulk_download_status": "unverified",
+        "api_status": "unverified"
+      },
+      "supports": [
+        "candidate_discovery",
+        "legal_basis",
+        "assessment_base",
+        "published_rates",
+        "exemptions",
+        "effective_dates",
+        "comparative_classification",
+        "revenue_when_available"
+      ],
+      "unit_of_observation": "fiche nationale d'un impôt principal",
+      "fields_available": [
+        "tax_name",
+        "legal_basis",
+        "tax_base",
+        "rates",
+        "exemptions",
+        "dates",
+        "classification",
+        "revenue"
+      ],
+      "stable_keys": [
+        "member_state",
+        "tax_identifier",
+        "business_version"
+      ],
+      "limitations": [
+        "La base porte sur les principaux impôts et n'est pas présentée comme exhaustive.",
+        "Les données sont fournies par les États membres et ne constituent pas une référence juridique.",
+        "Le point d'accès courant était temporairement indisponible lors d'une partie de la vérification.",
+        "La stabilité du téléchargement massif et des identifiants doit être testée avant ingestion."
+      ],
+      "next_action": "Obtenir un export courant de la France, mesurer sa couverture face aux 371 lignes et à la NTL, puis vérifier la stabilité des identifiants, dates et versions."
+    },
+    {
+      "id": "oecd-global-revenue-statistics",
+      "source_record_id": null,
+      "title": "Global Revenue Statistics Database",
+      "publisher": "OCDE",
+      "url": "https://www.oecd.org/en/data/datasets/global-revenue-statistics-database.html",
+      "evidence_urls": [
+        "https://sdmx.oecd.org/public/rest/v1/data/OECD.CTP.TPS,DSD_REV_COMP_GLOBAL@DF_RSGLOBAL/"
+      ],
+      "priority": 3,
+      "status": "support_only",
+      "authority_level": "official_international_statistics",
+      "family": "aggregate_control",
+      "relationship_to_existing_registry": "Fournit un contrôle indépendant de la classification et des recettes agrégées par niveau d'administration.",
+      "coverage": {
+        "geography": "141 économies lors de la vérification",
+        "period": "depuis 1990",
+        "source_update_seen": "2026-05-05",
+        "scope": "Recettes fiscales harmonisées selon 63 types d'impôts, avec ventilation par administration générale, niveaux infranationaux et fonds de sécurité sociale."
+      },
+      "access": {
+        "formats": [
+          "csv",
+          "sdmx",
+          "api",
+          "data_explorer"
+        ],
+        "machine_readability": "structured_multidimensional_dataset",
+        "bulk_download": true,
+        "api": true,
+        "authentication": "none",
+        "refresh": "annual"
+      },
+      "supports": [
+        "aggregate_revenue_observed",
+        "oecd_tax_classification",
+        "government_level",
+        "international_consistency"
+      ],
+      "unit_of_observation": "observation annuelle économie × type d'impôt × secteur",
+      "fields_available": [
+        "economy",
+        "year",
+        "tax_category",
+        "government_level",
+        "unit",
+        "value"
+      ],
+      "stable_keys": [
+        "economy",
+        "year",
+        "tax_category",
+        "government_level",
+        "unit"
+      ],
+      "limitations": [
+        "Les 63 catégories restent trop agrégées pour documenter des centaines de créances juridiques.",
+        "La classification OCDE n'est pas identique au SEC 2010.",
+        "La base ne fournit pas la vigueur, le texte juridique ou le bénéficiaire précis d'une taxe française.",
+        "Elle doit servir au contrôle, jamais à répartir automatiquement un agrégat entre fiches."
+      ],
+      "next_action": "Extraire la France par catégorie et niveau d'administration, puis documenter une table de correspondance agrégée OCDE ↔ SEC sans créer de liens individuels non prouvés."
+    },
+    {
+      "id": "eurostat-environmental-tax-accounts",
+      "source_record_id": null,
+      "title": "Environmental tax revenues — env_ac_tax et env_ac_taxind2",
+      "publisher": "Eurostat",
+      "url": "https://ec.europa.eu/eurostat/databrowser/view/env_ac_tax/default/table",
+      "evidence_urls": [
+        "https://ec.europa.eu/eurostat/databrowser/view/env_ac_taxind2/default/table",
+        "https://ec.europa.eu/eurostat/cache/metadata/en/env_ac_tax_esms.htm"
+      ],
+      "priority": 3,
+      "status": "support_only",
+      "authority_level": "official_european_statistics",
+      "family": "environmental_tax_control",
+      "relationship_to_existing_registry": "Contrôle spécialisé des familles énergie, transport, pollution et ressources issues de la NTL.",
+      "coverage": {
+        "geography": "France et autres pays européens",
+        "period": "annuel ; données courantes jusqu'en 2024 lors de la vérification",
+        "scope": "Recettes de taxes environnementales par catégorie et, dans env_ac_taxind2, par activité économique ou groupe de payeurs."
+      },
+      "access": {
+        "formats": [
+          "tsv",
+          "csv",
+          "sdmx",
+          "api"
+        ],
+        "machine_readability": "structured_multidimensional_dataset",
+        "bulk_download": true,
+        "api": true,
+        "authentication": "none",
+        "refresh": "annual"
+      },
+      "supports": [
+        "environmental_tax_family",
+        "aggregate_revenue_observed",
+        "payer_activity",
+        "ntl_environment_code_control"
+      ],
+      "unit_of_observation": "observation annuelle pays × catégorie environnementale × activité ou payeur",
+      "fields_available": [
+        "geo",
+        "time",
+        "environmental_tax_category",
+        "economic_activity",
+        "unit",
+        "value"
+      ],
+      "stable_keys": [
+        "geo",
+        "time",
+        "environmental_tax_category",
+        "economic_activity",
+        "unit"
+      ],
+      "limitations": [
+        "Les catégories environnementales sont des agrégats et ne permettent pas d'attribuer une recette à une taxe française précise.",
+        "Les données reposent sur les conventions de comptabilité nationale et sur le codage environnemental des NTL.",
+        "Des écarts de millésime peuvent apparaître entre NTL, env_ac_tax et env_ac_taxind2.",
+        "La source ne fournit ni base juridique ni vigueur."
+      ],
+      "next_action": "Extraire les totaux France par famille et activité et les utiliser comme tests de couverture des lignes NTL marquées E, T ou P/RS, sans ventilation individuelle."
+    },
+    {
+      "id": "boss-social-doctrine",
+      "source_record_id": null,
+      "title": "Bulletin officiel de la Sécurité sociale",
+      "publisher": "Ministère chargé de la Sécurité sociale",
+      "url": "https://boss.gouv.fr/",
+      "evidence_urls": [
+        "https://boss.gouv.fr/portail/accueil/flux-rss.html",
+        "https://boss.gouv.fr/portail/accueil/actualites.html"
+      ],
+      "priority": 3,
+      "status": "candidate",
+      "authority_level": "official_social_doctrine",
+      "family": "social_doctrine",
+      "relationship_to_existing_registry": "Équivalent social fonctionnel du BOFiP pour les règles d'assiette, taux, exonérations et positions administratives, mais sans export massif documenté identifié.",
+      "coverage": {
+        "geography": "France",
+        "period": "doctrine sociale courante et versions publiées",
+        "scope": "Doctrine opposable ou informative relative aux cotisations et contributions sociales, paramètres, rescrits et historiques de mise à jour."
+      },
+      "access": {
+        "formats": [
+          "html",
+          "pdf",
+          "rss"
+        ],
+        "machine_readability": "semi_structured_web",
+        "bulk_download": false,
+        "api": false,
+        "authentication": "none",
+        "refresh": "continuous"
+      },
+      "supports": [
+        "social_legal_context",
+        "assessment_base",
+        "published_rates",
+        "exemptions",
+        "doctrine_version",
+        "rescript",
+        "change_detection"
+      ],
+      "unit_of_observation": "rubrique, version, actualité ou rescrit BOSS",
+      "fields_available": [
+        "rubric",
+        "publication_date",
+        "effective_date",
+        "content",
+        "version",
+        "news_item"
+      ],
+      "stable_keys": [
+        "permalink",
+        "version_date"
+      ],
+      "limitations": [
+        "Aucun export complet ou API publique documentée n'a été identifié pendant cette recherche.",
+        "La doctrine ne remplace pas le Code de la sécurité sociale, les lois, décrets et arrêtés.",
+        "Le RSS signale les changements mais ne contient pas nécessairement le corpus complet.",
+        "La source ne fournit ni recettes ni classement SEC."
+      ],
+      "next_action": "Prototyper l'indexation du plan, des permaliens, versions et flux RSS, puis limiter l'automatisation aux rubriques nécessaires si aucune voie de téléchargement complet n'est documentée."
+    }
+  ],
+  "secondary_sources": [
+    {
+      "id": "openfisca-france",
+      "title": "OpenFisca-France",
+      "publisher": "Communauté OpenFisca",
+      "url": "https://github.com/openfisca/openfisca-france",
+      "authority_level": "secondary_open_source_model",
+      "status": "support_only",
+      "usefulness": [
+        "détection de noms et paramètres socio-fiscaux",
+        "historique de valeurs législatives encodées",
+        "tests de régression sur des formules",
+        "API et dépôt versionné"
+      ],
+      "limitations": [
+        "Ce modèle n'est pas une source officielle du droit ou des recettes.",
+        "Sa couverture répond aux besoins de microsimulation et peut omettre des prélèvements hors modèle.",
+        "Toute information doit être recoupée avec la source officielle citée dans le code."
+      ]
+    },
+    {
+      "id": "ipp-tax-benefit-parameters",
+      "title": "Barèmes IPP — système social et fiscal français",
+      "publisher": "Institut des politiques publiques",
+      "url": "https://www.data.gouv.fr/datasets/baremes-ipp-systeme-social-et-fiscal-francais",
+      "authority_level": "secondary_research_dataset",
+      "status": "support_only",
+      "usefulness": [
+        "longues séries de barèmes socio-fiscaux",
+        "références législatives documentées lorsque disponibles",
+        "détection d'anciennes appellations",
+        "contrôle historique des paramètres"
+      ],
+      "limitations": [
+        "La source est scientifique, non normative.",
+        "Le dernier millésime vu pendant la recherche est daté du 13 mars 2025.",
+        "Elle ne fournit ni recettes exhaustives ni classement SEC individuel."
+      ]
+    }
+  ],
+  "research_gaps": [
+    {
+      "gap": "Table officielle exhaustive CTP vers créance juridique",
+      "finding": "La table CTP et les nomenclatures DSN sont riches, mais aucune table publique officielle univoque reliant chaque version de CTP à une créance, une base juridique et un bénéficiaire final n'a été identifiée.",
+      "consequence": "Un graphe de rapprochement avec revue humaine reste nécessaire."
+    },
+    {
+      "gap": "Export massif documenté du BOSS",
+      "finding": "Un flux RSS et des pages versionnées existent, mais aucun stock complet ou API publique comparable au BOFiP n'a été trouvé.",
+      "consequence": "Conserver le BOSS en statut candidate jusqu'à un prototype respectueux de l'accès publié."
+    },
+    {
+      "gap": "Référentiel massif propre au régime agricole",
+      "finding": "Aucune table publique MSA équivalente à la table historique CTP de l'Urssaf n'a été identifiée pendant cette passe.",
+      "consequence": "Les prélèvements agricoles doivent être recherchés via DSN, textes, annexes LFSS et sources MSA ciblées jusqu'à découverte d'un export."
+    },
+    {
+      "gap": "Export courant stable de TEDB",
+      "finding": "La base européenne est pertinente, mais l'accès courant et le téléchargement massif n'ont pas encore été validés techniquement.",
+      "consequence": "Ne pas la promouvoir à ready_to_ingest avant mesure de couverture et stabilité des identifiants."
+    },
+    {
+      "gap": "Jeu public massif de recettes DGDDI par accise",
+      "finding": "Aucun jeu public officiel clairement exploitable en masse, ventilant les recettes douanières et accises par prélèvement, n'a été identifié dans cette passe.",
+      "consequence": "Les accises restent couvertes par le CIBS, le BOFiP, les Voies et moyens et la NTL, avec recherche DGDDI ciblée en attendant une source structurée."
+    }
+  ],
+  "recommended_ingestion_order": [
+    {
+      "rank": 1,
+      "source_id": "budget-plf-2026-open-data-tables",
+      "deliverable": "extractions structurées des taxes affectées et recettes du PLF 2026",
+      "reason": "les classeurs officiels évitent l'extraction fragile des tableaux PDF"
+    },
+    {
+      "rank": 2,
+      "source_id": "lfss-2026-annexe-4-open-data",
+      "deliverable": "data/reference/lfss-2026-annexe-4-measures.json",
+      "reason": "couverture massive des réductions, exonérations et compensations sociales"
+    },
+    {
+      "rank": 3,
+      "source_id": "urssaf-ctp-history",
+      "deliverable": "data/reference/urssaf-ctp-history.json",
+      "reason": "meilleur rendement immédiat pour le champ des cotisations et contributions sociales"
+    },
+    {
+      "rank": 4,
+      "source_id": "dgfip-bofip-open-data",
+      "deliverable": "index local des documents, identifiants, dates et références BOFiP",
+      "reason": "couverture massive des règles fiscales, alias, taux et exonérations"
+    },
+    {
+      "rank": 5,
+      "source_id": "dgfip-state-general-ledger",
+      "deliverable": "data/reference/state-tax-accounts-2016-2025.json",
+      "reason": "recettes comptables observées de l'État sur dix exercices"
+    },
+    {
+      "rank": 6,
+      "source_id": "netentreprises-dsn-p26v01",
+      "deliverable": "data/reference/dsn-p26v01-reference-tables.json",
+      "reason": "normalisation des organismes, bases et codes déclaratifs"
+    },
+    {
+      "rank": 7,
+      "source_id": "drees-protection-social-accounts",
+      "deliverable": "data/reference/drees-social-resources-history.json",
+      "reason": "contrôle historique du financement de la protection sociale"
+    },
+    {
+      "rank": 8,
+      "source_id": "dgfip-local-accounting-balances",
+      "deliverable": "agrégats nationaux par compte fiscal et niveau de collectivité",
+      "reason": "contrôle bénéficiaire des recettes locales observées"
+    }
+  ]
+}
