@@ -1,0 +1,641 @@
+{
+  "schema_version": 1,
+  "verification_date": "2026-09-02",
+  "purpose": "Registre opérationnel des sources publiques pouvant être exploitées en masse pour découvrir, rapprocher et documenter les prélèvements obligatoires français.",
+  "principles": [
+    "Aucune source massive ne prouve seule l'existence juridique, la vigueur, le classement SEC et le montant d'un prélèvement.",
+    "Les extractions automatiques produisent des candidats et des correspondances à valider ; elles ne créent jamais directement une fiche canonique.",
+    "Les montants observés, révisés et prévisionnels restent séparés et portent toujours leur année, leur unité, leur source et leur localisateur.",
+    "Une ligne statistique, budgétaire ou d'affectation n'est pas assimilée automatiquement à une unité juridique de prélèvement."
+  ],
+  "status_definitions": {
+    "ingested": "Une extraction normalisée et sourcée existe déjà dans data/reference/.",
+    "ready_to_ingest": "La couverture et la méthode d'extraction sont suffisamment établies pour commencer une ingestion reproductible.",
+    "candidate": "La source paraît utile à grande échelle, mais son accès, son schéma ou son coût d'exploitation doit encore être prototypé.",
+    "support_only": "La source sert au contrôle, à l'enrichissement ou à la découverte, mais ne peut pas constituer l'inventaire principal."
+  },
+  "priority_definitions": {
+    "1": "Pivot à exploiter en premier : fort rendement documentaire immédiat.",
+    "2": "Complément structurant pour une famille ou un champ de preuve.",
+    "3": "Contrôle, enrichissement ciblé ou infrastructure d'accès."
+  },
+  "sources": [
+    {
+      "id": "ec-ntl-2026-france",
+      "source_record_id": "ec-ntl-2026-france",
+      "title": "Data on Taxation Trends — National tax list 2026, feuille France",
+      "publisher": "Commission européenne, DG TAXUD / Eurostat",
+      "url": "https://taxation-customs.ec.europa.eu/document/download/600d56d1-ea6e-416e-9981-1c8b9c603b6b_en?filename=NTL%20edition%202026%20web.xlsx",
+      "priority": 1,
+      "status": "ingested",
+      "family": "national_accounts",
+      "coverage": {
+        "geography": "France",
+        "period": "1995-2024",
+        "source_record_count": 141,
+        "count_semantics": "lignes nationales de détail, hors totaux",
+        "scope": "Impôts et cotisations sociales retenus dans le périmètre statistique S.13 + S.212 de la National tax list."
+      },
+      "access": {
+        "formats": [
+          "xlsx"
+        ],
+        "machine_readability": "structured_table",
+        "bulk_download": true,
+        "api": false,
+        "authentication": "none",
+        "refresh": "annual"
+      },
+      "local_paths": [
+        "data/reference/ntl-france-2026.json"
+      ],
+      "supports": [
+        "candidate_discovery",
+        "po_classification",
+        "esa_code",
+        "economic_function",
+        "revenue_observed",
+        "revenue_history"
+      ],
+      "unit_of_observation": "ligne statistique nationale",
+      "fields_available": [
+        "source_row",
+        "esa_code",
+        "national_detail_code",
+        "name_fr",
+        "name_en",
+        "economic_function",
+        "revenues_by_year"
+      ],
+      "stable_keys": [
+        "source_row",
+        "esa_code",
+        "national_detail_code",
+        "name_fr"
+      ],
+      "limitations": [
+        "La granularité de comptabilité nationale peut agréger plusieurs créances ou scinder un même dispositif juridique.",
+        "La dernière observation détaillée est 2024 et ne prouve pas la vigueur juridique au 2 septembre 2026.",
+        "Les lignes génériques, résiduelles ou dupliquées ne doivent pas être ventilées sans table de passage explicite."
+      ],
+      "next_action": "Produire un rapport de rapprochement entre les 371 lignes historiques et les 141 lignes NTL, avec états exact, probable, ambigu et sans correspondance."
+    },
+    {
+      "id": "legifrance-lfi-2026-article-135",
+      "source_record_id": "legifrance-lfi-2026-article-135",
+      "title": "Loi de finances pour 2026 — article 135, ressources affectées",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000053511577",
+      "priority": 1,
+      "status": "ready_to_ingest",
+      "family": "affected_taxes",
+      "coverage": {
+        "geography": "France",
+        "period": "2026",
+        "source_record_count": 135,
+        "count_semantics": "lignes d'affectation ; plusieurs lignes peuvent décrire des fractions ou bénéficiaires d'un même prélèvement",
+        "scope": "Impositions de toutes natures ou ressources affectées à des bénéficiaires autres que les collectivités territoriales, leurs établissements publics, les organismes de sécurité sociale et l'audiovisuel public."
+      },
+      "access": {
+        "formats": [
+          "html"
+        ],
+        "machine_readability": "semi_structured_table",
+        "bulk_download": false,
+        "api": false,
+        "authentication": "none",
+        "refresh": "annual"
+      },
+      "local_paths": [],
+      "supports": [
+        "candidate_discovery",
+        "legal_basis",
+        "beneficiary",
+        "legal_context",
+        "revenue_forecast",
+        "earmarked_revenue_cap"
+      ],
+      "unit_of_observation": "ligne d'affectation",
+      "fields_available": [
+        "row_number",
+        "legal_references",
+        "resource_name",
+        "current_beneficiary",
+        "new_beneficiary",
+        "forecast_2026_eur",
+        "cap_2026_eur"
+      ],
+      "stable_keys": [
+        "row_number",
+        "legal_references",
+        "resource_name"
+      ],
+      "limitations": [
+        "La présence dans ce tableau ne suffit pas à qualifier la ressource de prélèvement obligatoire au sens des comptes nationaux.",
+        "Le tableau ne couvre ni les impôts d'État non affectés, ni la fiscalité locale, ni les ressources affectées aux organismes de sécurité sociale.",
+        "Le rendement 2026 est prévisionnel et expressément indicatif.",
+        "Une même imposition peut apparaître plusieurs fois par fraction ou bénéficiaire ; 135 lignes ne signifient pas 135 prélèvements distincts."
+      ],
+      "next_action": "Extraire les 135 lignes dans data/reference/lfi-2026-article-135-impositions.json en conservant le numéro de ligne, le texte brut et les montants en euros."
+    },
+    {
+      "id": "lfss-2026-annexe-3",
+      "source_record_id": "lfss-2026-annexe-3",
+      "title": "PLFSS 2026 — Annexe 3, tableau 31 des impositions affectées",
+      "publisher": "Direction de la Sécurité sociale",
+      "url": "https://www.securite-sociale.fr/files/live/sites/SSFR/files/medias/PLFSS/2026/PLFSS2026-Annexe3-20251015-103900-55-4_avec%20couverture.pdf",
+      "priority": 1,
+      "status": "ingested",
+      "family": "social_finances",
+      "coverage": {
+        "geography": "France",
+        "period": "2025-2026",
+        "source_locator": "tableau 31, pages imprimées 48 à 52",
+        "scope": "Impositions affectées à la sécurité sociale, avec bases juridiques et prévisions de recettes 2025 et 2026."
+      },
+      "access": {
+        "formats": [
+          "pdf"
+        ],
+        "machine_readability": "document_table",
+        "bulk_download": true,
+        "api": false,
+        "authentication": "none",
+        "refresh": "annual"
+      },
+      "local_paths": [
+        "data/reference/lfss-2026-annexe-3-impositions.json"
+      ],
+      "supports": [
+        "candidate_discovery",
+        "legal_basis",
+        "beneficiary",
+        "social_finance_scope",
+        "revenue_forecast"
+      ],
+      "unit_of_observation": "ligne budgétaire d'imposition affectée",
+      "fields_available": [
+        "name",
+        "legal_basis",
+        "forecast_2025_meur",
+        "forecast_2026_meur",
+        "pdf_printed_page"
+      ],
+      "stable_keys": [
+        "name",
+        "legal_basis",
+        "pdf_printed_page"
+      ],
+      "limitations": [
+        "Il s'agit d'une annexe au projet : les mesures ponctuelles et les références doivent être recoupées dans la loi promulguée et le droit en vigueur.",
+        "Une enveloppe familiale ne doit pas être ventilée entre plusieurs créances sans détail explicite.",
+        "La table ne fournit pas à elle seule le code SEC individuel de chaque ligne."
+      ],
+      "next_action": "Compléter l'extraction existante avec les bénéficiaires et un identifiant de ligne source lorsque le tableau les distingue, sans modifier les prévisions transcrites."
+    },
+    {
+      "id": "assemblee-plf-2026-voies-moyens-tome-1",
+      "source_record_id": null,
+      "title": "PLF 2026 — Évaluation des voies et moyens, tome I : recettes",
+      "publisher": "Ministère chargé du budget / Assemblée nationale",
+      "url": "https://www.assemblee-nationale.fr/dyn/contenu/visualisation/1087930/file/PLF%202026%20-%20V%26M%20TI%20-%20Evaluations%20des%20recettes.pdf",
+      "priority": 1,
+      "status": "ready_to_ingest",
+      "family": "state_budget",
+      "coverage": {
+        "geography": "France",
+        "period": "2024-2026",
+        "source_locator": "recettes fiscales pages 11 à 38 ; impôts affectés pages 97 à 101",
+        "scope": "Exécution 2024, évaluation révisée 2025 et prévision 2026 des recettes de l'État, plus un tableau des impôts affectés à des tiers."
+      },
+      "access": {
+        "formats": [
+          "pdf",
+          "companion_spreadsheets"
+        ],
+        "machine_readability": "mixed",
+        "bulk_download": true,
+        "api": false,
+        "authentication": "none",
+        "refresh": "annual"
+      },
+      "local_paths": [],
+      "supports": [
+        "candidate_discovery",
+        "state_budget_line",
+        "revenue_observed",
+        "revenue_revised",
+        "revenue_forecast",
+        "beneficiary",
+        "tax_rule_changes"
+      ],
+      "unit_of_observation": "ligne de recette budgétaire ou ligne d'impôt affecté",
+      "fields_available": [
+        "budget_line",
+        "resource_name",
+        "execution_2024",
+        "revised_2025",
+        "forecast_2026",
+        "methodological_notes",
+        "affected_tax_beneficiary"
+      ],
+      "stable_keys": [
+        "budget_line",
+        "resource_name",
+        "source_page"
+      ],
+      "limitations": [
+        "La comptabilité budgétaire de l'État ne se confond pas avec la comptabilité nationale utilisée pour qualifier les prélèvements obligatoires.",
+        "Les postes peuvent être nets, agrégés ou décrits à une granularité différente de l'unité juridique canonique.",
+        "Les montants 2025 et 2026 sont révisés ou prévisionnels ; le document est annexé au projet de loi de finances.",
+        "Les classeurs de calcul associés doivent être localisés et archivés avec leur URL stable et leur empreinte avant ingestion."
+      ],
+      "next_action": "Archiver les classeurs associés, extraire les lignes de recettes fiscales et les impôts affectés, puis conserver séparément exécution, révision et prévision."
+    },
+    {
+      "id": "dgfip-rei",
+      "source_record_id": null,
+      "title": "Impôts locaux — Recensement des éléments d'imposition à la fiscalité directe locale (REI)",
+      "publisher": "DGFiP",
+      "url": "https://www.data.gouv.fr/datasets/impots-locaux-fichier-de-recensement-des-elements-dimposition-a-la-fiscalite-directe-locale-rei-4",
+      "priority": 2,
+      "status": "ready_to_ingest",
+      "family": "local_taxation",
+      "coverage": {
+        "geography": "commune",
+        "period": "depuis 1982",
+        "scope": "Fiscalité directe locale par taxe et collectivité bénéficiaire, notamment TFPB, TFPNB, TH, CFE, TSE, TEOM, IFER et TASCOM."
+      },
+      "access": {
+        "formats": [
+          "zip",
+          "tabular_files"
+        ],
+        "machine_readability": "structured_files",
+        "bulk_download": true,
+        "api": false,
+        "authentication": "none",
+        "refresh": "annual",
+        "catalogue_api": true,
+        "api_note": "Métadonnées via data.gouv.fr ; accès tabulaire à vérifier ressource par ressource."
+      },
+      "local_paths": [],
+      "supports": [
+        "candidate_discovery",
+        "local_tax_scope",
+        "local_beneficiary",
+        "tax_base",
+        "tax_rate",
+        "local_revenue",
+        "historical_tracking"
+      ],
+      "unit_of_observation": "commune et millésime, avec variables par taxe et bénéficiaire",
+      "fields_available": [
+        "commune",
+        "year",
+        "tax_variables",
+        "beneficiary_level",
+        "tax_base",
+        "tax_rate",
+        "tax_product"
+      ],
+      "stable_keys": [
+        "year",
+        "commune_code",
+        "variable_code"
+      ],
+      "limitations": [
+        "Le REI porte sur les impositions primitives et exclut les impositions supplémentaires liées aux omissions ou insuffisances initiales.",
+        "Il couvre la fiscalité directe locale, pas l'ensemble des taxes locales.",
+        "Les dictionnaires et dispositions de fichiers peuvent varier selon les millésimes ; les codes de variables doivent être versionnés.",
+        "Les fractions de TVA et certaines taxes annexes exigent un traitement séparé pour éviter de les confondre avec une créance juridique autonome."
+      ],
+      "next_action": "Commencer par le dictionnaire du dernier millésime et produire une table nationale agrégée par taxe et bénéficiaire avant d'historiser tous les fichiers."
+    },
+    {
+      "id": "dgfip-fiscalite-locale-particuliers",
+      "source_record_id": null,
+      "title": "Fiscalité locale des particuliers",
+      "publisher": "DGFiP",
+      "url": "https://www.data.gouv.fr/datasets/fiscalite-locale-des-particuliers",
+      "priority": 3,
+      "status": "support_only",
+      "family": "local_taxation",
+      "coverage": {
+        "geography": "commune",
+        "period": "millésime courant publié",
+        "scope": "Taux globaux de TFPB, TFPNB et taxe d'habitation, taux de TEOM et composition par niveaux de collectivités et taxes annexes."
+      },
+      "access": {
+        "formats": [
+          "csv",
+          "json"
+        ],
+        "machine_readability": "structured_files",
+        "bulk_download": true,
+        "api": false,
+        "authentication": "none",
+        "refresh": "annual",
+        "catalogue_api": true,
+        "api_note": "Compatibilité avec l'API tabulaire à confirmer à partir des identifiants de ressource."
+      },
+      "local_paths": [],
+      "supports": [
+        "current_rate_control",
+        "local_tax_scope",
+        "candidate_discovery",
+        "local_applicability"
+      ],
+      "unit_of_observation": "commune et taxe",
+      "fields_available": [
+        "commune",
+        "tax_name",
+        "global_rate",
+        "component_rates"
+      ],
+      "stable_keys": [
+        "year",
+        "commune_code",
+        "tax_name"
+      ],
+      "limitations": [
+        "Les taux globaux agrègent plusieurs niveaux et taxes annexes ; ils ne permettent pas toujours de reconstituer une recette juridique autonome.",
+        "Les taxes des chambres d'agriculture, de commerce et d'industrie et de métiers ne sont pas incluses.",
+        "Les zonages et parts incitatives de TEOM ainsi que la REOM ne sont pas présentés dans ce jeu."
+      ],
+      "next_action": "Utiliser ce jeu comme contrôle courant des taux et de l'applicabilité après l'ingestion du REI, jamais comme source unique de recette."
+    },
+    {
+      "id": "dila-legi-bulk",
+      "source_record_id": null,
+      "title": "Base LEGI — archive globale et mises à jour quotidiennes",
+      "publisher": "DILA",
+      "url": "https://echanges.dila.gouv.fr/OPENDATA/LEGI/",
+      "priority": 2,
+      "status": "candidate",
+      "family": "legal_corpus",
+      "coverage": {
+        "geography": "France",
+        "period": "historique et droit consolidé",
+        "scope": "Corpus législatif et réglementaire consolidé de Légifrance, avec archive globale et fichiers d'incrément quotidiens.",
+        "available_snapshot": "Freemium_legi_global_20250713-140000.tar.gz",
+        "latest_increment_seen": "LEGI_20260901-212910.tar.gz"
+      },
+      "access": {
+        "formats": [
+          "tar.gz"
+        ],
+        "machine_readability": "structured_archives",
+        "bulk_download": true,
+        "api": false,
+        "authentication": "none",
+        "refresh": "daily"
+      },
+      "local_paths": [],
+      "supports": [
+        "legal_basis",
+        "legal_status",
+        "historical_versions",
+        "creation_and_repeal_tracking",
+        "cross_reference_resolution"
+      ],
+      "unit_of_observation": "objet juridique LEGI",
+      "fields_available": [
+        "legal_identifier",
+        "text_version",
+        "effective_dates",
+        "state",
+        "cross_references"
+      ],
+      "stable_keys": [
+        "legal_identifier",
+        "version_identifier"
+      ],
+      "limitations": [
+        "L'archive globale disponible est volumineuse et datée du 13 juillet 2025 ; il faut rejouer les incréments ultérieurs dans l'ordre.",
+        "Le corpus juridique ne fournit ni classement SEC ni recette et ne permet pas de repérer tous les prélèvements par une simple recherche lexicale.",
+        "Une indexation complète serait coûteuse ; un sous-ensemble de codes doit être prototypé avant généralisation."
+      ],
+      "next_action": "Prototyper un index limité au CIBS, CGI, CSS, CGCT, code de l'environnement, code des transports et code du travail, avec état au 2 septembre 2026."
+    },
+    {
+      "id": "legifrance-api",
+      "source_record_id": null,
+      "title": "API Légifrance stable via PISTE",
+      "publisher": "DILA",
+      "url": "https://www.legifrance.gouv.fr/contenu/pied-de-page/open-data-et-api",
+      "priority": 2,
+      "status": "candidate",
+      "family": "legal_corpus",
+      "coverage": {
+        "geography": "France",
+        "period": "droit diffusé par Légifrance",
+        "scope": "Recherche et récupération ciblée des textes et versions juridiques disponibles sur Légifrance."
+      },
+      "access": {
+        "formats": [
+          "api"
+        ],
+        "machine_readability": "structured_api",
+        "bulk_download": false,
+        "api": true,
+        "authentication": "free_registration_on_piste",
+        "refresh": "continuous",
+        "constraints": [
+          "quotas"
+        ]
+      },
+      "local_paths": [],
+      "supports": [
+        "legal_basis",
+        "legal_status",
+        "historical_versions",
+        "targeted_enrichment"
+      ],
+      "unit_of_observation": "résultat ou objet juridique de l'API",
+      "fields_available": [
+        "legal_identifier",
+        "text",
+        "effective_dates",
+        "state",
+        "metadata"
+      ],
+      "stable_keys": [
+        "legal_identifier",
+        "version_identifier"
+      ],
+      "limitations": [
+        "L'accès nécessite une inscription et reste soumis à des quotas.",
+        "L'API convient mieux à l'enrichissement ciblé qu'à une aspiration complète du corpus.",
+        "Elle ne fournit ni classement SEC ni recette."
+      ],
+      "next_action": "Comparer le coût d'un enrichissement ciblé par API à celui d'un index local des archives LEGI avant de retenir une voie."
+    },
+    {
+      "id": "urssaf-open-data",
+      "source_record_id": null,
+      "title": "Open Urssaf — API et jeux de données de recouvrement",
+      "publisher": "Urssaf",
+      "url": "https://open.urssaf.fr/api/explore/v2.0",
+      "priority": 3,
+      "status": "support_only",
+      "family": "social_collection",
+      "coverage": {
+        "geography": "France, selon le champ de chaque jeu",
+        "period": "variable selon le jeu",
+        "scope": "Catalogue public Open Urssaf, dont encaissements annuels par organisme et catégorie et exonérations de cotisations sociales.",
+        "notable_datasets": [
+          {
+            "id": "encaissements-annuels-des-urssaf",
+            "url": "https://open.urssaf.fr/explore/dataset/encaissements-annuels-des-urssaf/"
+          },
+          {
+            "id": "exos-champ-large-par-grandes-categories",
+            "url": "https://open.urssaf.fr/explore/dataset/exos-champ-large-par-grandes-categories/"
+          }
+        ]
+      },
+      "access": {
+        "formats": [
+          "api",
+          "csv",
+          "json"
+        ],
+        "machine_readability": "structured_api",
+        "bulk_download": true,
+        "api": true,
+        "authentication": "none",
+        "refresh": "dataset_specific"
+      },
+      "local_paths": [],
+      "supports": [
+        "collection_scope",
+        "administrative_revenue",
+        "exemptions",
+        "candidate_discovery",
+        "operational_category_control"
+      ],
+      "unit_of_observation": "variable selon le jeu de données",
+      "fields_available": [
+        "year",
+        "collecting_body",
+        "collection_category",
+        "amount",
+        "exemption_category",
+        "sector"
+      ],
+      "stable_keys": [
+        "dataset_id",
+        "record_fields"
+      ],
+      "limitations": [
+        "Le catalogue public identifié ne constitue pas un inventaire juridique exhaustif des cotisations et contributions par code type de personnel.",
+        "Les catégories de recouvrement ne correspondent pas nécessairement à une créance juridique ou à une ligne SEC.",
+        "Les champs géographiques et institutionnels varient selon les jeux ; certains excluent notamment le régime agricole ou Mayotte."
+      ],
+      "next_action": "Inventorier les schémas des jeux liés aux encaissements et aux exonérations, puis vérifier si une dimension CTP suffisamment fine est publiquement accessible."
+    },
+    {
+      "id": "insee-po-annual-2025",
+      "source_record_id": "insee-po-annual-2025",
+      "title": "Prélèvements obligatoires — séries annuelles 1959-2025",
+      "publisher": "Insee",
+      "url": "https://www.insee.fr/fr/statistiques/2381412",
+      "priority": 3,
+      "status": "support_only",
+      "family": "aggregate_control",
+      "coverage": {
+        "geography": "France",
+        "period": "1959-2025",
+        "scope": "Agrégats annuels de prélèvements obligatoires et ratios macroéconomiques."
+      },
+      "access": {
+        "formats": [
+          "web_table",
+          "downloadable_series"
+        ],
+        "machine_readability": "structured_series",
+        "bulk_download": true,
+        "api": false,
+        "authentication": "none",
+        "refresh": "annual",
+        "api_note": "Le téléchargement de série est privilégié tant qu'un point d'accès stable n'est pas archivé."
+      },
+      "local_paths": [],
+      "supports": [
+        "aggregate_consistency",
+        "coverage_control"
+      ],
+      "unit_of_observation": "agrégat annuel",
+      "fields_available": [
+        "year",
+        "aggregate_amount",
+        "ratio"
+      ],
+      "stable_keys": [
+        "series_identifier",
+        "year"
+      ],
+      "limitations": [
+        "La série ne constitue pas un inventaire juridique ligne par ligne.",
+        "Un écart avec la somme des fiches peut provenir de la couverture, des consolidations, du calendrier ou de conventions de comptes nationaux."
+      ],
+      "next_action": "Ajouter un contrôle de cohérence agrégé qui signale les écarts sans forcer l'équilibrage des fiches individuelles."
+    },
+    {
+      "id": "datagouv-catalogue-tabular-api",
+      "source_record_id": null,
+      "title": "data.gouv.fr — API catalogue et API tabulaire",
+      "publisher": "DINUM / data.gouv.fr",
+      "url": "https://www.data.gouv.fr/api/1",
+      "priority": 3,
+      "status": "support_only",
+      "family": "access_infrastructure",
+      "coverage": {
+        "geography": "France",
+        "period": "catalogue courant",
+        "scope": "Métadonnées des jeux et ressources référencés sur data.gouv.fr, avec accès tabulaire pour les ressources compatibles.",
+        "tabular_api_url": "https://tabular-api.data.gouv.fr/api"
+      },
+      "access": {
+        "formats": [
+          "api",
+          "json",
+          "csv_export"
+        ],
+        "machine_readability": "structured_api",
+        "bulk_download": true,
+        "api": true,
+        "authentication": "none_for_reading",
+        "refresh": "continuous"
+      },
+      "local_paths": [],
+      "supports": [
+        "source_discovery",
+        "resource_metadata",
+        "download_url_resolution",
+        "schema_profiling",
+        "tabular_query"
+      ],
+      "unit_of_observation": "jeu de données, ressource ou ligne tabulaire",
+      "fields_available": [
+        "dataset_metadata",
+        "resource_metadata",
+        "producer",
+        "license",
+        "resource_url",
+        "resource_schema"
+      ],
+      "stable_keys": [
+        "dataset_id",
+        "resource_id"
+      ],
+      "limitations": [
+        "data.gouv.fr est un catalogue et une infrastructure d'accès : l'autorité probatoire reste celle du producteur du jeu.",
+        "L'API tabulaire n'accepte que certains formats et tailles et ne couvre pas toutes les ressources référencées.",
+        "Les métadonnées, schémas et URL de ressources doivent être archivés au moment de la collecte pour assurer la reproductibilité."
+      ],
+      "next_action": "Utiliser l'API catalogue pour surveiller les mises à jour des sources retenues et l'API tabulaire pour profiler les fichiers compatibles avant téléchargement."
+    }
+  ]
+}
