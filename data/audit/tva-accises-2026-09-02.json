@@ -1,0 +1,622 @@
+{
+  "schema_version": 1,
+  "batch_id": "tva-accises-2026-09-02",
+  "title": "Lot de reprise — TVA, accises et contribution sur les boissons non alcooliques",
+  "audit_date": "2026-09-02",
+  "status": "ready_for_review",
+  "production_dataset_changed": false,
+  "source_draft": {
+    "path": "data/audit/draft-2026-08-05.json",
+    "source_version": "2026-08-05",
+    "draft_indices": [
+      106,
+      123,
+      124,
+      125,
+      126,
+      127,
+      198
+    ],
+    "draft_entry_count": 7
+  },
+  "scope": {
+    "description": "Reprise de sept lignes du brouillon relatives à la TVA, aux accises sur les alcools et les tabacs et aux boissons non alcooliques. Les anciennes dénominations sont rapprochées des unités juridiques en vigueur au 1er septembre 2026.",
+    "canonical_record_count": 4,
+    "canonical_ids": [
+      "tva",
+      "accise-alcools",
+      "accise-tabacs",
+      "contribution-boissons-non-alcooliques"
+    ]
+  },
+  "measurement_policy": {
+    "unit": "millions_euros",
+    "observed_revenue": "Recette constatée en comptabilité nationale dans la National tax list 2026, dernière année disponible : 2024.",
+    "forecast_revenue": "Prévision 2026 du PLFSS 2026, annexe 3. Elle reste distincte de la recette observée et ne la remplace pas.",
+    "aggregate_envelope": "Les lignes NTL 37 « Taxes sur les boissons » et 38 « Taxes sur les tabacs » sont des enveloppes statistiques plus larges que certaines unités juridiques du lot. Leur montant n'est attribué à aucune fiche lorsque l'exclusivité du périmètre n'est pas établie.",
+    "forecast_components": "Les lignes détaillées de l'annexe 3 sont conservées comme composantes documentaires. Elles ne sont pas additionnées pour fabriquer un total canonique.",
+    "draft_amounts": "Les montants du brouillon sans année explicite ne sont pas repris comme recettes canoniques."
+  },
+  "sources": [
+    {
+      "id": "ec-ntl-2026-france",
+      "title": "Data on Taxation Trends — National tax list 2026, feuille France",
+      "publisher": "Commission européenne, DG TAXUD / Eurostat",
+      "url": "https://taxation-customs.ec.europa.eu/document/download/600d56d1-ea6e-416e-9981-1c8b9c603b6b_en?filename=NTL%20edition%202026%20web.xlsx",
+      "publication_date": "2026-03-30",
+      "data_through": 2024,
+      "retrieved_at": "2026-09-01",
+      "local_path": "data/reference/ntl-france-2026.json",
+      "supports": [
+        "po_classification",
+        "observed_revenue"
+      ]
+    },
+    {
+      "id": "lfss-2026-annexe-3",
+      "title": "PLFSS 2026 — Annexe 3, équilibre des finances sociales",
+      "publisher": "Direction de la Sécurité sociale",
+      "url": "https://www.securite-sociale.fr/files/live/sites/SSFR/files/medias/PLFSS/2026/PLFSS2026-Annexe3-20251015-103900-55-4_avec%20couverture.pdf",
+      "publication_date": "2025-10-23",
+      "retrieved_at": "2026-09-01",
+      "local_path": "data/reference/lfss-2026-annexe-3-impositions.json",
+      "supports": [
+        "forecast_revenue",
+        "beneficiary",
+        "legal_context"
+      ],
+      "limitation": "Document annexé au projet : les libellés et références imprimés sont contrôlés séparément dans le droit en vigueur."
+    },
+    {
+      "id": "legifrance-cgi-2026-09-01",
+      "title": "Code général des impôts — version au 1er septembre 2026",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/codes/texte_lc/LEGITEXT000006069577/2026-09-01",
+      "effective_date": "2026-09-01",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "legal_status",
+        "legal_basis"
+      ]
+    },
+    {
+      "id": "legifrance-tva-chapitre-2026-09-01",
+      "title": "CGI — titre II et chapitre premier relatifs à la TVA, version au 1er septembre 2026",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/codes/id/LEGISCTA000053187724/2026-09-01",
+      "effective_date": "2026-09-01",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "legal_status",
+        "legal_basis"
+      ]
+    },
+    {
+      "id": "legifrance-tva-creation-1954",
+      "title": "Loi n° 54-404 du 10 avril 1954 portant réforme fiscale",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000000864818",
+      "publication_date": "1954-04-11",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "creation_year",
+        "historical_context"
+      ]
+    },
+    {
+      "id": "legifrance-tva-recodification-2027",
+      "title": "Ordonnance n° 2025-1247 du 17 décembre 2025 — article 49 consolidé",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/loda/article_lc/LEGIARTI000054587047",
+      "effective_date": "2026-07-29",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "future_legal_context"
+      ],
+      "notes": "Après modification par l'ordonnance n° 2026-671 du 27 juillet 2026, l'entrée en vigueur générale de la recodification de la TVA est fixée au 1er janvier 2027."
+    },
+    {
+      "id": "legifrance-cibs-alcools-2026-09-01",
+      "title": "CIBS — chapitre III : alcools, version au 1er septembre 2026",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/codes/section_lc/LEGITEXT000044595989/LEGISCTA000044598629/2026-09-01/",
+      "effective_date": "2026-09-01",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "legal_status",
+        "legal_basis",
+        "tax_categories",
+        "beneficiary"
+      ]
+    },
+    {
+      "id": "legifrance-cibs-tabacs-2026-09-01",
+      "title": "CIBS — chapitre IV : tabacs, version au 1er septembre 2026",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/codes/section_lc/LEGITEXT000044595989/LEGISCTA000044598767/2026-09-01/",
+      "effective_date": "2026-09-01",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "legal_status",
+        "legal_basis",
+        "tax_categories",
+        "beneficiary"
+      ]
+    },
+    {
+      "id": "legifrance-ordonnance-2021-1843-concordance",
+      "title": "Ordonnance n° 2021-1843 du 22 décembre 2021 — article 4, table de concordance",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/loda/article_lc/LEGIARTI000044595088/2023-07-13",
+      "effective_date": "2022-01-01",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "canonical_granularity",
+        "legacy_name_mapping",
+        "current_form_year"
+      ]
+    },
+    {
+      "id": "legifrance-cgi-1613-quater-2026-09-01",
+      "title": "CGI — article 1613 quater, version en vigueur depuis le 1er janvier 2026",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000051288275",
+      "effective_date": "2026-01-01",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "legal_status",
+        "legal_basis",
+        "tax_components",
+        "beneficiary"
+      ]
+    },
+    {
+      "id": "legifrance-cgi-1613-quater-creation-2011",
+      "title": "CGI — article 1613 quater, version créée par la loi de finances pour 2012",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000025051371/2011-12-30",
+      "effective_date": "2011-12-30",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "creation_year",
+        "historical_context"
+      ]
+    }
+  ],
+  "records": [
+    {
+      "canonical_id": "tva",
+      "draft_entries": [
+        {
+          "index": 106,
+          "id": "taxe-sur-la-valeur-ajoutee-tva",
+          "treatment": "keep"
+        }
+      ],
+      "nom": "TVA",
+      "nom_complet": "Taxe sur la valeur ajoutée (TVA)",
+      "annee_creation": 1954,
+      "creation_evidence": {
+        "source_id": "legifrance-tva-creation-1954",
+        "locator": "Loi n° 54-404 du 10 avril 1954 portant réforme fiscale"
+      },
+      "po_status": "confirmed",
+      "legal_status": "active",
+      "legal_basis": [
+        {
+          "source_id": "legifrance-tva-chapitre-2026-09-01",
+          "locator": "CGI, livre premier, première partie, titre II, chapitre premier, articles 256-0 à 298 octodecies"
+        }
+      ],
+      "future_legal_context": {
+        "effective_date": "2027-01-01",
+        "source_id": "legifrance-tva-recodification-2027",
+        "locator": "Ordonnance n° 2025-1247, article 49 consolidé",
+        "treatment": "La recodification dans le CIBS n'est pas utilisée comme base juridique au 1er septembre 2026."
+      },
+      "classification": {
+        "source_id": "ec-ntl-2026-france",
+        "source_row": 12,
+        "esa_code": "D211",
+        "national_detail_code": "C01",
+        "recipient_scope": "S.13 + S.212",
+        "locator": "FR row 12 — TVA"
+      },
+      "revenues": {
+        "observed": [
+          {
+            "year": 2024,
+            "amount_meur": 206332,
+            "source_id": "ec-ntl-2026-france",
+            "locator": "FR row 12 (D211 C01)"
+          }
+        ],
+        "forecast_total": null,
+        "forecast_components": [
+          {
+            "year": 2026,
+            "label": "TVA nette affectée à la sécurité sociale",
+            "amount_meur": 54820,
+            "source_id": "lfss-2026-annexe-3",
+            "locator": "Annexe 3, p. 51",
+            "scope": "fraction affectée, et non recette totale de TVA"
+          }
+        ]
+      },
+      "draft_corrections": [
+        {
+          "field": "recette",
+          "draft_value_meur": 141200,
+          "canonical_value_meur": 206332,
+          "explanation": "Le montant du brouillon n'avait pas d'année. Il est remplacé par l'observation NTL 2024."
+        }
+      ],
+      "warnings": [
+        "La prévision de 54 820 M€ ne couvre que la TVA nette affectée à la sécurité sociale.",
+        "La recodification générale de la TVA dans le CIBS entre en vigueur le 1er janvier 2027, pas le 1er septembre 2026."
+      ],
+      "research_status": "complete",
+      "publication_status": "ready_for_review",
+      "production_status": "not_integrated"
+    },
+    {
+      "canonical_id": "accise-alcools",
+      "draft_entries": [
+        {
+          "index": 123,
+          "id": "droit-de-consommation-sur-les-produits-intermediaires",
+          "treatment": "merge_as_fraction",
+          "current_fraction": "produits intermédiaires"
+        },
+        {
+          "index": 124,
+          "id": "droits-de-consommation-sur-les-alcools",
+          "treatment": "merge_as_fraction",
+          "current_fraction": "alcools"
+        },
+        {
+          "index": 125,
+          "id": "droit-de-circulation-sur-les-vins-cidres-poires-et-hydromels",
+          "treatment": "merge_as_fraction",
+          "current_fraction": "vins et autres boissons fermentées"
+        },
+        {
+          "index": 126,
+          "id": "droit-sur-les-bieres-et-les-boissons-non-alcoolisees",
+          "treatment": "split_then_merge",
+          "current_fraction": "bières"
+        }
+      ],
+      "nom": "Accise sur les alcools",
+      "nom_complet": "Accise sur les alcools",
+      "annee_creation": null,
+      "current_form_since": 2022,
+      "creation_evidence": {
+        "source_id": "legifrance-ordonnance-2021-1843-concordance",
+        "locator": "Article 4 — les anciens droits sur les vins, produits intermédiaires, alcools et bières deviennent des fractions de l'accise sur les alcools",
+        "note": "2022 décrit la forme juridique canonique actuelle ; l'origine historique des fractions est antérieure et n'est pas ramenée artificiellement à une année unique."
+      },
+      "po_status": "confirmed",
+      "legal_status": "active",
+      "legal_basis": [
+        {
+          "source_id": "legifrance-cibs-alcools-2026-09-01",
+          "locator": "CIBS, articles L. 313-1 à L. 313-45"
+        },
+        {
+          "source_id": "legifrance-cibs-alcools-2026-09-01",
+          "locator": "CIBS, article L. 313-15 — catégories : bières, vins, autres boissons fermentées, produits intermédiaires et alcools"
+        }
+      ],
+      "classification": {
+        "source_id": "ec-ntl-2026-france",
+        "source_row": 37,
+        "esa_code": "D214A",
+        "national_detail_code": "C09",
+        "recipient_scope": "S.13 + S.212",
+        "locator": "FR row 37 — Taxes sur les boissons",
+        "granularity": "aggregate_envelope",
+        "amount_attributable_to_record": false
+      },
+      "revenues": {
+        "observed": [],
+        "observed_statistical_envelope": {
+          "year": 2024,
+          "amount_meur": 4749,
+          "source_id": "ec-ntl-2026-france",
+          "locator": "FR row 37 (D214A C09)",
+          "scope": "ensemble agrégé des taxes sur les boissons ; non attribuable à la seule accise sur les alcools"
+        },
+        "forecast_total": null,
+        "forecast_components": [
+          {
+            "year": 2026,
+            "label": "Fraction perçue sur les produits intermédiaires",
+            "amount_meur": 54,
+            "source_id": "lfss-2026-annexe-3",
+            "locator": "Annexe 3, p. 48 — ancien libellé « droit de consommation sur les produits intermédiaires »"
+          },
+          {
+            "year": 2026,
+            "label": "Fraction perçue sur les alcools",
+            "amount_meur": 2173,
+            "source_id": "lfss-2026-annexe-3",
+            "locator": "Annexe 3, p. 48 — ancien libellé « droit de consommation sur les alcools »"
+          },
+          {
+            "year": 2026,
+            "label": "Fraction perçue sur les vins, poirés, cidres et hydromels",
+            "amount_meur": 98,
+            "source_id": "lfss-2026-annexe-3",
+            "locator": "Annexe 3, p. 48 — ancien libellé « droit de circulation »"
+          },
+          {
+            "year": 2026,
+            "label": "Fraction perçue sur les bières",
+            "amount_meur": 1081,
+            "source_id": "lfss-2026-annexe-3",
+            "locator": "Annexe 3, p. 48 — libellé « droit de circulation sur les bières »"
+          }
+        ]
+      },
+      "draft_corrections": [
+        {
+          "field": "granularite",
+          "draft_values": [
+            "droit-consommation-produits-intermediaires",
+            "droit-consommation-alcools",
+            "droit-circulation-vins-cidres-hydromels",
+            "composante bières de droits-bieres-boissons-non-alcoolisees"
+          ],
+          "canonical_value": "accise-alcools",
+          "explanation": "La table de concordance de l'ordonnance n° 2021-1843 qualifie ces anciens droits de fractions d'une même accise."
+        }
+      ],
+      "warnings": [
+        "Les quatre prévisions 2026 sont des composantes documentaires et ne sont pas additionnées en un total canonique.",
+        "La ligne NTL 37 inclut d'autres prélèvements sur les boissons.",
+        "Les recettes non datées de 104,7 M€ et 122,2 M€ du brouillon ne sont pas reprises."
+      ],
+      "research_status": "complete",
+      "publication_status": "ready_for_review",
+      "production_status": "not_integrated"
+    },
+    {
+      "canonical_id": "accise-tabacs",
+      "draft_entries": [
+        {
+          "index": 127,
+          "id": "droit-de-consommation-sur-les-tabacs-manufactures",
+          "treatment": "replace_legacy_name"
+        }
+      ],
+      "nom": "Accise sur les tabacs",
+      "nom_complet": "Accise sur les tabacs",
+      "annee_creation": null,
+      "current_form_since": 2022,
+      "creation_evidence": {
+        "source_id": "legifrance-ordonnance-2021-1843-concordance",
+        "locator": "Article 4 — l'ancien droit de consommation prévu à l'article 575 du CGI devient la fraction métropolitaine de l'accise sur les tabacs",
+        "note": "2022 décrit la forme juridique canonique actuelle ; l'origine historique du droit de consommation n'est pas ramenée artificiellement à cette date."
+      },
+      "po_status": "confirmed",
+      "legal_status": "active",
+      "legal_basis": [
+        {
+          "source_id": "legifrance-cibs-tabacs-2026-09-01",
+          "locator": "CIBS, articles L. 314-1 à L. 314-37"
+        }
+      ],
+      "classification": {
+        "source_id": "ec-ntl-2026-france",
+        "source_row": 38,
+        "esa_code": "D214A",
+        "national_detail_code": "C10",
+        "recipient_scope": "S.13 + S.212",
+        "locator": "FR row 38 — Taxes sur les tabacs",
+        "granularity": "aggregate_envelope",
+        "amount_attributable_to_record": false
+      },
+      "revenues": {
+        "observed": [],
+        "observed_statistical_envelope": {
+          "year": 2024,
+          "amount_meur": 13606,
+          "source_id": "ec-ntl-2026-france",
+          "locator": "FR row 38 (D214A C10)",
+          "scope": "ensemble agrégé des taxes sur les tabacs ; l'annexe 3 documente en parallèle un droit de licence distinct qui n'est pas isolé dans la NTL, de sorte que ce montant n'est pas attribuable exclusivement à l'accise"
+        },
+        "forecast_total": {
+          "year": 2026,
+          "amount_meur": 11423,
+          "source_id": "lfss-2026-annexe-3",
+          "locator": "Annexe 3, p. 48 — ancien libellé « droit de consommation sur les tabacs »"
+        }
+      },
+      "source_discrepancy": {
+        "source_id": "lfss-2026-annexe-3",
+        "printed_legal_basis": "CGI, article 575",
+        "current_legal_basis": "CIBS, articles L. 314-1 à L. 314-37",
+        "treatment": "La référence imprimée est conservée comme provenance ; la fiche emploie la dénomination et la base juridique actuelles."
+      },
+      "warnings": [
+        "La ligne NTL 38 « Taxes sur les tabacs » est traitée comme une enveloppe statistique : le PLFSS documente séparément un droit de licence sur la rémunération des débitants de tabacs, sans ligne NTL autonome retrouvée.",
+        "La prévision du PLFSS utilise encore l'ancienne référence à l'article 575 du CGI."
+      ],
+      "research_status": "complete",
+      "publication_status": "ready_for_review",
+      "production_status": "not_integrated"
+    },
+    {
+      "canonical_id": "contribution-boissons-non-alcooliques",
+      "draft_entries": [
+        {
+          "index": 126,
+          "id": "droit-sur-les-bieres-et-les-boissons-non-alcoolisees",
+          "treatment": "split_then_merge",
+          "current_component": "tarif général sur certaines boissons non alcooliques"
+        },
+        {
+          "index": 198,
+          "id": "contribution-percue-sur-les-boissons-et-preparations-liquide",
+          "treatment": "merge_as_component",
+          "current_component": "tarif sur les produits contenant des édulcorants de synthèse"
+        }
+      ],
+      "nom": "Contribution boissons non alcooliques",
+      "nom_complet": "Contribution sur les boissons autres que les boissons alcooliques",
+      "annee_creation": 2011,
+      "current_form_since": 2026,
+      "creation_evidence": {
+        "source_id": "legifrance-cgi-1613-quater-creation-2011",
+        "locator": "CGI, article 1613 quater créé par l'article 27 de la loi n° 2011-1977 du 28 décembre 2011",
+        "note": "L'article existe depuis 2011 ; sa forme actuelle, réunissant les deux tarifs documentés ici, s'applique depuis le 1er janvier 2026."
+      },
+      "po_status": "confirmed",
+      "legal_status": "active",
+      "legal_basis": [
+        {
+          "source_id": "legifrance-cgi-1613-quater-2026-09-01",
+          "locator": "CGI, article 1613 quater, I à V"
+        }
+      ],
+      "tax_components": [
+        {
+          "locator": "CGI, article 1613 quater, II, 1°",
+          "description": "tarif général applicable à certaines eaux et boissons conditionnées"
+        },
+        {
+          "locator": "CGI, article 1613 quater, II, 2°",
+          "description": "tarif applicable aux produits contenant des édulcorants de synthèse"
+        }
+      ],
+      "classification": {
+        "source_id": "ec-ntl-2026-france",
+        "source_row": 37,
+        "esa_code": "D214A",
+        "national_detail_code": "C09",
+        "recipient_scope": "S.13 + S.212",
+        "locator": "FR row 37 — Taxes sur les boissons",
+        "granularity": "aggregate_envelope",
+        "amount_attributable_to_record": false
+      },
+      "revenues": {
+        "observed": [],
+        "observed_statistical_envelope": {
+          "year": 2024,
+          "amount_meur": 4749,
+          "source_id": "ec-ntl-2026-france",
+          "locator": "FR row 37 (D214A C09)",
+          "scope": "ensemble agrégé des taxes sur les boissons ; non attribuable à cette seule contribution"
+        },
+        "forecast_total": null,
+        "forecast_components": [
+          {
+            "year": 2026,
+            "label": "Tarif général sur certaines boissons non alcooliques",
+            "amount_meur": 92,
+            "source_id": "lfss-2026-annexe-3",
+            "locator": "Annexe 3, p. 48 — libellé « taxe sur les boissons non alcoolisées »"
+          },
+          {
+            "year": 2026,
+            "label": "Tarif sur les produits contenant des édulcorants de synthèse",
+            "amount_meur": 70,
+            "source_id": "lfss-2026-annexe-3",
+            "locator": "Annexe 3, p. 48 — libellé « contribution sur les boissons édulcorées »"
+          }
+        ]
+      },
+      "source_discrepancy": {
+        "source_id": "lfss-2026-annexe-3",
+        "printed_legal_basis": [
+          "CGI, article 520 A",
+          "CGI, article 1613 quater"
+        ],
+        "current_legal_basis": "CGI, article 1613 quater",
+        "treatment": "La ligne fondée sur l'ancien article 520 A et la ligne relative aux édulcorants sont rapprochées des deux tarifs du même article 1613 quater en vigueur en 2026."
+      },
+      "draft_corrections": [
+        {
+          "field": "granularite",
+          "draft_values": [
+            "composante non alcoolisée de droits-bieres-boissons-non-alcoolisees",
+            "contribution-boissons-edulcorees"
+          ],
+          "canonical_value": "contribution-boissons-non-alcooliques",
+          "explanation": "L'article 1613 quater institue une contribution unique comportant deux montants, et non deux prélèvements autonomes."
+        },
+        {
+          "field": "recette",
+          "draft_value_meur": 58.4,
+          "canonical_value_meur": null,
+          "explanation": "Le montant du brouillon n'avait pas d'année. Les deux prévisions 2026 sont conservées séparément et ne forment pas un total observé."
+        }
+      ],
+      "warnings": [
+        "Les prévisions de 92 M€ et 70 M€ décrivent deux composantes tarifaires du même prélèvement.",
+        "La ligne NTL 37 inclut d'autres prélèvements sur les boissons.",
+        "La partie « bières » de l'entrée 126 relève de l'accise sur les alcools, pas de cette contribution."
+      ],
+      "research_status": "complete",
+      "publication_status": "ready_for_review",
+      "production_status": "not_integrated"
+    }
+  ],
+  "related_follow_up": [
+    {
+      "canonical_id": "contribution-boissons-sucrees",
+      "draft_entry": null,
+      "status": "candidate_missing_from_draft",
+      "current_legal_basis": "CGI, article 1613 ter",
+      "forecast_2026_meur": 967,
+      "source_id": "lfss-2026-annexe-3",
+      "note": "À traiter dans un prochain lot : la contribution figure dans l'annexe 3 mais pas comme ligne autonome du brouillon."
+    },
+    {
+      "canonical_id": "droit-licence-debitants-tabac",
+      "draft_entry": null,
+      "status": "candidate_missing_from_draft",
+      "current_legal_basis": "CGI, article 568 (référence imprimée dans l'annexe 3 à vérifier dans un prochain lot)",
+      "forecast_2026_meur": 330,
+      "source_id": "lfss-2026-annexe-3",
+      "note": "À traiter dans un prochain lot : cette ligne distincte du PLFSS explique pourquoi l'enveloppe NTL « Taxes sur les tabacs » n'est pas attribuée exclusivement à l'accise."
+    },
+    {
+      "canonical_id": "taxe-premix",
+      "draft_index": 197,
+      "status": "deferred",
+      "current_legal_basis": "CGI, article 1613 bis",
+      "forecast_2026_meur": 0,
+      "source_id": "lfss-2026-annexe-3"
+    },
+    {
+      "canonical_id": "cotisation-alcools-plus-18",
+      "status": "deferred",
+      "current_legal_basis": "CSS, articles L. 245-7 à L. 245-11",
+      "forecast_2026_meur": 734,
+      "source_id": "lfss-2026-annexe-3",
+      "draft_index": 23
+    }
+  ],
+  "quality_checks": {
+    "canonical_ids_are_unique": true,
+    "all_records_have_current_legal_basis": true,
+    "all_observed_revenues_have_year_and_source": true,
+    "all_forecasts_have_year_and_source": true,
+    "observed_and_forecast_series_are_separate": true,
+    "ntl_rows_37_and_38_are_not_assigned_to_single_levies": true,
+    "forecast_components_are_not_summed": true,
+    "legacy_alcohol_lines_are_merged": true,
+    "mixed_draft_entry_126_is_split": true,
+    "sweetener_draft_entry_198_is_merged_into_current_article_1613_quater": true,
+    "production_files_left_unchanged": [
+      "data/entries-full.json",
+      "data/entries-light.json"
+    ],
+    "draft_indices_are_unique_except_explicit_splits": true,
+    "explicit_split_indices": [
+      126
+    ]
+  }
+}
