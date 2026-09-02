@@ -1,0 +1,554 @@
+{
+  "schema_version": 1,
+  "batch_id": "cnbf-complementaire-invalidite-2026-09-02",
+  "title": "Lot de reprise — retraite complémentaire et invalidité-décès de la CNBF",
+  "audit_date": "2026-09-02",
+  "status": "ready_for_review",
+  "production_dataset_changed": false,
+  "source_draft": {
+    "path": "data/audit/draft-2026-08-05.json",
+    "source_version": "2026-08-05",
+    "draft_indices": [],
+    "draft_entry_count": 0,
+    "finding": "Aucune ligne autonome propre au régime complémentaire ou au régime invalidité-décès de la CNBF n'a été retrouvée dans le brouillon historique des 371 entrées. Les lignes génériques de retraite complémentaire et d'assurance maladie-invalidité-décès ne nomment pas les créances CNBF et ne leur sont pas attribuées."
+  },
+  "inventory_additions": {
+    "count": 2,
+    "canonical_ids": [
+      "cotisation-retraite-complementaire-cnbf",
+      "cotisation-invalidite-deces-cnbf"
+    ]
+  },
+  "continuity": {
+    "previous_batches": [
+      "data/audit/plaidoirie-cvec-2026-09-02.json",
+      "data/audit/cnbf-cotisations-base-2026-09-02.json"
+    ],
+    "relationship": "Le régime vieillesse complémentaire et le régime invalidité-décès sont deux régimes obligatoires distincts du régime vieillesse de base. Leurs cotisations ne sont fusionnées ni avec les droits de plaidoirie, ni avec les cotisations forfaitaire et proportionnelle du régime de base."
+  },
+  "scope": {
+    "description": "Documentation de deux cotisations sociales obligatoires absentes du brouillon : la cotisation au régime complémentaire à points et la cotisation forfaitaire invalidité-décès des avocats non salariés.",
+    "ready_record_count": 2,
+    "ready_canonical_ids": [
+      "cotisation-retraite-complementaire-cnbf",
+      "cotisation-invalidite-deces-cnbf"
+    ]
+  },
+  "measurement_policy": {
+    "unit": "millions_euros",
+    "administrative_product": "Les comptes de la CNBF fournissent des produits administratifs propres à chacun des deux régimes. Ils restent distincts d'observations de comptabilité nationale.",
+    "rate_classes": "Les classes C1, C2 et la majoration C2+ ainsi que les cinq tranches de revenu sont des modalités d'une seule cotisation complémentaire et ne deviennent pas des prélèvements autonomes.",
+    "payer_profiles": "Pour l'avocat salarié, la ventilation de la cotisation complémentaire entre employeur et salarié ne crée pas deux fiches. Elle reçoit des profils SEC distincts selon le débiteur économique.",
+    "carpa_component": "La part invalidité-décès recouvrée auprès de la CARPA est une composante de la cotisation prévue par l'article L. 652-9, non une créance canonique séparée. Son reroutage détaillé en comptes nationaux reste signalé comme une inférence.",
+    "historical_dates": "Une plus ancienne codification retrouvée ne devient pas une date de création certaine sans texte d'origine.",
+    "tariffs_and_ceiling": "Un taux, un montant forfaitaire, une tranche ou un plafond n'est pas une recette."
+  },
+  "sources": [
+    {
+      "id": "legifrance-css-l654-1-l654-7-2026",
+      "title": "CSS — régime complémentaire de retraite des avocats, articles L. 654-1 à L. 654-7",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/codes/section_lc/LEGITEXT000006073189/LEGISCTA000037055493/",
+      "effective_date": "2026-09-02",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "legal_status",
+        "mandatory_status",
+        "tax_base",
+        "collection",
+        "separate_account"
+      ]
+    },
+    {
+      "id": "cnbf-reglement-complementaire-2026",
+      "title": "Règlement du régime complémentaire de retraite de la CNBF",
+      "publisher": "Caisse nationale des barreaux français",
+      "url": "https://www.cnbf.fr/wp-content/uploads/2026/01/CNBF-reglement-regime-complementaire.pdf",
+      "effective_date": "2026-01-01",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "creation_year",
+        "rate_schedule",
+        "class_choice",
+        "spouse_collaborator",
+        "separate_account"
+      ]
+    },
+    {
+      "id": "legifrance-arrete-reglement-complementaire-2025",
+      "title": "Arrêté du 18 décembre 2025 portant approbation du règlement du régime complémentaire de la CNBF",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/loda/id/JORFTEXT000053227767/",
+      "publication_date": "2025-12-31",
+      "effective_from": "2026-01-01",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "current_regulation"
+      ]
+    },
+    {
+      "id": "cnbf-bareme-non-salaries-2026",
+      "title": "Barème des cotisations et prestations pour l'année 2026 — avocats non salariés",
+      "publisher": "Caisse nationale des barreaux français",
+      "url": "https://www.cnbf.fr/wp-content/uploads/2026/01/Bareme-CNBF-2026.01.01.pdf",
+      "publication_date": "2026-01-19",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "income_bands",
+        "complementary_rates",
+        "provisional_start_amount",
+        "invalidity_death_amounts"
+      ]
+    },
+    {
+      "id": "cnbf-bareme-employeurs-2026",
+      "title": "Barème employeurs 2026 — avocats salariés",
+      "publisher": "Caisse nationale des barreaux français",
+      "url": "https://www.cnbf.fr/wp-content/uploads/2026/01/CNBF-Bareme-employeurs-2026-.pdf",
+      "publication_date": "2026-01-13",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "income_bands",
+        "complementary_rates",
+        "employer_employee_split"
+      ]
+    },
+    {
+      "id": "legifrance-css-l652-9-2026",
+      "title": "CSS — article L. 652-9, régime invalidité-décès des avocats",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000037057479",
+      "effective_date": "2026-09-02",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "legal_status",
+        "mandatory_status",
+        "canonical_granularity"
+      ]
+    },
+    {
+      "id": "legifrance-css-d652-3-2026",
+      "title": "CSS — article D. 652-3, conjoint collaborateur et invalidité-décès",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/codes/id/LEGISCTA000038771222",
+      "effective_date": "2026-09-02",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "spouse_collaborator_rate"
+      ]
+    },
+    {
+      "id": "legifrance-cnbf-statuts-2026",
+      "title": "Arrêté du 26 mars 2026 portant approbation des statuts de la CNBF",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000053748691",
+      "publication_date": "2026-04-02",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "institutional_recipient",
+        "mandatory_schemes",
+        "carpa_component",
+        "collection"
+      ]
+    },
+    {
+      "id": "cnbf-principes-affiliation",
+      "title": "Immatriculation — les principes",
+      "publisher": "Caisse nationale des barreaux français",
+      "url": "https://www.cnbf.fr/espace-avocats/limmatriculation/les-principes/",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "mandatory_affiliation",
+        "invalidity_death_scope"
+      ]
+    },
+    {
+      "id": "cnbf-comptes-2025",
+      "title": "Comptes annuels 2025 de la CNBF",
+      "publisher": "Caisse nationale des barreaux français",
+      "url": "https://www.cnbf.fr/wp-content/uploads/2026/05/CNBF-Comptes-2025.pdf",
+      "publication_date": "2026-04-25",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "administrative_product",
+        "separate_scheme_accounts"
+      ]
+    },
+    {
+      "id": "eurlex-2023-734-sec-contributions",
+      "title": "Règlement d'exécution (UE) 2023/734 — ventilation des cotisations sociales",
+      "publisher": "Union européenne / EUR-Lex",
+      "url": "https://eur-lex.europa.eu/legal-content/FR/ALL/?uri=uriserv:OJ.L_.2023.097.01.0001.01.FRA",
+      "publication_date": "2023-04-05",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "esa_codes",
+        "mandatory_employer_contribution",
+        "mandatory_employee_contribution",
+        "mandatory_self_employed_contribution"
+      ]
+    },
+    {
+      "id": "legifrance-ancien-css-l723-6-1985",
+      "title": "Ancien CSS — article L. 723-6, version de 1985",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/codes/section_lc/LEGITEXT000006073189/LEGISCTA000006156237/1999-11-30/",
+      "effective_from": "1985-12-21",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "invalidity_death_historical_floor"
+      ]
+    }
+  ],
+  "records": [
+    {
+      "canonical_id": "cotisation-retraite-complementaire-cnbf",
+      "draft_entries": [],
+      "inventory_status": "missing_from_draft",
+      "nom": "Cotisation complémentaire CNBF",
+      "nom_complet": "Cotisation au régime complémentaire obligatoire de retraite des avocats",
+      "annee_creation": 1979,
+      "first_institution_date": "1979-02-16",
+      "current_regulation_since": "2026-01-01",
+      "creation_evidence": {
+        "source_id": "cnbf-reglement-complementaire-2026",
+        "locator": "Article 1 — régime prévu par la loi du 2 janvier 1979 et institué par décision de l'assemblée générale extraordinaire du 16 février 1979"
+      },
+      "po_status": "confirmed",
+      "legal_status": "active",
+      "obligation_status": "confirmed",
+      "membership_status": "ready",
+      "publication_status": "ready_for_review",
+      "reason_codes": [
+        "current-law-confirmed",
+        "statistical-classification-confirmed"
+      ],
+      "legal_basis": [
+        {
+          "source_id": "legifrance-css-l654-1-l654-7-2026",
+          "locator": "CSS, articles L. 654-1 à L. 654-7"
+        },
+        {
+          "source_id": "cnbf-reglement-complementaire-2026",
+          "locator": "Règlement approuvé applicable en 2026"
+        }
+      ],
+      "canonical_granularity": {
+        "treatment": "single_contribution_with_rate_classes_and_payer_profiles",
+        "reason": "Les classes, tranches de revenu, options de majoration, profils salarié ou non salarié et options du conjoint collaborateur sont des modalités de la même cotisation au même régime.",
+        "separate_records_for_classes": false
+      },
+      "liable_persons": [
+        "avocat non salarié affilié à la CNBF",
+        "employeur de l'avocat salarié pour la part patronale et le versement",
+        "avocat salarié pour la quote-part précomptée",
+        "conjoint collaborateur ayant opté pour une assiette de 25 % ou 50 %"
+      ],
+      "income_bands_2026_eur": [
+        {
+          "band": 1,
+          "from": 1,
+          "to": 42507
+        },
+        {
+          "band": 2,
+          "from": 42508,
+          "to": 85014
+        },
+        {
+          "band": 3,
+          "from": 85015,
+          "to": 127521
+        },
+        {
+          "band": 4,
+          "from": 127522,
+          "to": 170028
+        },
+        {
+          "band": 5,
+          "from": 170029,
+          "to": 212535
+        }
+      ],
+      "rate_classes_2026_percent": {
+        "C1": [
+          7,
+          10.4,
+          12.2,
+          14,
+          15.8
+        ],
+        "C2": [
+          7,
+          11.6,
+          13.7,
+          15.8,
+          17.9
+        ],
+        "C2_plus": [
+          7,
+          11.6,
+          13.7,
+          15.8,
+          20.4
+        ]
+      },
+      "class_rules": {
+        "C2_plus_treatment": "Majoration facultative de 2,5 points du taux de la tranche la plus élevée de C2 ; elle ne constitue ni une nouvelle classe légale autonome ni une nouvelle cotisation.",
+        "choice_and_retention": "Le règlement organise le choix, le maintien et le changement de classe selon le statut et la date d'affiliation. Aucun taux n'est présenté comme applicable uniformément à tous les avocats."
+      },
+      "salaried_split": {
+        "employer_percent_of_total_contribution": 60,
+        "employee_percent_of_total_contribution": 40,
+        "separate_canonical_records": false,
+        "source_id": "cnbf-bareme-employeurs-2026"
+      },
+      "spouse_collaborator": {
+        "base_options_percent_of_lawyer_income": [
+          25,
+          50
+        ],
+        "default_percent_without_choice": 25,
+        "source_id": "cnbf-reglement-complementaire-2026"
+      },
+      "provisional_start_2026": {
+        "scope": "avocats non salariés inscrits pour la première fois en 2025 ou 2026, classe C1",
+        "amount_eur": 639,
+        "treatment": "appel provisionnel avant régularisation, non recette"
+      },
+      "beneficiary": {
+        "name": "Régime complémentaire obligatoire de retraite de la Caisse nationale des barreaux français",
+        "separate_account": true,
+        "source_id": "legifrance-css-l654-1-l654-7-2026"
+      },
+      "institutional_recipient": {
+        "name": "Caisse nationale des barreaux français",
+        "status": "Organisme de sécurité sociale gestionnaire de régimes obligatoires",
+        "sector": "S.1314",
+        "sector_treatment": "inferred_from_official_social_security_status",
+        "source_id": "legifrance-cnbf-statuts-2026",
+        "warning": "Le code S.1314 n'est pas imprimé dans l'arrêté ; le rattachement est une inférence documentée à partir du statut officiel."
+      },
+      "classification_profiles": [
+        {
+          "payer_profile": "avocat non salarié",
+          "esa_code": "D613c",
+          "optional_detail_code": "D613cs",
+          "label": "Cotisations sociales effectives obligatoires à la charge des travailleurs indépendants"
+        },
+        {
+          "payer_profile": "employeur d'un avocat salarié — part patronale",
+          "esa_code": "D611C",
+          "label": "Cotisations sociales effectives obligatoires à la charge des employeurs"
+        },
+        {
+          "payer_profile": "avocat salarié — part précomptée",
+          "esa_code": "D613c",
+          "detail_code": "D613ce",
+          "label": "Cotisations sociales effectives obligatoires à la charge des salariés"
+        }
+      ],
+      "classification_sources": [
+        "legifrance-css-l654-1-l654-7-2026",
+        "legifrance-cnbf-statuts-2026",
+        "eurlex-2023-734-sec-contributions"
+      ],
+      "revenues": {
+        "observed_national_accounts": [],
+        "administrative_product": [
+          {
+            "year": 2024,
+            "amount_meur": 455.905694,
+            "source_id": "cnbf-comptes-2025",
+            "measure": "administrative_accounting_product"
+          },
+          {
+            "year": 2025,
+            "amount_meur": 478.895026,
+            "source_id": "cnbf-comptes-2025",
+            "measure": "administrative_accounting_product"
+          }
+        ]
+      },
+      "warnings": [
+        "Les classes C1, C2 et C2+ ne sont pas trois prélèvements.",
+        "La ventilation employeur-salarié ne modifie pas l'unité juridique.",
+        "Les produits des comptes CNBF ne sont pas présentés comme des observations de comptes nationaux."
+      ],
+      "research_status": "complete_except_direct_national_accounts_revenue_and_literal_sector_code",
+      "production_status": "not_integrated"
+    },
+    {
+      "canonical_id": "cotisation-invalidite-deces-cnbf",
+      "draft_entries": [],
+      "inventory_status": "missing_from_draft",
+      "nom": "Cotisation invalidité-décès CNBF",
+      "nom_complet": "Cotisation au régime obligatoire d'invalidité-décès des avocats non salariés",
+      "annee_creation": null,
+      "earliest_confirmed_codification_year": 1985,
+      "historical_date_treatment": "La version retrouvée de l'ancien article L. 723-6 confirme l'existence de la cotisation au plus tard en 1985, sans établir son origine historique complète.",
+      "po_status": "confirmed",
+      "legal_status": "active",
+      "obligation_status": "confirmed",
+      "membership_status": "ready",
+      "publication_status": "ready_for_review",
+      "reason_codes": [
+        "current-law-confirmed",
+        "statistical-classification-confirmed"
+      ],
+      "legal_basis": [
+        {
+          "source_id": "legifrance-css-l652-9-2026",
+          "locator": "CSS, article L. 652-9"
+        },
+        {
+          "source_id": "legifrance-css-d652-3-2026",
+          "locator": "CSS, article D. 652-3 pour le conjoint collaborateur"
+        },
+        {
+          "source_id": "legifrance-cnbf-statuts-2026",
+          "locator": "Statuts CNBF, article 53 pour la part recouvrée auprès des CARPA"
+        }
+      ],
+      "scope": {
+        "covered": [
+          "avocats non salariés affiliés à la CNBF",
+          "conjoints collaborateurs selon l'option réglementaire"
+        ],
+        "excluded_from_cnbf_scheme": [
+          "avocats salariés, couverts pour ces risques par le régime général"
+        ],
+        "source_id": "cnbf-principes-affiliation"
+      },
+      "canonical_granularity": {
+        "treatment": "single_flat_contribution_with_collection_components",
+        "reason": "L'article L. 652-9 institue une cotisation distincte unique. Les montants appelés auprès de l'avocat, du conjoint collaborateur et de la CARPA sont des modalités ou composantes de financement du même régime.",
+        "separate_carpa_record": false
+      },
+      "amounts_2026_eur": [
+        {
+          "profile": "avocat non salarié — 1re à 4e année d'exercice",
+          "amount": 68
+        },
+        {
+          "profile": "avocat non salarié — 5e année et suivantes, ainsi que 65 ans et plus",
+          "amount": 170
+        },
+        {
+          "profile": "avocat retraité encore en activité au 1er janvier 2026",
+          "amount": 500
+        },
+        {
+          "profile": "part recouvrée auprès de la CARPA par avocat non salarié du barreau",
+          "amount": 163
+        }
+      ],
+      "spouse_collaborator": {
+        "amount_options_as_fraction_of_lawyer_contribution": [
+          0.25,
+          0.5
+        ],
+        "source_id": "legifrance-css-d652-3-2026"
+      },
+      "beneficiary": {
+        "name": "Régime obligatoire invalidité-décès de la Caisse nationale des barreaux français",
+        "source_id": "legifrance-css-l652-9-2026"
+      },
+      "institutional_recipient": {
+        "name": "Caisse nationale des barreaux français",
+        "status": "Organisme de sécurité sociale gestionnaire de régimes obligatoires",
+        "sector": "S.1314",
+        "sector_treatment": "inferred_from_official_social_security_status",
+        "source_id": "legifrance-cnbf-statuts-2026",
+        "warning": "Le code S.1314 n'est pas imprimé dans l'arrêté ; le rattachement est une inférence documentée à partir du statut officiel."
+      },
+      "classification": {
+        "family": "D61",
+        "principal_payer_profile": {
+          "esa_code": "D613c",
+          "optional_detail_code": "D613cs",
+          "label": "Cotisations sociales effectives obligatoires à la charge des travailleurs indépendants"
+        },
+        "classification_basis": [
+          "régime obligatoire de sécurité sociale réservé aux avocats non salariés",
+          "cotisation distincte prévue par l'article L. 652-9",
+          "nomenclature européenne des cotisations sociales effectives obligatoires"
+        ],
+        "carpa_component_rerouting": {
+          "status": "inferred_not_directly_documented",
+          "treatment": "La part juridiquement recouvrée auprès de la CARPA reste dans la même fiche. Aucun code de débiteur économique plus détaillé n'est inventé sans source de comptes nationaux."
+        },
+        "sources": [
+          "legifrance-css-l652-9-2026",
+          "legifrance-cnbf-statuts-2026",
+          "eurlex-2023-734-sec-contributions"
+        ]
+      },
+      "operational_label_discrepancy": {
+        "barometer_label": "cotisation recouvrée auprès du barreau",
+        "current_legal_collector_or_debtor": "CARPA selon les statuts CNBF",
+        "treatment": "Le montant de 163 € est conservé, mais la fiche emploie la précision juridique CARPA et signale le raccourci du barème."
+      },
+      "revenues": {
+        "observed_national_accounts": [],
+        "administrative_product": [
+          {
+            "year": 2024,
+            "amount_meur": 22.099465,
+            "source_id": "cnbf-comptes-2025",
+            "measure": "administrative_accounting_product"
+          },
+          {
+            "year": 2025,
+            "amount_meur": 23.102695,
+            "source_id": "cnbf-comptes-2025",
+            "measure": "administrative_accounting_product"
+          }
+        ]
+      },
+      "warnings": [
+        "Les montants avocat, conjoint collaborateur et CARPA sont des composantes d'une seule cotisation.",
+        "Le reroutage statistique détaillé de la part CARPA n'est pas imprimé dans les sources et reste documenté comme une inférence.",
+        "L'année 1985 est un plancher documentaire, non une date de création certaine.",
+        "Les produits des comptes CNBF ne sont pas présentés comme des observations de comptes nationaux."
+      ],
+      "research_status": "complete_except_original_creation_date_direct_national_accounts_revenue_and_carpa_rerouting_detail",
+      "production_status": "not_integrated"
+    }
+  ],
+  "related_follow_up": [
+    {
+      "canonical_id": "origine-cotisation-invalidite-deces-cnbf",
+      "status": "source_needed",
+      "note": "Rechercher le texte antérieur à 1985 ayant institué la cotisation invalidité-décès, sans confondre l'origine du régime et la première codification retrouvée."
+    },
+    {
+      "canonical_id": "reroutage-carpa-invalidite-deces",
+      "status": "source_needed",
+      "note": "Rechercher une documentation Insee, Drees ou CNBF précisant le débiteur économique et le reroutage de la part recouvrée auprès des CARPA."
+    },
+    {
+      "canonical_id": "recettes-comptes-nationaux-cnbf",
+      "status": "source_needed",
+      "note": "Rechercher une ventilation de comptes nationaux entre régime de base, complémentaire et invalidité-décès afin de rapprocher les produits administratifs des flux SEC."
+    }
+  ],
+  "quality_checks": {
+    "inventory_gap_is_explicit": true,
+    "canonical_ids_are_unique": true,
+    "both_records_have_current_legal_basis": true,
+    "both_records_finance_mandatory_social_security_schemes": true,
+    "complementary_classes_are_not_duplicate_records": true,
+    "salaried_split_is_not_duplicate_records": true,
+    "spouse_collaborator_options_are_not_duplicate_records": true,
+    "invalidity_carpa_component_is_not_duplicate_record": true,
+    "administrative_products_have_year_and_source": true,
+    "administrative_products_are_separate_from_national_accounts_revenue": true,
+    "historical_floor_is_not_presented_as_creation_date": true,
+    "production_files_left_unchanged": [
+      "data/entries-full.json",
+      "data/entries-light.json"
+    ]
+  }
+}
