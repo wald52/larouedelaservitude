@@ -1,0 +1,935 @@
+{
+  "schema_version": 1,
+  "batch_id": "redevances-eau-2026-09-02",
+  "title": "Lot de reprise — redevances des agences et offices de l'eau",
+  "audit_date": "2026-09-02",
+  "status": "ready_for_review_with_blocked_candidates_and_aggregate_resolution",
+  "production_dataset_changed": false,
+  "source_draft": {
+    "path": "data/audit/draft-2026-08-05.json",
+    "source_version": "2026-08-05",
+    "draft_indices": [
+      35,
+      36,
+      37,
+      38,
+      39
+    ],
+    "draft_entry_count": 5,
+    "aggregate_indices": [
+      39
+    ]
+  },
+  "inventory_additions": {
+    "count": 6,
+    "canonical_ids": [
+      "redevance-prelevement-ressource-eau",
+      "redevance-pollution-eau-elevage",
+      "redevance-pollution-eau-pfas",
+      "redevance-consommation-eau-potable",
+      "redevance-performance-reseaux-eau-potable",
+      "redevance-performance-assainissement-collectif"
+    ],
+    "description": "Six créances en vigueur ne disposent pas de ligne autonome dans le brouillon. La redevance de prélèvement bénéficie d'une ligne NTL directement nommée ; les cinq autres ajouts restent bloqués faute de correspondance statistique individuelle."
+  },
+  "scope": {
+    "description": "Reprise des redevances environnementales perçues par les agences de l'eau en métropole et par les offices de l'eau dans les départements d'outre-mer. Le lot résout la ligne outre-mer comme agrégat territorial, ajoute les créances créées ou maintenues par la réforme de 2025 et la loi de finances pour 2026, et ne ventile aucune enveloppe statistique ou budgétaire.",
+    "ready_record_count": 1,
+    "ready_canonical_ids": [
+      "redevance-prelevement-ressource-eau"
+    ],
+    "blocked_candidate_count": 9,
+    "blocked_candidate_ids": [
+      "redevance-pollution-eau-non-domestique",
+      "redevance-pollutions-diffuses",
+      "redevance-stockage-eau-etiage",
+      "redevance-protection-milieu-aquatique",
+      "redevance-pollution-eau-elevage",
+      "redevance-pollution-eau-pfas",
+      "redevance-consommation-eau-potable",
+      "redevance-performance-reseaux-eau-potable",
+      "redevance-performance-assainissement-collectif"
+    ],
+    "aggregate_resolution_count": 1
+  },
+  "measurement_policy": {
+    "unit": "millions_euros",
+    "observed_revenue": "La National tax list 2026 fournit des observations jusqu'en 2024. Seule la ligne 67 nomme directement la redevance pour prélèvement sur la ressource en eau.",
+    "pollution_envelope": "La ligne 64 « Autres taxes sur la pollution » est une enveloppe résiduelle plus large que les redevances de pollution de l'eau. Son montant n'est attribué à aucune fiche.",
+    "agency_forecast_envelope": "Le rendement prévisionnel 2026 et le plafond d'affectation des agences de l'eau couvrent une liste de redevances plus large que le présent lot. Ils restent une enveloppe familiale non ventilée.",
+    "territorial_profiles": "Une même fiche canonique peut comporter un profil agences de l'eau et un profil offices de l'eau lorsque le nom et l'objet de la créance sont communs mais que les articles, tarifs ou exonérations territoriaux diffèrent.",
+    "aggregate_draft_entry": "La ligne générique des départements d'outre-mer n'est pas une créance. Elle est répartie comme profil territorial entre les fiches juridiques correspondantes.",
+    "new_charge_and_2024_statistics": "Une créance créée en 2025 ou 2026 n'est pas rétroprojetée dans une observation NTL arrêtée à 2024.",
+    "draft_amounts": "Les montants du brouillon dépourvus d'année explicite ne sont pas repris comme recettes canoniques.",
+    "tariffs": "Un plafond, un tarif par unité, un seuil ou un coefficient de modulation n'est pas une recette."
+  },
+  "sources": [
+    {
+      "id": "ec-ntl-2026-france",
+      "title": "Data on Taxation Trends — National tax list 2026, feuille France",
+      "publisher": "Commission européenne, DG TAXUD / Eurostat",
+      "url": "https://taxation-customs.ec.europa.eu/document/download/600d56d1-ea6e-416e-9981-1c8b9c603b6b_en?filename=NTL%20edition%202026%20web.xlsx",
+      "publication_date": "2026-03-30",
+      "data_through": 2024,
+      "retrieved_at": "2026-09-01",
+      "local_path": "data/reference/ntl-france-2026.json",
+      "supports": [
+        "po_classification",
+        "observed_revenue",
+        "statistical_envelopes"
+      ]
+    },
+    {
+      "id": "legifrance-code-environnement-redevances-2026",
+      "title": "Code de l'environnement — redevances des agences de l'eau, articles L. 213-10 à L. 213-10-12",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/codes/id/LEGISCTA000006188366",
+      "effective_date": "2026-09-01",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "legal_status",
+        "legal_basis",
+        "canonical_granularity",
+        "tax_base",
+        "rates",
+        "collection"
+      ]
+    },
+    {
+      "id": "legifrance-agences-eau-status-2026",
+      "title": "Code de l'environnement — article L. 213-8-1",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000045213183",
+      "effective_date": "2026-08-20",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "institutional_recipient",
+        "public_administrative_body"
+      ]
+    },
+    {
+      "id": "legifrance-offices-eau-status-2026",
+      "title": "Code de l'environnement — article L. 213-13",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/codes/section_lc/LEGITEXT000006074220/LEGISCTA000048802586/2026-09-02/",
+      "effective_date": "2026-09-02",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "institutional_recipient",
+        "public_local_administrative_body"
+      ]
+    },
+    {
+      "id": "legifrance-offices-eau-redevances-2026",
+      "title": "Code de l'environnement — articles L. 213-14 à L. 213-14-2",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/codes/section_lc/LEGITEXT000006074220/LEGISCTA000006176459/2026-09-02/",
+      "effective_date": "2026-09-02",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "overseas_territorial_profile",
+        "legal_basis",
+        "rates",
+        "collection"
+      ]
+    },
+    {
+      "id": "legifrance-lf-2024-art-101",
+      "title": "Loi n° 2023-1322 du 29 décembre 2023 de finances pour 2024 — article 101",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/jorf/article_jo/JORFARTI000048727454",
+      "publication_date": "2023-12-30",
+      "effective_from": "2025-01-01",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "water_charge_reform",
+        "new_charge_creation",
+        "replacement_history"
+      ]
+    },
+    {
+      "id": "eaufrance-reforme-redevances-2025",
+      "title": "La réforme des redevances des agences de l'eau",
+      "publisher": "Service public d'information Eaufrance",
+      "url": "https://economie.eaufrance.fr/actualites/la-reforme-des-redevances-des-agences-de-leau",
+      "publication_date": "2024-05-13",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "replacement_history",
+        "reform_context"
+      ]
+    },
+    {
+      "id": "legifrance-lf-2026-art-79",
+      "title": "Loi n° 2026-103 du 19 février 2026 de finances pour 2026 — article 79",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/loda/article_lc/LEGIARTI000053511450/2026-09-02",
+      "publication_date": "2026-02-20",
+      "effective_from": "2026-03-01",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "pfas_charge_creation",
+        "2026_current_forms"
+      ]
+    },
+    {
+      "id": "legifrance-lf-2026-art-135",
+      "title": "Loi n° 2026-103 du 19 février 2026 de finances pour 2026 — article 135",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000053511577",
+      "publication_date": "2026-02-20",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "agency_family_forecast",
+        "agency_family_cap",
+        "beneficiary",
+        "transitional_labels"
+      ]
+    }
+  ],
+  "statistical_envelopes": [
+    {
+      "id": "ntl-autres-taxes-pollution-2024",
+      "source_id": "ec-ntl-2026-france",
+      "source_row": 64,
+      "esa_code": "D214H",
+      "national_detail_code": "C02",
+      "name": "Autres taxes sur la pollution",
+      "year": 2024,
+      "amount_meur": 1095,
+      "warning_flag": "aggregate-or-residual-label",
+      "assigned_to_records": false,
+      "reason": "Le libellé ne nomme aucune des redevances de pollution de l'eau et peut couvrir d'autres taxes environnementales."
+    }
+  ],
+  "forecast_envelopes": [
+    {
+      "id": "lf-2026-agences-eau",
+      "source_id": "legifrance-lf-2026-art-135",
+      "year": 2026,
+      "beneficiary": "Agences de l'eau",
+      "forecast_amount_meur": 2485.65912,
+      "allocation_cap_meur": 2482.62,
+      "assigned_to_records": false,
+      "scope_note": "L'enveloppe couvre l'ensemble des ressources nommées par l'article 135, notamment les redevances de pollution, consommation, performance, pollutions diffuses, prélèvement, stockage, chasse et protection du milieu aquatique, ainsi que des libellés transitoires."
+    }
+  ],
+  "aggregate_resolutions": [
+    {
+      "draft_index": 39,
+      "draft_id": "redevances-de-l-eau-dans-les-departements-d-outre-mer",
+      "draft_name": "Redevances de l'eau dans les départements d'outre-mer",
+      "treatment": "split_and_merge_into_territorial_profiles",
+      "publication_status": "not_a_canonical_levy",
+      "reason_codes": [
+        "aggregate-label",
+        "split-required"
+      ],
+      "legal_basis": {
+        "source_id": "legifrance-offices-eau-redevances-2026",
+        "locator": "Code de l'environnement, articles L. 213-14 à L. 213-14-2"
+      },
+      "mapped_canonical_ids": [
+        "redevance-prelevement-ressource-eau",
+        "redevance-pollution-eau-non-domestique",
+        "redevance-pollutions-diffuses",
+        "redevance-stockage-eau-etiage",
+        "redevance-protection-milieu-aquatique",
+        "redevance-pollution-eau-elevage",
+        "redevance-pollution-eau-pfas",
+        "redevance-consommation-eau-potable",
+        "redevance-performance-reseaux-eau-potable",
+        "redevance-performance-assainissement-collectif"
+      ],
+      "draft_amount_meur": 2,
+      "canonical_amount_meur": null,
+      "explanation": "Les offices de l'eau établissent plusieurs redevances juridiquement distinctes. Le montant non daté du brouillon ne peut être réparti entre elles."
+    }
+  ],
+  "records": [
+    {
+      "canonical_id": "redevance-prelevement-ressource-eau",
+      "draft_entries": [],
+      "inventory_status": "missing_as_general_levy_from_draft",
+      "nom": "Redevance prélèvement eau",
+      "nom_complet": "Redevance pour prélèvement sur la ressource en eau",
+      "annee_creation": null,
+      "current_form_since": "2026-02-21",
+      "po_status": "confirmed",
+      "legal_status": "active",
+      "obligation_status": "confirmed",
+      "membership_status": "ready",
+      "publication_status": "ready_for_review",
+      "reason_codes": [
+        "current-law-confirmed",
+        "statistical-classification-confirmed"
+      ],
+      "legal_basis": [
+        {
+          "source_id": "legifrance-code-environnement-redevances-2026",
+          "locator": "Code de l'environnement, article L. 213-10-9 — agences de l'eau"
+        },
+        {
+          "source_id": "legifrance-offices-eau-redevances-2026",
+          "locator": "Code de l'environnement, article L. 213-14-1 — offices de l'eau"
+        }
+      ],
+      "canonical_granularity": {
+        "treatment": "single_levy_with_territorial_and_use_profiles",
+        "reason": "Le droit nomme une redevance de prélèvement commune, avec des régimes tarifaires territoriaux et des usages différents. Les usages, bassins et catégories de ressource ne deviennent pas des prélèvements autonomes."
+      },
+      "liable_person": "Toute personne dont les activités entraînent un prélèvement sur la ressource en eau, sous les exonérations prévues par les textes.",
+      "tax_base": "Volume d'eau prélevé pendant l'année, avec règles particulières de mesure ou de forfaitisation et assiette hydroélectrique spécifique.",
+      "territorial_profiles": [
+        {
+          "territory": "bassins couverts par les agences de l'eau",
+          "source_id": "legifrance-code-environnement-redevances-2026",
+          "resource_categories": [
+            "catégorie 1 hors zone de répartition des eaux",
+            "catégorie 2 en zone de répartition des eaux"
+          ],
+          "use_profiles": [
+            "irrigation non gravitaire",
+            "irrigation gravitaire",
+            "alimentation en eau potable",
+            "alimentation d'un canal",
+            "refroidissement industriel avec restitution supérieure à 99 %",
+            "autres usages économiques",
+            "hydroélectricité"
+          ],
+          "rate_rule": "Tarifs fixés par agence dans les fourchettes légales ; pour l'hydroélectricité, entre 0,71 et 2,52 euros par million de mètres cubes et par mètre de chute avant indexation."
+        },
+        {
+          "territory": "départements d'outre-mer dotés d'un office de l'eau",
+          "source_id": "legifrance-offices-eau-redevances-2026",
+          "rate_rule": "Tarifs propres aux offices selon l'usage ; les prélèvements destinés à la production d'énergies renouvelables figurent parmi les exonérations territoriales."
+        }
+      ],
+      "institutional_recipients": [
+        {
+          "name": "Agences de l'eau",
+          "status": "établissements publics de l'Etat à caractère administratif",
+          "source_id": "legifrance-agences-eau-status-2026"
+        },
+        {
+          "name": "Offices de l'eau des départements d'outre-mer",
+          "status": "établissements publics locaux à caractère administratif rattachés au département",
+          "source_id": "legifrance-offices-eau-status-2026"
+        }
+      ],
+      "classification": {
+        "source_id": "ec-ntl-2026-france",
+        "source_row": 67,
+        "esa_code": "D214H",
+        "national_detail_code": "C07",
+        "name": "Redevances sur les prélèvements de l'eau",
+        "economic_function": "C",
+        "environmental_tag": "P",
+        "recipient_scope": "S.13 + S.212",
+        "granularity": "direct_named_national_line",
+        "amount_attributable_to_record": true
+      },
+      "revenues": {
+        "observed": [
+          {
+            "year": 2024,
+            "amount_meur": 826,
+            "source_id": "ec-ntl-2026-france",
+            "locator": "FR row 67 (D214H C07)"
+          }
+        ],
+        "forecast": []
+      },
+      "warnings": [
+        "Les 826 M€ constituent un total national de la ligne de prélèvement et ne sont pas ventilés entre territoires, bassins ou usages.",
+        "L'usage hydroélectrique prévu par L. 213-10-9 est distinct des redevances de concession ou d'autorisation du code de l'énergie.",
+        "L'année d'origine historique reste à établir et n'est pas déduite de la dernière réforme."
+      ],
+      "research_status": "complete_except_original_creation_date_and_revenue_breakdown",
+      "production_status": "not_integrated"
+    }
+  ],
+  "blocked_candidates": [
+    {
+      "canonical_id": "redevance-pollution-eau-non-domestique",
+      "draft_entries": [
+        {
+          "index": 35,
+          "id": "redevance-pour-pollution-de-l-eau-d-origine-non-domestique",
+          "treatment": "keep_and_narrow_current_scope"
+        }
+      ],
+      "nom": "Pollution eau industrielle",
+      "nom_complet": "Redevance pour pollution de l'eau d'origine non domestique des industriels non raccordés au réseau public de collecte",
+      "annee_creation": null,
+      "current_form_since": "2026-03-01",
+      "po_status": "unresolved",
+      "legal_status": "active",
+      "obligation_status": "confirmed",
+      "membership_status": "blocked",
+      "publication_status": "blocked",
+      "reason_codes": [
+        "current-law-confirmed",
+        "classification-unverified",
+        "source-needed",
+        "receipt-year-missing"
+      ],
+      "legal_basis": [
+        {
+          "source_id": "legifrance-code-environnement-redevances-2026",
+          "locator": "Code de l'environnement, articles L. 213-10-1 et L. 213-10-2"
+        }
+      ],
+      "tax_base": "Pollution annuelle rejetée directement dans le milieu naturel par les industriels non raccordés, déterminée par suivi ou selon les méthodes prévues par le code.",
+      "classification": {
+        "status": "unverified",
+        "candidate_envelope": "ntl-autres-taxes-pollution-2024",
+        "candidate_amount_attributable": false,
+        "required_evidence": "Ligne SEC ou table de passage nommant cette redevance."
+      },
+      "revenues": {
+        "observed": [],
+        "forecast": []
+      },
+      "draft_corrections": [
+        {
+          "field": "nom_et_perimetre",
+          "draft_value": "Redevance pour pollution de l'eau d'origine non domestique",
+          "canonical_value": "Redevance pour pollution de l'eau d'origine non domestique des industriels non raccordés au réseau public de collecte"
+        },
+        {
+          "field": "recette",
+          "draft_value_meur": 107,
+          "canonical_value_meur": null,
+          "explanation": "Le montant du brouillon n'avait pas d'année."
+        }
+      ],
+      "research_status": "complete_except_statistical_classification_revenue_and_creation_date",
+      "production_status": "not_integrated"
+    },
+    {
+      "canonical_id": "redevance-pollutions-diffuses",
+      "draft_entries": [
+        {
+          "index": 36,
+          "id": "redevances-pour-pollutions-diffuses",
+          "treatment": "keep"
+        }
+      ],
+      "nom": "Redevance pollutions diffuses",
+      "nom_complet": "Redevance pour pollutions diffuses",
+      "annee_creation": null,
+      "po_status": "unresolved",
+      "legal_status": "active",
+      "obligation_status": "confirmed",
+      "membership_status": "blocked",
+      "publication_status": "blocked",
+      "reason_codes": [
+        "current-law-confirmed",
+        "classification-unverified",
+        "source-needed",
+        "receipt-year-missing"
+      ],
+      "legal_basis": [
+        {
+          "source_id": "legifrance-code-environnement-redevances-2026",
+          "locator": "Code de l'environnement, article L. 213-10-8"
+        }
+      ],
+      "liable_person": "Acquéreur de produits phytopharmaceutiques ou de semences traitées, ou commanditaire d'une prestation de traitement de semences, sous les exclusions légales.",
+      "rates_eur_per_kg_before_indexation": [
+        9.0,
+        5.1,
+        3.0,
+        0.9,
+        5.0,
+        2.5
+      ],
+      "classification": {
+        "status": "unverified",
+        "candidate_envelope": "ntl-autres-taxes-pollution-2024",
+        "candidate_amount_attributable": false
+      },
+      "revenues": {
+        "observed": [],
+        "forecast": []
+      },
+      "draft_corrections": [
+        {
+          "field": "annee_creation",
+          "draft_value": 1964,
+          "canonical_value": null,
+          "explanation": "Le lot confirme la vigueur de l'article actuel mais n'établit pas que 1964 est l'origine de cette créance dans sa granularité présente."
+        },
+        {
+          "field": "recette",
+          "draft_value_meur": 107,
+          "canonical_value_meur": null,
+          "explanation": "Le montant du brouillon n'avait pas d'année."
+        }
+      ],
+      "research_status": "complete_except_statistical_classification_revenue_and_creation_date",
+      "production_status": "not_integrated"
+    },
+    {
+      "canonical_id": "redevance-stockage-eau-etiage",
+      "draft_entries": [
+        {
+          "index": 37,
+          "id": "redevance-pour-stockage-d-eau-en-periode-d-etiage",
+          "treatment": "keep"
+        }
+      ],
+      "nom": "Redevance stockage étiage",
+      "nom_complet": "Redevance pour stockage d'eau en période d'étiage",
+      "annee_creation": null,
+      "po_status": "unresolved",
+      "legal_status": "active",
+      "obligation_status": "confirmed",
+      "membership_status": "blocked",
+      "publication_status": "blocked",
+      "reason_codes": [
+        "current-law-confirmed",
+        "classification-unverified",
+        "source-needed",
+        "receipt-year-missing"
+      ],
+      "legal_basis": [
+        {
+          "source_id": "legifrance-code-environnement-redevances-2026",
+          "locator": "Code de l'environnement, article L. 213-10-10"
+        }
+      ],
+      "liable_person": "Personne disposant d'une installation de stockage de plus d'un million de mètres cubes et stockant tout ou partie du volume écoulé dans un cours d'eau pendant l'étiage.",
+      "tax_base": "Différence entre le volume stocké en fin et en début de période d'étiage, sous les exclusions relatives à certaines crues.",
+      "maximum_rate_eur_per_m3_before_indexation": 0.01,
+      "classification": {
+        "status": "unverified",
+        "required_evidence": "Correspondance SEC nommant la redevance de stockage."
+      },
+      "revenues": {
+        "observed": [],
+        "forecast": []
+      },
+      "draft_corrections": [
+        {
+          "field": "recette",
+          "draft_value_meur": 1.3,
+          "canonical_value_meur": null,
+          "explanation": "Le montant du brouillon n'avait pas d'année."
+        },
+        {
+          "field": "annee_creation",
+          "draft_value": 2006,
+          "canonical_value": null,
+          "explanation": "La date d'origine sera établie dans un lot historique dédié."
+        }
+      ],
+      "research_status": "complete_except_statistical_classification_revenue_and_creation_date",
+      "production_status": "not_integrated"
+    },
+    {
+      "canonical_id": "redevance-protection-milieu-aquatique",
+      "draft_entries": [
+        {
+          "index": 38,
+          "id": "redevance-pour-protection-du-milieu-aquatique",
+          "treatment": "keep"
+        }
+      ],
+      "nom": "Protection milieu aquatique",
+      "nom_complet": "Redevance pour protection du milieu aquatique",
+      "annee_creation": null,
+      "po_status": "unresolved",
+      "legal_status": "active",
+      "obligation_status": "confirmed",
+      "membership_status": "blocked",
+      "publication_status": "blocked",
+      "reason_codes": [
+        "current-law-confirmed",
+        "classification-unverified",
+        "source-needed",
+        "recipient-routing-unverified",
+        "receipt-year-missing"
+      ],
+      "legal_basis": [
+        {
+          "source_id": "legifrance-code-environnement-redevances-2026",
+          "locator": "Code de l'environnement, article L. 213-10-12"
+        }
+      ],
+      "rate_limits_before_indexation_eur": [
+        {
+          "scope": "pêche annuelle d'une personne majeure",
+          "amount": 10
+        },
+        {
+          "scope": "pêche pendant sept jours consécutifs",
+          "amount": 4
+        },
+        {
+          "scope": "pêche à la journée",
+          "amount": 1
+        },
+        {
+          "scope": "supplément annuel pour certaines espèces migratrices",
+          "amount": 20
+        }
+      ],
+      "collection": "Collecte par les fédérations ou associations de pêche et autres structures nommées par l'article pour le compte du dispositif des agences ou offices.",
+      "classification": {
+        "status": "unverified",
+        "required_evidence": "Classement SEC et documentation du reroutage entre structures de collecte et bénéficiaire public."
+      },
+      "revenues": {
+        "observed": [],
+        "forecast": []
+      },
+      "draft_corrections": [
+        {
+          "field": "annee_creation",
+          "draft_value": 1941,
+          "canonical_value": null,
+          "explanation": "Le lot ne confond pas l'origine historique du permis ou de la pêche avec la création de la redevance actuelle."
+        },
+        {
+          "field": "recette",
+          "draft_value_meur": 8.5,
+          "canonical_value_meur": null,
+          "explanation": "Le montant du brouillon n'avait pas d'année."
+        }
+      ],
+      "research_status": "complete_except_statistical_classification_routing_revenue_and_creation_date",
+      "production_status": "not_integrated"
+    },
+    {
+      "canonical_id": "redevance-pollution-eau-elevage",
+      "draft_entries": [],
+      "inventory_status": "missing_from_draft",
+      "nom": "Pollution eau élevage",
+      "nom_complet": "Redevance pour pollution de l'eau par les activités d'élevage",
+      "annee_creation": null,
+      "po_status": "unresolved",
+      "legal_status": "active",
+      "obligation_status": "confirmed",
+      "membership_status": "blocked",
+      "publication_status": "blocked",
+      "reason_codes": [
+        "current-law-confirmed",
+        "classification-unverified",
+        "source-needed",
+        "canonical-record-incomplete"
+      ],
+      "legal_basis": [
+        {
+          "source_id": "legifrance-code-environnement-redevances-2026",
+          "locator": "Code de l'environnement, articles L. 213-10-1 et L. 213-10-3"
+        }
+      ],
+      "tax_base": "Nombre d'unités de gros bétail, sous condition de chargement et après application des seuils et de la réfaction légale.",
+      "thresholds_ugb": [
+        {
+          "zone": "zones de montagne visées par la loi du 9 janvier 1985",
+          "threshold": 150
+        },
+        {
+          "zone": "autres zones",
+          "threshold": 90
+        }
+      ],
+      "base_reduction_ugb_above_threshold": 40,
+      "rate_eur_per_ugb_before_indexation": 3,
+      "penalty_multiplier_for_convicted_holdings": 3,
+      "classification": {
+        "status": "unverified",
+        "candidate_envelope": "ntl-autres-taxes-pollution-2024",
+        "candidate_amount_attributable": false
+      },
+      "revenues": {
+        "observed": [],
+        "forecast": []
+      },
+      "research_status": "complete_except_statistical_classification_revenue_and_creation_date",
+      "production_status": "not_integrated"
+    },
+    {
+      "canonical_id": "redevance-pollution-eau-pfas",
+      "draft_entries": [],
+      "inventory_status": "missing_from_draft",
+      "nom": "Redevance pollution PFAS",
+      "nom_complet": "Redevance pour pollution de l'eau par les substances perfluoroalkylées et polyfluoroalkylées",
+      "annee_creation": 2026,
+      "first_effective_date": "2026-03-01",
+      "po_status": "unresolved",
+      "legal_status": "active",
+      "obligation_status": "confirmed",
+      "membership_status": "blocked",
+      "publication_status": "blocked",
+      "reason_codes": [
+        "current-law-confirmed",
+        "classification-unverified",
+        "source-needed",
+        "canonical-record-incomplete"
+      ],
+      "creation_evidence": {
+        "source_id": "legifrance-lf-2026-art-79",
+        "locator": "Article 79 — création de l'article L. 213-10-2-1, entrée en vigueur le 1er mars 2026"
+      },
+      "legal_basis": [
+        {
+          "source_id": "legifrance-code-environnement-redevances-2026",
+          "locator": "Code de l'environnement, article L. 213-10-2-1"
+        }
+      ],
+      "liable_person": "Exploitant d'une installation soumise à autorisation rejetant les PFAS compris dans la liste réglementaire, sous les exclusions légales.",
+      "annual_exemption_threshold_grams": 100,
+      "rate_eur_per_hectogram_before_indexation": 100,
+      "classification": {
+        "status": "unverified",
+        "ntl_coverage_limitation": "Créance entrée en vigueur en 2026, après l'année 2024 couverte par la NTL.",
+        "candidate_envelope": "ntl-autres-taxes-pollution-2024",
+        "candidate_amount_attributable": false
+      },
+      "revenues": {
+        "observed": [],
+        "forecast": []
+      },
+      "research_status": "complete_except_statistical_classification_and_revenue",
+      "production_status": "not_integrated"
+    },
+    {
+      "canonical_id": "redevance-consommation-eau-potable",
+      "draft_entries": [],
+      "inventory_status": "missing_from_draft",
+      "nom": "Consommation eau potable",
+      "nom_complet": "Redevance sur la consommation d'eau potable",
+      "annee_creation": 2023,
+      "first_effective_date": "2025-01-01",
+      "current_form_since": "2026-03-01",
+      "po_status": "unresolved",
+      "legal_status": "active",
+      "obligation_status": "confirmed",
+      "membership_status": "blocked",
+      "publication_status": "blocked",
+      "reason_codes": [
+        "current-law-confirmed",
+        "classification-unverified",
+        "source-needed",
+        "canonical-record-incomplete"
+      ],
+      "creation_evidence": {
+        "source_id": "legifrance-lf-2024-art-101",
+        "locator": "Article 101 — création de la redevance, applicable à compter du 1er janvier 2025"
+      },
+      "legal_basis": [
+        {
+          "source_id": "legifrance-code-environnement-redevances-2026",
+          "locator": "Code de l'environnement, article L. 213-10-4"
+        },
+        {
+          "source_id": "legifrance-offices-eau-redevances-2026",
+          "locator": "Code de l'environnement, articles L. 213-14 et L. 213-14-2 pour les offices de l'eau ; non applicable à Mayotte selon L. 213-10"
+        }
+      ],
+      "liable_person": "Personne abonnée au service d'eau potable.",
+      "tax_base": "Volume d'eau potable facturé, avec exclusions ou forfaits prévus par le code.",
+      "maximum_rate_eur_per_m3_before_indexation": 1,
+      "classification": {
+        "status": "unverified",
+        "ntl_coverage_limitation": "La créance est applicable depuis 2025 ; la NTL archivée s'arrête à 2024 et la ligne 67 vise le prélèvement dans le milieu naturel, non la consommation facturée."
+      },
+      "revenues": {
+        "observed": [],
+        "forecast": [],
+        "family_forecast_ref": "lf-2026-agences-eau"
+      },
+      "research_status": "complete_except_statistical_classification_and_individual_revenue",
+      "production_status": "not_integrated"
+    },
+    {
+      "canonical_id": "redevance-performance-reseaux-eau-potable",
+      "draft_entries": [],
+      "inventory_status": "missing_from_draft",
+      "nom": "Performance réseaux eau potable",
+      "nom_complet": "Redevance pour la performance des réseaux d'eau potable",
+      "annee_creation": 2023,
+      "first_effective_date": "2025-01-01",
+      "current_form_since": "2026-03-01",
+      "po_status": "unresolved",
+      "legal_status": "active",
+      "obligation_status": "confirmed",
+      "membership_status": "blocked",
+      "publication_status": "blocked",
+      "reason_codes": [
+        "current-law-confirmed",
+        "classification-unverified",
+        "source-needed",
+        "canonical-record-incomplete"
+      ],
+      "creation_evidence": {
+        "source_id": "legifrance-lf-2024-art-101",
+        "locator": "Article 101 — création de la redevance, applicable à compter du 1er janvier 2025"
+      },
+      "legal_basis": [
+        {
+          "source_id": "legifrance-code-environnement-redevances-2026",
+          "locator": "Code de l'environnement, articles L. 213-10-5 et L. 213-10-7"
+        },
+        {
+          "source_id": "legifrance-offices-eau-redevances-2026",
+          "locator": "Code de l'environnement, articles L. 213-14 et L. 213-14-2 pour les offices de l'eau"
+        }
+      ],
+      "liable_person": "Commune ou établissement public compétent en matière de distribution d'eau potable.",
+      "tax_base": "Volume d'eau facturé, multiplié par le tarif de bassin et par un coefficient de modulation fondé sur les pertes du réseau et la gestion patrimoniale.",
+      "maximum_rate_eur_per_m3_before_indexation": 1,
+      "modulation": {
+        "performance_range": [
+          0,
+          0.55
+        ],
+        "asset_management_range": [
+          0,
+          0.25
+        ]
+      },
+      "classification": {
+        "status": "unverified",
+        "ntl_coverage_limitation": "Créance créée pour 2025, postérieure à l'année 2024 de la NTL."
+      },
+      "revenues": {
+        "observed": [],
+        "forecast": [],
+        "family_forecast_ref": "lf-2026-agences-eau"
+      },
+      "research_status": "complete_except_statistical_classification_and_individual_revenue",
+      "production_status": "not_integrated"
+    },
+    {
+      "canonical_id": "redevance-performance-assainissement-collectif",
+      "draft_entries": [],
+      "inventory_status": "missing_from_draft",
+      "nom": "Performance assainissement collectif",
+      "nom_complet": "Redevance pour la performance des systèmes d'assainissement collectif",
+      "annee_creation": 2023,
+      "first_effective_date": "2025-01-01",
+      "current_form_since": "2026-03-01",
+      "po_status": "unresolved",
+      "legal_status": "active",
+      "obligation_status": "confirmed",
+      "membership_status": "blocked",
+      "publication_status": "blocked",
+      "reason_codes": [
+        "current-law-confirmed",
+        "classification-unverified",
+        "source-needed",
+        "canonical-record-incomplete"
+      ],
+      "creation_evidence": {
+        "source_id": "legifrance-lf-2024-art-101",
+        "locator": "Article 101 — création de la redevance, applicable à compter du 1er janvier 2025"
+      },
+      "legal_basis": [
+        {
+          "source_id": "legifrance-code-environnement-redevances-2026",
+          "locator": "Code de l'environnement, articles L. 213-10-6 et L. 213-10-7"
+        },
+        {
+          "source_id": "legifrance-offices-eau-redevances-2026",
+          "locator": "Code de l'environnement, articles L. 213-14 et L. 213-14-2 pour les offices de l'eau"
+        }
+      ],
+      "liable_person": "Commune ou établissement public compétent en matière d'épuration des eaux usées, sous les règles de transfert prévues par le code.",
+      "tax_base": "Volume d'eau facturé au titre de l'assainissement collectif, multiplié par le tarif de bassin et par un coefficient de modulation du système.",
+      "maximum_rate_eur_per_m3_before_indexation": 1,
+      "modulation": {
+        "self_monitoring_range": [
+          0,
+          0.3
+        ],
+        "regulatory_compliance_range": [
+          0,
+          0.2
+        ],
+        "efficiency_range": [
+          0,
+          0.2
+        ]
+      },
+      "classification": {
+        "status": "unverified",
+        "ntl_coverage_limitation": "Créance créée pour 2025, postérieure à l'année 2024 de la NTL."
+      },
+      "revenues": {
+        "observed": [],
+        "forecast": [],
+        "family_forecast_ref": "lf-2026-agences-eau"
+      },
+      "research_status": "complete_except_statistical_classification_and_individual_revenue",
+      "production_status": "not_integrated"
+    }
+  ],
+  "reform_and_transitional_notes": [
+    {
+      "topic": "replacement_2025",
+      "source_ids": [
+        "legifrance-lf-2024-art-101",
+        "eaufrance-reforme-redevances-2025"
+      ],
+      "finding": "Depuis le 1er janvier 2025, la redevance sur la consommation d'eau potable et les deux redevances de performance remplacent la redevance pour pollution d'origine domestique et la redevance pour modernisation des réseaux de collecte dans le mécanisme courant de facturation."
+    },
+    {
+      "topic": "labels_reinserted_in_2026_resource_ceiling",
+      "source_id": "legifrance-lf-2026-art-135",
+      "finding": "L'article 135 de la loi de finances pour 2026 réinsère les libellés « modernisation des réseaux de collecte » et « obstacle sur les cours d'eau » dans la liste générale des ressources plafonnées et dans l'article L. 213-10, alors que la sous-section opérationnelle L. 213-10-1 à L. 213-10-12 ne contient pas, au 2 septembre 2026, d'article autonome établissant leurs assiettes et tarifs.",
+      "treatment": "Aucune fiche active n'est créée sur le seul fondement d'un libellé de plafond. Rechercher si ces mentions couvrent des encaissements de droits antérieurs, une transition ou une omission de coordination."
+    }
+  ],
+  "related_follow_up": [
+    {
+      "canonical_id": "redevance-proportionnelle-energie-hydraulique",
+      "draft_index": 31,
+      "status": "deferred_current_transition",
+      "note": "Le code de l'énergie a été profondément remanié au 1er septembre 2026. Les anciennes redevances des concessions et la nouvelle redevance de l'article L. 543-1 doivent être auditées séparément sans les confondre avec l'usage hydroélectrique de la redevance pour prélèvement d'eau."
+    },
+    {
+      "canonical_id": "redevances-cynegetiques",
+      "draft_indices": [
+        40,
+        41
+      ],
+      "status": "deferred",
+      "note": "Les redevances liées au permis de chasse et la redevance cynégétique exigent un lot distinct sur la granularité et le bénéficiaire."
+    },
+    {
+      "canonical_id": "classification-redevances-eau-hors-prelevement",
+      "status": "source_needed",
+      "note": "Rechercher une table de passage Insee/Eurostat ou un état des comptes des agences ventilant les redevances de pollution, consommation, performance, stockage et protection du milieu aquatique."
+    }
+  ],
+  "quality_checks": {
+    "ready_canonical_ids_are_unique": true,
+    "blocked_candidate_ids_are_unique": true,
+    "draft_indices_covered": [
+      35,
+      36,
+      37,
+      38,
+      39
+    ],
+    "inventory_additions_are_explicit": true,
+    "overseas_aggregate_is_not_a_canonical_record": true,
+    "ntl_row_67_is_assigned_only_to_water_withdrawal": true,
+    "ntl_row_64_is_not_allocated": true,
+    "agency_2026_forecast_is_not_allocated": true,
+    "new_2025_and_2026_charges_are_not_backcast_to_2024": true,
+    "unit_tariffs_thresholds_and_coefficients_are_not_revenues": true,
+    "undated_draft_amounts_are_not_promoted": true,
+    "hydroelectric_water_use_is_not_confused_with_energy_concession_royalties": true,
+    "transitional_labels_without_operational_articles_are_not_published": true,
+    "production_files_left_unchanged": [
+      "data/entries-full.json",
+      "data/entries-light.json"
+    ]
+  }
+}
