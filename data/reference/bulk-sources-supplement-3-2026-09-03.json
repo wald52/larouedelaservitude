@@ -1,0 +1,266 @@
+{
+  "schema_version": 1,
+  "verification_date": "2026-09-03",
+  "extends": [
+    "data/reference/bulk-sources.json",
+    "data/reference/bulk-sources-supplement-2026-09-02.json",
+    "data/reference/bulk-sources-supplement-2-2026-09-02.json"
+  ],
+  "purpose": "Quatrième passe de recherche sur les comptes sociaux observés, les décisions fiscales locales, la classification des bénéficiaires publics et les contrôles environnementaux et de comptabilité nationale.",
+  "sources": [
+    {
+      "id": "placss-2025-social-financing-accounts",
+      "title": "PLACSS 2025 — données chiffrées du financement et des comptes sociaux",
+      "publisher": "Direction de la Sécurité sociale",
+      "url": "https://www.securite-sociale.fr/home/la-secu-en-detail/loi-de-financement/projet-de-loi-d-approbation-des-comptes-de-la-securite-sociale-placss.html",
+      "downloads": [
+        "https://www.securite-sociale.fr/files/live/sites/SSFR/files/medias/PLACSS/2025/PLACSS%202025%20-%20Annexe%201%20-%20REPSS%20Financement%202026%20-%20Donn%C3%A9es.xlsx",
+        "https://www.securite-sociale.fr/files/live/sites/SSFR/files/medias/PLACSS/2025/PLACSS%202025%20-%20grille%20d%27analyse%20-%20vpropre.xlsx",
+        "https://www.securite-sociale.fr/files/live/sites/SSFR/files/medias/PLACSS/2025/Annexe%204%20Tableaux%20RCO.xlsx",
+        "https://www.securite-sociale.fr/files/live/sites/SSFR/files/medias/PLACSS/2025/Annexe%207_Donn%C3%A9es_2025.xlsx"
+      ],
+      "priority": 1,
+      "status": "ready_to_ingest",
+      "coverage": "Exercice 2025 : financement, exonérations et compensation, assurance chômage, retraites complémentaires, FSV, CADES, FRR et fonds sociaux.",
+      "access": {
+        "formats": ["xlsx", "pdf"],
+        "bulk_download": true,
+        "api": false,
+        "refresh": "annual"
+      },
+      "supports": ["social_revenue_observed", "exemptions", "compensation", "scheme_accounts", "fund_accounts"],
+      "limitations": [
+        "Une ligne de financement peut agréger plusieurs prélèvements ou inclure des transferts.",
+        "Une exonération ou sa compensation n'est pas un prélèvement autonome.",
+        "Le statut observé, estimé, rectifié ou définitif doit être conservé par cellule."
+      ],
+      "next_action": "Profiler les quatre classeurs prioritaires et extraire d'abord les ressources, contributions et comptes par organisme."
+    },
+    {
+      "id": "unedic-unemployment-insurance-financing",
+      "title": "Dépenses et recettes de l'Assurance chômage",
+      "publisher": "Unédic",
+      "url": "https://www.data.gouv.fr/datasets/depenses-et-recettes-de-lassurance-chomage",
+      "downloads": [
+        "https://data.unedic.org/api/explore/v2.1/catalog/datasets/financement-de-l-assurance-chomage/exports/csv?use_labels=true",
+        "https://data.unedic.org/api/explore/v2.1/catalog/datasets/financement-de-l-assurance-chomage/exports/json"
+      ],
+      "priority": 1,
+      "status": "ready_to_ingest",
+      "coverage": "Série depuis 2011 des contributions employeurs, fraction de CSG, autres recettes, dépenses, soldes et dette.",
+      "access": {
+        "formats": ["csv", "json", "api"],
+        "bulk_download": true,
+        "api": true,
+        "refresh": "annual_or_forecast_update"
+      },
+      "supports": ["unemployment_contributions", "allocated_csg", "scheme_revenue", "scheme_balance", "debt"],
+      "limitations": [
+        "La fraction de CSG est une affectation d'un prélèvement existant, pas une nouvelle contribution.",
+        "Les catégories comptables ne correspondent pas automatiquement à une créance juridique.",
+        "Les prévisions doivent rester séparées des observations."
+      ],
+      "next_action": "Ingérer CSV et JSON, vérifier leur identité logique et rapprocher les recettes du PLACSS, de la DREES et de S.1314."
+    },
+    {
+      "id": "dgfip-local-direct-tax-rates-2026",
+      "title": "Taux de fiscalité directe locale votés en 2026 par les communes et les EPCI",
+      "publisher": "DGFiP / DGCL",
+      "url": "https://www.collectivites-locales.gouv.fr/etudes-et-statistiques/acces-aux-statistiques-par-thematique/fiscalite/taux-de-fiscalite-directe-locale-votes-par-les-collectivites",
+      "downloads": [
+        "https://www.collectivites-locales.gouv.fr/files/files/Etudes-et-statistiques/Taux%20de%20fiscalit%C3%A9%20directe%20locale%20vot%C3%A9s%20par%20les%20collectivit%C3%A9s/2026/Taux_2026_communes.xlsx",
+        "https://www.collectivites-locales.gouv.fr/files/files/Etudes-et-statistiques/Taux%20de%20fiscalit%C3%A9%20directe%20locale%20vot%C3%A9s%20par%20les%20collectivit%C3%A9s/2026/Taux_2026_EPCI.xlsx"
+      ],
+      "priority": 1,
+      "status": "ready_to_ingest",
+      "coverage": "TFB, TFNB, taxe d'habitation et CFE votées en 2026 par les communes et EPCI ; archives à couverture variable depuis 2008.",
+      "access": {
+        "formats": ["xlsx"],
+        "bulk_download": true,
+        "api": false,
+        "refresh": "annual"
+      },
+      "supports": ["local_rate", "local_applicability", "commune", "epci", "historical_rate"],
+      "limitations": [
+        "Un taux ne fournit ni base ni produit observé.",
+        "Une ligne par collectivité n'est pas un prélèvement autonome.",
+        "Les composantes communales et intercommunales ne s'additionnent pas sans connaître le régime fiscal."
+      ],
+      "next_action": "Ingérer les deux classeurs, normaliser les collectivités avec la composition EPCI et comparer les taux au REI."
+    },
+    {
+      "id": "dgfip-local-tax-deliberations-2026",
+      "title": "Délibérations de fiscalité directe locale applicables en 2026 hors taux",
+      "publisher": "Direction générale des Finances publiques",
+      "url": "https://www.collectivites-locales.gouv.fr/etudes-et-statistiques/acces-aux-statistiques-par-thematique/fiscalite/deliberations-de-fiscalite-directe-locale-des-communes",
+      "downloads": [
+        "https://data.economie.gouv.fr/explore/assets/deliberations-de-fiscalite-directe-locale-des-communes-2026-hors-taux/",
+        "https://data.economie.gouv.fr/explore/assets/deliberations-de-fiscalite-directe-locale-des-groupements-a-fiscalite-propre-2026-hors-taux/"
+      ],
+      "priority": 1,
+      "status": "ready_to_ingest",
+      "coverage": "Décisions communales et intercommunales relatives aux exonérations, abattements, majorations et options de TH, taxes foncières et CFE.",
+      "access": {
+        "formats": ["xlsx", "csv", "json", "api"],
+        "bulk_download": true,
+        "api": true,
+        "refresh": "annual"
+      },
+      "supports": ["local_exemption", "local_abatement", "local_majoration", "cfe_option", "effective_year"],
+      "limitations": [
+        "Une décision optionnelle n'est pas une taxe distincte.",
+        "La présence d'une délibération ne fournit pas son coût ou son produit.",
+        "Les codes et libellés d'options doivent être versionnés."
+      ],
+      "next_action": "Extraire le dictionnaire des options et construire des intervalles d'application par collectivité et taxe nationale."
+    },
+    {
+      "id": "dgfip-smcl-monthly-local-accounts",
+      "title": "Situation mensuelle comptable des collectivités locales",
+      "publisher": "Direction générale des Finances publiques",
+      "url": "https://www.collectivites-locales.gouv.fr/etudes-et-statistiques/acces-aux-statistiques-par-thematique/budget/situation-mensuelle-comptable-des-collectivites-locales-smcl",
+      "downloads": [
+        "https://www.impots.gouv.fr/sites/default/files/media/9_statistiques/data_colloc/smcl/46/graphiques_smcl_46.xlsx"
+      ],
+      "priority": 1,
+      "status": "ready_to_ingest",
+      "coverage": "Budgets principaux des communes, EPCI à fiscalité propre, départements et régions ; dernière situation vérifiée au 31 juillet 2026.",
+      "access": {
+        "formats": ["xlsx", "pdf", "html"],
+        "bulk_download": true,
+        "api": false,
+        "refresh": "monthly"
+      },
+      "supports": ["local_tax_aggregate", "allocated_vat", "dmto", "beneficiary_level", "monthly_monitoring"],
+      "limitations": [
+        "Les rythmes d'enregistrement rendent les comparaisons infra-annuelles fragiles.",
+        "Le champ porte sur les budgets principaux et sur des agrégats comptables.",
+        "Une fraction de TVA reçue n'est pas une taxe locale nouvelle."
+      ],
+      "next_action": "Archiver chaque numéro, identifier les séries cumulatives et rapprocher les agrégats fiscaux des balances annuelles à périmètre constant."
+    },
+    {
+      "id": "dgcl-epci-composition-2026",
+      "title": "Liste et composition des EPCI à fiscalité propre au 1er janvier 2026",
+      "publisher": "Direction générale des collectivités locales",
+      "url": "https://www.collectivites-locales.gouv.fr/etudes-et-statistiques/acces-aux-statistiques-par-thematique/perimetre-des-intercommunalites/liste-et-composition-des-epci-fiscalite-propre",
+      "downloads": [
+        "https://www.collectivites-locales.gouv.fr/files/files/Etudes-et-statistiques/DESL/2026/EPCI/epcicom2026.xlsx",
+        "https://www.collectivites-locales.gouv.fr/files/files/Etudes-et-statistiques/DESL/2026/EPCI/epcisanscom2026.xlsx"
+      ],
+      "priority": 2,
+      "status": "ready_to_ingest",
+      "coverage": "Composition communale, liste, catégorie et périmètre des EPCI à fiscalité propre au 1er janvier 2026, avec archives annuelles.",
+      "access": {
+        "formats": ["xlsx"],
+        "bulk_download": true,
+        "api": false,
+        "refresh": "annual"
+      },
+      "supports": ["commune_to_epci", "beneficiary_normalization", "territorial_grouping", "epci_category", "historical_perimeter"],
+      "limitations": [
+        "La source ne décrit ni taxe, ni taux, ni produit.",
+        "Une photographie au 1er janvier ne date pas toujours tous les changements infra-annuels.",
+        "Les fusions, extensions, retraits et communes isolées doivent être historisés."
+      ],
+      "next_action": "Créer une dimension commune-EPCI datée et l'imposer comme table de jointure des sources fiscales intercommunales."
+    },
+    {
+      "id": "sdes-environmental-taxation-2025",
+      "title": "Fiscalité environnementale en France — état des connaissances en 2025",
+      "publisher": "Service des données et études statistiques",
+      "url": "https://www.statistiques.developpement-durable.gouv.fr/la-fiscalite-environnementale-en-france-etat-des-connaissances-en-2025",
+      "downloads": [
+        "https://www.statistiques.developpement-durable.gouv.fr/media/8979/download?inline="
+      ],
+      "priority": 1,
+      "status": "ready_to_ingest",
+      "coverage": "Près de quarante taxes environnementales au sens d'Eurostat, principalement en 2023, réparties entre énergie, transport, pollution et ressources.",
+      "access": {
+        "formats": ["xlsx", "html"],
+        "bulk_download": true,
+        "api": false,
+        "refresh": "annual_or_publication_cycle"
+      },
+      "supports": ["candidate_discovery", "environmental_category", "revenue_observed", "payer_group", "economic_activity"],
+      "limitations": [
+        "La qualification environnementale dépend de l'assiette physique, pas de l'objectif juridique de la taxe.",
+        "Les données peuvent être provisoires ou révisées.",
+        "Les ventilations par financeur ou activité ne doivent pas être additionnées aux totaux."
+      ],
+      "next_action": "Extraire la liste exacte des taxes et agrégats et la rapprocher des lignes NTL E, T et P/RS sans ventiler les agrégats."
+    },
+    {
+      "id": "insee-apu-accounts-2025",
+      "title": "Comptes 2025 des administrations publiques et tableaux de prélèvements obligatoires",
+      "publisher": "Insee",
+      "url": "https://www.insee.fr/fr/statistiques/8988845?sommaire=8988934",
+      "downloads": [
+        "https://www.insee.fr/fr/statistiques/fichier/8988845/t_3201_fr.xlsx",
+        "https://www.insee.fr/fr/statistiques/fichier/8988845/t_3212_fr.xlsx",
+        "https://www.insee.fr/fr/statistiques/fichier/8988845/t_3216_fr.xlsx",
+        "https://www.insee.fr/fr/statistiques/fichier/8988845/t_3217_fr.xlsx"
+      ],
+      "priority": 1,
+      "status": "ready_to_ingest",
+      "coverage": "Comptes 2025 de S.13 et de ses sous-secteurs, prélèvements obligatoires et principaux impôts par catégorie, en base 2020.",
+      "access": {
+        "formats": ["xlsx", "catalogue_open_data"],
+        "bulk_download": true,
+        "api": "to_evaluate",
+        "refresh": "annual_with_revisions"
+      },
+      "supports": ["aggregate_po", "government_subsector", "esa_transaction", "main_tax_category", "revision_control"],
+      "limitations": [
+        "Les tableaux sont agrégés et ne permettent pas d'allouer un écart à une fiche.",
+        "Certains flux imputés et crédits d'impôt restituables restent présents selon les conventions SEC.",
+        "Le statut provisoire, semi-définitif ou révisé doit être conservé."
+      ],
+      "next_action": "Ingérer d'abord les tableaux 3.201, 3.212, 3.216 et 3.217 et contrôler leurs totaux contre la NTL et Eurostat."
+    },
+    {
+      "id": "insee-odac-odal-2024",
+      "title": "Listes des ODAC et ODAL — classification des bénéficiaires publics",
+      "publisher": "Insee",
+      "url": "https://www.insee.fr/fr/statistiques/8988845?sommaire=8988934",
+      "downloads": [
+        "https://www.insee.fr/fr/statistiques/fichier/8988934/Liste_ODAC_SD2024.pdf",
+        "https://www.insee.fr/fr/statistiques/fichier/8988934/Liste_ODAL_SD2024.pdf"
+      ],
+      "priority": 2,
+      "status": "candidate",
+      "coverage": "Classification 2024, publiée en mai 2026 : liste nominative d'environ 700 ODAC et catégories/effectifs d'ODAL.",
+      "access": {
+        "formats": ["pdf"],
+        "bulk_download": true,
+        "api": false,
+        "refresh": "annual"
+      },
+      "supports": ["beneficiary_s13112", "beneficiary_s13132", "public_unit_name", "cofog_function", "affected_tax_control"],
+      "limitations": [
+        "Les identifiants SIREN ne sont pas systématiquement fournis.",
+        "Le document ODAL n'est pas une liste nominative complète de toutes les unités.",
+        "La classification 2024 ne prouve pas le secteur d'un organisme en 2026."
+      ],
+      "next_action": "Extraire la liste ODAC, normaliser noms et sigles et produire des candidats de correspondance avec les bénéficiaires de l'article 135."
+    }
+  ],
+  "research_gaps": [
+    "Aucun répertoire public unique avec identifiant, dates et secteur SEC de toutes les unités bénéficiaires n'a été identifié.",
+    "Aucun jeu national structuré de taxe sur les conventions d'assurance ventilé par risque et bénéficiaire n'a été identifié.",
+    "Les taux et délibérations locales ne sont pas reliés nationalement à leur produit observé.",
+    "Les PDF ODAC et ODAL ne fournissent pas systématiquement d'identifiant institutionnel stable.",
+    "Aucun jeu transversal homogène n'a été identifié pour plusieurs taxes culturelles et contributions sectorielles au niveau créance, assiette, recette et bénéficiaire."
+  ],
+  "recommended_ingestion_order": [
+    "placss-2025-social-financing-accounts",
+    "sdes-environmental-taxation-2025",
+    "dgfip-local-direct-tax-rates-2026",
+    "dgfip-local-tax-deliberations-2026",
+    "unedic-unemployment-insurance-financing",
+    "insee-apu-accounts-2025",
+    "dgfip-smcl-monthly-local-accounts",
+    "dgcl-epci-composition-2026",
+    "insee-odac-odal-2024"
+  ]
+}
