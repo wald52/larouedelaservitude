@@ -13,13 +13,13 @@ La fiche structurée correspondante est publiée dans [`data/audit/retraites-rup
 | Fiche canonique | Ligne du brouillon | Base juridique au 2 septembre 2026 | Prévision 2025 | Prévision 2026 | Décision |
 |---|---:|---|---:|---:|---|
 | Contribution sur les avantages de préretraite d'entreprise | 13 | CSS, article L. 137-10 | 38 M€ | 34 M€ | conserver |
-| Contribution employeur sur les retraites à prestations définies à droits conditionnels | 14 | CSS, article L. 137-11 | enveloppe familiale | enveloppe familiale | scinder |
-| Contribution à la charge des bénéficiaires sur les rentes à prestations définies | 14 | CSS, article L. 137-11-1 | enveloppe familiale | enveloppe familiale | scinder |
-| Contribution employeur sur les retraites à prestations définies à droits acquis | 14 | CSS, article L. 137-11-2 | enveloppe familiale | enveloppe familiale | scinder |
+| Contribution employeur sur les retraites à prestations définies à droits conditionnels | 14 | CSS, article L. 137-11 | enveloppe familiale | enveloppe familiale | scinder et conserver |
+| Contribution à la charge des bénéficiaires sur les rentes à prestations définies | 14 | CSS, article L. 137-11-1 | enveloppe familiale | enveloppe familiale | scinder, classement SEC à confirmer |
+| Contribution employeur sur les retraites à prestations définies à droits acquis | 14 | CSS, article L. 137-11-2 | enveloppe familiale | enveloppe familiale | scinder et conserver |
 | Contribution sur les indemnités de rupture conventionnelle et de mise à la retraite | 15 | CSS, article L. 137-12 | 873 M€ | 1 155 M€ | conserver, renommer et élargir le périmètre |
 | Cotisation des débitants de tabac au RAVGDT | absente | décret n° 63-1104 du 30 octobre 1963 | inconnue | inconnue | candidat bloqué |
 
-Les cinq premières fiches sont prêtes à relire. Le RAVGDT est documenté séparément, mais ne franchit pas le test de publication faute de classement SEC explicite et de rattachement institutionnel suffisamment précis.
+Quatre fiches sont prêtes à relire. Deux créances juridiquement actives restent bloquées : la contribution précomptée sur les rentes à prestations définies, faute de classement statistique explicite, et la cotisation RAVGDT, faute de classement SEC et de rattachement institutionnel suffisamment précis.
 
 ## La ligne 14 doit produire trois créances distinctes
 
@@ -38,11 +38,19 @@ Le droit en vigueur distingue pourtant trois contributions ayant des redevables,
 
 La scission n'est donc pas une séparation de simples taux : elle correspond à trois créances légales autonomes.
 
+## Classement statistique de la contribution des bénéficiaires
+
+Le contrôle final a montré que la contribution de l'article L. 137-11-1 ne pouvait pas hériter automatiquement de la ligne 107 de la National tax list.
+
+Cette ligne, classée D29C et intitulée « Autres taxes », est une enveloppe résiduelle utilisée pour les contributions employeur du lot. Elle ne nomme pas la créance précomptée sur les rentes et ne suffit pas à classer un prélèvement dû par le bénéficiaire.
+
+Deux lignes D51 agrégées ont été repérées comme pistes — « Autres taxes » et « Autres prélèvements sociaux » — mais aucune ne nomme explicitement la contribution. Le dossier conserve donc les trois créances juridiques issues de la scission, tout en bloquant la fiche L. 137-11-1 jusqu'à obtention d'une table de passage ou d'une source de comptabilité nationale plus précise.
+
 ## Prévision de 179 M€ non ventilée
 
 L'annexe 3 du PLFSS 2026 présente une seule ligne « Contribution sur les régimes de retraite à prestations définies », fondée sur l'article L. 137-11, avec 179 M€ en 2025 et 179 M€ en 2026.
 
-Après la scission juridique, cette source ne permet pas de déterminer si la prévision couvre exclusivement l'article L. 137-11 ou toute la section L. 137-11 à L. 137-11-2. Les 179 M€ sont donc conservés comme **enveloppe familiale non attribuée**. Aucune répartition n'est fabriquée entre les trois fiches.
+Après la scission juridique, cette source ne permet pas de déterminer si la prévision couvre exclusivement l'article L. 137-11 ou toute la section L. 137-11 à L. 137-11-2. Les 179 M€ sont donc conservés comme **enveloppe familiale non attribuée**. Aucune répartition n'est fabriquée entre les trois créances.
 
 ## Contribution sur les avantages de préretraite
 
@@ -65,11 +73,17 @@ Le taux a été porté de 30 % à **40 %** par la loi de financement de la sécu
 
 Le libellé plus étroit imprimé dans l'annexe du PLFSS est conservé comme provenance de la prévision, sans remplacer le périmètre juridique courant.
 
-## Ligne statistique « Autres taxes »
+## Enveloppes statistiques non ventilées
 
-La National tax list 2026 classe la famille dans la ligne 107, code SEC D29C C01, intitulée « Autres taxes ». Cette ligne porte 1 364 M€ en 2024 et comporte un avertissement indiquant un libellé agrégé ou résiduel.
+La National tax list 2026 fournit notamment trois lignes agrégées ou résiduelles pertinentes pour le contrôle :
 
-Elle soutient le classement statistique de la famille, mais son montant n'est attribué à aucune fiche particulière.
+| Ligne | Code SEC | Libellé | Montant 2024 | Traitement |
+|---:|---|---|---:|---|
+| 107 | D29C C01 | Autres taxes | 1 364 M€ | soutien de classement pour les contributions employeur ; aucun montant individuel |
+| 136 | D51M C01 | Autres taxes | 1 127 M€ | piste non attribuée |
+| 141 | D51M C06 | Autres prélèvements sociaux | 14 646 M€ | piste non attribuée |
+
+Aucun de ces montants n'est attribué à une fiche particulière. Les lignes D51 sont seulement conservées comme pistes de recherche pour la contribution due par les bénéficiaires.
 
 ## RAVGDT : obligation confirmée, appartenance au périmètre encore bloquée
 
@@ -99,9 +113,10 @@ Deux entrées voisines sont réservées à un lot ultérieur :
 ## Garde-fous appliqués
 
 1. Des créances fondées sur des articles, redevables et assiettes distincts ne sont pas fusionnées.
-2. Une enveloppe budgétaire familiale n'est pas répartie sans source.
-3. Une ligne statistique résiduelle n'est pas attribuée à une fiche particulière.
-4. Les dispositions déclarées inconstitutionnelles ne sont pas publiées comme taux applicables.
-5. Un montant du brouillon sans année ne devient pas une recette canonique.
-6. Une obligation juridique ne suffit pas, seule, à établir l'appartenance aux prélèvements obligatoires.
-7. Les données servies par l'application restent inchangées.
+2. Une classification statistique agrégée n'est pas héritée automatiquement après une scission juridique.
+3. Une enveloppe budgétaire familiale n'est pas répartie sans source.
+4. Une ligne statistique résiduelle n'est pas attribuée à une fiche particulière.
+5. Les dispositions déclarées inconstitutionnelles ne sont pas publiées comme taux applicables.
+6. Un montant du brouillon sans année ne devient pas une recette canonique.
+7. Une obligation juridique ne suffit pas, seule, à établir l'appartenance aux prélèvements obligatoires.
+8. Les données servies par l'application restent inchangées.

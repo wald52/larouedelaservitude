@@ -3,7 +3,7 @@
   "batch_id": "retraites-ruptures-2026-09-02",
   "title": "Lot de reprise — préretraites, retraites à prestations définies et indemnités de rupture",
   "audit_date": "2026-09-02",
-  "status": "ready_for_review_with_blocked_candidate",
+  "status": "ready_for_review_with_blocked_candidates",
   "production_dataset_changed": false,
   "source_draft": {
     "path": "data/audit/draft-2026-08-05.json",
@@ -19,17 +19,17 @@
     ]
   },
   "scope": {
-    "description": "Reprise de trois lignes du brouillon relatives aux préretraites, aux régimes de retraite à prestations définies et aux indemnités de rupture ou de mise à la retraite. La ligne 14 est scindée en trois créances juridiques distinctes. La cotisation RAVGDT, absente du brouillon, est documentée comme candidate mais reste bloquée faute de classement statistique explicite.",
-    "ready_record_count": 5,
+    "description": "Reprise de trois lignes du brouillon relatives aux préretraites, aux régimes de retraite à prestations définies et aux indemnités de rupture ou de mise à la retraite. La ligne 14 est scindée en trois créances juridiques distinctes. Deux contributions employeur sont prêtes à relire ; la contribution due par les bénéficiaires reste bloquée faute de classement statistique explicite. La cotisation RAVGDT, absente du brouillon, est elle aussi documentée comme candidate bloquée.",
+    "ready_record_count": 4,
+    "blocked_candidate_count": 2,
     "ready_canonical_ids": [
       "contribution-preretraite",
       "contribution-employeur-retraites-prestations-definies-droits-conditionnels",
-      "contribution-beneficiaires-rentes-prestations-definies",
       "contribution-employeur-retraites-prestations-definies-droits-acquis",
       "contribution-rupture-conventionnelle-mise-retraite"
     ],
-    "blocked_candidate_count": 1,
     "blocked_candidate_ids": [
+      "contribution-beneficiaires-rentes-prestations-definies",
       "cotisation-ravgdt-debitants-tabac"
     ]
   },
@@ -37,9 +37,9 @@
     "unit": "millions_euros",
     "forecast_revenue": "Prévisions 2025 et 2026 du PLFSS 2026, annexe 3. Elles restent distinctes des recettes observées.",
     "family_forecast": "La ligne budgétaire agrégée relative aux retraites à prestations définies n'est pas répartie entre les trois créances issues de la scission sans source précisant son périmètre.",
-    "aggregate_envelope": "La ligne NTL 107 « Autres taxes » est une enveloppe statistique résiduelle. Son montant n'est attribué à aucune fiche particulière.",
+    "aggregate_envelope": "Les lignes NTL 107 « Autres taxes », 136 « Autres taxes » et 141 « Autres prélèvements sociaux » sont des enveloppes statistiques agrégées ou résiduelles. Leurs montants ne sont attribués à aucune fiche particulière.",
     "draft_amounts": "Les montants du brouillon sans année explicite ne sont pas repris comme recettes canoniques.",
-    "blocked_candidate": "Une obligation juridique ne devient pas une fiche publiable tant que le bénéficiaire institutionnel et le classement SEC ne sont pas établis par une source primaire."
+    "blocked_candidate": "Une créance juridiquement obligatoire ne devient pas une fiche publiable tant que son rattachement statistique explicite et, lorsque nécessaire, le secteur institutionnel du bénéficiaire final ne sont pas établis par une source primaire."
   },
   "sources": [
     {
@@ -262,18 +262,49 @@
   ],
   "statistical_envelopes": [
     {
-      "id": "ntl-autres-taxes-2024",
+      "id": "ntl-autres-taxes-d29c-2024",
       "source_id": "ec-ntl-2026-france",
       "source_row": 107,
       "esa_code": "D29C",
       "national_detail_code": "C01",
       "name": "Autres taxes",
+      "economic_function": "LEYRS",
       "recipient_scope": "S.13 + S.212",
       "year": 2024,
       "amount_meur": 1364,
       "warning_flag": "aggregate-or-residual-label",
       "assigned_to_records": false,
-      "reason": "La ligne est résiduelle et couvre plusieurs contributions. Elle soutient le classement de la famille mais ne permet pas d'attribuer 1 364 M€ à une fiche particulière."
+      "reason": "La ligne est résiduelle et couvre plusieurs taxes assises sur l'emploi ou la masse salariale. Elle soutient le classement des contributions employeur du lot, mais ne permet pas d'attribuer 1 364 M€ à une fiche particulière."
+    },
+    {
+      "id": "ntl-autres-taxes-d51m-2024",
+      "source_id": "ec-ntl-2026-france",
+      "source_row": 136,
+      "esa_code": "D51M",
+      "national_detail_code": "C01",
+      "name": "Autres taxes",
+      "economic_function": "_Z",
+      "recipient_scope": "S.13 + S.212",
+      "year": 2024,
+      "amount_meur": 1127,
+      "warning_flag": "aggregate-or-residual-label",
+      "assigned_to_records": false,
+      "reason": "Cette ligne est conservée comme piste de classement possible pour des prélèvements directs non identifiés individuellement. Elle ne nomme pas la contribution sur les rentes à prestations définies."
+    },
+    {
+      "id": "ntl-autres-prelevements-sociaux-d51m-2024",
+      "source_id": "ec-ntl-2026-france",
+      "source_row": 141,
+      "esa_code": "D51M",
+      "national_detail_code": "C06",
+      "name": "Autres prélèvements sociaux",
+      "economic_function": "_Z",
+      "recipient_scope": "S.13 + S.212",
+      "year": 2024,
+      "amount_meur": 14646,
+      "warning_flag": "aggregate-label",
+      "assigned_to_records": false,
+      "reason": "Cette ligne est conservée comme autre piste de classement possible pour la contribution due par les bénéficiaires. Son agrégation ne permet pas d'établir l'inclusion de cette créance particulière."
     }
   ],
   "forecast_envelopes": [
@@ -453,87 +484,6 @@
       "publication_status": "ready_for_review",
       "production_status": "not_integrated",
       "operational_status": "closed_to_new_rights"
-    },
-    {
-      "canonical_id": "contribution-beneficiaires-rentes-prestations-definies",
-      "draft_entries": [
-        {
-          "index": 14,
-          "id": "contribution-sur-les-regimes-de-retraite-conditionnant-la-co",
-          "treatment": "split",
-          "legal_claim": "CSS L. 137-11-1"
-        }
-      ],
-      "nom": "Contrib. bénéficiaires rentes définies",
-      "nom_complet": "Contribution à la charge des bénéficiaires sur les rentes de retraite à prestations définies",
-      "annee_creation": 2010,
-      "current_form_since": "2019-07-05",
-      "creation_evidence": {
-        "source_id": "legifrance-css-l137-11-1-creation-2010",
-        "locator": "Première version — création par la loi n° 2010-1594, article 10"
-      },
-      "po_status": "confirmed",
-      "legal_status": "active",
-      "membership_status": "ready",
-      "reason_codes": [
-        "statistical-classification-confirmed",
-        "current-law-confirmed",
-        "split-required"
-      ],
-      "legal_basis": [
-        {
-          "source_id": "legifrance-css-l137-11-a-l137-11-2-2026-09-02",
-          "locator": "CSS, article L. 137-11-1"
-        }
-      ],
-      "liable_person": "Bénéficiaire de la rente",
-      "tax_base": "Rentes versées dans le cadre des régimes mentionnés au I de l'article L. 137-11 et à l'article L. 137-11-2.",
-      "rate_structure": {
-        "reference_bands_before_annual_revaluation": [
-          {
-            "retirement_liquidation": "avant le 1er janvier 2011",
-            "zero_rate_until_eur_per_month": 500,
-            "rate_7_percent_until_eur_per_month": 1000,
-            "rate_14_percent_above_eur_per_month": 1000
-          },
-          {
-            "retirement_liquidation": "à compter du 1er janvier 2011",
-            "zero_rate_until_eur_per_month": 400,
-            "rate_7_percent_until_eur_per_month": 600,
-            "rate_14_percent_above_eur_per_month": 600
-          }
-        ],
-        "annual_revaluation": "Les valeurs sont revalorisées chaque année selon l'évolution du plafond de l'article L. 241-3.",
-        "constitutional_treatment": "Le taux de 21 % et les plafonds supérieurs de 24 000 € figurant dans le texte ont été déclarés contraires à la Constitution et sont inapplicables."
-      },
-      "collection_framework": "Précompte par les organismes débiteurs des rentes ; recouvrement et contrôle dans les mêmes conditions que la CSG due sur ces rentes.",
-      "beneficiary": {
-        "name": "Assurance vieillesse et veuvage du régime général",
-        "source_id": "legifrance-css-l241-3-2026"
-      },
-      "classification": {
-        "source_id": "ec-ntl-2026-france",
-        "source_row": 107,
-        "esa_code": "D29C",
-        "national_detail_code": "C01",
-        "recipient_scope": "S.13 + S.212",
-        "locator": "FR row 107 — Autres taxes",
-        "granularity": "family_level_aggregate_or_residual_envelope",
-        "amount_attributable_to_record": false
-      },
-      "revenues": {
-        "observed": [],
-        "forecast": [],
-        "forecast_envelope_ref": "lfss-retraites-prestations-definies-2025-2026"
-      },
-      "warnings": [
-        "Les seuils numériques inscrits dans le code sont des valeurs de référence revalorisées chaque année.",
-        "Les dispositions déclarées inconstitutionnelles ne sont pas traitées comme des taux applicables.",
-        "La prévision LFSS de 179 M€ n'est pas attribuée individuellement après la scission de la ligne 14."
-      ],
-      "research_status": "complete_except_individual_revenue_and_2026_revalued_thresholds",
-      "publication_status": "ready_for_review",
-      "production_status": "not_integrated"
     },
     {
       "canonical_id": "contribution-employeur-retraites-prestations-definies-droits-acquis",
@@ -716,6 +666,110 @@
   ],
   "blocked_candidates": [
     {
+      "canonical_id": "contribution-beneficiaires-rentes-prestations-definies",
+      "draft_entries": [
+        {
+          "index": 14,
+          "id": "contribution-sur-les-regimes-de-retraite-conditionnant-la-co",
+          "treatment": "split",
+          "legal_claim": "CSS L. 137-11-1"
+        }
+      ],
+      "nom": "Contrib. bénéficiaires rentes définies",
+      "nom_complet": "Contribution à la charge des bénéficiaires sur les rentes de retraite à prestations définies",
+      "annee_creation": 2010,
+      "current_form_since": "2019-07-05",
+      "creation_evidence": {
+        "source_id": "legifrance-css-l137-11-1-creation-2010",
+        "locator": "Première version — création par la loi n° 2010-1594, article 10"
+      },
+      "po_status": "unresolved",
+      "legal_status": "active",
+      "membership_status": "blocked",
+      "reason_codes": [
+        "current-law-confirmed",
+        "classification-unverified",
+        "source-needed",
+        "split-required"
+      ],
+      "legal_basis": [
+        {
+          "source_id": "legifrance-css-l137-11-a-l137-11-2-2026-09-02",
+          "locator": "CSS, article L. 137-11-1"
+        }
+      ],
+      "liable_person": "Bénéficiaire de la rente",
+      "tax_base": "Rentes versées dans le cadre des régimes mentionnés au I de l'article L. 137-11 et à l'article L. 137-11-2.",
+      "rate_structure": {
+        "reference_bands_before_annual_revaluation": [
+          {
+            "retirement_liquidation": "avant le 1er janvier 2011",
+            "zero_rate_until_eur_per_month": 500,
+            "rate_7_percent_until_eur_per_month": 1000,
+            "rate_14_percent_above_eur_per_month": 1000
+          },
+          {
+            "retirement_liquidation": "à compter du 1er janvier 2011",
+            "zero_rate_until_eur_per_month": 400,
+            "rate_7_percent_until_eur_per_month": 600,
+            "rate_14_percent_above_eur_per_month": 600
+          }
+        ],
+        "annual_revaluation": "Les valeurs sont revalorisées chaque année selon l'évolution du plafond de l'article L. 241-3.",
+        "constitutional_treatment": "Le taux de 21 % et les plafonds supérieurs de 24 000 € figurant dans le texte ont été déclarés contraires à la Constitution et sont inapplicables."
+      },
+      "collection_framework": "Précompte par les organismes débiteurs des rentes ; recouvrement et contrôle dans les mêmes conditions que la CSG due sur ces rentes.",
+      "beneficiary": {
+        "name": "Assurance vieillesse et veuvage du régime général",
+        "source_id": "legifrance-css-l241-3-2026"
+      },
+      "classification": {
+        "status": "unverified",
+        "excluded_inheritance": {
+          "source_id": "ec-ntl-2026-france",
+          "source_row": 107,
+          "esa_code": "D29C",
+          "national_detail_code": "C01",
+          "reason": "La ligne 107 est une enveloppe résiduelle utilisée pour les contributions employeur du lot. Elle ne nomme pas la créance précomptée sur les rentes et ne peut pas être héritée automatiquement après la scission de la ligne 14."
+        },
+        "candidate_rows_to_verify": [
+          {
+            "source_id": "ec-ntl-2026-france",
+            "source_row": 136,
+            "esa_code": "D51M",
+            "national_detail_code": "C01",
+            "name": "Autres taxes",
+            "amount_2024_meur": 1127,
+            "amount_attributable_to_record": false
+          },
+          {
+            "source_id": "ec-ntl-2026-france",
+            "source_row": 141,
+            "esa_code": "D51M",
+            "national_detail_code": "C06",
+            "name": "Autres prélèvements sociaux",
+            "amount_2024_meur": 14646,
+            "amount_attributable_to_record": false
+          }
+        ],
+        "required_evidence": "Correspondance officielle nommant la contribution de l'article L. 137-11-1, ou document de passage permettant de la rattacher sans ambiguïté à une catégorie SEC."
+      },
+      "revenues": {
+        "observed": [],
+        "forecast": [],
+        "forecast_envelope_ref": "lfss-retraites-prestations-definies-2025-2026"
+      },
+      "warnings": [
+        "Les seuils numériques inscrits dans le code sont des valeurs de référence revalorisées chaque année.",
+        "Les dispositions déclarées inconstitutionnelles ne sont pas traitées comme des taux applicables.",
+        "La prévision LFSS de 179 M€ n'est pas attribuée individuellement après la scission de la ligne 14.",
+        "Le classement D29C de la ligne 107 n'est pas hérité : la source ne nomme pas cette contribution due par le bénéficiaire."
+      ],
+      "research_status": "complete_except_statistical_classification_individual_revenue_and_2026_revalued_thresholds",
+      "publication_status": "blocked",
+      "production_status": "not_integrated"
+    },
+    {
       "canonical_id": "cotisation-ravgdt-debitants-tabac",
       "draft_entries": [],
       "inventory_status": "missing_from_draft",
@@ -845,6 +899,11 @@
     "production_files_left_unchanged": [
       "data/entries-full.json",
       "data/entries-light.json"
-    ]
+    ],
+    "split_index_14_ready_records": 2,
+    "split_index_14_blocked_records": 1,
+    "beneficiary_paid_defined_benefit_contribution_is_not_assigned_to_d29c": true,
+    "d51_candidate_envelopes_are_not_assigned": true,
+    "blocked_candidates_lack_explicit_classification": true
   }
 }
