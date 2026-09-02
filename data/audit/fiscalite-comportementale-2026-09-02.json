@@ -1,0 +1,667 @@
+{
+  "schema_version": 1,
+  "batch_id": "fiscalite-comportementale-2026-09-02",
+  "title": "Lot de reprise — fiscalité comportementale et droit de licence des débitants de tabac",
+  "audit_date": "2026-09-02",
+  "status": "ready_for_review",
+  "production_dataset_changed": false,
+  "source_draft": {
+    "path": "data/audit/draft-2026-08-05.json",
+    "source_version": "2026-08-05",
+    "draft_indices": [
+      23,
+      197
+    ],
+    "draft_entry_count": 2
+  },
+  "inventory_additions": {
+    "count": 2,
+    "description": "Deux impositions actives documentées par les sources officielles n'avaient pas de ligne autonome dans le brouillon historique.",
+    "canonical_ids": [
+      "contribution-boissons-sucrees",
+      "droit-licence-debitants-tabac"
+    ]
+  },
+  "scope": {
+    "description": "Reprise de deux lignes du brouillon et ajout documentaire de deux unités absentes, dans le prolongement du lot TVA et accises. Le lot couvre les contributions sur les boissons sucrées et prémix, la cotisation sur les alcools de plus de 18° et le droit de licence des débitants de tabac.",
+    "canonical_record_count": 4,
+    "canonical_ids": [
+      "contribution-boissons-sucrees",
+      "cotisation-alcools-plus-18",
+      "taxe-premix",
+      "droit-licence-debitants-tabac"
+    ]
+  },
+  "measurement_policy": {
+    "unit": "millions_euros",
+    "forecast_revenue": "Prévisions 2025 et 2026 du PLFSS 2026, annexe 3. Elles restent distinctes de recettes observées.",
+    "explicit_zero": "Une prévision officielle égale à zéro est conservée comme valeur documentée. Elle ne signifie ni abrogation ni absence juridique.",
+    "aggregate_envelopes": "Les lignes NTL 37 « Taxes sur les boissons » et 38 « Taxes sur les tabacs » couvrent plusieurs impositions. Leurs montants ne sont attribués à aucune fiche particulière.",
+    "draft_amounts": "Les montants du brouillon sans année explicite ne sont pas repris comme recettes canoniques.",
+    "missing_draft_entry": "L'absence d'une imposition dans le brouillon n'est pas interprétée comme une exclusion : une fiche d'ajout d'inventaire est créée lorsque l'existence juridique et une prévision officielle sont établies."
+  },
+  "sources": [
+    {
+      "id": "ec-ntl-2026-france",
+      "title": "Data on Taxation Trends — National tax list 2026, feuille France",
+      "publisher": "Commission européenne, DG TAXUD / Eurostat",
+      "url": "https://taxation-customs.ec.europa.eu/document/download/600d56d1-ea6e-416e-9981-1c8b9c603b6b_en?filename=NTL%20edition%202026%20web.xlsx",
+      "publication_date": "2026-03-30",
+      "data_through": 2024,
+      "retrieved_at": "2026-09-01",
+      "local_path": "data/reference/ntl-france-2026.json",
+      "supports": [
+        "po_classification",
+        "statistical_envelope"
+      ]
+    },
+    {
+      "id": "lfss-2026-annexe-3",
+      "title": "PLFSS 2026 — Annexe 3, équilibre des finances sociales",
+      "publisher": "Direction de la Sécurité sociale",
+      "url": "https://www.securite-sociale.fr/files/live/sites/SSFR/files/medias/PLFSS/2026/PLFSS2026-Annexe3-20251015-103900-55-4_avec%20couverture.pdf",
+      "publication_date": "2025-10-23",
+      "retrieved_at": "2026-09-01",
+      "local_path": "data/reference/lfss-2026-annexe-3-impositions.json",
+      "supports": [
+        "forecast_revenue",
+        "collection_body",
+        "beneficiary",
+        "inventory_completeness"
+      ],
+      "locator": "Tableau 31, page imprimée 48",
+      "limitation": "Document annexé au projet : la vigueur et les références juridiques sont contrôlées séparément dans le droit en vigueur."
+    },
+    {
+      "id": "legifrance-cgi-1613-ter-2026-09-01",
+      "title": "CGI — article 1613 ter, version en vigueur au 1er septembre 2026",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000052022129",
+      "effective_from": "2026-07-01",
+      "effective_to": "2027-01-01",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "legal_status",
+        "legal_basis",
+        "tax_base",
+        "rates",
+        "beneficiary",
+        "future_recodification"
+      ]
+    },
+    {
+      "id": "legifrance-loi-2011-1977-art-26",
+      "title": "Loi n° 2011-1977 du 28 décembre 2011 de finances pour 2012 — article 26",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000025044460/",
+      "publication_date": "2011-12-29",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "creation_year"
+      ]
+    },
+    {
+      "id": "legifrance-cgi-1613-bis-2026-09-01",
+      "title": "CGI — article 1613 bis, version en vigueur au 1er septembre 2026",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000053282843",
+      "effective_from": "2025-12-31",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "legal_status",
+        "legal_basis",
+        "tax_base",
+        "rates",
+        "collection_recipient"
+      ]
+    },
+    {
+      "id": "legifrance-loi-1996-1160-art-29",
+      "title": "Loi n° 96-1160 du 27 décembre 1996 de financement de la sécurité sociale pour 1997 — article 29",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000000198309",
+      "publication_date": "1996-12-29",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "creation_year"
+      ]
+    },
+    {
+      "id": "legifrance-arrete-premix-stimulants-2026",
+      "title": "Arrêté du 25 juin 2026 pris pour l'application de l'article 1613 bis du CGI relatif à la taxe dite « prémix »",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000054436369",
+      "publication_date": "2026-07-17",
+      "effective_from": "2026-09-01",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "current_scope",
+        "implementing_rules"
+      ]
+    },
+    {
+      "id": "legifrance-css-l245-7-12-2026-09-01",
+      "title": "CSS — section « Cotisation sur les boissons alcooliques », articles L. 245-7 à L. 245-12",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/codes/section_lc/LEGITEXT000006073189/LEGISCTA000006173030/",
+      "effective_date": "2026-09-01",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "legal_status",
+        "legal_basis",
+        "tax_base",
+        "assessment_and_collection"
+      ]
+    },
+    {
+      "id": "legifrance-loi-1983-25-art-26",
+      "title": "Loi n° 83-25 du 19 janvier 1983 portant diverses mesures relatives à la sécurité sociale — article 26",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/loda/article_lc/LEGIARTI000006274083",
+      "publication_date": "1983-01-20",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "creation_year",
+        "historical_threshold"
+      ]
+    },
+    {
+      "id": "douane-alcools-2026",
+      "title": "Droits des alcools et boissons alcooliques — tarifs 2026",
+      "publisher": "Direction générale des douanes et droits indirects",
+      "url": "https://www.douane.gouv.fr/fiche/droits-des-alcools-et-boissons-alcooliques",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "current_rates",
+        "operational_guidance"
+      ]
+    },
+    {
+      "id": "legifrance-cgi-568-2026-09-01",
+      "title": "CGI — article 568, version en vigueur au 1er septembre 2026",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000041472783",
+      "effective_from": "2026-07-29",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "legal_status",
+        "legal_basis",
+        "statutory_rate_mechanism",
+        "assessment_and_collection"
+      ]
+    },
+    {
+      "id": "legifrance-cgi-annexe-iv-56-aj-2026",
+      "title": "CGI, annexe IV — article 56 AJ, taux de rémunération et prélèvements des débitants de tabac",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000053307157",
+      "effective_date": "2026-01-01",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "operational_rate",
+        "ravgdt_candidate"
+      ]
+    },
+    {
+      "id": "douane-remuneration-debitants-tabac-2026",
+      "title": "Rémunération des débitants de tabac",
+      "publisher": "Direction générale des douanes et droits indirects",
+      "url": "https://www.douane.gouv.fr/fiche/remuneration-des-debitants-de-tabac",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "operational_rate",
+        "payment_process",
+        "ravgdt_candidate"
+      ]
+    }
+  ],
+  "records": [
+    {
+      "canonical_id": "contribution-boissons-sucrees",
+      "draft_entries": [],
+      "inventory_status": "missing_from_draft",
+      "inventory_evidence": {
+        "finding": "Aucune ligne autonome n'a été retrouvée dans le brouillon des 371 entrées.",
+        "official_evidence": [
+          "lfss-2026-annexe-3",
+          "legifrance-cgi-1613-ter-2026-09-01"
+        ]
+      },
+      "nom": "Contribution boissons sucrées",
+      "nom_complet": "Contribution sur les boissons contenant des sucres ajoutés",
+      "annee_creation": 2011,
+      "creation_evidence": {
+        "source_id": "legifrance-loi-2011-1977-art-26",
+        "locator": "Article 26 — création de l'article 1613 ter du CGI"
+      },
+      "po_status": "confirmed",
+      "legal_status": "active",
+      "legal_basis": [
+        {
+          "source_id": "legifrance-cgi-1613-ter-2026-09-01",
+          "locator": "CGI, article 1613 ter, I à VI"
+        }
+      ],
+      "future_legal_context": {
+        "effective_date": "2027-01-01",
+        "source_id": "legifrance-cgi-1613-ter-2026-09-01",
+        "treatment": "L'abrogation affichée correspond à la recodification programmée. La fiche reste active au 1er septembre 2026 et devra être remappée dans le CIBS en 2027."
+      },
+      "tax_base": {
+        "description": "Boissons et préparations liquides relevant des codes NC 2009 et 2202, contenant des sucres ajoutés, conditionnées pour la consommation humaine et non alcooliques.",
+        "liable_event": "Première livraison en France ou consommation dans le cadre d'une activité économique."
+      },
+      "rates_2026": [
+        {
+          "added_sugar_kg_per_hl": "moins de 5",
+          "amount_eur_per_hl": 4.07
+        },
+        {
+          "added_sugar_kg_per_hl": "de 5 à 8",
+          "amount_eur_per_hl": 21.38
+        },
+        {
+          "added_sugar_kg_per_hl": "plus de 8",
+          "amount_eur_per_hl": 35.63
+        }
+      ],
+      "collection_body": "DGFIP",
+      "beneficiary": "CCMSA — branche maladie des non-salariés agricoles",
+      "classification": {
+        "source_id": "ec-ntl-2026-france",
+        "source_row": 37,
+        "esa_code": "D214A",
+        "national_detail_code": "C09",
+        "recipient_scope": "S.13 + S.212",
+        "locator": "FR row 37 — Taxes sur les boissons",
+        "granularity": "aggregate_envelope",
+        "amount_attributable_to_record": false
+      },
+      "revenues": {
+        "observed": [],
+        "observed_statistical_envelope": {
+          "year": 2024,
+          "amount_meur": 4749,
+          "source_id": "ec-ntl-2026-france",
+          "locator": "FR row 37 (D214A C09)",
+          "scope": "ensemble agrégé des taxes sur les boissons ; non attribuable à cette contribution seule"
+        },
+        "forecast": [
+          {
+            "year": 2025,
+            "amount_meur": 817,
+            "source_id": "lfss-2026-annexe-3",
+            "locator": "Annexe 3, p. 48"
+          },
+          {
+            "year": 2026,
+            "amount_meur": 967,
+            "source_id": "lfss-2026-annexe-3",
+            "locator": "Annexe 3, p. 48"
+          }
+        ]
+      },
+      "warnings": [
+        "Cette imposition était absente du brouillon historique et constitue un ajout d'inventaire.",
+        "La ligne NTL 37 inclut d'autres prélèvements sur les boissons.",
+        "La base juridique devra être remappée lors de la recodification entrant en vigueur le 1er janvier 2027."
+      ],
+      "research_status": "complete",
+      "publication_status": "ready_for_review",
+      "production_status": "not_integrated",
+      "current_article_version_since": "2026-07-01"
+    },
+    {
+      "canonical_id": "cotisation-alcools-plus-18",
+      "draft_entries": [
+        {
+          "index": 23,
+          "id": "cotisation-speciale-sur-les-boissons-alcooliques",
+          "treatment": "keep_and_update_name"
+        }
+      ],
+      "nom": "Cotisation alcools > 18°",
+      "nom_complet": "Cotisation sur les boissons alcooliques d'une teneur supérieure à 18 % vol.",
+      "annee_creation": 1983,
+      "current_form_since": "2024-01-01",
+      "creation_evidence": {
+        "source_id": "legifrance-loi-1983-25-art-26",
+        "locator": "Article 26 — création d'une cotisation sur les boissons alcooliques alors applicable au-delà de 25 % vol.",
+        "note": "Le seuil historique de 25 % a ensuite été abaissé à 18 %. L'année 1983 décrit la création de la cotisation, non son périmètre actuel."
+      },
+      "po_status": "confirmed",
+      "legal_status": "active",
+      "legal_basis": [
+        {
+          "source_id": "legifrance-css-l245-7-12-2026-09-01",
+          "locator": "CSS, articles L. 245-7 à L. 245-12"
+        }
+      ],
+      "tax_base": {
+        "description": "Boissons alcooliques d'une teneur supérieure à 18 % vol.",
+        "assessment_rule": "Les règles de fait générateur, d'exigibilité, de redevable, de constatation et de paiement suivent celles de l'accise sur les alcools."
+      },
+      "rates_2026": [
+        {
+          "category": "alcools titrant plus de 18 % vol.",
+          "amount": 620.47,
+          "unit": "euros_par_hectolitre_alcool_pur",
+          "source_id": "douane-alcools-2026"
+        },
+        {
+          "category": "produits intermédiaires et bières titrant plus de 18 % vol.",
+          "amount": 52.39,
+          "unit": "euros_par_hectolitre",
+          "source_id": "douane-alcools-2026"
+        },
+        {
+          "category": "certains produits intermédiaires de la vigne, taux réduit à 40 %",
+          "amount": 20.97,
+          "unit": "euros_par_hectolitre",
+          "source_id": "douane-alcools-2026"
+        }
+      ],
+      "beneficiary": "CCMSA — branche vieillesse des non-salariés agricoles",
+      "classification": {
+        "source_id": "ec-ntl-2026-france",
+        "source_row": 37,
+        "esa_code": "D214A",
+        "national_detail_code": "C09",
+        "recipient_scope": "S.13 + S.212",
+        "locator": "FR row 37 — Taxes sur les boissons",
+        "granularity": "aggregate_envelope",
+        "amount_attributable_to_record": false
+      },
+      "revenues": {
+        "observed": [],
+        "observed_statistical_envelope": {
+          "year": 2024,
+          "amount_meur": 4749,
+          "source_id": "ec-ntl-2026-france",
+          "locator": "FR row 37 (D214A C09)",
+          "scope": "ensemble agrégé des taxes sur les boissons ; non attribuable à cette cotisation seule"
+        },
+        "forecast": [
+          {
+            "year": 2025,
+            "amount_meur": 732,
+            "source_id": "lfss-2026-annexe-3",
+            "locator": "Annexe 3, p. 48"
+          },
+          {
+            "year": 2026,
+            "amount_meur": 734,
+            "source_id": "lfss-2026-annexe-3",
+            "locator": "Annexe 3, p. 48"
+          }
+        ]
+      },
+      "draft_corrections": [
+        {
+          "field": "nom",
+          "draft_value": "Cotisation spéciale sur les boissons alcooliques",
+          "canonical_value": "Cotisation sur les boissons alcooliques d'une teneur supérieure à 18 % vol.",
+          "explanation": "Le nom canonique reprend le seuil légal actuel."
+        },
+        {
+          "field": "recette",
+          "draft_value_meur": 700,
+          "canonical_value_meur": null,
+          "explanation": "Le montant du brouillon n'avait pas d'année. Les prévisions 2025 et 2026 sont conservées séparément et ne deviennent pas une recette observée."
+        }
+      ],
+      "warnings": [
+        "Cette cotisation est distincte de l'accise sur les alcools malgré des règles de recouvrement alignées.",
+        "La ligne NTL 37 inclut d'autres prélèvements sur les boissons.",
+        "Le PLFSS cite les articles L. 245-7 à L. 245-11 ; la fiche référence la section complète jusqu'à L. 245-12, qui prévoit le décret d'application."
+      ],
+      "research_status": "complete",
+      "publication_status": "ready_for_review",
+      "production_status": "not_integrated",
+      "collection_framework": "Règles de fait générateur, d'exigibilité, de déclaration, de paiement, de contrôle et de recouvrement applicables à l'accise sur les alcools."
+    },
+    {
+      "canonical_id": "taxe-premix",
+      "draft_entries": [
+        {
+          "index": 197,
+          "id": "taxe-sur-les-boissons-premix",
+          "treatment": "keep_and_update_scope"
+        }
+      ],
+      "nom": "Taxe prémix",
+      "nom_complet": "Taxe dite « prémix »",
+      "annee_creation": 1996,
+      "current_form_since": "2025-12-31",
+      "current_implementation_since": "2026-09-01",
+      "creation_evidence": {
+        "source_id": "legifrance-loi-1996-1160-art-29",
+        "locator": "Article 29 — création de l'article 1613 bis du CGI"
+      },
+      "po_status": "confirmed",
+      "legal_status": "active",
+      "legal_basis": [
+        {
+          "source_id": "legifrance-cgi-1613-bis-2026-09-01",
+          "locator": "CGI, article 1613 bis, I à V"
+        },
+        {
+          "source_id": "legifrance-arrete-premix-stimulants-2026",
+          "locator": "Article 1 — caféine, guaranine, taurine et ginseng ; entrée en vigueur le 1er septembre 2026"
+        }
+      ],
+      "tax_base": {
+        "description": "Certaines boissons alcoolisées mélangées ou fortement sucrées présentant plus de 1,2 % vol. et moins de 12 % vol., ainsi que les boissons de plus de 1,2 % vol. auxquelles sont ajoutées certaines substances stimulantes.",
+        "stimulants_effective_2026_09_01": [
+          "caféine",
+          "guaranine",
+          "taurine",
+          "ginseng"
+        ]
+      },
+      "rates": [
+        {
+          "category": "vins et autres boissons fermentées",
+          "amount": 3,
+          "unit": "euros_par_decilitre_alcool_pur"
+        },
+        {
+          "category": "autres produits",
+          "amount": 11,
+          "unit": "euros_par_decilitre_alcool_pur"
+        }
+      ],
+      "collection_recipient": "ACOSS",
+      "beneficiary": "CNAM",
+      "classification": {
+        "source_id": "ec-ntl-2026-france",
+        "source_row": 37,
+        "esa_code": "D214A",
+        "national_detail_code": "C09",
+        "recipient_scope": "S.13 + S.212",
+        "locator": "FR row 37 — Taxes sur les boissons",
+        "granularity": "aggregate_envelope",
+        "amount_attributable_to_record": false
+      },
+      "revenues": {
+        "observed": [],
+        "observed_statistical_envelope": {
+          "year": 2024,
+          "amount_meur": 4749,
+          "source_id": "ec-ntl-2026-france",
+          "locator": "FR row 37 (D214A C09)",
+          "scope": "ensemble agrégé des taxes sur les boissons ; non attribuable à la taxe prémix seule"
+        },
+        "forecast": [
+          {
+            "year": 2025,
+            "amount_meur": 0,
+            "source_id": "lfss-2026-annexe-3",
+            "locator": "Annexe 3, p. 48",
+            "value_semantics": "explicit_zero"
+          },
+          {
+            "year": 2026,
+            "amount_meur": 0,
+            "source_id": "lfss-2026-annexe-3",
+            "locator": "Annexe 3, p. 48",
+            "value_semantics": "explicit_zero"
+          }
+        ]
+      },
+      "draft_corrections": [
+        {
+          "field": "recette",
+          "draft_value_meur": 2.3,
+          "canonical_value_meur": null,
+          "explanation": "Le montant du brouillon n'avait pas d'année. Les zéros du PLFSS sont des prévisions explicites et ne constituent pas une recette observée."
+        },
+        {
+          "field": "perimetre",
+          "draft_value": "boissons prémix",
+          "canonical_value": "périmètre de l'article 1613 bis en vigueur, incluant depuis le 1er septembre 2026 les stimulants listés par arrêté",
+          "explanation": "La définition juridique a été élargie et doit être datée."
+        }
+      ],
+      "warnings": [
+        "Une prévision nulle ne signifie pas que la taxe est abrogée : l'article 1613 bis est en vigueur.",
+        "Le périmètre réglementaire relatif aux stimulants est entré en vigueur le 1er septembre 2026.",
+        "La ligne NTL 37 inclut d'autres prélèvements sur les boissons."
+      ],
+      "research_status": "complete",
+      "publication_status": "ready_for_review",
+      "production_status": "not_integrated",
+      "collection_framework": "Règles applicables à l'accise sur les alcools pour le fait générateur, l'exigibilité, les obligations fiscales, le paiement, le contrôle et le recouvrement."
+    },
+    {
+      "canonical_id": "droit-licence-debitants-tabac",
+      "draft_entries": [],
+      "inventory_status": "missing_from_draft",
+      "inventory_evidence": {
+        "finding": "Aucune ligne autonome n'a été retrouvée dans le brouillon des 371 entrées.",
+        "official_evidence": [
+          "lfss-2026-annexe-3",
+          "legifrance-cgi-568-2026-09-01"
+        ]
+      },
+      "nom": "Droit de licence débitants tabac",
+      "nom_complet": "Droit de licence sur la rémunération des débitants de tabac",
+      "annee_creation": null,
+      "creation_status": "not_established_in_this_batch",
+      "current_article_version_since": "2026-07-29",
+      "po_status": "confirmed",
+      "legal_status": "active",
+      "legal_basis": [
+        {
+          "source_id": "legifrance-cgi-568-2026-09-01",
+          "locator": "CGI, article 568"
+        },
+        {
+          "source_id": "legifrance-cgi-annexe-iv-56-aj-2026",
+          "locator": "CGI, annexe IV, article 56 AJ"
+        }
+      ],
+      "tax_base": {
+        "description": "Droit dû par les débitants de tabac et basé juridiquement sur la remise brute.",
+        "assessment_and_payment": "Exigible à la mise à la consommation, liquidé et acquitté par les fournisseurs agréés pour le compte des débitants."
+      },
+      "rate_mechanism": {
+        "statutory": {
+          "basis": "remise brute",
+          "range_percent": [
+            15,
+            30
+          ],
+          "source_id": "legifrance-cgi-568-2026-09-01"
+        },
+        "operational_2026_metropolitan_france": {
+          "basis": "montant des livraisons de tabacs manufacturés",
+          "rate_percent": 1.78,
+          "effective_from": "2026-01-01",
+          "source_id": "douane-remuneration-debitants-tabac-2026"
+        },
+        "interpretation": "Les deux pourcentages portent sur des bases différentes et ne sont pas directement comparables."
+      },
+      "collection_body": "Administration des douanes",
+      "beneficiary": "CNAM",
+      "classification": {
+        "source_id": "ec-ntl-2026-france",
+        "source_row": 38,
+        "esa_code": "D214A",
+        "national_detail_code": "C10",
+        "recipient_scope": "S.13 + S.212",
+        "locator": "FR row 38 — Taxes sur les tabacs",
+        "granularity": "aggregate_envelope",
+        "amount_attributable_to_record": false
+      },
+      "revenues": {
+        "observed": [],
+        "observed_statistical_envelope": {
+          "year": 2024,
+          "amount_meur": 13606,
+          "source_id": "ec-ntl-2026-france",
+          "locator": "FR row 38 (D214A C10)",
+          "scope": "ensemble agrégé des taxes sur les tabacs ; non attribuable à ce droit de licence seul"
+        },
+        "forecast": [
+          {
+            "year": 2025,
+            "amount_meur": 340,
+            "source_id": "lfss-2026-annexe-3",
+            "locator": "Annexe 3, p. 48"
+          },
+          {
+            "year": 2026,
+            "amount_meur": 330,
+            "source_id": "lfss-2026-annexe-3",
+            "locator": "Annexe 3, p. 48"
+          }
+        ]
+      },
+      "warnings": [
+        "Cette imposition était absente du brouillon historique et constitue un ajout d'inventaire.",
+        "L'année de création n'est pas établie dans ce lot et reste nulle.",
+        "La ligne NTL 38 couvre également l'accise sur les tabacs et potentiellement d'autres prélèvements."
+      ],
+      "research_status": "complete_except_creation_year",
+      "publication_status": "ready_for_review",
+      "production_status": "not_integrated"
+    }
+  ],
+  "related_follow_up": [
+    {
+      "canonical_id": "cotisation-ravgdt-debitants-tabac",
+      "draft_entry": null,
+      "status": "candidate_missing_from_draft",
+      "current_rate_2026_percent_of_deliveries": 0.16,
+      "source_id": "douane-remuneration-debitants-tabac-2026",
+      "note": "Le portail des douanes décrit une cotisation obligatoire au régime de retraite additionnel des débitants de tabac. Sa base juridique, son affectation et son classement comme prélèvement obligatoire doivent être vérifiés avant création d'une fiche canonique."
+    },
+    {
+      "canonical_id": "contributions-boissons-recodification-2027",
+      "status": "future_legal_update",
+      "effective_date": "2027-01-01",
+      "note": "Les articles 1613 ter et 1613 quater du CGI doivent être remappés vers leur codification future dans le CIBS à l'entrée en vigueur de la recodification."
+    }
+  ],
+  "quality_checks": {
+    "canonical_ids_are_unique": true,
+    "draft_indices_are_unique": true,
+    "draft_indices": [
+      23,
+      197
+    ],
+    "inventory_additions_are_explicit": true,
+    "inventory_addition_count": 2,
+    "all_records_have_current_legal_basis": true,
+    "all_forecasts_have_year_and_source": true,
+    "explicit_zero_forecasts_are_preserved": true,
+    "observed_and_forecast_series_are_separate": true,
+    "ntl_rows_37_and_38_are_not_assigned_to_single_levies": true,
+    "undated_draft_amounts_are_not_promoted": true,
+    "production_files_left_unchanged": [
+      "data/entries-full.json",
+      "data/entries-light.json"
+    ]
+  }
+}
