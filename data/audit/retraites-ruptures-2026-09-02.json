@@ -243,7 +243,7 @@
       "supports": [
         "mandatory_status",
         "operational_context",
-        "source_discrepancy"
+        "source_quality_note"
       ]
     },
     {
@@ -755,10 +755,21 @@
       ],
       "liable_person": "Gérant de débit de tabac ordinaire",
       "rate_2026": {
-        "basis": "montant des livraisons de tabacs manufacturés en France métropolitaine",
-        "amount_percent": 0.16,
-        "effective_from": "2026-01-01",
-        "source_id": "douane-remuneration-debitants-tabac-2026"
+        "statutory_reference": {
+          "basis": "remise brute",
+          "amount_percent": 1.555,
+          "effective_from": "2025-01-01",
+          "source_id": "legifrance-decret-63-1104-ravgdt"
+        },
+        "operational_expression": {
+          "basis": "montant des livraisons de tabacs manufacturés en France métropolitaine",
+          "amount_percent": 0.16,
+          "effective_from": "2026-01-01",
+          "source_id": "douane-remuneration-debitants-tabac-2026"
+        },
+        "gross_commission_percent_of_deliveries_2026": 10.29,
+        "calculated_equivalent_percent_of_deliveries": 0.1600095,
+        "interpretation": "Le taux de 1,555 % de la remise brute équivaut à environ 0,1600 % des livraisons lorsque la remise brute vaut 10,29 % des livraisons. Les deux présentations sont cohérentes à l'arrondi."
       },
       "assessment_and_payment": "Cotisation exigible à la livraison, liquidée et acquittée par les fournisseurs pour le compte des débitants auprès de l'administration.",
       "funding_context": {
@@ -783,18 +794,10 @@
         "observed": [],
         "forecast": []
       },
-      "source_discrepancy": {
-        "dedicated_page": {
-          "source_id": "douane-ravgdt-2026",
-          "displayed_rate_percent_of_gross_commission": 1.57,
-          "displayed_effective_from": "2024-01-01"
-        },
-        "current_operational_page": {
-          "source_id": "douane-remuneration-debitants-tabac-2026",
-          "rate_percent_of_deliveries": 0.16,
-          "effective_from": "2026-01-01"
-        },
-        "treatment": "La fiche opérationnelle datée du 5 janvier 2026 est retenue pour le taux courant. Les taux portent en outre sur des assiettes différentes ; aucune conversion n'est utilisée comme preuve de classement statistique."
+      "source_quality_note": {
+        "source_id": "douane-ravgdt-2026",
+        "finding": "La page dédiée au RAVGDT, pourtant mise à jour le 31 juillet 2026, affiche encore le taux de 1,570 % de la remise brute applicable depuis 2024.",
+        "treatment": "Cette page n'est pas utilisée pour le taux courant : le décret consolidé retient 1,555 % depuis 2025 et la fiche opérationnelle 2026 fournit son expression équivalente, 0,16 % des livraisons."
       },
       "blocking_questions": [
         "Quel est le secteur institutionnel SEC du RAVGDT ou de son bénéficiaire final ?",

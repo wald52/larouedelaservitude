@@ -75,11 +75,11 @@ Elle soutient le classement statistique de la famille, mais son montant n'est at
 
 Le décret n° 63-1104 a institué à compter du 1er janvier 1963 un régime d'allocations viagères pour les gérants de débits de tabac. Les sources administratives le décrivent comme un régime de retraite obligatoire par répartition. Son financement comprend notamment une cotisation des gérants et une contribution de l'État.
 
-Pour la France métropolitaine, la fiche opérationnelle de la douane indique depuis le 1er janvier 2026 une cotisation égale à 0,16 % du montant des livraisons de tabacs manufacturés, acquittée par les fournisseurs pour le compte des débitants.
+Pour la France métropolitaine, le décret consolidé retient depuis le 1er janvier 2025 un taux de 1,555 % de la remise brute. La fiche opérationnelle de la douane indique depuis le 1er janvier 2026 une remise brute égale à 10,29 % des livraisons et exprime la cotisation RAVGDT à 0,16 % du montant des livraisons de tabacs manufacturés.
 
-Une autre page dédiée de la douane affiche encore un taux de 1,570 % de la remise brute applicable depuis 2024. Les deux chiffres portent sur des assiettes différentes, et la fiche la plus récente ne suffit pas à résoudre seule le classement statistique.
+Ces deux présentations sont cohérentes : 1,555 % de 10,29 % représente environ 0,1600 % des livraisons. Une page dédiée au RAVGDT, pourtant mise à jour en juillet 2026, affiche encore le taux de 1,570 % applicable depuis 2024 ; elle n'est donc pas utilisée pour fixer le taux courant.
 
-La cotisation est donc enregistrée comme candidate avec :
+Cette réconciliation tarifaire ne résout pas, à elle seule, le classement statistique. La cotisation est enregistrée comme candidate avec :
 
 - `legal_status: active` ;
 - `obligation_status: confirmed` ;
