@@ -10,6 +10,7 @@ Ce dossier conserve les sources officielles et les extractions normalisées util
 | [`bulk-sources.json`](bulk-sources.json) | Registre opérationnel principal des sources exploitables en masse, avec priorité, couverture, accès, limites et prochaine action |
 | [`bulk-sources-supplement-2026-09-02.json`](bulk-sources-supplement-2026-09-02.json) | Première recherche complémentaire vérifiée le 2 septembre 2026 : tableurs budgétaires, CTP, BOFiP, DSN, comptabilité et contrôles statistiques |
 | [`bulk-sources-supplement-2-2026-09-02.json`](bulk-sources-supplement-2-2026-09-02.json) | Troisième passe ciblée du 2 septembre 2026 : recettes DGFiP, référentiels locaux nationaux, JORF, calculateurs fiscaux et MSA |
+| [`bulk-sources-supplement-3-2026-09-03.json`](bulk-sources-supplement-3-2026-09-03.json) | Quatrième passe du 3 septembre 2026 : PLACSS, Unédic, taux et décisions locales, fiscalité environnementale, comptes Insee et bénéficiaires publics |
 | [`ntl-france-2026.json`](ntl-france-2026.json) | Extraction des 141 lignes françaises de détail de la National tax list 2026 |
 | [`lfss-2026-annexe-3-impositions.json`](lfss-2026-annexe-3-impositions.json) | Transcription contrôlée du tableau 31 de l’annexe 3 du PLFSS 2026 |
 
@@ -23,6 +24,11 @@ DSN, les balances comptables et les contrôles statistiques est décrite dans
 La passe ciblée sur les recettes administratives, les référentiels territoriaux, JORF,
 les calculateurs fiscaux et la MSA est décrite dans
 [`docs/sources-massives-recherche-complementaire-2.md`](../../docs/sources-massives-recherche-complementaire-2.md).
+
+La quatrième passe sur les comptes sociaux observés, les décisions fiscales locales,
+la fiscalité environnementale, les comptes Insee et la classification des bénéficiaires
+publics est décrite dans
+[`docs/sources-massives-recherche-complementaire-3.md`](../../docs/sources-massives-recherche-complementaire-3.md).
 
 ## Deux registres complémentaires
 
