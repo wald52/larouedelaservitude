@@ -1,0 +1,515 @@
+{
+  "schema_version": 1,
+  "batch_id": "cnbf-cotisations-base-2026-09-02",
+  "title": "Extension du lot CNBF — cotisations forfaitaire et proportionnelle du régime de base",
+  "audit_date": "2026-09-02",
+  "status": "ready_for_review",
+  "production_dataset_changed": false,
+  "source_draft": {
+    "path": "data/audit/draft-2026-08-05.json",
+    "source_version": "2026-08-05",
+    "draft_indices": [],
+    "draft_entry_count": 0,
+    "finding": "Aucune ligne autonome relative aux cotisations forfaitaire et proportionnelle du régime de base de la CNBF n'a été retrouvée dans le brouillon historique des 371 entrées."
+  },
+  "inventory_additions": {
+    "count": 2,
+    "canonical_ids": [
+      "cotisation-forfaitaire-retraite-base-cnbf",
+      "cotisation-proportionnelle-retraite-base-cnbf"
+    ],
+    "description": "Les deux cotisations obligatoires prévues par l'article L. 652-7 complètent la fiche sur les droits de plaidoirie créée dans le même lot de travail."
+  },
+  "continuity": {
+    "previous_batch": "data/audit/plaidoirie-cvec-2026-09-02.json",
+    "previous_canonical_id": "droits-plaidoirie-cnbf",
+    "relationship": "Les droits de plaidoirie et la contribution équivalente, la cotisation forfaitaire et la cotisation proportionnelle sont des ressources distinctes du même régime vieillesse de base. Elles ne doivent être ni fusionnées ni additionnées sans préciser la nature du total."
+  },
+  "scope": {
+    "description": "Documentation de deux cotisations sociales obligatoires absentes du brouillon : la cotisation annuelle forfaitaire et la cotisation proportionnelle au revenu du régime vieillesse de base des avocats. Chacune reste une créance unique malgré la ventilation employeur-salarié applicable aux avocats salariés.",
+    "ready_record_count": 2,
+    "ready_canonical_ids": [
+      "cotisation-forfaitaire-retraite-base-cnbf",
+      "cotisation-proportionnelle-retraite-base-cnbf"
+    ]
+  },
+  "measurement_policy": {
+    "unit": "millions_euros",
+    "administrative_product": "Les comptes de la CNBF fournissent un produit administratif du régime de base. Il reste distinct d'une observation de comptabilité nationale et n'est pas ventilé entre cotisation forfaitaire et cotisation proportionnelle.",
+    "classification_profiles": "Une même créance juridique reçoit plusieurs profils SEC selon le statut du cotisant : part employeur d'un avocat salarié, part salariale et cotisation d'un avocat non salarié.",
+    "employer_employee_split": "La ventilation 60 % employeur / 40 % salarié ne crée pas deux prélèvements canoniques supplémentaires ; elle décrit les débiteurs économiques d'une même cotisation.",
+    "historical_dates": "Les premières versions du code retrouvées fixent seulement un plancher documentaire. Elles ne sont pas présentées comme l'origine historique certaine des cotisations.",
+    "individual_revenue": "Aucune recette individuelle n'est fabriquée à partir du produit familial du régime de base."
+  },
+  "sources": [
+    {
+      "id": "legifrance-css-l652-7-2026",
+      "title": "CSS — article L. 652-7",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000051288997",
+      "effective_from": "2026-01-01",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "legal_status",
+        "legal_basis",
+        "mandatory_status",
+        "canonical_granularity",
+        "tax_base"
+      ]
+    },
+    {
+      "id": "legifrance-css-l652-10-2026",
+      "title": "CSS — article L. 652-10, avocats salariés",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000037084295",
+      "effective_from": "2018-09-01",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "salaried_base",
+        "employer_payment",
+        "employee_withholding",
+        "collection"
+      ]
+    },
+    {
+      "id": "legifrance-css-d652-1-d652-2-2026",
+      "title": "CSS — articles D. 652-1 et D. 652-2",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/codes/section_lc/LEGITEXT000006073189/LEGISCTA000038771222/",
+      "effective_date": "2026-09-02",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "proportional_rate",
+        "proportional_ceiling_rule",
+        "employee_share"
+      ]
+    },
+    {
+      "id": "cnbf-bareme-non-salaries-2026",
+      "title": "Barème des cotisations et prestations pour l'année 2026 — avocats non salariés",
+      "publisher": "Caisse nationale des barreaux français",
+      "url": "https://www.cnbf.fr/wp-content/uploads/2026/01/Bareme-CNBF-2026.01.01.pdf",
+      "publication_date": "2026-01-19",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "fixed_schedule",
+        "proportional_rate",
+        "annual_ceiling",
+        "new_practitioner_provisional_base"
+      ]
+    },
+    {
+      "id": "cnbf-bareme-employeurs-2026",
+      "title": "Barème employeurs 2026 — avocats salariés",
+      "publisher": "Caisse nationale des barreaux français",
+      "url": "https://www.cnbf.fr/wp-content/uploads/2026/01/CNBF-Bareme-employeurs-2026-.pdf",
+      "publication_date": "2026-01-13",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "fixed_schedule",
+        "employer_employee_split",
+        "proportional_rate",
+        "annual_and_monthly_ceiling"
+      ]
+    },
+    {
+      "id": "cnbf-comptes-2025",
+      "title": "Comptes annuels 2025 de la CNBF",
+      "publisher": "Caisse nationale des barreaux français",
+      "url": "https://www.cnbf.fr/wp-content/uploads/2026/05/CNBF-Comptes-2025.pdf",
+      "publication_date": "2026-04-25",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "administrative_product",
+        "institutional_recipient",
+        "previous_rights_record_product"
+      ],
+      "locator": "Compte de résultat du régime de retraite de base, page PDF 69"
+    },
+    {
+      "id": "legifrance-cnbf-statuts-2026",
+      "title": "Arrêté du 26 mars 2026 portant approbation des statuts de la CNBF",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000053748691",
+      "publication_date": "2026-04-02",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "institutional_recipient",
+        "mandatory_scheme",
+        "social_security_body"
+      ]
+    },
+    {
+      "id": "insee-independants-cnbf",
+      "title": "Les indépendants, témoins des transformations du travail ?",
+      "publisher": "Insee",
+      "url": "https://www.insee.fr/fr/statistiques/4470790",
+      "publication_date": "2020-04-28",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "compulsory_contribution",
+        "base_pension_scheme",
+        "po_classification"
+      ]
+    },
+    {
+      "id": "eurlex-2023-734-sec-contributions",
+      "title": "Règlement d'exécution (UE) 2023/734 — ventilation des cotisations sociales",
+      "publisher": "Union européenne / EUR-Lex",
+      "url": "https://eur-lex.europa.eu/legal-content/FR/ALL/?uri=uriserv:OJ.L_.2023.097.01.0001.01.FRA",
+      "publication_date": "2023-04-05",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "esa_codes",
+        "mandatory_employer_contribution",
+        "mandatory_employee_contribution",
+        "mandatory_self_employed_contribution"
+      ]
+    },
+    {
+      "id": "legifrance-css-l723-5-1985",
+      "title": "Ancien CSS — article L. 723-5, version du 21 décembre 1985",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/codes/id/LEGISCTA000006126905/1985-12-21",
+      "effective_from": "1985-12-21",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "fixed_contribution_historical_floor"
+      ]
+    },
+    {
+      "id": "legifrance-css-l723-5-1992",
+      "title": "Ancien CSS — article L. 723-5, version du 4 janvier 1992",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/codes/section_lc/LEGITEXT000006073189/LEGISCTA000006126905/1992-07-08",
+      "effective_from": "1992-01-04",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "proportional_contribution_historical_floor"
+      ]
+    }
+  ],
+  "administrative_product_envelopes": [
+    {
+      "id": "cnbf-base-cotisations-sociales-2024-2025",
+      "source_id": "cnbf-comptes-2025",
+      "label": "Cotisations sociales — régime de retraite de base",
+      "values": [
+        {
+          "year": 2024,
+          "amount_meur": 306.622518
+        },
+        {
+          "year": 2025,
+          "amount_meur": 325.810142
+        }
+      ],
+      "measure": "administrative_accounting_product",
+      "assigned_to_records": false,
+      "reason": "Le compte de résultat ne ventile pas le poste entre cotisation forfaitaire, cotisation proportionnelle, parts salariales, parts employeur et non-salariés."
+    }
+  ],
+  "previous_record_administrative_products": {
+    "canonical_id": "droits-plaidoirie-cnbf",
+    "source_id": "cnbf-comptes-2025",
+    "components": [
+      {
+        "label": "Droits de plaidoirie",
+        "values": [
+          {
+            "year": 2024,
+            "amount_meur": 4.673876
+          },
+          {
+            "year": 2025,
+            "amount_meur": 4.050671
+          }
+        ]
+      },
+      {
+        "label": "Contributions équivalentes aux droits de plaidoirie",
+        "values": [
+          {
+            "year": 2024,
+            "amount_meur": 110.748136
+          },
+          {
+            "year": 2025,
+            "amount_meur": 114.447025
+          }
+        ]
+      }
+    ],
+    "combined_values": [
+      {
+        "year": 2024,
+        "amount_meur": 115.422012
+      },
+      {
+        "year": 2025,
+        "amount_meur": 118.497696
+      }
+    ],
+    "measure": "administrative_accounting_product",
+    "treatment": "Addendum documentaire à la fiche du lot plaidoirie-CVEC ; ces valeurs ne sont pas présentées comme une observation de comptabilité nationale."
+  },
+  "records": [
+    {
+      "canonical_id": "cotisation-forfaitaire-retraite-base-cnbf",
+      "draft_entries": [],
+      "inventory_status": "missing_from_draft",
+      "nom": "Cotisation forfaitaire CNBF",
+      "nom_complet": "Cotisation annuelle forfaitaire au régime d'assurance vieillesse de base des avocats",
+      "annee_creation": null,
+      "earliest_confirmed_codification_year": 1985,
+      "historical_date_treatment": "La version de 1985 confirme que la cotisation existait au plus tard à cette date ; elle n'établit pas son origine historique complète.",
+      "po_status": "confirmed",
+      "legal_status": "active",
+      "obligation_status": "confirmed",
+      "membership_status": "ready",
+      "publication_status": "ready_for_review",
+      "reason_codes": [
+        "current-law-confirmed",
+        "statistical-classification-confirmed"
+      ],
+      "legal_basis": [
+        {
+          "source_id": "legifrance-css-l652-7-2026",
+          "locator": "CSS, article L. 652-7, premier alinéa"
+        },
+        {
+          "source_id": "legifrance-css-l652-10-2026",
+          "locator": "CSS, article L. 652-10 pour les avocats salariés"
+        },
+        {
+          "source_id": "legifrance-css-d652-1-d652-2-2026",
+          "locator": "CSS, article D. 652-2 — quote-part salariale de 40 %"
+        }
+      ],
+      "canonical_granularity": {
+        "treatment": "single_contribution_with_payer_profiles",
+        "reason": "Le montant annuel est une seule cotisation prévue par L. 652-7. Pour l'avocat salarié, L. 652-10 et D. 652-2 en répartissent la charge sans créer deux créances canoniques.",
+        "separate_employer_and_employee_records": false
+      },
+      "liable_persons": [
+        "avocat non salarié",
+        "employeur de l'avocat salarié pour la part patronale et le reversement",
+        "avocat salarié pour la quote-part précomptée"
+      ],
+      "schedule_2026": [
+        {
+          "professional_seniority": "1re année",
+          "total_eur": 363,
+          "salaried_employer_share_eur": 217.8,
+          "salaried_employee_share_eur": 145.2
+        },
+        {
+          "professional_seniority": "2e année",
+          "total_eur": 730,
+          "salaried_employer_share_eur": 438,
+          "salaried_employee_share_eur": 292
+        },
+        {
+          "professional_seniority": "3e année",
+          "total_eur": 1145,
+          "salaried_employer_share_eur": 687,
+          "salaried_employee_share_eur": 458
+        },
+        {
+          "professional_seniority": "4e et 5e années",
+          "total_eur": 1558,
+          "salaried_employer_share_eur": 934.8,
+          "salaried_employee_share_eur": 623.2
+        },
+        {
+          "professional_seniority": "6e année et suivantes, ainsi qu'avocats de 65 ans et plus",
+          "total_eur": 1988,
+          "salaried_employer_share_eur": 1192.8,
+          "salaried_employee_share_eur": 795.2
+        }
+      ],
+      "rate_sources": [
+        "cnbf-bareme-non-salaries-2026",
+        "cnbf-bareme-employeurs-2026"
+      ],
+      "beneficiary": {
+        "name": "Régime d'assurance vieillesse de base de la Caisse nationale des barreaux français",
+        "source_id": "legifrance-css-l652-7-2026"
+      },
+      "institutional_recipient": {
+        "name": "Caisse nationale des barreaux français",
+        "status": "Organisme de sécurité sociale gestionnaire de régimes obligatoires",
+        "sector": "S.1314",
+        "sector_treatment": "inferred_from_official_social_security_status",
+        "source_id": "legifrance-cnbf-statuts-2026",
+        "warning": "Le code S.1314 n'est pas imprimé dans l'arrêté ; le rattachement est une inférence documentée à partir du statut officiel."
+      },
+      "classification_profiles": [
+        {
+          "payer_profile": "avocat non salarié",
+          "esa_code": "D613c",
+          "optional_detail_code": "D613cs",
+          "label": "Cotisations sociales effectives obligatoires à la charge des travailleurs indépendants"
+        },
+        {
+          "payer_profile": "employeur d'un avocat salarié — part de 60 %",
+          "esa_code": "D611C",
+          "label": "Cotisations sociales effectives obligatoires à la charge des employeurs"
+        },
+        {
+          "payer_profile": "avocat salarié — part de 40 %",
+          "esa_code": "D613c",
+          "detail_code": "D613ce",
+          "label": "Cotisations sociales effectives obligatoires à la charge des salariés"
+        }
+      ],
+      "classification_sources": [
+        "insee-independants-cnbf",
+        "eurlex-2023-734-sec-contributions"
+      ],
+      "revenues": {
+        "observed_national_accounts": [],
+        "administrative_product": [],
+        "administrative_envelope_ref": "cnbf-base-cotisations-sociales-2024-2025"
+      },
+      "warnings": [
+        "Les cinq niveaux d'ancienneté sont un barème d'une même cotisation.",
+        "La ventilation 60/40 pour les salariés ne crée pas deux fiches.",
+        "Le poste comptable de 306,6 M€ en 2024 et 325,8 M€ en 2025 n'est pas ventilé entre les deux cotisations de base."
+      ],
+      "research_status": "complete_except_individual_revenue_and_original_creation_date",
+      "production_status": "not_integrated"
+    },
+    {
+      "canonical_id": "cotisation-proportionnelle-retraite-base-cnbf",
+      "draft_entries": [],
+      "inventory_status": "missing_from_draft",
+      "nom": "Cotisation proportionnelle CNBF",
+      "nom_complet": "Cotisation proportionnelle au revenu au régime d'assurance vieillesse de base des avocats",
+      "annee_creation": null,
+      "earliest_confirmed_codification_year": 1992,
+      "historical_date_treatment": "La version de 1992 confirme l'existence d'une cotisation assise sur les revenus au plus tard à cette date ; elle n'est pas utilisée comme preuve d'une origine historique exhaustive.",
+      "po_status": "confirmed",
+      "legal_status": "active",
+      "obligation_status": "confirmed",
+      "membership_status": "ready",
+      "publication_status": "ready_for_review",
+      "reason_codes": [
+        "current-law-confirmed",
+        "statistical-classification-confirmed"
+      ],
+      "legal_basis": [
+        {
+          "source_id": "legifrance-css-l652-7-2026",
+          "locator": "CSS, article L. 652-7, deuxième alinéa"
+        },
+        {
+          "source_id": "legifrance-css-d652-1-d652-2-2026",
+          "locator": "CSS, article D. 652-1 — taux et plafond ; article D. 652-2 — quote-part salariale"
+        },
+        {
+          "source_id": "legifrance-css-l652-10-2026",
+          "locator": "CSS, article L. 652-10 pour les avocats salariés"
+        }
+      ],
+      "canonical_granularity": {
+        "treatment": "single_contribution_with_payer_profiles",
+        "reason": "Le taux proportionnel correspond à une seule cotisation. L'employeur verse la cotisation de l'avocat salarié et précompte sa quote-part de 40 %.",
+        "separate_employer_and_employee_records": false
+      },
+      "liable_persons": [
+        "avocat non salarié",
+        "employeur de l'avocat salarié pour la part patronale et le reversement",
+        "avocat salarié pour la quote-part précomptée"
+      ],
+      "rate_2026": {
+        "total_percent": 3.2,
+        "annual_ceiling_eur": 297549,
+        "monthly_ceiling_eur": 24795.75,
+        "salaried_employer_share_percent": 1.92,
+        "salaried_employee_share_percent": 1.28,
+        "non_salaried_first_and_second_year_provisional_base_eur": 9131,
+        "non_salaried_first_and_second_year_provisional_amount_eur": 292,
+        "sources": [
+          "legifrance-css-d652-1-d652-2-2026",
+          "cnbf-bareme-non-salaries-2026",
+          "cnbf-bareme-employeurs-2026"
+        ]
+      },
+      "beneficiary": {
+        "name": "Régime d'assurance vieillesse de base de la Caisse nationale des barreaux français",
+        "source_id": "legifrance-css-l652-7-2026"
+      },
+      "institutional_recipient": {
+        "name": "Caisse nationale des barreaux français",
+        "status": "Organisme de sécurité sociale gestionnaire de régimes obligatoires",
+        "sector": "S.1314",
+        "sector_treatment": "inferred_from_official_social_security_status",
+        "source_id": "legifrance-cnbf-statuts-2026",
+        "warning": "Le code S.1314 n'est pas imprimé dans l'arrêté ; le rattachement est une inférence documentée à partir du statut officiel."
+      },
+      "classification_profiles": [
+        {
+          "payer_profile": "avocat non salarié",
+          "esa_code": "D613c",
+          "optional_detail_code": "D613cs",
+          "label": "Cotisations sociales effectives obligatoires à la charge des travailleurs indépendants"
+        },
+        {
+          "payer_profile": "employeur d'un avocat salarié — part de 60 %",
+          "esa_code": "D611C",
+          "label": "Cotisations sociales effectives obligatoires à la charge des employeurs"
+        },
+        {
+          "payer_profile": "avocat salarié — part de 40 %",
+          "esa_code": "D613c",
+          "detail_code": "D613ce",
+          "label": "Cotisations sociales effectives obligatoires à la charge des salariés"
+        }
+      ],
+      "classification_sources": [
+        "insee-independants-cnbf",
+        "eurlex-2023-734-sec-contributions"
+      ],
+      "revenues": {
+        "observed_national_accounts": [],
+        "administrative_product": [],
+        "administrative_envelope_ref": "cnbf-base-cotisations-sociales-2024-2025"
+      },
+      "warnings": [
+        "Le plafond de 297 549 € est une limite d'assiette, pas une recette.",
+        "Le montant provisoire de 292 € pour les deux premières années est une modalité d'appel avant régularisation.",
+        "Le poste comptable du régime de base n'est pas ventilé entre cotisation forfaitaire et proportionnelle."
+      ],
+      "research_status": "complete_except_individual_revenue_and_original_creation_date",
+      "production_status": "not_integrated"
+    }
+  ],
+  "related_follow_up": [
+    {
+      "canonical_id": "cotisation-retraite-complementaire-cnbf",
+      "status": "deferred",
+      "note": "Le barème 2026 documente également un régime complémentaire obligatoire à points. Il doit faire l'objet d'un lot séparé afin de ne pas confondre les ressources du régime de base et du régime complémentaire."
+    },
+    {
+      "canonical_id": "cotisation-invalidite-deces-cnbf",
+      "status": "deferred",
+      "note": "La cotisation invalidité-décès des avocats non salariés et la cotisation recouvrée auprès des barreaux doivent être contrôlées séparément."
+    }
+  ],
+  "quality_checks": {
+    "inventory_gap_is_explicit": true,
+    "canonical_ids_are_unique": true,
+    "both_records_have_current_legal_basis": true,
+    "classification_profiles_cover_self_employed_employer_and_employee": true,
+    "salaried_split_does_not_create_duplicate_records": true,
+    "administrative_family_product_is_not_allocated": true,
+    "administrative_product_is_separate_from_national_accounts_revenue": true,
+    "historical_floor_is_not_presented_as_creation_date": true,
+    "previous_rights_components_are_separate_and_summed_only_as_documented_total": true,
+    "production_files_left_unchanged": [
+      "data/entries-full.json",
+      "data/entries-light.json"
+    ]
+  }
+}
