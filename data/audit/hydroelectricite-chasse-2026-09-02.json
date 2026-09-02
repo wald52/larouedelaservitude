@@ -1,0 +1,669 @@
+{
+  "schema_version": 1,
+  "batch_id": "hydroelectricite-chasse-2026-09-02",
+  "title": "Lot de reprise — hydroélectricité et redevances de chasse",
+  "audit_date": "2026-09-02",
+  "status": "ready_for_review_with_blocked_candidates_and_non_po_charges",
+  "production_dataset_changed": false,
+  "source_draft": {
+    "path": "data/audit/draft-2026-08-05.json",
+    "source_version": "2026-08-05",
+    "draft_indices": [31, 40, 41],
+    "draft_entry_count": 3,
+    "explicit_split_indices": [31]
+  },
+  "scope": {
+    "description": "Reprise de l'ancien libellé hydroélectrique et des deux lignes relatives au permis de chasser. La ligne 31 est scindée entre la redevance créée pour les installations autorisées, les redevances transitoires des concessions anciennes et la redevance distincte d'occupation du domaine public. La ligne 41 devient une fiche canonique directement classée ; la ligne 40 est exclue du périmètre des prélèvements obligatoires comme paiement d'un acte administratif individualisé.",
+    "ready_record_count": 1,
+    "ready_canonical_ids": [
+      "redevance-cynegetique-validation"
+    ],
+    "blocked_candidate_count": 2,
+    "blocked_candidate_ids": [
+      "redevance-hydroelectricite-autorisations-l543-1",
+      "redevances-hydroelectriques-concessions-transitoires"
+    ],
+    "active_non_po_charge_count": 2,
+    "active_non_po_charge_ids": [
+      "redevance-delivrance-permis-chasser",
+      "redevance-occupation-domaine-hydroelectricite"
+    ]
+  },
+  "measurement_policy": {
+    "unit": "millions_euros",
+    "observed_revenue": "La National tax list 2026 fournit des observations jusqu'en 2024. La ligne 195 nomme directement la redevance cynégétique ; les lignes relatives à l'énergie restent agrégées, nulles en 2024 ou de périmètre différent.",
+    "transition_date": "Le droit positif hydroélectrique est contrôlé au 2 septembre 2026, soit après l'entrée en vigueur au plus tard le 1er septembre 2026 de la loi n° 2026-554.",
+    "tariffs": "Un tarif unitaire, une tranche de barème, un taux à fixer par décret ou un montant par mégawatt n'est pas une recette.",
+    "legacy_amounts": "Le montant de 0,9 M€ de la ligne 31, sans année, n'est attribué à aucune des créances résultant de la scission.",
+    "direct_consideration": "Les redevances de délivrance d'un titre ou d'occupation du domaine public sont exclues lorsqu'elles rémunèrent directement un acte ou un usage individualisable, sauf classement statistique contraire explicite.",
+    "rate_variants": "Les variantes nationale, départementale, annuelle, temporaire et première validation de la redevance cynégétique restent les modalités d'une seule créance."
+  },
+  "sources": [
+    {
+      "id": "ec-ntl-2026-france",
+      "title": "Data on Taxation Trends — National tax list 2026, feuille France",
+      "publisher": "Commission européenne, DG TAXUD / Eurostat",
+      "url": "https://taxation-customs.ec.europa.eu/document/download/600d56d1-ea6e-416e-9981-1c8b9c603b6b_en?filename=NTL%20edition%202026%20web.xlsx",
+      "publication_date": "2026-03-30",
+      "data_through": 2024,
+      "retrieved_at": "2026-09-01",
+      "local_path": "data/reference/ntl-france-2026.json",
+      "supports": [
+        "po_classification",
+        "observed_revenue",
+        "statistical_envelopes"
+      ]
+    },
+    {
+      "id": "legifrance-code-energie-l543-1-3-2026",
+      "title": "Code de l'énergie — articles L. 543-1 à L. 543-3",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/codes/id/LEGISCTA000054356156/2026-09-01",
+      "effective_from": "2026-09-01",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "legal_status",
+        "legal_basis",
+        "tax_base",
+        "progressive_bands",
+        "beneficiaries",
+        "implementation_decree"
+      ]
+    },
+    {
+      "id": "legifrance-loi-2026-554-art-21",
+      "title": "Loi n° 2026-554 du 29 juin 2026 — article 21",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/loda/id/JORFTEXT000054340720",
+      "publication_date": "2026-06-30",
+      "effective_no_later_than": "2026-09-01",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "transition_date",
+        "legacy_concessions"
+      ]
+    },
+    {
+      "id": "legifrance-ancien-code-energie-l523-1-3",
+      "title": "Ancien code de l'énergie — articles L. 523-1 à L. 523-3",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/codes/id/LEGISCTA000023987266/2026-08-31",
+      "effective_to": "2026-09-01",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "legacy_legal_basis",
+        "canonical_granularity",
+        "beneficiaries"
+      ]
+    },
+    {
+      "id": "legifrance-ancien-code-energie-r523-1-5",
+      "title": "Ancien code de l'énergie — articles R. 523-1 à R. 523-5",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/codes/section_lc/LEGITEXT000023983208/LEGISCTA000031749801/",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "legacy_calculation",
+        "legacy_occupation_charge",
+        "legacy_rate_40_percent"
+      ]
+    },
+    {
+      "id": "legifrance-cg3p-l2125-1",
+      "title": "Code général de la propriété des personnes publiques — article L. 2125-1",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000042914938",
+      "effective_from": "2022-01-01",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "public_domain_occupation_consideration"
+      ]
+    },
+    {
+      "id": "legifrance-code-environnement-l423-19-21-1",
+      "title": "Code de l'environnement — articles L. 423-19 à L. 423-21-1",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/codes/section_lc/LEGITEXT000006074220/LEGISCTA000006188410/2026-09-02/",
+      "effective_date": "2026-09-02",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "legal_status",
+        "legal_basis",
+        "annual_and_temporary_validation",
+        "first_validation_reduction",
+        "public_collection",
+        "beneficiary"
+      ]
+    },
+    {
+      "id": "legifrance-arrete-redevances-cynegetiques-2026",
+      "title": "Arrêté du 14 mai 2020 relatif au montant des redevances cynégétiques, version 2026",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/loda/id/JORFTEXT000041893859/2026-09-02",
+      "effective_from": "2026-04-03",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "rates_2026",
+        "first_validation_rates"
+      ]
+    },
+    {
+      "id": "legifrance-code-environnement-l213-10-11",
+      "title": "Code de l'environnement — article L. 213-10-11",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000048833210",
+      "effective_from": "2025-01-01",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "water_agency_royalty",
+        "beneficiary_context"
+      ]
+    },
+    {
+      "id": "legifrance-code-environnement-r423-9-11",
+      "title": "Code de l'environnement — articles R. 423-9 à R. 423-11",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/codes/section_lc/LEGITEXT000006074220/LEGISCTA000006188842/",
+      "effective_date": "2026-09-02",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "initial_issue_fee",
+        "duplicate_fee",
+        "refund_rule",
+        "collector"
+      ]
+    },
+    {
+      "id": "legifrance-ofb-l131-8",
+      "title": "Code de l'environnement — article L. 131-8",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000038845970",
+      "effective_from": "2020-01-01",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "ofb_public_body"
+      ]
+    }
+  ],
+  "statistical_envelopes": [
+    {
+      "id": "ntl-autres-taxes-energie-d214a-2024",
+      "source_id": "ec-ntl-2026-france",
+      "source_row": 32,
+      "esa_code": "D214A",
+      "national_detail_code": "C04",
+      "name": "Autres taxes sur l'énergie",
+      "year": 2024,
+      "amount_meur": 622,
+      "assigned_to_records": false,
+      "reason": "Libellé résiduel ne nommant aucune redevance hydroélectrique particulière."
+    },
+    {
+      "id": "ntl-autres-taxes-energie-d214h-2024",
+      "source_id": "ec-ntl-2026-france",
+      "source_row": 65,
+      "esa_code": "D214H",
+      "national_detail_code": "C03",
+      "name": "Autres taxes sur l'énergie",
+      "year": 2024,
+      "amount_meur": 0,
+      "assigned_to_records": false,
+      "reason": "Ligne résiduelle à produit nul en 2024 ; elle ne permet pas de classer le nouveau dispositif de 2026."
+    },
+    {
+      "id": "ntl-voies-navigables-taxe-hydraulique-2024",
+      "source_id": "ec-ntl-2026-france",
+      "source_row": 92,
+      "esa_code": "D29A",
+      "national_detail_code": "C11",
+      "name": "Taxe sur l'utilisation des voies navigables (dont taxe hydraulique)",
+      "year": 2024,
+      "amount_meur": 0,
+      "assigned_to_records": false,
+      "reason": "La ligne vise l'utilisation des voies navigables et une taxe hydraulique non assimilée sans preuve aux redevances du code de l'énergie."
+    }
+  ],
+  "records": [
+    {
+      "canonical_id": "redevance-cynegetique-validation",
+      "draft_entries": [
+        {
+          "index": 41,
+          "id": "redevances-cynegetiques",
+          "treatment": "keep_and_merge_rate_variants"
+        }
+      ],
+      "nom": "Redevance cynégétique",
+      "nom_complet": "Redevance cynégétique nationale ou départementale due lors de la validation du permis de chasser",
+      "annee_creation": null,
+      "current_framework_since": "2018-12-31",
+      "po_status": "confirmed",
+      "legal_status": "active",
+      "obligation_status": "confirmed",
+      "membership_status": "ready",
+      "publication_status": "ready_for_review",
+      "reason_codes": [
+        "current-law-confirmed",
+        "statistical-classification-confirmed",
+        "rate-or-threshold-split"
+      ],
+      "legal_basis": [
+        {
+          "source_id": "legifrance-code-environnement-l423-19-21-1",
+          "locator": "Code de l'environnement, articles L. 423-19 à L. 423-21-1"
+        },
+        {
+          "source_id": "legifrance-code-environnement-l213-10-11",
+          "locator": "Code de l'environnement, article L. 213-10-11"
+        }
+      ],
+      "liable_person": "Titulaire d'un permis de chasser ou d'un titre étranger admis, demandant une validation annuelle ou temporaire.",
+      "canonical_granularity": {
+        "treatment": "single_levy_with_geographic_duration_and_first_validation_rate_variants",
+        "reason": "Les variantes nationale ou départementale, annuelle, neuf jours ou trois jours et la réduction de première validation sont les modalités tarifaires de la même redevance.",
+        "separate_records_for_rate_variants": false
+      },
+      "rates_2026_eur": [
+        {
+          "geographic_scope": "national ou départemental",
+          "duration": "annuelle",
+          "standard_amount": 50.6,
+          "first_validation_amount": 25.3
+        },
+        {
+          "geographic_scope": "national ou départemental",
+          "duration": "neuf jours",
+          "standard_amount": 35.25,
+          "first_validation_amount": 17.62
+        },
+        {
+          "geographic_scope": "national ou départemental",
+          "duration": "trois jours",
+          "standard_amount": 25.01,
+          "first_validation_amount": 12.51
+        }
+      ],
+      "collection": "Encaissement par un comptable public de l'Etat ou un régisseur de recettes de l'Etat placé auprès d'une fédération départementale ou interdépartementale des chasseurs.",
+      "beneficiary": {
+        "name": "Une agence de l'eau désignée selon les modalités réglementaires",
+        "source_id": "legifrance-code-environnement-l423-19-21-1"
+      },
+      "classification": {
+        "source_id": "ec-ntl-2026-france",
+        "source_row": 195,
+        "esa_code": "D59D",
+        "national_detail_code": "C04",
+        "name": "Redevance cynégétique (permis de chasse)",
+        "economic_function": "C",
+        "recipient_scope": "S.13 + S.212",
+        "granularity": "direct_named_line",
+        "amount_attributable_to_record": true
+      },
+      "revenues": {
+        "observed": [
+          {
+            "year": 2024,
+            "amount_meur": 57,
+            "source_id": "ec-ntl-2026-france",
+            "locator": "FR row 195 (D59D C04)"
+          }
+        ],
+        "forecast": []
+      },
+      "warnings": [
+        "La ligne NTL porte le libellé générique « permis de chasse », mais la base juridique distingue clairement la validation annuelle ou temporaire de la délivrance initiale du titre.",
+        "Les cotisations fédérales associées à la validation ne sont pas incluses dans cette fiche.",
+        "L'année historique d'origine de la redevance reste à établir."
+      ],
+      "research_status": "complete_except_original_creation_date",
+      "production_status": "not_integrated"
+    }
+  ],
+  "blocked_candidates": [
+    {
+      "canonical_id": "redevance-hydroelectricite-autorisations-l543-1",
+      "draft_entries": [
+        {
+          "index": 31,
+          "id": "redevance-proportionnelle-sur-l-energie-hydraulique",
+          "treatment": "split_to_current_authorization_royalty"
+        }
+      ],
+      "nom": "Redevance hydroélectricité autorisée",
+      "nom_complet": "Redevance sur les installations hydroélectriques autorisées de plus de 4 500 kilowatts",
+      "annee_creation": 2026,
+      "first_effective_date": "2026-09-01",
+      "po_status": "unresolved",
+      "legal_status": "active",
+      "obligation_status": "confirmed",
+      "membership_status": "blocked",
+      "publication_status": "blocked",
+      "reason_codes": [
+        "current-law-confirmed",
+        "classification-unverified",
+        "source-needed",
+        "canonical-record-incomplete"
+      ],
+      "creation_evidence": {
+        "source_id": "legifrance-code-energie-l543-1-3-2026",
+        "locator": "Article L. 543-1 créé par la loi n° 2026-554 du 29 juin 2026"
+      },
+      "legal_basis": [
+        {
+          "source_id": "legifrance-code-energie-l543-1-3-2026",
+          "locator": "Code de l'énergie, article L. 543-1"
+        }
+      ],
+      "liable_person": "Exploitant d'une installation hydroélectrique relevant du régime d'autorisation de plus de 4 500 kilowatts, située en France métropolitaine hors Corse.",
+      "tax_base": "Quantité d'électricité injectée sur le réseau multipliée par un montant calculé en appliquant un barème progressif au résultat net annuel par mégawattheure.",
+      "progressive_bands_eur_per_mwh": [
+        {
+          "from": 0,
+          "to": 30
+        },
+        {
+          "from_exclusive": 30,
+          "to": 60
+        },
+        {
+          "from_exclusive": 60,
+          "to": 100
+        },
+        {
+          "from_exclusive": 100,
+          "to": null
+        }
+      ],
+      "rates": {
+        "status": "not_identified_in_sources_checked_as_of_2026-09-02",
+        "legal_requirement": "Taux croissants fixés par décret en Conseil d'Etat.",
+        "treatment": "Aucun taux n'est inventé. La fiche restera incomplète tant que le décret d'application ou une publication officielle équivalente ne sera pas joint."
+      },
+      "beneficiaries": [
+        {
+          "name": "Etat",
+          "share": "solde après reversement"
+        },
+        {
+          "name": "Etablissements publics territoriaux de bassin concernés",
+          "share_percent": 3,
+          "share_cap": "50 % de certaines dépenses de fonctionnement définies par l'article"
+        }
+      ],
+      "classification": {
+        "status": "unverified",
+        "candidate_envelopes": [
+          "ntl-autres-taxes-energie-d214a-2024",
+          "ntl-autres-taxes-energie-d214h-2024"
+        ],
+        "ntl_coverage_limitation": "Créance entrée en vigueur en 2026, après l'année 2024 couverte par la NTL.",
+        "required_evidence": "Classement SEC publié pour les comptes 2026 ou table de passage officielle nommant l'article L. 543-1."
+      },
+      "revenues": {
+        "observed": [],
+        "forecast": []
+      },
+      "counterpart_test": {
+        "status": "unresolved",
+        "reason": "La redevance est distincte de la redevance domaniale de L. 543-2, mais son classement statistique fiscal n'est pas encore publié dans les sources du lot."
+      },
+      "warnings": [
+        "La Corse est exclue du champ territorial explicite de l'article L. 543-1.",
+        "Les quatre tranches ne sont pas quatre prélèvements.",
+        "La date de 1919 et le montant de 0,9 M€ du brouillon ne décrivent pas cette créance créée en 2026."
+      ],
+      "research_status": "complete_except_rates_statistical_classification_and_revenue",
+      "production_status": "not_integrated"
+    },
+    {
+      "canonical_id": "redevances-hydroelectriques-concessions-transitoires",
+      "draft_entries": [
+        {
+          "index": 31,
+          "id": "redevance-proportionnelle-sur-l-energie-hydraulique",
+          "treatment": "split_to_legacy_concession_family"
+        }
+      ],
+      "nom": "Redevances concessions hydroélectriques",
+      "nom_complet": "Redevances applicables aux concessions hydroélectriques maintenues sous le droit antérieur",
+      "annee_creation": null,
+      "po_status": "unresolved",
+      "legal_status": "transitional_active",
+      "obligation_status": "confirmed_for_covered_concessions",
+      "membership_status": "blocked",
+      "publication_status": "blocked",
+      "reason_codes": [
+        "current-law-confirmed",
+        "aggregate-not-legal-unit",
+        "split-required",
+        "classification-unverified",
+        "receipt-year-missing",
+        "obsolete-label-or-mechanism"
+      ],
+      "transition_basis": {
+        "source_id": "legifrance-loi-2026-554-art-21",
+        "locator": "Article 21, II — maintien du droit antérieur pour certaines concessions jusqu'à leur résiliation ou selon le régime transitoire applicable"
+      },
+      "legacy_components": [
+        {
+          "legacy_article": "L. 523-1",
+          "description": "Redevances prévues par l'acte de concession, proportionnelles aux kilowattheures produits et/ou aux dividendes ou bénéfices répartis.",
+          "beneficiaries": [
+            "Etat",
+            "départements",
+            "communes"
+          ]
+        },
+        {
+          "legacy_article": "L. 523-2",
+          "description": "Redevance des nouvelles concessions ou renouvellements, proportionnelle aux recettes de la concession, avec taux plafond déterminé dans la procédure de mise en concurrence.",
+          "beneficiaries": [
+            "Etat",
+            "départements",
+            "communes",
+            "groupements de communes"
+          ]
+        },
+        {
+          "legacy_article": "L. 523-3 et R. 523-5",
+          "description": "Redevance des concessions prorogées, assise sur le résultat normatif net d'impôt sur les sociétés.",
+          "rate_percent": 40,
+          "beneficiary": "Etat"
+        }
+      ],
+      "canonical_granularity": {
+        "status": "not_final",
+        "reason": "L'ancien libellé du brouillon agrège au moins trois bases juridiques et plusieurs modes de calcul. Une reprise concession par concession ou par article est nécessaire avant publication."
+      },
+      "classification": {
+        "status": "unverified",
+        "candidate_envelopes": [
+          "ntl-autres-taxes-energie-d214a-2024",
+          "ntl-autres-taxes-energie-d214h-2024",
+          "ntl-voies-navigables-taxe-hydraulique-2024"
+        ],
+        "candidate_amounts_attributable": false
+      },
+      "revenues": {
+        "observed": [],
+        "forecast": []
+      },
+      "draft_corrections": [
+        {
+          "field": "granularite",
+          "draft_value": "Redevance proportionnelle sur l'énergie hydraulique",
+          "canonical_value": null,
+          "explanation": "Le libellé ne permet pas de distinguer les articles L. 523-1, L. 523-2 et L. 523-3 ni leur maintien transitoire."
+        },
+        {
+          "field": "annee_creation",
+          "draft_value": 1919,
+          "canonical_value": null,
+          "explanation": "1919 peut renvoyer à l'histoire générale des concessions hydroélectriques mais ne constitue pas une date commune prouvée pour toutes les créances agrégées."
+        },
+        {
+          "field": "recette",
+          "draft_value_meur": 0.9,
+          "canonical_value_meur": null,
+          "explanation": "Le montant n'a pas d'année et ne peut pas être réparti entre les composantes."
+        }
+      ],
+      "research_status": "complete_except_final_granularity_classification_and_revenue",
+      "production_status": "not_integrated"
+    }
+  ],
+  "active_non_po_charges": [
+    {
+      "canonical_id": "redevance-delivrance-permis-chasser",
+      "draft_entries": [
+        {
+          "index": 40,
+          "id": "redevance-pour-delivrance-initiale-du-permis-de-chasse",
+          "treatment": "exclude_from_po_inventory"
+        }
+      ],
+      "nom": "Délivrance permis de chasser",
+      "nom_complet": "Redevance pour délivrance initiale ou duplicata du permis de chasser",
+      "annee_creation": null,
+      "po_status": "excluded",
+      "legal_status": "active",
+      "membership_status": "excluded_from_po_inventory",
+      "publication_status": "non_po_charge",
+      "reason_codes": [
+        "current-law-confirmed",
+        "direct-individual-consideration",
+        "non-fiscal-revenue"
+      ],
+      "legal_basis": [
+        {
+          "source_id": "legifrance-code-environnement-r423-9-11",
+          "locator": "Code de l'environnement, articles R. 423-9 à R. 423-11"
+        }
+      ],
+      "liable_person": "Demandeur de la délivrance initiale ou d'un duplicata du permis de chasser.",
+      "tariffs_eur": [
+        {
+          "service": "délivrance initiale",
+          "amount": 30
+        },
+        {
+          "service": "délivrance initiale à un mineur âgé de plus de seize ans",
+          "amount": 15
+        },
+        {
+          "service": "duplicata",
+          "amount": 30
+        }
+      ],
+      "collector_and_beneficiary": {
+        "name": "Office français de la biodiversité",
+        "status": "établissement public de l'Etat",
+        "source_id": "legifrance-ofb-l131-8"
+      },
+      "counterpart_test": {
+        "status": "direct_individual_consideration",
+        "reason": "Le paiement est exigé à l'occasion d'une délivrance ou d'un duplicata individualisé et peut être remboursé lorsque le titre ne peut juridiquement être délivré."
+      },
+      "classification": {
+        "ntl_row_195_inherited": false,
+        "reason": "La ligne 195 correspond à la redevance cynégétique de validation, non à la délivrance initiale du titre."
+      },
+      "revenues": {
+        "observed": [],
+        "forecast": []
+      },
+      "research_status": "complete_for_po_exclusion",
+      "production_status": "not_integrated"
+    },
+    {
+      "canonical_id": "redevance-occupation-domaine-hydroelectricite",
+      "draft_entries": [],
+      "inventory_status": "adjacent_charge_identified_during_split",
+      "nom": "Occupation domaine hydroélectricité",
+      "nom_complet": "Redevance d'occupation du domaine public des installations hydroélectriques autorisées",
+      "annee_creation": 2026,
+      "first_effective_date": "2026-09-01",
+      "po_status": "excluded",
+      "legal_status": "active",
+      "membership_status": "excluded_from_po_inventory",
+      "publication_status": "non_po_charge",
+      "reason_codes": [
+        "current-law-confirmed",
+        "direct-individual-consideration",
+        "non-fiscal-revenue"
+      ],
+      "legal_basis": [
+        {
+          "source_id": "legifrance-code-energie-l543-1-3-2026",
+          "locator": "Code de l'énergie, article L. 543-2"
+        },
+        {
+          "source_id": "legifrance-cg3p-l2125-1",
+          "locator": "CG3P, article L. 2125-1"
+        }
+      ],
+      "liable_person": "Exploitant d'une installation hydroélectrique autorisée occupant ou utilisant le domaine public de l'Etat ou de ses établissements publics.",
+      "tariff": {
+        "base_amount_eur_per_installed_mw": 2000,
+        "indexation": "Indice du coût de la construction au 1er janvier de chaque année",
+        "possible_reduction_or_suppression": "Pendant la durée de certains financements publics accordés par l'Etat."
+      },
+      "counterpart_test": {
+        "status": "direct_property_use_consideration",
+        "reason": "L'article renvoie expressément à la redevance de l'article L. 2125-1 du CG3P due pour l'occupation ou l'utilisation du domaine public."
+      },
+      "relationship_to_l543_1": {
+        "separate_charge": true,
+        "reason": "La redevance de production ou stockage de L. 543-1 et la redevance domaniale de L. 543-2 ont des assiettes, objets et traitements différents."
+      },
+      "revenues": {
+        "observed": [],
+        "forecast": []
+      },
+      "research_status": "complete_for_po_exclusion",
+      "production_status": "not_integrated"
+    }
+  ],
+  "related_follow_up": [
+    {
+      "canonical_id": "cotisations-federales-chasse",
+      "status": "deferred",
+      "note": "Les cotisations fédérales annuelles et temporaires accompagnent la validation du permis mais ne sont pas incluses dans la redevance cynégétique ; leur statut institutionnel et leur éventuel reroutage doivent être étudiés séparément."
+    },
+    {
+      "canonical_id": "redevances-concessions-hydroelectriques-detail",
+      "status": "source_needed",
+      "note": "Déterminer le découpage final des concessions maintenues sous le droit antérieur, leur produit et leur classement SEC, idéalement à partir d'un état domanial ou budgétaire ventilé."
+    },
+    {
+      "canonical_id": "decret-application-l543-1",
+      "status": "source_needed",
+      "note": "Ajouter le décret fixant les taux du barème progressif et les modalités de comptabilité dès sa publication ou son identification."
+    },
+    {
+      "canonical_id": "taxes-navigation-maritime",
+      "draft_indices": [51, 52, 53],
+      "status": "next_batch_candidate",
+      "note": "Les anciens droits de francisation, de navigation et de passeport sont déjà signalés comme remplacés et forment le prochain lot cohérent."
+    }
+  ],
+  "quality_checks": {
+    "canonical_ids_are_unique": true,
+    "draft_indices_covered": [31, 40, 41],
+    "draft_index_31_is_split": true,
+    "hunting_validation_has_direct_ntl_match": true,
+    "ntl_row_195_is_not_assigned_to_initial_permit_issue": true,
+    "hunting_rate_variants_are_not_duplicate_records": true,
+    "hydroelectric_energy_envelopes_are_not_allocated": true,
+    "new_2026_hydroelectric_royalty_is_not_backcast_to_2024": true,
+    "implementation_rates_are_not_invented": true,
+    "legacy_concession_family_is_not_published_as_single_levy": true,
+    "public_domain_occupation_charge_is_excluded": true,
+    "unit_tariffs_are_not_revenues": true,
+    "undated_draft_amount_is_not_promoted": true,
+    "production_files_left_unchanged": [
+      "data/entries-full.json",
+      "data/entries-light.json"
+    ]
+  }
+}
