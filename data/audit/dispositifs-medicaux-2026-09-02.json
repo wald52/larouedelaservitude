@@ -1,0 +1,478 @@
+{
+  "schema_version": 1,
+  "batch_id": "dispositifs-medicaux-2026-09-02",
+  "title": "Lot de reprise — dispositifs médicaux",
+  "audit_date": "2026-09-02",
+  "status": "documented_with_blocked_candidates_and_historical_exclusion",
+  "production_dataset_changed": false,
+  "source_draft": {
+    "path": "data/audit/draft-2026-08-05.json",
+    "source_version": "2026-08-05",
+    "draft_indices": [],
+    "draft_entry_count": 0,
+    "finding": "Aucune ligne autonome relative aux contributions sur les dispositifs médicaux n'a été retrouvée dans le brouillon historique des 371 entrées."
+  },
+  "continuity": {
+    "previous_batch": "data/audit/fiscalite-pharmaceutique-2026-09-02.json",
+    "expanded_candidate_ids": [
+      "contribution-dispositifs-medicaux-publicite",
+      "contribution-sauvegarde-dispositifs-medicaux-z"
+    ]
+  },
+  "scope": {
+    "description": "Documentation de deux contributions actives portant sur les dispositifs médicaux et d'une ancienne contribution de première vente. Les deux contributions actives restent bloquées faute de correspondance explicite avec une ligne de comptabilité nationale.",
+    "ready_record_count": 0,
+    "blocked_candidate_count": 2,
+    "blocked_candidate_ids": [
+      "contribution-dispositifs-medicaux-publicite",
+      "contribution-sauvegarde-dispositifs-medicaux-z"
+    ],
+    "historical_exclusion_count": 1,
+    "historical_exclusion_ids": [
+      "contribution-premiere-vente-dispositifs-medicaux-historique"
+    ]
+  },
+  "measurement_policy": {
+    "unit": "millions_euros",
+    "observed_revenue": "La National tax list 2026 fournit une enveloppe 2024 de 957 M€ pour les « Taxes pharmaceutiques ». Son libellé ne nomme pas les dispositifs médicaux et son montant n'est attribué à aucune fiche du lot.",
+    "forecast_revenue": "Les montants 2025 et 2026 de l'annexe 3 du PLFSS sont conservés comme prévisions et restent distincts d'une recette observée.",
+    "threshold_not_revenue": "Le montant Z de la contribution de sauvegarde est un seuil de déclenchement, non une recette, une assiette constatée ou une prévision de produit.",
+    "missing_draft_entry": "Une créance absente du brouillon est enregistrée comme ajout d'inventaire lorsque son existence juridique est établie, mais elle reste bloquée tant que le test statistique n'est pas satisfait.",
+    "historical_entries": "Une contribution abrogée est documentée comme historique et exclue de l'inventaire actif."
+  },
+  "sources": [
+    {
+      "id": "ec-ntl-2026-france",
+      "title": "Data on Taxation Trends — National tax list 2026, feuille France",
+      "publisher": "Commission européenne, DG TAXUD / Eurostat",
+      "url": "https://taxation-customs.ec.europa.eu/document/download/600d56d1-ea6e-416e-9981-1c8b9c603b6b_en?filename=NTL%20edition%202026%20web.xlsx",
+      "publication_date": "2026-03-30",
+      "data_through": 2024,
+      "retrieved_at": "2026-09-01",
+      "local_path": "data/reference/ntl-france-2026.json",
+      "supports": [
+        "statistical_envelope",
+        "classification_search"
+      ]
+    },
+    {
+      "id": "lfss-2026-annexe-3",
+      "title": "PLFSS 2026 — Annexe 3, équilibre des finances sociales",
+      "publisher": "Direction de la Sécurité sociale",
+      "url": "https://www.securite-sociale.fr/files/live/sites/SSFR/files/medias/PLFSS/2026/PLFSS2026-Annexe3-20251015-103900-55-4_avec%20couverture.pdf",
+      "publication_date": "2025-10-23",
+      "retrieved_at": "2026-09-01",
+      "local_path": "data/reference/lfss-2026-annexe-3-impositions.json",
+      "locator": "Tableau 31, page imprimée 50",
+      "supports": [
+        "forecast_revenue",
+        "beneficiary",
+        "inventory_completeness"
+      ],
+      "limitation": "La vigueur, le périmètre juridique et le classement en prélèvement obligatoire sont contrôlés séparément."
+    },
+    {
+      "id": "legifrance-css-promotion-dispositifs-2026-09-01",
+      "title": "CSS — contribution sur les dépenses de promotion des dispositifs médicaux",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/codes/section_lc/LEGITEXT000006073189/LEGISCTA000006172590/2026-09-01/",
+      "effective_date": "2026-09-01",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "legal_status",
+        "legal_basis",
+        "tax_base",
+        "rate",
+        "allowances",
+        "exemption",
+        "beneficiary",
+        "assessment_and_collection"
+      ]
+    },
+    {
+      "id": "legifrance-loi-2003-1199-art-14",
+      "title": "Loi n° 2003-1199 du 18 décembre 2003 de financement de la sécurité sociale pour 2004 — article 14",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/loda/id/JORFTEXT000000249276",
+      "publication_date": "2003-12-19",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "creation_year",
+        "historical_context"
+      ]
+    },
+    {
+      "id": "legifrance-css-sauvegarde-dispositifs-2026-09-01",
+      "title": "CSS — contribution de sauvegarde sur les dispositifs médicaux",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/codes/section_lc/LEGITEXT000006073189/LEGISCTA000039763415/2026-09-01/",
+      "effective_date": "2026-09-01",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "legal_status",
+        "legal_basis",
+        "tax_base",
+        "calculation",
+        "allocation",
+        "cap",
+        "payment_deadline",
+        "beneficiary"
+      ]
+    },
+    {
+      "id": "legifrance-loi-2019-1446-art-23",
+      "title": "Loi n° 2019-1446 du 24 décembre 2019 de financement de la sécurité sociale pour 2020 — article 23",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/jorf/article_jo/JORFARTI000039675380",
+      "publication_date": "2019-12-27",
+      "effective_from": "2020-01-01",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "creation_year",
+        "first_due_year",
+        "historical_context"
+      ]
+    },
+    {
+      "id": "legifrance-lfss-2025-art-29",
+      "title": "Loi n° 2025-199 du 28 février 2025 de financement de la sécurité sociale pour 2025 — article 29",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/loda/article_lc/LEGIARTI000053282746",
+      "publication_date": "2025-02-28",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "threshold_z_2025",
+        "historical_context"
+      ]
+    },
+    {
+      "id": "legifrance-lfss-2026-art-28",
+      "title": "Loi n° 2025-1403 du 30 décembre 2025 de financement de la sécurité sociale pour 2026 — article 28",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/loda/article_lc/LEGIARTI000053265302",
+      "publication_date": "2025-12-31",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "threshold_z_2026"
+      ]
+    },
+    {
+      "id": "legifrance-lfss-2026-art-30",
+      "title": "Loi n° 2025-1403 du 30 décembre 2025 de financement de la sécurité sociale pour 2026 — article 30",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/jorf/article_jo/JORFARTI000053226569",
+      "publication_date": "2025-12-31",
+      "effective_from": "2026-01-01",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "scope_2026",
+        "human_origin_exclusion"
+      ]
+    },
+    {
+      "id": "legifrance-ancien-css-l245-5-5-1",
+      "title": "Ancien CSS — article L. 245-5-5-1, contribution sur la première vente de dispositifs médicaux",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000037064523/2019-09-01",
+      "effective_from": "2018-06-14",
+      "effective_to": "2021-01-01",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "historical_legal_basis",
+        "tax_base",
+        "rate",
+        "exemption",
+        "beneficiary",
+        "repeal"
+      ]
+    },
+    {
+      "id": "legifrance-loi-2014-1554-art-15",
+      "title": "Loi n° 2014-1554 du 22 décembre 2014 de financement de la sécurité sociale pour 2015 — article 15",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/loda/id/JORFTEXT000029953502",
+      "publication_date": "2014-12-24",
+      "effective_from": "2014-12-25",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "creation_year",
+        "historical_context"
+      ]
+    }
+  ],
+  "statistical_envelopes": [
+    {
+      "id": "ntl-taxes-pharmaceutiques-2024",
+      "source_id": "ec-ntl-2026-france",
+      "source_row": 73,
+      "esa_code": "D214I",
+      "national_detail_code": "C01",
+      "name": "Taxes pharmaceutiques (contribution grossistes répartiteurs, taxe sur les ventes de médicaments et de cosmétiques)",
+      "recipient_scope": "S.13 + S.212",
+      "year": 2024,
+      "amount_meur": 957,
+      "assigned_to_records": false,
+      "reason": "Le libellé cite les médicaments, cosmétiques et grossistes répartiteurs mais pas les dispositifs médicaux. Il ne peut pas servir de preuve individuelle ni être ventilé entre les deux contributions actives du lot."
+    }
+  ],
+  "blocked_candidates": [
+    {
+      "canonical_id": "contribution-dispositifs-medicaux-publicite",
+      "draft_entries": [],
+      "inventory_status": "missing_from_draft",
+      "continuity": {
+        "previous_status": "blocked",
+        "previous_batch": "data/audit/fiscalite-pharmaceutique-2026-09-02.json",
+        "treatment": "expanded_without_status_change"
+      },
+      "nom": "Contribution promotion dispositifs médicaux",
+      "nom_complet": "Contribution sur les dépenses de promotion des dispositifs médicaux et prestations associées",
+      "annee_creation": 2003,
+      "po_status": "unresolved",
+      "legal_status": "active",
+      "obligation_status": "confirmed",
+      "membership_status": "blocked",
+      "publication_status": "blocked",
+      "reason_codes": [
+        "current-law-confirmed",
+        "classification-unverified",
+        "source-needed",
+        "canonical-record-incomplete"
+      ],
+      "creation_evidence": {
+        "source_id": "legifrance-loi-2003-1199-art-14",
+        "locator": "Article 14 — création de la contribution sur les dépenses de promotion des dispositifs médicaux"
+      },
+      "legal_basis": [
+        {
+          "source_id": "legifrance-css-promotion-dispositifs-2026-09-01",
+          "locator": "CSS, articles L. 245-5-1 à L. 245-5-6"
+        }
+      ],
+      "liable_person": "Entreprises assurant la fabrication, l'importation ou la distribution en France de dispositifs médicaux et prestations associées entrant dans le champ légal.",
+      "tax_base": "Dépenses de rémunération, charges, frais de déplacement, publications, espaces publicitaires, congrès et prestations de promotion entrant dans les catégories prévues par le code, après abattements.",
+      "rate": {
+        "amount_percent": 15,
+        "source_id": "legifrance-css-promotion-dispositifs-2026-09-01"
+      },
+      "allowances": {
+        "fixed_eur": 50000,
+        "congress_cost_percent": 75,
+        "source_id": "legifrance-css-promotion-dispositifs-2026-09-01"
+      },
+      "exemption": {
+        "annual_revenue_threshold_meur": 11,
+        "group_rules_apply": true,
+        "source_id": "legifrance-css-promotion-dispositifs-2026-09-01"
+      },
+      "beneficiary": {
+        "name": "Caisse nationale de l'assurance maladie",
+        "source_id": "legifrance-css-promotion-dispositifs-2026-09-01"
+      },
+      "assessment_and_payment": {
+        "advance_percent": 75,
+        "advance_deadline": "01-06",
+        "regularization_deadline": "01-10 de l'année suivante",
+        "source_id": "legifrance-css-promotion-dispositifs-2026-09-01"
+      },
+      "classification": {
+        "status": "unverified",
+        "candidate_envelope": "ntl-taxes-pharmaceutiques-2024",
+        "candidate_amount_attributable": false,
+        "required_evidence": "Une table de passage ou une ligne de comptabilité nationale nommant explicitement les dispositifs médicaux."
+      },
+      "revenues": {
+        "observed": [],
+        "forecast": [
+          {
+            "year": 2025,
+            "amount_meur": 46,
+            "source_id": "lfss-2026-annexe-3",
+            "locator": "Annexe 3, p. 50"
+          },
+          {
+            "year": 2026,
+            "amount_meur": 48,
+            "source_id": "lfss-2026-annexe-3",
+            "locator": "Annexe 3, p. 50"
+          }
+        ]
+      },
+      "blocking_questions": [
+        "Dans quelle ligne SEC cette contribution est-elle enregistrée ?",
+        "La ligne NTL 73 comprend-elle les dispositifs médicaux ou seulement les médicaments, cosmétiques et grossistes répartiteurs ?",
+        "Existe-t-il une recette observée directement attribuable ?"
+      ],
+      "research_status": "complete_except_statistical_classification_and_observed_revenue",
+      "production_status": "not_integrated"
+    },
+    {
+      "canonical_id": "contribution-sauvegarde-dispositifs-medicaux-z",
+      "draft_entries": [],
+      "inventory_status": "missing_from_draft",
+      "continuity": {
+        "previous_status": "deferred",
+        "previous_batch": "data/audit/fiscalite-pharmaceutique-2026-09-02.json",
+        "treatment": "fully_documented_but_still_blocked"
+      },
+      "nom": "Sauvegarde dispositifs médicaux",
+      "nom_complet": "Contribution de sauvegarde sur les dispositifs médicaux fondée sur le montant Z",
+      "annee_creation": 2019,
+      "first_due_year": 2020,
+      "po_status": "unresolved",
+      "legal_status": "active",
+      "obligation_status": "confirmed",
+      "membership_status": "blocked",
+      "publication_status": "blocked",
+      "reason_codes": [
+        "current-law-confirmed",
+        "classification-unverified",
+        "source-needed",
+        "canonical-record-incomplete"
+      ],
+      "creation_evidence": {
+        "source_id": "legifrance-loi-2019-1446-art-23",
+        "locator": "Article 23 — création des articles L. 138-19-8 à L. 138-19-13, applicables à compter du 1er janvier 2020"
+      },
+      "legal_basis": [
+        {
+          "source_id": "legifrance-css-sauvegarde-dispositifs-2026-09-01",
+          "locator": "CSS, articles L. 138-19-8 à L. 138-19-13"
+        }
+      ],
+      "liable_person": "Exploitants des produits et prestations entrant dans le champ de la contribution.",
+      "scope_2026": {
+        "included": [
+          "produits et prestations inscrits sur la liste de l'article L. 165-1 et pris en charge en sus des prestations d'hospitalisation dans le cadre de l'article L. 162-22-7",
+          "produits et prestations pris en charge dans le cadre transitoire de l'article L. 165-1-5"
+        ],
+        "excluded": [
+          "implants issus de dérivés humains",
+          "greffons d'origine humaine"
+        ],
+        "source_id": "legifrance-lfss-2026-art-30"
+      },
+      "tax_base": {
+        "description": "Montants remboursés par l'assurance maladie pendant l'année civile au titre des produits et prestations entrant dans le champ, nets de TVA, des remises prévues par le code et des majorations mentionnées par l'article L. 165-7.",
+        "source_id": "legifrance-css-sauvegarde-dispositifs-2026-09-01"
+      },
+      "thresholds": [
+        {
+          "year": 2025,
+          "amount_eur": 2260000000,
+          "status": "historical_context",
+          "note": "Conservé uniquement pour expliquer l'évolution du seuil.",
+          "source_id": "legifrance-lfss-2025-art-29"
+        },
+        {
+          "year": 2026,
+          "amount_eur": 2160000000,
+          "symbol": "Z",
+          "source_id": "legifrance-lfss-2026-art-28"
+        }
+      ],
+      "calculation_2026": {
+        "total_contribution_percent_of_excess_over_z": 90,
+        "negative_or_zero_excess_treatment": "aucune contribution totale",
+        "individual_allocation": "au prorata des montants remboursés entrant dans le champ",
+        "individual_cap_percent_of_reimbursed_base": 10,
+        "source_id": "legifrance-css-sauvegarde-dispositifs-2026-09-01"
+      },
+      "beneficiary": {
+        "name": "Caisse nationale de l'assurance maladie",
+        "source_id": "legifrance-css-sauvegarde-dispositifs-2026-09-01"
+      },
+      "payment": {
+        "deadline": "1er novembre de l'année suivant celle au titre de laquelle la contribution est due",
+        "source_id": "legifrance-css-sauvegarde-dispositifs-2026-09-01"
+      },
+      "classification": {
+        "status": "unverified",
+        "candidate_envelope": "ntl-taxes-pharmaceutiques-2024",
+        "candidate_amount_attributable": false,
+        "required_evidence": "Une correspondance statistique explicite nommant la contribution ou un document de passage permettant de la rattacher à une catégorie SEC."
+      },
+      "revenues": {
+        "observed": [],
+        "forecast": [],
+        "threshold_is_not_revenue": true
+      },
+      "blocking_questions": [
+        "Dans quelle ligne SEC la contribution fondée sur Z est-elle enregistrée ?",
+        "La contribution est-elle comprise dans la ligne NTL 73 malgré l'absence des dispositifs médicaux dans son libellé ?",
+        "Existe-t-il un produit annuel officiel distinct du seuil Z et directement attribuable ?"
+      ],
+      "research_status": "complete_except_statistical_classification_and_revenue",
+      "production_status": "not_integrated"
+    }
+  ],
+  "historical_exclusions": [
+    {
+      "canonical_id": "contribution-premiere-vente-dispositifs-medicaux-historique",
+      "draft_entries": [],
+      "inventory_status": "missing_from_draft",
+      "nom": "Ancienne contribution première vente dispositifs",
+      "nom_complet": "Ancienne contribution sur la première vente en France de dispositifs médicaux et de dispositifs médicaux de diagnostic in vitro",
+      "annee_creation": 2014,
+      "effective_from": "2015-01-01",
+      "effective_to": "2021-01-01",
+      "po_status": "historically_confirmed",
+      "legal_status": "repealed",
+      "membership_status": "excluded_from_current_inventory",
+      "publication_status": "historical_only",
+      "reason_codes": [
+        "repealed"
+      ],
+      "creation_evidence": {
+        "source_id": "legifrance-loi-2014-1554-art-15",
+        "locator": "Article 15 — création de l'article L. 245-5-5-1 ; application aux ventes réalisées à compter du 1er janvier 2015"
+      },
+      "historical_legal_basis": [
+        {
+          "source_id": "legifrance-ancien-css-l245-5-5-1",
+          "locator": "Ancien CSS, article L. 245-5-5-1"
+        }
+      ],
+      "liable_person": "Personnes réalisant en France la première vente de dispositifs médicaux ou de dispositifs médicaux de diagnostic in vitro entrant dans le champ.",
+      "historical_tax_base": "Montant total hors taxe des premières ventes réalisées en France au cours de l'année civile.",
+      "historical_rate_percent": 0.29,
+      "historical_exemption": {
+        "annual_sales_threshold_eur": 500000
+      },
+      "historical_beneficiary": "Caisse nationale de l'assurance maladie",
+      "revenues": {
+        "observed": [],
+        "forecast": []
+      },
+      "research_status": "complete_for_current_inventory",
+      "production_status": "not_integrated",
+      "first_applicable_sales_since": "2015-01-01"
+    }
+  ],
+  "related_follow_up": [
+    {
+      "canonical_id": "classification-dispositifs-medicaux",
+      "status": "source_needed",
+      "note": "Rechercher une table de passage Insee/Eurostat ou un document de comptabilité nationale nommant les contributions des articles L. 245-5-1 à L. 245-5-6 et L. 138-19-8 à L. 138-19-13."
+    },
+    {
+      "canonical_id": "recette-sauvegarde-dispositifs-z",
+      "status": "source_needed",
+      "note": "Rechercher un état de produit ou une annexe budgétaire distinguant le seuil Z de la recette effectivement appelée."
+    }
+  ],
+  "quality_checks": {
+    "draft_inventory_gap_is_explicit": true,
+    "blocked_candidate_ids_are_unique": true,
+    "historical_exclusion_ids_are_unique": true,
+    "ntl_row_73_is_not_allocated": true,
+    "threshold_z_is_not_recorded_as_revenue": true,
+    "all_forecasts_have_year_and_source": true,
+    "active_candidates_have_current_legal_basis": true,
+    "repealed_first_sale_contribution_is_excluded_from_current_inventory": true,
+    "production_files_left_unchanged": [
+      "data/entries-full.json",
+      "data/entries-light.json"
+    ]
+  }
+}
