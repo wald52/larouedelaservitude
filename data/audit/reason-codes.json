@@ -26,6 +26,10 @@
       "meaning": "Le secteur institutionnel du bénéficiaire final n’est pas établi."
     },
     {
+      "id": "recipient-routing-unverified",
+      "meaning": "Le prélèvement peut être encaissé ou géré par un organisme intermédiaire ; le reroutage vers le bénéficiaire économique retenu en comptabilité nationale n’est pas établi."
+    },
+    {
       "id": "repealed",
       "meaning": "Le prélèvement n’est plus en vigueur à la date d’audit."
     },

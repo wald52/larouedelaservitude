@@ -1,0 +1,387 @@
+{
+  "schema_version": 1,
+  "batch_id": "transport-aerien-complement-2026-09-02",
+  "title": "Complément — taxe d'embarquement outre-mer, TNSA et redevance d'atterrissage",
+  "audit_date": "2026-09-02",
+  "status": "existing_record_updated_with_blocked_candidate_and_non_po_charge",
+  "production_dataset_changed": false,
+  "parent_batch": {
+    "path": "data/audit/transport-aerien-2026-09-02.json",
+    "relationship": "Complète la taxe passagers, traite la TNSA et résout la nature juridique de la redevance d'atterrissage sans dupliquer les fiches déjà créées."
+  },
+  "source_draft": {
+    "path": "data/audit/draft-2026-08-05.json",
+    "source_version": "2026-08-05",
+    "draft_indices": [
+      186,
+      340,
+      341
+    ],
+    "draft_entry_count": 3
+  },
+  "scope": {
+    "existing_record_addendum_count": 1,
+    "existing_record_addenda": [
+      "taxe-transport-aerien-passagers"
+    ],
+    "blocked_candidate_count": 1,
+    "blocked_candidate_ids": [
+      "taxe-nuisances-sonores-aeriennes"
+    ],
+    "active_non_po_charge_count": 1,
+    "active_non_po_charge_ids": [
+      "redevance-atterrissage-aerodrome"
+    ]
+  },
+  "measurement_policy": {
+    "unit": "millions_euros",
+    "draft_amounts": "Le montant de 57 M€ attribué à la TNSA dans le brouillon n'a pas d'année et n'est pas promu comme recette observée.",
+    "unit_rates": "Les tarifs par passager, décollage ou tonne et les coefficients acoustiques ne sont pas des recettes.",
+    "statistical_envelope": "La ligne NTL 70 « Taxes sur les transports » reste une enveloppe agrégée de 1 859 M€ en 2024 et n'est pas attribuée à la TNSA.",
+    "direct_consideration": "La redevance d'atterrissage rémunère explicitement la mise à disposition d'infrastructures et de services aéroportuaires ; elle est exclue du périmètre des prélèvements obligatoires du projet.",
+    "supersession": "Le statut source_needed de la ligne 340 dans le lot parent est remplacé par le rapprochement documenté avec la majoration outre-mer de la taxe passagers."
+  },
+  "sources": [
+    {
+      "id": "parent-transport-aerien-batch",
+      "title": "Lot de reprise — taxes sur le transport aérien",
+      "publisher": "Projet La roue de la servitude",
+      "local_path": "data/audit/transport-aerien-2026-09-02.json",
+      "audit_date": "2026-09-02",
+      "supports": [
+        "passenger_tax_record",
+        "transport_statistical_envelope"
+      ]
+    },
+    {
+      "id": "ec-ntl-2026-france",
+      "title": "Data on Taxation Trends — National tax list 2026, feuille France",
+      "publisher": "Commission européenne, DG TAXUD / Eurostat",
+      "url": "https://taxation-customs.ec.europa.eu/document/download/600d56d1-ea6e-416e-9981-1c8b9c603b6b_en?filename=NTL%20edition%202026%20web.xlsx",
+      "publication_date": "2026-03-30",
+      "data_through": 2024,
+      "retrieved_at": "2026-09-01",
+      "local_path": "data/reference/ntl-france-2026.json",
+      "supports": [
+        "classification_search",
+        "aggregate_transport_envelope"
+      ]
+    },
+    {
+      "id": "douane-momtap-2026",
+      "title": "Déclaration en vue d'établir la majoration outre-mer de la taxe sur le transport aérien de passagers",
+      "publisher": "Direction générale des douanes et droits indirects",
+      "url": "https://www.douane.gouv.fr/demarche/declaration-en-vue-detablir-la-majoration-outre-mer-de-la-taxe-sur-le-transport-aerien-de",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "draft_340_mapping",
+        "former_name_tep",
+        "liable_person",
+        "tax_base"
+      ]
+    },
+    {
+      "id": "legifrance-cibs-passagers-2026-09-01",
+      "title": "CIBS — taxe sur le transport aérien de passagers",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/codes/section_lc/LEGITEXT000044595989/LEGISCTA000044599467/2026-09-01/",
+      "effective_date": "2026-09-01",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "passenger_tax_scope",
+        "corsica_and_cdg_disembarkments",
+        "overseas_majoration"
+      ]
+    },
+    {
+      "id": "legifrance-cibs-tnsa-2026-09-01",
+      "title": "CIBS — taxe sur les nuisances sonores aériennes",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/codes/section_lc/LEGITEXT000044595989/LEGISCTA000044599425/2026-09-01/",
+      "effective_date": "2026-09-01",
+      "retrieved_at": "2026-09-02",
+      "locator": "Articles L. 422-49 à L. 422-57",
+      "supports": [
+        "legal_status",
+        "taxable_event",
+        "liable_person",
+        "calculation",
+        "beneficiary_and_use"
+      ]
+    },
+    {
+      "id": "legifrance-cibs-tnsa-reglementaire-2026",
+      "title": "CIBS — montants réglementaires de la TNSA",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/codes/section_lc/LEGITEXT000044595989/LEGISCTA000049804116/2026-09-01/",
+      "effective_date": "2026-09-01",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "airport_rates",
+        "acoustic_coefficients",
+        "declaration"
+      ]
+    },
+    {
+      "id": "legifrance-lfr-2003-art-19",
+      "title": "Loi n° 2003-1312 du 30 décembre 2003 de finances rectificative pour 2003 — article 19",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/jorf/article_jo/JORFARTI000002261644",
+      "publication_date": "2003-12-31",
+      "first_effective_date": "2005-01-01",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "creation_year",
+        "first_effective_date"
+      ]
+    },
+    {
+      "id": "legifrance-transports-r6325-5-2026",
+      "title": "Code des transports — article R. 6325-5, redevance d'atterrissage",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000048323342/2026-07-13",
+      "effective_date": "2026-09-02",
+      "retrieved_at": "2026-09-02",
+      "supports": [
+        "legal_status",
+        "direct_consideration",
+        "tax_base"
+      ]
+    }
+  ],
+  "existing_record_addenda": [
+    {
+      "canonical_id": "taxe-transport-aerien-passagers",
+      "draft_entry": {
+        "index": 340,
+        "id": "taxe-d-embarquement-sur-les-passagers-dans-les-territoires-d",
+        "treatment": "merge_as_overseas_majoration_profile"
+      },
+      "supersedes_parent_follow_up": true,
+      "mapping": {
+        "former_name": "Taxe d'embarquement sur les passagers dans les territoires d'outre-mer — TEP",
+        "current_name": "Majoration outre-mer de la taxe sur le transport aérien de passagers — MOMTAP",
+        "current_legal_basis": "CIBS, article L. 422-30",
+        "reason": "Le portail des douanes indique expressément que la MOMTAP était précédemment dénommée taxe d'embarquement sur les passagers."
+      },
+      "current_profile": {
+        "territories": [
+          "Guadeloupe",
+          "Guyane",
+          "Martinique",
+          "Mayotte",
+          "La Réunion"
+        ],
+        "taxable_event": "Embarquement sur un vol commercial lorsqu'un billet a été émis à titre onéreux.",
+        "maximum_eur_per_passenger": 4.57,
+        "distance_modulation_possible": true,
+        "liable_person": "Entreprise de transport aérien réalisant l'embarquement taxable."
+      },
+      "scope_correction": {
+        "parent_value": "Embarquement taxable ; certains débarquements en Corse.",
+        "canonical_value": "Embarquement taxable ; depuis le 1er avril 2026, débarquements taxables en Corse et à Paris-Charles de Gaulle.",
+        "source_id": "legifrance-cibs-passagers-2026-09-01"
+      },
+      "revenues": {
+        "observed": [],
+        "forecast": []
+      },
+      "warnings": [
+        "Cette ligne ne crée pas une nouvelle taxe distincte de la taxe passagers.",
+        "Le plafond de 4,57 euros n'est pas substitué aux taux effectivement délibérés par les territoires.",
+        "Le rattachement ne modifie pas la décision de conserver les 47 M€ de la ligne NTL 105 comme enveloppe collective Corse-outre-mer."
+      ]
+    }
+  ],
+  "blocked_candidates": [
+    {
+      "canonical_id": "taxe-nuisances-sonores-aeriennes",
+      "draft_entries": [
+        {
+          "index": 186,
+          "id": "taxe-sur-les-nuisances-sonores-aeriennes",
+          "treatment": "keep_and_correct_creation_year"
+        }
+      ],
+      "nom": "Taxe nuisances sonores aériennes",
+      "nom_complet": "Taxe sur les nuisances sonores aériennes",
+      "sigle": "TNSA",
+      "annee_creation": 2003,
+      "first_effective_date": "2005-01-01",
+      "po_status": "unresolved",
+      "legal_status": "active",
+      "obligation_status": "confirmed",
+      "membership_status": "blocked",
+      "publication_status": "blocked",
+      "reason_codes": [
+        "current-law-confirmed",
+        "classification-unverified",
+        "recipient-routing-unverified",
+        "source-needed",
+        "receipt-year-missing"
+      ],
+      "creation_evidence": {
+        "source_id": "legifrance-lfr-2003-art-19",
+        "locator": "Article 19 — création de la TNSA à compter du 1er janvier 2005"
+      },
+      "legal_basis": [
+        {
+          "source_id": "legifrance-cibs-tnsa-2026-09-01",
+          "locator": "CIBS, articles L. 422-49 à L. 422-57"
+        },
+        {
+          "source_id": "legifrance-cibs-tnsa-reglementaire-2026",
+          "locator": "CIBS, articles A. 422-32 à A. 422-41"
+        }
+      ],
+      "taxable_event": "Décollage d'un aéronef sur un aérodrome entrant dans le champ de la taxe.",
+      "liable_person": "Exploitant de l'aéronef ou, à défaut, son propriétaire.",
+      "exemptions_summary": [
+        "aéronefs de masse maximale au décollage inférieure à deux tonnes",
+        "aéronefs d'Etat et missions entrant dans les exclusions légales"
+      ],
+      "calculation": {
+        "formula": "tarif propre à l'aérodrome × coefficient acoustique et horaire de l'aéronef × logarithme décimal de la masse maximale au décollage en tonnes",
+        "airport_rates_eur": [
+          {"group": 1, "airport": "Nantes-Atlantique", "amount": 37.8},
+          {"group": 1, "airport": "Paris-Charles de Gaulle", "amount": 24.3},
+          {"group": 1, "airport": "Paris-Le Bourget", "amount": 75},
+          {"group": 1, "airport": "Paris-Orly", "amount": 26.6},
+          {"group": 2, "airport": "Toulouse-Blagnac", "amount": 17.7},
+          {"group": 3, "airport": "Beauvais-Tillé", "amount": 2.9},
+          {"group": 3, "airport": "Bordeaux-Mérignac", "amount": 10},
+          {"group": 3, "airport": "Lyon-Saint Exupéry", "amount": 0},
+          {"group": 3, "airport": "Marseille-Provence", "amount": 4.7},
+          {"group": 3, "airport": "Nice-Côte d'Azur", "amount": 0.5}
+        ],
+        "acoustic_coefficient_range": [
+          0.25,
+          60
+        ],
+        "coefficient_dimensions": [
+          "groupe acoustique de l'aéronef",
+          "heure de décollage"
+        ]
+      },
+      "beneficiary_and_use": {
+        "description": "Produit affecté, pour l'aérodrome concerné, au financement des aides et mesures en faveur des riverains exposés au bruit.",
+        "routing_status": "Le bénéficiaire opérationnel peut être un exploitant public ou privé ; le reroutage SEC vers la politique publique d'insonorisation n'est pas documenté dans le corpus local."
+      },
+      "classification": {
+        "status": "unverified",
+        "candidate_envelope": "ntl-transports-2024",
+        "candidate_amount_attributable": false,
+        "required_evidence": "Ligne de comptabilité nationale ou table de passage nommant la TNSA et son traitement de reroutage."
+      },
+      "revenues": {
+        "observed": [],
+        "forecast": []
+      },
+      "draft_corrections": [
+        {
+          "field": "annee_creation",
+          "draft_value": 1992,
+          "canonical_value": 2003,
+          "first_effective_date": "2005-01-01",
+          "explanation": "La taxe portant le nom actuel a été créée par la loi de finances rectificative pour 2003."
+        },
+        {
+          "field": "recette",
+          "draft_value_meur": 57,
+          "canonical_value_meur": null,
+          "explanation": "Le montant du brouillon n'avait pas d'année et aucune ligne statistique directement attribuable n'a été identifiée."
+        }
+      ],
+      "warnings": [
+        "Les tarifs nuls de certains aérodromes sont des valeurs explicites et ne signifient pas que la taxe est abrogée.",
+        "Les coefficients acoustiques et horaires sont des paramètres d'une seule taxe.",
+        "La ligne NTL 70 de 1 859 M€ n'est pas attribuée."
+      ],
+      "research_status": "complete_except_statistical_classification_routing_and_revenue",
+      "production_status": "not_integrated"
+    }
+  ],
+  "active_non_po_charges": [
+    {
+      "canonical_id": "redevance-atterrissage-aerodrome",
+      "draft_entries": [
+        {
+          "index": 341,
+          "id": "taxe-d-atterrissage",
+          "treatment": "exclude_and_correct_legal_nature"
+        }
+      ],
+      "nom": "Redevance d'atterrissage",
+      "nom_complet": "Redevance aéroportuaire d'atterrissage",
+      "annee_creation": null,
+      "po_status": "excluded",
+      "legal_status": "active",
+      "membership_status": "excluded_from_po_inventory",
+      "publication_status": "non_po_charge",
+      "reason_codes": [
+        "current-law-confirmed",
+        "direct-individual-consideration",
+        "non-fiscal-revenue",
+        "obsolete-label-or-mechanism"
+      ],
+      "legal_basis": [
+        {
+          "source_id": "legifrance-transports-r6325-5-2026",
+          "locator": "Code des transports, article R. 6325-5"
+        }
+      ],
+      "liable_person": "Usager de l'aérodrome exploitant un aéronef de plus de six tonnes dans le champ de la redevance.",
+      "tax_base": "Masse maximale certifiée au décollage de l'aéronef.",
+      "counterpart_test": {
+        "status": "direct_individual_consideration",
+        "reason": "Le texte qualifie expressément le paiement de contrepartie de la mise à disposition des infrastructures et équipements nécessaires à l'atterrissage, au décollage et à la circulation au sol, ainsi que de services complémentaires éventuels."
+      },
+      "classification": {
+        "ntl_tax_lines_inherited": false,
+        "reason": "La redevance de service n'est assimilée ni à la taxe passagers, ni à la taxe marchandises, ni à la TNSA."
+      },
+      "revenues": {
+        "observed": [],
+        "forecast": []
+      },
+      "research_status": "complete_for_po_exclusion",
+      "production_status": "not_integrated"
+    }
+  ],
+  "related_follow_up": [
+    {
+      "canonical_id": "tnsa-statistical-routing",
+      "status": "source_needed",
+      "note": "Rechercher une table de passage Insee/Eurostat ou un document budgétaire identifiant la TNSA, son code SEC et le reroutage des exploitants aéroportuaires."
+    },
+    {
+      "canonical_id": "majorations-aeriennes-local-rates",
+      "status": "source_needed",
+      "note": "Consolider les délibérations fixant les taux effectivement appliqués en Corse et dans les cinq territoires ultramarins."
+    },
+    {
+      "canonical_id": "redevances-aeroportuaires-autres",
+      "status": "deferred_non_po_family",
+      "note": "Les redevances de stationnement et par passager relèvent du même examen de contrepartie directe."
+    }
+  ],
+  "quality_checks": {
+    "draft_indices_covered": [
+      186,
+      340,
+      341
+    ],
+    "draft_340_is_resolved_into_existing_passenger_tax": true,
+    "passenger_tax_scope_includes_cdg_disembarkments_from_2026_04_01": true,
+    "tnsa_has_current_legal_basis": true,
+    "tnsa_creation_year_is_corrected": true,
+    "tnsa_airport_rates_and_coefficients_are_not_duplicate_records": true,
+    "tnsa_draft_amount_is_not_promoted": true,
+    "transport_envelope_is_not_allocated_to_tnsa": true,
+    "landing_fee_is_excluded_for_direct_consideration": true,
+    "production_files_left_unchanged": [
+      "data/entries-full.json",
+      "data/entries-light.json"
+    ]
+  }
+}

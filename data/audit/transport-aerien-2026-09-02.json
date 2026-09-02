@@ -1,0 +1,277 @@
+{
+  "schema_version": 1,
+  "batch_id": "transport-aerien-2026-09-02",
+  "title": "Lot de reprise — taxes sur le transport aérien",
+  "audit_date": "2026-09-02",
+  "status": "ready_for_review_with_statistical_envelopes",
+  "production_dataset_changed": false,
+  "source_draft": {
+    "path": "data/audit/draft-2026-08-05.json",
+    "draft_indices": [63, 108, 109, 172, 338, 339],
+    "explicit_split_indices": [63, 109, 172, 339],
+    "continuity": "Les composantes maritimes des lignes 63 et 172 ont été traitées dans le lot permis-bateau-passagers-maritimes."
+  },
+  "scope": {
+    "ready_record_count": 2,
+    "ready_canonical_ids": [
+      "taxe-transport-aerien-passagers",
+      "taxe-transport-aerien-marchandises"
+    ],
+    "description": "Les anciennes TAC, taxe de solidarité, taxe d'aéroport et taxes territoriales mixtes sont remappées vers deux taxes actuelles. Tarifs et majorations restent des composantes."
+  },
+  "policy": {
+    "unit": "millions_euros",
+    "ntl_row_70": "Enveloppe large non ventilée.",
+    "ntl_row_105": "Enveloppe collective des majorations aériennes Corse et outre-mer en 2024, non ventilée entre territoires.",
+    "undated_draft_amounts": "Non repris.",
+    "explicit_zero": "Conservé comme valeur réglementaire, non comme abrogation.",
+    "future_rules": "Séparées du droit applicable au 2 septembre 2026."
+  },
+  "sources": [
+    {
+      "id": "ntl-2026-france",
+      "title": "National tax list 2026 — France",
+      "url": "https://taxation-customs.ec.europa.eu/document/download/600d56d1-ea6e-416e-9981-1c8b9c603b6b_en?filename=NTL%20edition%202026%20web.xlsx",
+      "local_path": "data/reference/ntl-france-2026.json",
+      "data_through": 2024
+    },
+    {
+      "id": "cibs-passagers-2026",
+      "title": "CIBS — taxe sur le transport aérien de passagers",
+      "url": "https://www.legifrance.gouv.fr/codes/section_lc/LEGITEXT000044595989/LEGISCTA000044599467/2026-09-01/",
+      "locator": "L. 422-13 à L. 422-40"
+    },
+    {
+      "id": "cibs-passagers-reglementaire-2026",
+      "title": "CIBS — montants réglementaires de la taxe passagers",
+      "url": "https://www.legifrance.gouv.fr/codes/section_lc/LEGITEXT000044595989/LEGISCTA000049804038/2026-09-01/"
+    },
+    {
+      "id": "dgac-taxes-aeronautiques-2026",
+      "title": "Taxes aéronautiques",
+      "url": "https://www.ecologie.gouv.fr/politiques-publiques/taxes-aeronautiques",
+      "updated_at": "2026-08-06"
+    },
+    {
+      "id": "osp-reduction-2026",
+      "title": "Arrêté du 13 mai 2026 — tarif réduit de solidarité",
+      "url": "https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000054154710",
+      "effective_from": "2026-06-01"
+    },
+    {
+      "id": "cdg-zero-2026",
+      "title": "Arrêté du 16 janvier 2026 — majoration Paris-CDG",
+      "url": "https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000053388566",
+      "rate_period": ["2026-04-01", "2027-04-01"]
+    },
+    {
+      "id": "cibs-marchandises-2026",
+      "title": "CIBS — taxe sur le transport aérien de marchandises",
+      "url": "https://www.legifrance.gouv.fr/codes/section_lc/LEGITEXT000044595989/LEGISCTA000044599551/2026-09-01/",
+      "locator": "L. 422-41 à L. 422-48"
+    },
+    {
+      "id": "cibs-marchandises-reglementaire-2026",
+      "title": "CIBS — montants réglementaires de la taxe marchandises",
+      "url": "https://www.legifrance.gouv.fr/codes/section_lc/LEGITEXT000044595989/LEGISCTA000049804110/2026-09-01/"
+    },
+    {
+      "id": "concordance-2021-1843",
+      "title": "Ordonnance n° 2021-1843 — article 4, table de concordance",
+      "url": "https://www.legifrance.gouv.fr/loda/article_lc/LEGIARTI000051216915",
+      "effective_from": "2022-01-01"
+    }
+  ],
+  "statistical_envelopes": [
+    {
+      "id": "ntl-transports-2024",
+      "source_id": "ntl-2026-france",
+      "row": 70,
+      "esa": "D214H C10",
+      "label": "Taxes sur les transports",
+      "year": 2024,
+      "amount_meur": 1859,
+      "allocated": false
+    },
+    {
+      "id": "ntl-majorations-territoriales-air-2024",
+      "source_id": "ntl-2026-france",
+      "row": 105,
+      "esa": "D29B C05",
+      "label": "Taxe due par les entreprises de transport public aérien et maritime (Corse, DOM)",
+      "year": 2024,
+      "amount_meur": 47,
+      "assigned_to": "taxe-transport-aerien-passagers",
+      "scope": "majorations Corse et outre-mer collectivement",
+      "territorial_split": false,
+      "inference": "Les composantes maritimes avaient cessé avant 2024 ; le libellé statistique est retardataire."
+    }
+  ],
+  "records": [
+    {
+      "canonical_id": "taxe-transport-aerien-passagers",
+      "draft_entries": [
+        {"index": 63, "treatment": "majoration_outre_mer"},
+        {"index": 108, "treatment": "tarif_solidarite"},
+        {"index": 109, "treatment": "split_tarif_aviation_civile_passagers"},
+        {"index": 172, "treatment": "majoration_corse"},
+        {"index": 338, "treatment": "ancienne_presentation_tarif_solidarite"},
+        {"index": 339, "treatment": "split_surete_securite_et_perequation_passagers"}
+      ],
+      "nom": "Taxe sur le transport aérien de passagers",
+      "annee_creation": 2021,
+      "first_effective_date": "2022-01-01",
+      "po_status": "confirmed",
+      "legal_status": "active",
+      "publication_status": "ready_for_review",
+      "legal_basis": {
+        "source_id": "cibs-passagers-2026",
+        "locator": "L. 422-13 à L. 422-40"
+      },
+      "granularity": "Une taxe égale à la somme de quatre tarifs, complétée par des tarifs spéciaux et majorations ; aucune composante n'est une fiche autonome.",
+      "taxable_event": "Embarquement taxable sur un vol commercial ; en Corse, certains débarquements sont aussi taxables.",
+      "liable_person": "Transporteur aérien public exploitant l'aéronef ou dont le numéro de vol est utilisé pour le contrôle de la circulation aérienne.",
+      "components_2026": {
+        "aviation_civile_eur": [
+          {"destination": "européenne ou assimilée", "amount": 5.21},
+          {"destination": "intermédiaire ou lointaine", "amount": 9.37}
+        ],
+        "solidarite_eur": [
+          {"destination": "européenne ou assimilée", "normal": 7.4, "services_additionnels": 30, "affaires_turbopropulseur": 210, "affaires_turboreacteur": 420},
+          {"destination": "intermédiaire", "normal": 15, "services_additionnels": 80, "affaires_turbopropulseur": 675, "affaires_turboreacteur": 1015},
+          {"destination": "lointaine", "normal": 40, "services_additionnels": 120, "affaires_turbopropulseur": 1025, "affaires_turboreacteur": 2100}
+        ],
+        "solidarite_osp": {
+          "effective_from": "2026-06-01",
+          "reduction_percent": 65,
+          "source_id": "osp-reduction-2026"
+        },
+        "surete_securite_ranges_eur": [
+          {"class": 1, "min": 3.3, "max": 11.8},
+          {"class": 2, "min": 2.16, "max": 10.25},
+          {"class": 3, "min": 0.73, "max": 20},
+          {"class": 4, "min": 0, "max": 0}
+        ],
+        "correspondance_reduction_percent": 72,
+        "perequation_eur": {"amount": 1.35, "effective_from": "2026-07-01"},
+        "bale_mulhouse_eur": {"amount": 1.42, "effective_from": "2026-07-01"},
+        "paris_cdg_eur": {
+          "legal_ceiling": 1.4,
+          "actual_rate": 0,
+          "period": ["2026-04-01", "2027-04-01"],
+          "declaration_exemption": true
+        },
+        "corse": {
+          "ceiling_eur_per_passenger": 4.57,
+          "movement": "embarquement ou débarquement",
+          "local_rates": "not_consolidated"
+        },
+        "outre_mer": {
+          "ceiling_eur_per_passenger": 4.57,
+          "movement": "embarquement en Guadeloupe, Guyane, Martinique, Mayotte ou La Réunion",
+          "allocation_percent": {"territory": 70, "coastal_tourism_communes": 30},
+          "local_rates": "not_consolidated"
+        }
+      },
+      "classification": {
+        "family_envelope_ref": "ntl-transports-2024",
+        "territorial_component_ref": "ntl-majorations-territoriales-air-2024",
+        "full_revenue_attributable": false
+      },
+      "revenues": {
+        "observed": [],
+        "observed_component_envelope": {
+          "year": 2024,
+          "amount_meur": 47,
+          "source_id": "ntl-2026-france",
+          "scope": "majorations Corse et outre-mer collectivement"
+        },
+        "forecast": []
+      },
+      "draft_amounts_not_promoted": [
+        {"index": 108, "amount_meur": 161.99},
+        {"index": 109, "amount_meur": 401},
+        {"index": 63, "amount_meur": 9.4},
+        {"index": 172, "amount_meur": 47.4}
+      ],
+      "warnings": [
+        "47 M€ ne représente pas la taxe passagers entière.",
+        "1 859 M€ n'est attribué à aucune fiche.",
+        "Le tarif CDG nul est temporaire, pas une abrogation.",
+        "Les taux locaux Corse et outre-mer restent à consolider."
+      ],
+      "research_status": "complete_except_full_revenue_breakdown_and_local_rates",
+      "production_status": "not_integrated"
+    },
+    {
+      "canonical_id": "taxe-transport-aerien-marchandises",
+      "draft_entries": [
+        {"index": 109, "treatment": "split_tarif_aviation_civile_fret_courrier"},
+        {"index": 339, "treatment": "split_surete_securite_fret_courrier"}
+      ],
+      "nom": "Taxe sur le transport aérien de marchandises",
+      "annee_creation": 2021,
+      "first_effective_date": "2022-01-01",
+      "po_status": "confirmed",
+      "legal_status": "active",
+      "publication_status": "ready_for_review",
+      "legal_basis": {
+        "source_id": "cibs-marchandises-2026",
+        "locator": "L. 422-41 à L. 422-48"
+      },
+      "granularity": "Une taxe sur le fret et le courrier, composée du tarif de l'aviation civile et du tarif de sûreté et de sécurité.",
+      "taxable_event": "Embarquement taxable de fret ou de courrier sur un vol commercial, hors transit direct.",
+      "liable_person": "Transporteur aérien public exploitant l'aéronef ou dont le numéro de vol est utilisé pour le contrôle.",
+      "components_2026": {
+        "aviation_civile_eur_per_tonne": {
+          "amount": 1.55,
+          "period": ["2026-04-01", "2027-04-01"]
+        },
+        "surete_securite_eur_per_tonne": [
+          {"airport_class": "1 à 3", "amount": 1},
+          {"airport_class": 4, "amount": 0}
+        ]
+      },
+      "collection": "Déclaration et paiement conjoints avec la taxe passagers.",
+      "classification": {
+        "family_envelope_ref": "ntl-transports-2024",
+        "individual_ntl_line": null,
+        "amount_attributable": false
+      },
+      "revenues": {"observed": [], "forecast": []},
+      "warnings": [
+        "1 859 M€ n'est attribué à aucune fiche.",
+        "Le produit fret n'est pas isolé dans les sources archivées.",
+        "La TNSA reste une taxe distincte."
+      ],
+      "research_status": "complete_except_individual_revenue",
+      "production_status": "not_integrated"
+    }
+  ],
+  "predecessor_resolution": [
+    {"draft_index": 63, "current": "taxe-transport-aerien-passagers / majoration outre-mer", "maritime": "historical_only"},
+    {"draft_index": 108, "current": "taxe-transport-aerien-passagers / tarif de solidarité"},
+    {"draft_index": 109, "current": ["taxe-transport-aerien-passagers / tarif aviation civile", "taxe-transport-aerien-marchandises / tarif aviation civile"]},
+    {"draft_index": 172, "current": "taxe-transport-aerien-passagers / majoration Corse", "maritime": "historical_only"},
+    {"draft_index": 338, "current": "taxe-transport-aerien-passagers / ancienne présentation du tarif de solidarité"},
+    {"draft_index": 339, "current": ["taxe-transport-aerien-passagers / sûreté-sécurité et péréquation", "taxe-transport-aerien-marchandises / sûreté-sécurité"]}
+  ],
+  "follow_up": [
+    {"canonical_id": "taxe-nuisances-sonores-aeriennes", "status": "next_batch"},
+    {"draft_index": 340, "status": "source_needed", "note": "Identifier le territoire, le texte et le bénéficiaire exacts."},
+    {"draft_index": 341, "status": "deferred_non_po_review", "note": "Documenter la redevance d'atterrissage comme charge d'usage aéroportuaire."},
+    {"id": "ventilation-ntl-aerien", "status": "source_needed", "note": "Ventiler les lignes NTL 70 et 105 à partir d'une source primaire."}
+  ],
+  "quality_checks": {
+    "canonical_ids_unique": true,
+    "draft_indices_covered": [63, 108, 109, 172, 338, 339],
+    "tac_split_between_passengers_and_freight": true,
+    "airport_tax_split_between_passengers_and_freight": true,
+    "solidarity_and_territorial_majorations_not_separate_taxes": true,
+    "cdg_zero_rate_preserved": true,
+    "ntl_row_70_not_allocated": true,
+    "ntl_row_105_only_component_envelope": true,
+    "undated_draft_amounts_not_promoted": true,
+    "production_files_unchanged": ["data/entries-full.json", "data/entries-light.json"]
+  }
+}
