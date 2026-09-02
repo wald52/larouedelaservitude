@@ -19,7 +19,7 @@ La fiche structurée correspondante est publiée dans [`data/audit/tva-accises-2
 |---|---:|---|---:|---:|---|
 | TVA | 106 | CGI, articles 256-0 à 298 octodecies | 206 332 M€ en 2024 | 54 820 M€ de TVA nette affectée à la sécurité sociale, pas un total national | conserver |
 | Accise sur les alcools | 123, 124, 125 et partie « bières » de 126 | CIBS, articles L. 313-1 à L. 313-45 | aucune recette directement attribuable ; enveloppe « taxes sur les boissons » de 4 749 M€ en 2024 | composantes de 54, 2 173, 98 et 1 081 M€, non additionnées | fusionner |
-| Accise sur les tabacs | 127 | CIBS, articles L. 314-1 à L. 314-37 | 13 606 M€ en 2024 | prévision de 11 423 M€ | remplacer l'ancien libellé |
+| Accise sur les tabacs | 127 | CIBS, articles L. 314-1 à L. 314-37 | aucune recette directement attribuable ; enveloppe « taxes sur les tabacs » de 13 606 M€ en 2024 | prévision de 11 423 M€ | remplacer l'ancien libellé |
 | Contribution sur les boissons non alcooliques | partie « boissons non alcoolisées » de 126 et 198 | CGI, article 1613 quater | aucune recette directement attribuable ; enveloppe « taxes sur les boissons » de 4 749 M€ en 2024 | deux composantes de 92 et 70 M€, non additionnées | scinder puis fusionner |
 
 Les quatre fiches sont prêtes à relire. Les valeurs inconnues restent `null` ou sont absentes des séries canoniques ; aucune estimation n'est produite pour combler les lacunes.
@@ -58,6 +58,8 @@ L'article 4 de l'ordonnance n° 2021-1843 rattache l'ancien article 575 du CGI �
 
 L'annexe 3 du PLFSS 2026 emploie encore l'ancien libellé et l'ancienne référence. Cette divergence est conservée dans la provenance de la prévision, sans contaminer la base juridique courante.
 
+La ligne NTL « Taxes sur les tabacs » n'est pas attribuée intégralement à cette accise : l'annexe 3 documente aussi un droit de licence sur la rémunération des débitants de tabacs, sans ligne autonome retrouvée dans la NTL. Le montant de 13 606 M€ est donc conservé comme enveloppe statistique, et non comme recette observée de l'accise seule.
+
 ### 5. La TVA reste dans le CGI jusqu'au 1er janvier 2027
 
 Au 1er septembre 2026, le chapitre premier du titre II du CGI demeure la base juridique en vigueur de la TVA. L'article 49 consolidé de l'ordonnance n° 2025-1247, après sa modification du 27 juillet 2026, fixe l'entrée en vigueur générale de la recodification au 1er janvier 2027.
@@ -74,7 +76,9 @@ La National tax list 2026 fournit des montants de comptabilité nationale pour 2
 - taxes sur les boissons : 4 749 M€ ;
 - taxes sur les tabacs : 13 606 M€.
 
-La ligne « taxes sur les boissons » couvre plusieurs prélèvements. Elle sert à confirmer la classification statistique, mais son montant n'est attribué ni à l'accise sur les alcools ni à la contribution sur les boissons non alcooliques.
+Les lignes « taxes sur les boissons » et « taxes sur les tabacs » couvrent des périmètres plus larges que certaines fiches juridiques du lot. Elles servent à confirmer la classification statistique, mais leurs montants ne sont pas attribués à une fiche lorsque l'exclusivité du périmètre n'est pas établie.
+
+Ainsi, les 4 749 M€ ne sont attribués ni à l'accise sur les alcools ni à la contribution sur les boissons non alcooliques. Les 13 606 M€ ne sont pas attribués à la seule accise sur les tabacs, car le PLFSS documente séparément un droit de licence sur la rémunération des débitants.
 
 ### Prévisions 2026
 
@@ -113,9 +117,10 @@ Elles restent visibles dans le brouillon historique et sont mentionnées dans le
 
 ## Contrôle de complétude du secteur
 
-Trois unités voisines ont été repérées mais laissées à un lot ultérieur afin de ne pas élargir artificiellement le périmètre :
+Quatre unités voisines ont été repérées mais laissées à un lot ultérieur afin de ne pas élargir artificiellement le périmètre :
 
 - la contribution sur les boissons sucrées de l'article 1613 ter du CGI, présente dans l'annexe 3 mais sans ligne autonome retrouvée dans le brouillon ;
+- le droit de licence sur la rémunération des débitants de tabacs, présent dans l'annexe 3 mais sans ligne autonome retrouvée dans le brouillon ;
 - la taxe sur les boissons dites « prémix » de la ligne 197 ;
 - la cotisation sur les alcools de plus de 18° de la ligne 23, distincte de l'accise sur les alcools.
 
@@ -124,7 +129,7 @@ Ce contrôle évite de confondre la reprise des anciennes fractions d'accise ave
 ## Garde-fous appliqués
 
 1. Une ancienne dénomination ou une fraction n'est pas publiée comme prélèvement autonome.
-2. Une ligne statistique agrégée n'est pas distribuée entre ses composantes sans source.
+2. Une ligne statistique agrégée n'est pas attribuée à une seule unité juridique sans preuve d'exclusivité.
 3. Une prévision n'est pas présentée comme une recette observée.
 4. Deux composantes tarifaires d'un même article ne deviennent pas deux fiches.
 5. Les montants sans année restent exclus des séries canoniques.

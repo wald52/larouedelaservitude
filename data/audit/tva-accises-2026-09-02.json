@@ -33,7 +33,7 @@
     "unit": "millions_euros",
     "observed_revenue": "Recette constatée en comptabilité nationale dans la National tax list 2026, dernière année disponible : 2024.",
     "forecast_revenue": "Prévision 2026 du PLFSS 2026, annexe 3. Elle reste distincte de la recette observée et ne la remplace pas.",
-    "aggregate_envelope": "La ligne NTL 37 « Taxes sur les boissons » est une enveloppe statistique couvrant plusieurs impositions. Son montant n'est attribué à aucune fiche juridique particulière.",
+    "aggregate_envelope": "Les lignes NTL 37 « Taxes sur les boissons » et 38 « Taxes sur les tabacs » sont des enveloppes statistiques plus larges que certaines unités juridiques du lot. Leur montant n'est attribué à aucune fiche lorsque l'exclusivité du périmètre n'est pas établie.",
     "forecast_components": "Les lignes détaillées de l'annexe 3 sont conservées comme composantes documentaires. Elles ne sont pas additionnées pour fabriquer un total canonique.",
     "draft_amounts": "Les montants du brouillon sans année explicite ne sont pas repris comme recettes canoniques."
   },
@@ -413,17 +413,19 @@
         "esa_code": "D214A",
         "national_detail_code": "C10",
         "recipient_scope": "S.13 + S.212",
-        "locator": "FR row 38 — Taxes sur les tabacs"
+        "locator": "FR row 38 — Taxes sur les tabacs",
+        "granularity": "aggregate_envelope",
+        "amount_attributable_to_record": false
       },
       "revenues": {
-        "observed": [
-          {
-            "year": 2024,
-            "amount_meur": 13606,
-            "source_id": "ec-ntl-2026-france",
-            "locator": "FR row 38 (D214A C10)"
-          }
-        ],
+        "observed": [],
+        "observed_statistical_envelope": {
+          "year": 2024,
+          "amount_meur": 13606,
+          "source_id": "ec-ntl-2026-france",
+          "locator": "FR row 38 (D214A C10)",
+          "scope": "ensemble agrégé des taxes sur les tabacs ; l'annexe 3 documente en parallèle un droit de licence distinct qui n'est pas isolé dans la NTL, de sorte que ce montant n'est pas attribuable exclusivement à l'accise"
+        },
         "forecast_total": {
           "year": 2026,
           "amount_meur": 11423,
@@ -438,7 +440,7 @@
         "treatment": "La référence imprimée est conservée comme provenance ; la fiche emploie la dénomination et la base juridique actuelles."
       },
       "warnings": [
-        "Le libellé NTL « Taxes sur les tabacs » est plus large que l'intitulé juridique ; le rapprochement est conservé avec son localisateur.",
+        "La ligne NTL 38 « Taxes sur les tabacs » est traitée comme une enveloppe statistique : le PLFSS documente séparément un droit de licence sur la rémunération des débitants de tabacs, sans ligne NTL autonome retrouvée.",
         "La prévision du PLFSS utilise encore l'ancienne référence à l'article 575 du CGI."
       ],
       "research_status": "complete",
@@ -572,6 +574,15 @@
       "note": "À traiter dans un prochain lot : la contribution figure dans l'annexe 3 mais pas comme ligne autonome du brouillon."
     },
     {
+      "canonical_id": "droit-licence-debitants-tabac",
+      "draft_entry": null,
+      "status": "candidate_missing_from_draft",
+      "current_legal_basis": "CGI, article 568 (référence imprimée dans l'annexe 3 à vérifier dans un prochain lot)",
+      "forecast_2026_meur": 330,
+      "source_id": "lfss-2026-annexe-3",
+      "note": "À traiter dans un prochain lot : cette ligne distincte du PLFSS explique pourquoi l'enveloppe NTL « Taxes sur les tabacs » n'est pas attribuée exclusivement à l'accise."
+    },
+    {
       "canonical_id": "taxe-premix",
       "draft_index": 197,
       "status": "deferred",
@@ -594,7 +605,7 @@
     "all_observed_revenues_have_year_and_source": true,
     "all_forecasts_have_year_and_source": true,
     "observed_and_forecast_series_are_separate": true,
-    "ntl_row_37_is_not_assigned_to_a_single_levy": true,
+    "ntl_rows_37_and_38_are_not_assigned_to_single_levies": true,
     "forecast_components_are_not_summed": true,
     "legacy_alcohol_lines_are_merged": true,
     "mixed_draft_entry_126_is_split": true,
