@@ -1,0 +1,446 @@
+{
+  "schema_version": 1,
+  "verification_date": "2026-09-03",
+  "extends": [
+    "data/reference/bulk-sources.json",
+    "data/reference/bulk-sources-supplement-2026-09-02.json",
+    "data/reference/bulk-sources-supplement-2-2026-09-02.json",
+    "data/reference/bulk-sources-supplement-3-2026-09-03.json",
+    "data/reference/bulk-sources-supplement-4-2026-09-03.json"
+  ],
+  "purpose": "Sixième passe consacrée aux bases d'assiette physiques et sectorielles permettant de contrôler les prélèvements immobiliers, routiers, d'urbanisme, de réseau, énergétiques, aéronautiques, environnementaux et pharmaceutiques.",
+  "principle": "Ces sources décrivent principalement une activité, un actif ou un marché. Elles produisent des candidats taxables et des contrôles de couverture, jamais directement une dette ou une recette fiscale.",
+  "sources": [
+    {
+      "id": "dgfip-dvf",
+      "title": "Demandes de valeurs foncières",
+      "publisher": "Direction générale des Finances publiques",
+      "url": "https://www.data.gouv.fr/datasets/demandes-de-valeurs-foncieres",
+      "priority": 1,
+      "status": "ready_to_ingest",
+      "family": "property_transfers",
+      "coverage": {
+        "geography": "France métropolitaine et territoires couverts, hors Alsace, Moselle et Mayotte",
+        "period": "cinq dernières années glissantes",
+        "last_data_update_seen": "2026-04-07",
+        "refresh": "semestriel, avril et octobre",
+        "scope": "Transactions immobilières issues des actes notariés et des informations cadastrales."
+      },
+      "access": {
+        "formats": ["txt_pipe_delimited", "zip"],
+        "bulk_download": true,
+        "api": false,
+        "replacement_semantics": "Chaque publication remplace tous les millésimes et peut ajouter des mutations anciennes."
+      },
+      "supports": ["mutation_candidate", "transaction_date", "transaction_value", "property_type", "parcel_reference", "dmto_context"],
+      "unit_of_observation": "ligne d'acte, de disposition, de parcelle ou de local selon la structure DVF",
+      "stable_keys": ["publication_snapshot", "source_year", "source_row"],
+      "limitations": [
+        "Une mutation peut être décrite par plusieurs lignes ; une ligne DVF n'est pas une transaction fiscale autonome.",
+        "La valeur foncière n'est pas nécessairement l'assiette taxable finale des droits de mutation.",
+        "Les exonérations, abattements, régimes de TVA immobilière et fractions bénéficiaires ne sont pas déductibles du seul fichier.",
+        "La réutilisation doit respecter l'interdiction de ré-identification et d'indexation externe.",
+        "Les millésimes doivent être archivés car les publications antérieures sont remplacées."
+      ],
+      "next_action": "Archiver les cinq fichiers et la notice, conserver le numéro de ligne, construire des groupes de mutation candidats et rapprocher les agrégats départementaux des recettes DMTO sans calcul individuel."
+    },
+    {
+      "id": "sdes-sitadel3-authorizations",
+      "title": "Sitadel3 — permis de construire et autres autorisations d'urbanisme",
+      "publisher": "Service des données et études statistiques",
+      "url": "https://www.statistiques.developpement-durable.gouv.fr/donnees-des-permis-de-construire-et-autres-autorisations-durbanisme",
+      "priority": 1,
+      "status": "ready_to_ingest",
+      "family": "urban_planning_tax_context",
+      "coverage": {
+        "geography": "France selon le champ Sitadel",
+        "period": "autorisations depuis 2013",
+        "last_update_seen": "2026-08-28",
+        "refresh": "mensuel",
+        "scope": "Permis de construire et déclarations préalables de logements et locaux, permis d'aménager et permis de démolir."
+      },
+      "access": {
+        "formats": ["dido_downloads", "api"],
+        "bulk_download": true,
+        "api": true,
+        "dataset_count": 4
+      },
+      "supports": ["development_tax_candidate", "preventive_archaeology_candidate", "authorization_date", "created_floor_area", "parcel_reference", "project_destination"],
+      "unit_of_observation": "autorisation d'urbanisme ou événement de son cycle",
+      "stable_keys": ["authorization_identifier", "event_date", "publication_snapshot"],
+      "limitations": [
+        "Une autorisation n'est ni un fait générateur définitivement taxable, ni une liquidation, ni une recette.",
+        "Les annulations, modifications, commencements et achèvements doivent être distingués.",
+        "Les exonérations et taux locaux de taxe d'aménagement proviennent d'autres sources.",
+        "Sitadel3 remplace Sitadel2 depuis mars 2026 et a entraîné des révisions ; la rupture doit être historisée."
+      ],
+      "next_action": "Ingérer les quatre jeux via DiDo, conserver les événements et produire des agrégats par commune, nature de projet et mois à rapprocher de DELTA taxe d'aménagement."
+    },
+    {
+      "id": "sdes-rsvero-registrations",
+      "title": "Immatriculations de véhicules routiers — RSVERO",
+      "publisher": "Service des données et études statistiques",
+      "url": "https://www.data.gouv.fr/datasets/immatriculations-de-vehicules-routiers",
+      "priority": 1,
+      "status": "ready_to_ingest",
+      "family": "vehicle_tax_context",
+      "coverage": {
+        "geography": "commune de l'utilisateur, France",
+        "period": "2011-2025",
+        "last_update_seen": "2026-09-02",
+        "scope": "Véhicules neufs et d'occasion par type, motorisation, statut de l'utilisateur et catégorie Crit'Air."
+      },
+      "access": {
+        "formats": ["csv", "dido_catalog"],
+        "bulk_download": true,
+        "api": "Dido_to_use",
+        "refresh": "annuel avec publications courantes"
+      },
+      "supports": ["registration_tax_context", "co2_malus_context", "mass_malus_context", "vehicle_use_tax_context", "motorization", "vehicle_type", "user_status", "commune"],
+      "unit_of_observation": "agrégat d'immatriculations par période, territoire et caractéristiques",
+      "stable_keys": ["year_or_period", "commune_code", "vehicle_type", "motorization", "user_status"],
+      "limitations": [
+        "Une immatriculation ne prouve pas l'exigibilité ou le montant d'une taxe.",
+        "Les véhicules de démonstration sont comptés comme neufs.",
+        "Pour les locations longues, la localisation est celle du locataire et non du propriétaire.",
+        "Les exemptions, caractéristiques fiscales fines et montants payés ne sont pas publiés.",
+        "Les codes communaux fictifs doivent être conservés et non géocodés arbitrairement."
+      ],
+      "next_action": "Ingérer le millésime 2025 et le dictionnaire, conserver toutes les dimensions et construire des contrôles par famille de véhicule sans estimer les recettes."
+    },
+    {
+      "id": "anfr-radio-installations-over-5w",
+      "title": "Installations radioélectriques de plus de 5 watts",
+      "publisher": "Agence nationale des fréquences",
+      "url": "https://www.data.gouv.fr/datasets/donnees-sur-les-installations-radioelectriques-de-plus-de-5-watts-1",
+      "priority": 1,
+      "status": "ready_to_ingest",
+      "family": "ifer_radio",
+      "coverage": {
+        "geography": "France, hors installations de l'Aviation civile et des ministères de la Défense et de l'Intérieur",
+        "last_update_seen": "2026-08-24",
+        "scope": "Installations déclarées par les exploitants publics et privés dans le cadre de l'article L.43 du CPCE."
+      },
+      "access": {
+        "formats": ["zip", "structured_files"],
+        "bulk_download": true,
+        "api": false,
+        "resource_history_seen": 276,
+        "refresh": "fréquent, généralement mensuel"
+      },
+      "supports": ["ifer_station_candidate", "operator", "site", "radio_system", "frequency", "power_class", "status", "geolocation"],
+      "unit_of_observation": "support, station, antenne ou système radio selon la table source",
+      "stable_keys": ["snapshot_date", "anfr_support_or_station_identifier", "system_identifier"],
+      "limitations": [
+        "Une installation supérieure à 5 watts n'est pas automatiquement une station taxable à l'IFER.",
+        "Un support peut porter plusieurs systèmes et plusieurs opérateurs.",
+        "Les installations exclues du fichier doivent être couvertes par d'autres sources.",
+        "Le régime fiscal dépend du type d'équipement, de la date, de l'exploitant et d'exonérations non contenues dans le jeu."
+      ],
+      "next_action": "Archiver un snapshot complet et son schéma, dédupliquer supports et systèmes et produire uniquement des candidats IFER avec les raisons d'inclusion ou d'exclusion."
+    },
+    {
+      "id": "rte-national-generation-storage-register",
+      "title": "Registre national des installations de production et de stockage d'électricité",
+      "publisher": "RTE et gestionnaires de réseaux",
+      "url": "https://odre.opendatasoft.com/explore/dataset/registre-national-installation-production-stockage-electricite-agrege/",
+      "priority": 1,
+      "status": "ready_to_ingest",
+      "family": "ifer_energy_assets",
+      "coverage": {
+        "geography": "France métropolitaine et zones non interconnectées",
+        "snapshot": "2026-06-30",
+        "scope": "Installations raccordées directement ou indirectement aux réseaux publics de production et de stockage."
+      },
+      "access": {
+        "formats": ["csv", "json", "api", "opendatasoft"],
+        "bulk_download": true,
+        "api": true,
+        "dataset_identifier": "registre-national-installation-production-stockage-electricite-agrege"
+      },
+      "supports": ["ifer_generation_candidate", "technology", "installed_capacity", "commissioning_date", "operator_or_producer", "network_connection", "location", "storage_candidate"],
+      "unit_of_observation": "installation ou agrégat protégé selon la puissance et la confidentialité",
+      "stable_keys": ["snapshot_date", "installation_identifier_or_eic", "technology"],
+      "limitations": [
+        "Le registre n'est pas un rôle fiscal et ne fournit ni valeur locative ni montant d'IFER.",
+        "Les seuils, exonérations, dates d'imposition et distinctions propriétaire-exploitant doivent être ajoutés depuis le droit.",
+        "Les installations de moins de 36 kW sont publiées sous forme agrégée par IRIS.",
+        "La couverture des gestionnaires peut évoluer et certains identifiants EIC ont été corrigés."
+      ],
+      "next_action": "Ingérer le snapshot du 30 juin 2026 et la table agrégée des moins de 36 kW, puis classer les actifs par composante IFER sans compter les lignes agrégées comme installations."
+    },
+    {
+      "id": "dgac-commercial-air-traffic",
+      "title": "Trafic aérien commercial mensuel français",
+      "publisher": "Direction générale de l'aviation civile",
+      "url": "https://www.data.gouv.fr/datasets/trafic-aerien-commercial-mensuel-francais-par-paire-daeroports-par-sens-depuis-1990",
+      "priority": 1,
+      "status": "ready_to_ingest",
+      "family": "aviation_tax_base_context",
+      "coverage": {
+        "geography": "aérodromes et trafic commercial concernant la France",
+        "period": "aérodromes et liaisons depuis 1990 ; transporteurs depuis 2010",
+        "last_update_seen": "2026-07-31",
+        "scope": "Passagers, fret, poste, mouvements, liaisons et transporteurs selon trois séries."
+      },
+      "access": {
+        "formats": ["csv", "zip", "pdf_documentation"],
+        "bulk_download": true,
+        "api": false,
+        "refresh": "annuel après délai d'ouverture"
+      },
+      "series": [
+        {"id": "ASP_APT_AAAA", "grain": "aérodrome × mois"},
+        {"id": "ASP_LSN_AAAA", "grain": "segment ou liaison × mois"},
+        {"id": "ASP_CIE_AAAA", "grain": "transporteur × mois"}
+      ],
+      "supports": ["passenger_tax_context", "freight_tax_context", "airport_security_tariff_context", "noise_tax_eligibility_context", "traffic_unit", "airport", "carrier"],
+      "unit_of_observation": "agrégat mensuel par aérodrome, liaison ou transporteur",
+      "stable_keys": ["series_id", "year", "month", "source_entity_code"],
+      "limitations": [
+        "Les petits aérodromes, liaisons et transporteurs sont regroupés sous des lignes d'agrégation selon des seuils publiés.",
+        "Le trafic transporté n'est pas nécessairement l'assiette taxable après correspondances, exemptions et règles territoriales.",
+        "Une unité de trafic statistique ne doit pas être confondue avec une recette.",
+        "Les fichiers sont ouverts annuellement et ne constituent pas un suivi fiscal courant."
+      ],
+      "next_action": "Ingérer les trois séries avec leurs notices, conserver les lignes agrégées et calculer seulement des contrôles d'ordre de grandeur par tarif et période."
+    },
+    {
+      "id": "dgac-aeronautical-tax-parameters",
+      "title": "Taxes aéronautiques — règles, tarifs et notices",
+      "publisher": "Direction générale de l'aviation civile",
+      "url": "https://www.ecologie.gouv.fr/politiques-publiques/taxes-aeronautiques",
+      "priority": 1,
+      "status": "ready_to_ingest",
+      "family": "aviation_tax_parameters",
+      "coverage": {
+        "geography": "France métropolitaine et territoires ultramarins selon le tarif",
+        "period": "paramètres courants et notices, dont tarifs 2026-2027",
+        "scope": "Transport aérien de passagers et de marchandises, sûreté, péréquation, solidarité, majorations Corse et outre-mer, nuisances sonores."
+      },
+      "access": {
+        "formats": ["html", "pdf_notices", "legal_links"],
+        "bulk_download": "document_bundle",
+        "api": false,
+        "refresh": "annual_and_legal_change"
+      },
+      "supports": ["legal_basis", "tax_component", "published_tariff", "effective_period", "territorial_scope", "airport_class", "beneficiary", "exemption_rule"],
+      "unit_of_observation": "tarif ou règle × période × territoire ou classe d'aérodrome",
+      "stable_keys": ["cibs_article", "component", "valid_from", "valid_to", "territory_or_airport_class"],
+      "limitations": [
+        "La page et les notices sont semi-structurées et doivent être rapprochées du CIBS et des arrêtés en vigueur.",
+        "Les composantes d'une même taxe ne sont pas des prélèvements autonomes.",
+        "Les taux ne fournissent ni déclarations ni recettes.",
+        "Les majorations territoriales et affectations peuvent changer au cours du temps."
+      ],
+      "next_action": "Extraire une table versionnée des tarifs et bénéficiaires, puis la joindre aux séries de trafic sans publier de recette calculée comme observation."
+    },
+    {
+      "id": "georisques-irep",
+      "title": "Registre français des émissions polluantes",
+      "publisher": "Ministère de la Transition écologique",
+      "url": "https://www.data.gouv.fr/datasets/registre-francais-des-emissions-polluantes",
+      "evidence_urls": ["https://www.georisques.gouv.fr/consulter-les-dossiers-thematiques/registre-des-emissions-polluantes"],
+      "priority": 2,
+      "status": "ready_to_ingest",
+      "family": "pollution_and_waste_context",
+      "coverage": {
+        "geography": "France",
+        "last_catalog_update_seen": "2025-10-11",
+        "scope": "Rejets dans l'air, l'eau et le sol, déchets produits ou traités hors site, volumes d'eau selon les seuils déclaratifs."
+      },
+      "access": {
+        "formats": ["zip", "web_search"],
+        "bulk_download": true,
+        "api": false,
+        "refresh": "annual_or_registry_update"
+      },
+      "supports": ["tgap_candidate", "pollutant", "waste_category", "waste_quantity", "industrial_establishment", "water_withdrawal", "sector", "geolocation"],
+      "unit_of_observation": "déclaration annuelle d'établissement par polluant, milieu ou catégorie de déchet",
+      "stable_keys": ["year", "establishment_identifier", "declaration_type", "substance_or_waste_code"],
+      "limitations": [
+        "Le registre ne couvre que les installations, stations d'épuration et élevages soumis aux obligations et seuils de déclaration.",
+        "Il n'est pas exhaustif des petits émetteurs, sources diffuses, transports, particuliers ou activités hors champ.",
+        "Une émission, un transfert ou une quantité de déchets ne prouve pas l'assujettissement à la TGAP.",
+        "Le champ des établissements et paramètres a évolué, créant des ruptures de série.",
+        "Le catalogue signale que certains fichiers ne sont pas disponibles."
+      ],
+      "next_action": "Archiver le ZIP, profiler les identifiants et années, joindre à Sirene et construire des candidats TGAP sans calculer de dette."
+    },
+    {
+      "id": "arcep-electronic-communications-observatory",
+      "title": "Observatoire des communications électroniques",
+      "publisher": "ARCEP",
+      "url": "https://www.data.gouv.fr/datasets/observatoire-des-communications-electroniques",
+      "priority": 2,
+      "status": "ready_to_ingest",
+      "family": "telecom_market_context",
+      "coverage": {
+        "geography": "France, avec détails ultramarins pour certaines séries",
+        "last_update_seen": "2026-07-23",
+        "scope": "Revenus, trafics, parcs, investissements, emplois, marché entreprises et indices de prix."
+      },
+      "access": {
+        "formats": ["xlsx"],
+        "bulk_download": true,
+        "api": false,
+        "resource_count_seen": 4,
+        "refresh": "quarterly_annual_and_index_cycle"
+      },
+      "supports": ["telecom_revenue_context", "subscriber_base", "traffic", "investment", "employment", "market_scope", "operator_survey_control"],
+      "unit_of_observation": "agrégat de marché × période × indicateur",
+      "stable_keys": ["workbook_version", "sheet", "period", "indicator", "market_segment"],
+      "limitations": [
+        "Les données sont agrégées sur l'ensemble du marché et ne fournissent pas les bases fiscales par opérateur.",
+        "Le marché de détail est le champ principal ; certaines taxes peuvent viser un autre périmètre.",
+        "Les fichiers sont signalés comme non standard et leur documentation est incomplète.",
+        "Revenu de marché, chiffre d'affaires fiscal, parc taxable et recette de prélèvement sont des notions distinctes."
+      ],
+      "next_action": "Profiler les quatre classeurs, versionner les définitions des indicateurs et les utiliser comme contrôles sectoriels des taxes télécoms et de l'IFER."
+    },
+    {
+      "id": "cnam-open-medic-2014-2025",
+      "title": "Open Medic — dépenses de médicaments délivrés en ville",
+      "publisher": "Caisse nationale de l'Assurance Maladie",
+      "url": "https://www.assurance-maladie.ameli.fr/etudes-et-donnees/open-medic-base-complete-depenses-medicaments",
+      "priority": 3,
+      "status": "support_only",
+      "family": "pharmaceutical_market_context",
+      "coverage": {
+        "geography": "France entière, ensemble des régimes d'assurance maladie",
+        "period": "2014-2025",
+        "publication_seen": "2026-04-21",
+        "scope": "Montants remboursés et remboursables et nombre de boîtes délivrées en ville, selon classification ATC et dimensions de bénéficiaire ou de prescripteur."
+      },
+      "access": {
+        "formats": ["csv", "xlsx_dictionary"],
+        "bulk_download": true,
+        "api": false,
+        "refresh": "annual"
+      },
+      "supports": ["medicine_class", "reimbursed_amount", "reimbursable_base", "box_count", "beneficiary_region", "prescriber_specialty", "pharmaceutical_market_control"],
+      "unit_of_observation": "agrégat annuel de remboursement par classe et dimensions",
+      "stable_keys": ["year", "atc_code", "dimension_values"],
+      "limitations": [
+        "Le remboursement n'est ni le chiffre d'affaires du laboratoire, ni l'assiette légale d'une contribution pharmaceutique, ni une recette fiscale.",
+        "Le jeu couvre les médicaments délivrés en ville et non l'ensemble du marché hospitalier ou des produits de santé.",
+        "Des valeurs sont floutées pour respecter le secret statistique.",
+        "L'anomalie 2025 sur la région du bénéficiaire a été signalée puis corrigée le 10 juillet 2026.",
+        "Les honoraires de dispensation ne sont pas inclus dans les montants décrits."
+      ],
+      "next_action": "Ingérer uniquement comme contrôle de marché, conserver la version corrigée 2025 et rapprocher les classes ATC sans attribuer les remboursements aux contributions sur les entreprises."
+    },
+    {
+      "id": "cstb-bdnb",
+      "title": "Base de données nationale des bâtiments",
+      "publisher": "Centre scientifique et technique du bâtiment",
+      "url": "https://www.data.gouv.fr/datasets/base-de-donnees-nationale-des-batiments",
+      "priority": 3,
+      "status": "support_only",
+      "family": "building_reference",
+      "coverage": {
+        "geography": "France, extractions départementales",
+        "latest_vintage_seen": "2026-02.a, publié le 2026-05-25",
+        "scope": "Carte d'identité des bâtiments construite par croisement géospatial de nombreuses bases publiques."
+      },
+      "access": {
+        "formats": ["departmental_exports", "database_extracts"],
+        "bulk_download": true,
+        "api": "to_evaluate",
+        "refresh": "vintage_releases"
+      },
+      "supports": ["building_identifier_candidate", "parcel_to_building", "building_use", "floor_area_context", "construction_period", "energy_characteristics", "dvf_and_sitadel_enrichment"],
+      "unit_of_observation": "bâtiment ou groupe de bâtiments selon le modèle dérivé",
+      "stable_keys": ["bdnb_vintage", "bdnb_building_identifier"],
+      "limitations": [
+        "La BDNB est une base dérivée par croisement et n'est pas un fichier fiscal ou cadastral probatoire.",
+        "Les attributs héritent des dates, erreurs et incertitudes de nombreuses sources.",
+        "Un bâtiment BDNB ne correspond pas nécessairement à un local fiscal, une parcelle ou une autorisation unique.",
+        "Les surfaces et usages ne doivent pas servir à recalculer une taxe foncière ou une taxe d'aménagement."
+      ],
+      "next_action": "Tester une extraction départementale et mesurer sa capacité à résoudre les bâtiments DVF et Sitadel sans remplacer les identifiants bruts."
+    }
+  ],
+  "research_gaps": [
+    {
+      "gap": "Rôle fiscal individuel des mutations immobilières",
+      "finding": "DVF décrit les mutations et valeurs déclarées, mais aucun fichier public national ne relie chaque mutation aux droits effectivement liquidés, exonérations, frais d'assiette et parts bénéficiaires.",
+      "consequence": "Limiter DVF aux candidats, agrégats de marché et contrôles des DMTO."
+    },
+    {
+      "gap": "Taxes réellement payées lors de l'immatriculation",
+      "finding": "RSVERO décrit les opérations et caractéristiques agrégées, sans montant de taxe régionale, malus ou exonération par véhicule.",
+      "consequence": "Ne pas calculer une recette à partir du nombre d'immatriculations."
+    },
+    {
+      "gap": "Rôles IFER publics",
+      "finding": "ANFR et RTE décrivent les actifs, mais aucun rôle fiscal national public n'a été identifié pour relier équipement, valeur imposable, bénéficiaire et produit.",
+      "consequence": "Construire des candidats et rapprocher seulement les agrégats du REI et des comptes locaux."
+    },
+    {
+      "gap": "Passage GEREP vers les déclarations TGAP",
+      "finding": "Les émissions et déchets déclarés ne sont pas accompagnés d'une table publique univoque vers les composantes, seuils, exonérations et paiements TGAP.",
+      "consequence": "Aucune dette ne doit être inférée d'une quantité IREP."
+    },
+    {
+      "gap": "Bases fiscales télécoms et pharmaceutiques par entreprise",
+      "finding": "ARCEP et Open Medic fournissent des agrégats de marché ou de remboursement, pas les assiettes déclarées aux prélèvements par redevable.",
+      "consequence": "Les conserver comme contrôles sectoriels et rechercher les montants dans les documents budgétaires et comptes des bénéficiaires."
+    },
+    {
+      "gap": "Déclarations et paiements aéronautiques ouverts",
+      "finding": "La DGAC publie les tarifs et le trafic, mais aucun export public national des déclarations et paiements par taxe, aérodrome et transporteur n'a été identifié.",
+      "consequence": "Ne publier que des contrôles d'ordre de grandeur, jamais des recettes reconstruites comme observations."
+    }
+  ],
+  "recommended_ingestion_order": [
+    {
+      "rank": 1,
+      "source_ids": ["dgfip-dvf"],
+      "deliverable": "data/reference/dvf-snapshots-manifest.json",
+      "reason": "Volume élevé, couverture nationale des mutations et complément immédiat des sources DMTO."
+    },
+    {
+      "rank": 2,
+      "source_ids": ["sdes-sitadel3-authorizations"],
+      "deliverable": "data/reference/sitadel3-authorizations-manifest.json",
+      "reason": "Source mensuelle directement reliée aux familles taxe d'aménagement et archéologie."
+    },
+    {
+      "rank": 3,
+      "source_ids": ["anfr-radio-installations-over-5w", "rte-national-generation-storage-register"],
+      "deliverable": "inventaires candidats IFER",
+      "reason": "Deux registres nationaux d'actifs permettant de tester la couverture des composantes IFER."
+    },
+    {
+      "rank": 4,
+      "source_ids": ["dgac-commercial-air-traffic", "dgac-aeronautical-tax-parameters"],
+      "deliverable": "data/reference/aviation-tax-parameters-and-traffic.json",
+      "reason": "Paramètres et assiettes physiques peuvent être joints avec des périodes explicites."
+    },
+    {
+      "rank": 5,
+      "source_ids": ["sdes-rsvero-registrations"],
+      "deliverable": "data/reference/vehicle-registration-aggregates-2011-2025.json",
+      "reason": "Contrôle national des familles d'immatriculation, malus et taxes d'usage."
+    },
+    {
+      "rank": 6,
+      "source_ids": ["georisques-irep"],
+      "deliverable": "data/reference/irep-establishment-declarations.json",
+      "reason": "Couverture industrielle et environnementale utile à la TGAP, avec seuils à conserver."
+    },
+    {
+      "rank": 7,
+      "source_ids": ["arcep-electronic-communications-observatory"],
+      "deliverable": "data/reference/arcep-market-series.json",
+      "reason": "Contrôles de marché télécoms et cohérence des prélèvements sectoriels."
+    },
+    {
+      "rank": 8,
+      "source_ids": ["cnam-open-medic-2014-2025", "cstb-bdnb"],
+      "deliverable": "prototypes de sources de support",
+      "reason": "Enrichissements utiles mais non probatoires des champs pharmaceutique et immobilier."
+    }
+  ]
+}
