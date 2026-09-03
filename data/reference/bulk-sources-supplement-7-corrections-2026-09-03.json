@@ -1,0 +1,107 @@
+{
+  "schema_version": 1,
+  "verification_date": "2026-09-03",
+  "applies_to": "data/reference/bulk-sources-supplement-7-2026-09-03.json",
+  "precedence": "Ce fichier remplace les champs contradictoires du registre auquel il s'applique. Il doit être lu avant toute ingestion ou promotion dans bulk-sources.json.",
+  "reason": "La première recherche avait retrouvé un ancien miroir Ircantec mis à jour en novembre 2023. Un contrôle supplémentaire a identifié deux jeux officiels plus récents, actualisés en juillet et août 2026.",
+  "corrections": [
+    {
+      "source_id": "cdc-ircantec-contributors-employers",
+      "operation": "replace_source_record",
+      "replacement": {
+        "id": "cdc-ircantec-contributors-employers",
+        "source_record_id": null,
+        "title": "Ircantec — actifs, cotisants et employeurs",
+        "publisher": "Caisse des Dépôts / Ircantec",
+        "url": "https://www.data.gouv.fr/datasets/actifs-et-cotisants-ircantec-1",
+        "evidence_urls": [
+          "https://www.data.gouv.fr/datasets/employeurs-ircantec",
+          "https://www.data.gouv.fr/datasets/effectifs-de-cotisants-a-lircantec-par-employeurs"
+        ],
+        "priority": 2,
+        "status": "ready_to_ingest",
+        "authority_level": "official_public_service_supplementary_pension_statistics",
+        "family": "public_service_supplementary_pension",
+        "coverage": {
+          "geography": "France et champ Ircantec",
+          "period": "séries historiques publiées dans les ressources courantes",
+          "dataset_updates_seen": {
+            "active_members_and_contributors": "2026-07-03",
+            "employers": "2026-08-14",
+            "older_external_mirror": "2023-11-09"
+          },
+          "scope": "Effectifs d'actifs et de cotisants et répartitions par employeur ou famille d'employeurs du régime complémentaire des agents non titulaires, élus et autres populations affiliées.",
+          "employer_families": [
+            "État et établissements publics nationaux",
+            "collectivités territoriales, EPCI et établissements publics locaux",
+            "établissements hospitaliers et autres établissements de santé",
+            "autres employeurs, dont EPIC, sociétés de droit privé, Banque de France, OPH, GIP, associations et fondations"
+          ]
+        },
+        "access": {
+          "formats": [
+            "csv"
+          ],
+          "machine_readability": "structured_files",
+          "bulk_download": true,
+          "api": false,
+          "authentication": "none",
+          "refresh": "irregular_or_annual",
+          "resource_counts_seen": {
+            "active_members_and_contributors": 5,
+            "employers": 2
+          }
+        },
+        "supports": [
+          "active_member_count",
+          "contributor_count",
+          "employer_count",
+          "employer_family",
+          "public_non_tenured_scope",
+          "elected_official_scope",
+          "scheme_scope",
+          "historical_denominator_control"
+        ],
+        "unit_of_observation": "effectif agrégé par année, population, employeur ou famille d'employeurs selon la ressource",
+        "stable_keys": [
+          "dataset_id",
+          "resource_id",
+          "year",
+          "population_or_employer_category",
+          "dimension_values"
+        ],
+        "limitations": [
+          "Un actif peut avoir acquis des droits sans cotiser pendant l'année ; actif et cotisant sont deux populations différentes.",
+          "Un cotisant peut relever de plusieurs employeurs ou périodes et les conventions de comptage doivent être conservées.",
+          "Les effectifs ne fournissent ni assiette, ni taux, ni montant de cotisation acquitté.",
+          "Une famille d'employeurs ne constitue ni une créance juridique ni un secteur institutionnel SEC.",
+          "Le régime couvre salariés, élus et autres populations selon des réglementations distinctes.",
+          "La page des employeurs signale que certains fichiers ne sont pas disponibles ; le manifeste doit conserver les ressources effectivement récupérées.",
+          "L'ancien miroir mis à jour en novembre 2023 ne doit pas être utilisé comme source de fraîcheur lorsque les jeux officiels courants sont disponibles."
+        ],
+        "next_action": "Archiver les cinq CSV du jeu actifs-cotisants et les deux CSV du jeu employeurs, documenter leur millésime et leurs dimensions, puis rapprocher uniquement les agrégats des comptes PLACSS, DREES et Insee."
+      }
+    }
+  ],
+  "research_gap_corrections": [
+    {
+      "operation": "remove",
+      "gap": "Référentiel Ircantec courant",
+      "reason": "Deux jeux officiels courants ont été identifiés après la première rédaction."
+    },
+    {
+      "operation": "add",
+      "gap": "Cotisations Ircantec détaillées par employeur et composante",
+      "finding": "Les jeux courants décrivent les actifs, cotisants, employeurs et familles d'employeurs, mais aucune table publique nationale ne donne les assiettes, taux, montants dus et paiements par employeur et composante.",
+      "consequence": "Utiliser ces jeux comme dénominateurs et contrôles de champ et rechercher les montants dans les comptes et publications du régime."
+    }
+  ],
+  "recommended_ingestion_order_corrections": [
+    {
+      "source_id": "cdc-ircantec-contributors-employers",
+      "operation": "replace",
+      "deliverable": "data/reference/ircantec-contributors-employers-manifest.json",
+      "reason": "Les jeux officiels courants contiennent sept ressources CSV et peuvent être ingérés comme dénominateurs, sous réserve du contrôle des fichiers indisponibles."
+    }
+  ]
+}
