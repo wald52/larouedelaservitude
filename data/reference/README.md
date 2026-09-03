@@ -12,6 +12,7 @@ Ce dossier conserve les sources officielles et les extractions normalisées util
 | [`bulk-sources-supplement-2-2026-09-02.json`](bulk-sources-supplement-2-2026-09-02.json) | Troisième passe ciblée du 2 septembre 2026 : recettes DGFiP, référentiels locaux nationaux, JORF, calculateurs fiscaux et MSA |
 | [`bulk-sources-supplement-3-2026-09-03.json`](bulk-sources-supplement-3-2026-09-03.json) | Quatrième passe du 3 septembre 2026 : PLACSS, Unédic, taux et décisions locales, fiscalité environnementale, comptes Insee et bénéficiaires publics |
 | [`bulk-sources-supplement-4-2026-09-03.json`](bulk-sources-supplement-4-2026-09-03.json) | Cinquième passe du 3 septembre 2026 : Douane, TARIC, COG, BANATIC, Sirene, M57, AT/MP, eau, OPCO et jeux |
+| [`bulk-sources-supplement-5-2026-09-03.json`](bulk-sources-supplement-5-2026-09-03.json) | Sixième passe du 3 septembre 2026 : DVF, Sitadel3, RSVERO, ANFR, registre RTE, aviation, IREP, ARCEP, Open Medic et BDNB |
 | [`ntl-france-2026.json`](ntl-france-2026.json) | Extraction des 141 lignes françaises de détail de la National tax list 2026 |
 | [`lfss-2026-annexe-3-impositions.json`](lfss-2026-annexe-3-impositions.json) | Transcription contrôlée du tableau 31 de l’annexe 3 du PLFSS 2026 |
 
@@ -34,6 +35,9 @@ publics est décrite dans
 La cinquième passe sur les référentiels douaniers, territoriaux, institutionnels,
 comptables et sectoriels est décrite dans
 [`docs/sources-massives-recherche-complementaire-4.md`](../../docs/sources-massives-recherche-complementaire-4.md).
+
+La sixième passe sur les bases d’assiette physiques et sectorielles est décrite dans
+[`docs/sources-massives-recherche-complementaire-5.md`](../../docs/sources-massives-recherche-complementaire-5.md).
 
 ## Deux registres complémentaires
 
