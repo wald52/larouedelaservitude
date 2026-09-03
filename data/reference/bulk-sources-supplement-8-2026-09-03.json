@@ -1,0 +1,580 @@
+{
+  "schema_version": 1,
+  "verification_date": "2026-09-03",
+  "extends": [
+    "data/reference/bulk-sources.json",
+    "data/reference/bulk-sources-supplement-2026-09-02.json",
+    "data/reference/bulk-sources-supplement-2-2026-09-02.json",
+    "data/reference/bulk-sources-supplement-3-2026-09-03.json",
+    "data/reference/bulk-sources-supplement-4-2026-09-03.json",
+    "data/reference/bulk-sources-supplement-5-2026-09-03.json",
+    "data/reference/bulk-sources-supplement-6-2026-09-03.json",
+    "data/reference/bulk-sources-supplement-7-2026-09-03.json",
+    "data/reference/bulk-sources-supplement-7-corrections-2026-09-03.json"
+  ],
+  "purpose": "Neuvième passe consacrée aux installations nucléaires de base, à la fiscalité de la plaisance, au zonage des logements vacants, aux remontées mécaniques et à l'octroi de mer.",
+  "principle": "Une liste réglementaire d'installations, de communes ou d'engins réduit fortement la recherche de périmètre, mais ne prouve pas à elle seule l'assiette définitive, le montant dû, le paiement, le bénéficiaire SEC ou la recette.",
+  "key_findings": [
+    {
+      "finding": "L'ASNR publie chaque année deux listes nationales structurées des installations nucléaires de base, en exploitation et déclassées.",
+      "impact": "Le périmètre, l'exploitant, la nature, la catégorie, les dates et l'état de chaque INB peuvent être extraits en une passe et reliés aux taxes nucléaires."
+    },
+    {
+      "finding": "Le GUFIP publie simultanément les règles courantes de la TAEMUP et un rapport annuel comportant flotte taxable, flotte taxée, collecte et affectataires.",
+      "impact": "La fiscalité de la plaisance dispose désormais d'un couple paramètres-résultats permettant des contrôles massifs sans accès au registre individuel des navires."
+    },
+    {
+      "finding": "Légifrance fournit les listes nationales codées INSEE du zonage de la vacance des logements pour 2026 et pour le nouveau régime applicable en 2027.",
+      "impact": "Le champ communal peut être extrait directement du droit, historisé et joint au COG sans utiliser un simulateur commune par commune."
+    },
+    {
+      "finding": "CAIRN permet une recherche nationale des remontées mécaniques et publie un identifiant propre, mais aucun export complet public n'a été validé.",
+      "impact": "La source peut réduire les recherches d'installations pour les taxes communales sur les remontées mécaniques, sous réserve d'un prototype d'accès respectueux de l'interface."
+    },
+    {
+      "finding": "Le corpus officiel de l'octroi de mer existe, mais il est fragmenté par territoire, date, nomenclature, tarif et dispositif d'exonération.",
+      "impact": "Un manifeste de publications est possible ; une table nationale courante et homogène ne doit pas être annoncée avant consolidation des cinq territoires."
+    }
+  ],
+  "sources": [
+    {
+      "id": "asnr-inb-lists-2025",
+      "source_record_id": null,
+      "title": "Listes des installations nucléaires de base au 31 décembre 2025",
+      "publisher": "Autorité de sûreté nucléaire et de radioprotection",
+      "url": "https://reglementation-controle.asnr.fr/espace-professionnels/installations-nucleaires/listes-des-installations-nucleaires-de-base",
+      "evidence_urls": [
+        "https://reglementation-controle.asnr.fr/reglementation/bulletin-officiel-de-l-asnr/installations-nucleaires/decisions-reglementaires/decision-n-2026-dc-030-de-l-asnr-du-13-janvier-2026",
+        "https://reglementation-controle.asnr.fr/content/download/181722/file/Liste%20des%20installations%20nucl%C3%A9aires%20de%20base%20en%20exploitation%C2%A0%C2%A0(liste%20au%2031%20d%C3%A9cembre%202025).pdf",
+        "https://reglementation-controle.asnr.fr/content/download/181723/file/Liste%20des%20installations%20nucl%C3%A9aires%20de%20base%20d%C3%A9class%C3%A9es%20depuis%20le%2013%20juin%202006%C2%A0(liste%20au%2031%20d%C3%A9cembre%202025).pdf"
+      ],
+      "priority": 1,
+      "status": "ready_to_ingest",
+      "authority_level": "official_nuclear_regulatory_list",
+      "family": "nuclear_installations_and_taxes",
+      "coverage": {
+        "geography": "France",
+        "reference_date": "2025-12-31",
+        "decision": "2026-DC-030 du 13 janvier 2026",
+        "publication_date": "2026-01-15",
+        "operating_list_count": 121,
+        "declassified_since_2006_count": 13,
+        "scope": "INB figurant dans la liste dite en exploitation, avec leur état détaillé, et INB déclassées depuis le 13 juin 2006."
+      },
+      "access": {
+        "formats": [
+          "pdf",
+          "html_decision"
+        ],
+        "machine_readability": "document_tables",
+        "bulk_download": true,
+        "api": false,
+        "authentication": "none",
+        "refresh": "annual"
+      },
+      "supports": [
+        "candidate_discovery",
+        "inb_number",
+        "installation_name",
+        "location",
+        "operator",
+        "installation_nature",
+        "installation_category",
+        "declaration_date",
+        "authorization_date",
+        "installation_state",
+        "declassification",
+        "legal_history"
+      ],
+      "unit_of_observation": "installation nucléaire de base dans une liste annuelle",
+      "fields_available": [
+        "inb_number",
+        "name_and_location",
+        "operator",
+        "nature",
+        "category",
+        "declared_date",
+        "authorized_date",
+        "state",
+        "observations"
+      ],
+      "stable_keys": [
+        "reference_date",
+        "inb_number",
+        "list_kind"
+      ],
+      "limitations": [
+        "La liste dite en exploitation inclut des installations en fonctionnement, arrêtées définitivement ou en démantèlement ; le libellé de liste ne remplace pas le champ état.",
+        "Une INB réglementaire n'est pas automatiquement une unité fiscale ni une ligne de recette.",
+        "La catégorie ASNR ne doit pas être transformée en tarif ou coefficient fiscal sans le texte financier applicable.",
+        "Exploitant réglementaire, redevable juridique, propriétaire et bénéficiaire de la taxe peuvent être différents.",
+        "Le classement, le paiement et la recette ne figurent pas dans les listes.",
+        "Les installations déclassées doivent rester dans une table historique distincte et ne pas être supprimées du référentiel."
+      ],
+      "next_action": "Extraire les deux tableaux en conservant le texte brut, le numéro de page et les observations, puis construire un diff annuel et une file de rapprochement vers les taxes nucléaires et les comptes des bénéficiaires."
+    },
+    {
+      "id": "gufip-taemup-activity-2025",
+      "source_record_id": null,
+      "title": "Rapport d'activité 2025 du Guichet unique de la fiscalité de la plaisance",
+      "publisher": "Direction générale des affaires maritimes, de la pêche et de l'aquaculture",
+      "url": "https://www.mer.gouv.fr/sites/default/files/2026-06/rapp.d-act_2026_gufip_vf_eb.pdf",
+      "priority": 1,
+      "status": "ready_to_ingest",
+      "authority_level": "official_tax_collection_report",
+      "family": "personal_maritime_craft_tax",
+      "coverage": {
+        "geography": "Hexagone et outre-mer dans le périmètre de collecte du GUFIP",
+        "period": "2022-2025 pour plusieurs séries, avec flotte et collecte détaillées en 2025",
+        "publication_period": "juin 2026",
+        "scope": "Flotte enregistrée, flotte taxable, flotte effectivement taxée, cible brute, collecte nette, recouvrement, exonérations, affectataires et opérations de fiabilisation."
+      },
+      "access": {
+        "formats": [
+          "pdf"
+        ],
+        "machine_readability": "visual_report_with_tables_and_charts",
+        "bulk_download": true,
+        "api": false,
+        "authentication": "none",
+        "refresh": "annual"
+      },
+      "headline_2025": {
+        "registered_craft": 1109000,
+        "taxable_craft": 159255,
+        "taxed_craft_at_campaign_opening": 96841,
+        "gross_target_eur": 54620000,
+        "net_collection_eur": 52670000,
+        "allocations_eur": {
+          "Conservatoire_du_Littoral": 39000000,
+          "Collectivite_de_Corse": 4990000,
+          "SNSM": 3930000,
+          "Etat_budget_general": 3810000,
+          "APER": 940000
+        }
+      },
+      "supports": [
+        "registered_fleet",
+        "taxable_fleet",
+        "taxed_fleet",
+        "gross_target",
+        "net_collection",
+        "recovery",
+        "geographical_distribution",
+        "age_reduction",
+        "exemption_context",
+        "beneficiary",
+        "allocation"
+      ],
+      "unit_of_observation": "agrégat annuel, catégorie d'engin, région ou affectataire selon le tableau",
+      "stable_keys": [
+        "report_year",
+        "section",
+        "indicator",
+        "dimension_values"
+      ],
+      "limitations": [
+        "Le rapport ne publie pas le registre individuel de propriété des navires.",
+        "Flotte enregistrée, flotte taxable, flotte taxée et nombre de créances sont des populations différentes.",
+        "Cible brute, paiement spontané, recouvrement et collecte nette doivent rester séparés.",
+        "La somme affectée à un bénéficiaire n'établit pas à elle seule son secteur institutionnel SEC.",
+        "Les anciennes appellations DAFN et DAP décrivent l'origine du dispositif ; elles ne doivent pas créer deux prélèvements courants supplémentaires.",
+        "Les répartitions géographiques et d'âge sont des ventilations de la flotte, pas des montants à ajouter aux totaux."
+      ],
+      "next_action": "Transcrire les tableaux 2022-2025, conserver les agrégats 2025 par population et affectataire et produire des contrôles de somme sans tenter de reconstituer les créances individuelles."
+    },
+    {
+      "id": "mer-taemup-parameters-2026-2027",
+      "source_record_id": null,
+      "title": "TAEMUP — redevables, critères, tarifs et transition 2026-2027",
+      "publisher": "Ministère chargé de la mer",
+      "url": "https://www.mer.gouv.fr/la-taxe-annuelle-sur-les-engins-maritimes-usage-personnel-taemup",
+      "priority": 1,
+      "status": "ready_to_ingest",
+      "authority_level": "official_tax_parameter_guidance",
+      "family": "personal_maritime_craft_tax",
+      "coverage": {
+        "geography": "France selon les règles de pavillon, résidence et enregistrement",
+        "period": "règles applicables jusqu'au 31 décembre 2026 et paramètres annoncés à partir du 1er janvier 2027",
+        "last_update_seen": "2026-06-08",
+        "legal_basis": "CIBS, articles L. 423-1 à L. 423-37",
+        "scope": "Redevables, critères de taxation, seuils, droits coque et moteur, yachts, VNM, minorations, taux Corse, exonérations et transition vers les paramètres 2027."
+      },
+      "access": {
+        "formats": [
+          "html",
+          "linked_pdf_flyers",
+          "online_simulator"
+        ],
+        "machine_readability": "semi_structured_tables",
+        "bulk_download": false,
+        "api": false,
+        "authentication": "none",
+        "refresh": "legal_change"
+      },
+      "supports": [
+        "legal_basis",
+        "liable_person",
+        "reference_date",
+        "vessel_criterion",
+        "hull_length",
+        "administrative_power",
+        "propulsive_power",
+        "hull_tariff",
+        "engine_tariff",
+        "yacht_tariff",
+        "age_reduction",
+        "corsica_reduction",
+        "exemption",
+        "future_parameter"
+      ],
+      "unit_of_observation": "règle ou tranche tarifaire × période de validité × type d'engin",
+      "stable_keys": [
+        "rule_or_tariff_id",
+        "valid_from",
+        "valid_to",
+        "craft_type",
+        "band"
+      ],
+      "limitations": [
+        "La page est une présentation administrative et doit être recoupée avec le CIBS et les textes applicables.",
+        "Les règles 2027 ne doivent pas être appliquées aux situations 2026.",
+        "Droit coque, droit moteur, tarif VNM et tarif yacht sont des composantes de calcul, pas des prélèvements autonomes.",
+        "La situation au 1er janvier, les acquisitions en cours d'année et les règles de prorata doivent être conservées séparément.",
+        "Le simulateur produit une estimation pour des caractéristiques saisies et ne constitue ni une déclaration ni une preuve de paiement.",
+        "Le taux Corse est une décision annuelle qui doit être versionnée avec sa délibération."
+      ],
+      "next_action": "Construire une table versionnée des règles 2026 et 2027, avec dates, unités, tranches et composantes, puis la relier aux agrégats du rapport GUFIP sans calculer de recette observée."
+    },
+    {
+      "id": "legifrance-vacant-housing-geography-2026-2027",
+      "source_record_id": null,
+      "title": "Listes communales TLV 2026 et TVLH 2027",
+      "publisher": "Légifrance",
+      "url": "https://www.legifrance.gouv.fr/loda/id/JORFTEXT000027399823/",
+      "evidence_urls": [
+        "https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000053143539",
+        "https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000054761859",
+        "https://www.service-public.gouv.fr/particuliers/vosdroits/R65012"
+      ],
+      "priority": 1,
+      "status": "ready_to_ingest",
+      "authority_level": "official_legal_geographical_scope",
+      "family": "vacant_housing_taxes",
+      "coverage": {
+        "geography": "communes françaises listées avec leur code INSEE",
+        "period": "TLV et THLV jusqu'au 31 décembre 2026 ; TVLH à partir du 1er janvier 2027",
+        "current_2026_text": "décret n° 2013-392 du 10 mai 2013, annexe modifiée par le décret n° 2025-1267 du 22 décembre 2025",
+        "future_2027_text": "décret n° 2026-831 du 25 août 2026",
+        "scope": "Deux catégories nationales de communes présentant un déséquilibre marqué entre l'offre et la demande de logements, avec code INSEE."
+      },
+      "access": {
+        "formats": [
+          "html_legal_table",
+          "authenticated_jorf_pdf"
+        ],
+        "machine_readability": "very_large_structured_html_table",
+        "bulk_download": true,
+        "api": "legifrance_or_jorf_bulk",
+        "authentication": "none_for_web",
+        "refresh": "legal_change"
+      },
+      "supports": [
+        "candidate_discovery",
+        "commune_code",
+        "commune_name",
+        "agglomeration",
+        "legal_scope_category",
+        "automatic_application",
+        "local_option_eligibility",
+        "valid_from",
+        "valid_to",
+        "legal_transition"
+      ],
+      "unit_of_observation": "commune × catégorie juridique × période de validité",
+      "stable_keys": [
+        "legal_text_id",
+        "scope_category",
+        "commune_code",
+        "valid_from",
+        "valid_to"
+      ],
+      "limitations": [
+        "La présence d'une commune dans la liste ne prouve pas qu'un logement particulier remplit les conditions de vacance et d'assujettissement.",
+        "Pour 2026, la TLV de plein droit et la THLV instituée localement restent des mécanismes distincts.",
+        "À partir de 2027, la TVLH remplace les régimes antérieurs ; les anciennes fiches ne doivent pas être prolongées sans relation de remplacement.",
+        "Les deux catégories du zonage doivent rester distinctes même lorsque le traitement fiscal converge.",
+        "La majoration de taxe d'habitation sur les résidences secondaires nécessite une décision locale et ne se déduit pas de la seule présence dans la zone.",
+        "Les créations, fusions et changements de codes communaux doivent être reliés au COG du bon millésime."
+      ],
+      "next_action": "Extraire les deux catégories communales du texte 2026 et du décret 2027, comparer les périmètres et créer des relations replaced_by entre TLV, THLV et TVLH avec des dates explicites."
+    },
+    {
+      "id": "strmtg-cairn-ski-lifts",
+      "source_record_id": null,
+      "title": "CAIRN — catalogue informatique des remontées mécaniques nationales",
+      "publisher": "Service technique des remontées mécaniques et des transports guidés",
+      "url": "https://cairn.din.developpement-durable.gouv.fr/consultationInternet.do",
+      "evidence_urls": [
+        "https://www.strmtg.developpement-durable.gouv.fr/base-de-donnees-cairn-a398.html",
+        "https://www.strmtg.developpement-durable.gouv.fr/base-de-donnees-cairn-catalogue-informatique-des-r267.html"
+      ],
+      "priority": 2,
+      "status": "candidate",
+      "authority_level": "official_operational_catalogue",
+      "family": "ski_lift_tax_context",
+      "coverage": {
+        "geography": "France",
+        "period": "catalogue courant",
+        "application_version_seen": "CAIRN V7.22.1, mise à jour le 13 mai 2026",
+        "scope": "Remontées mécaniques et tapis roulants de stations de montagne, avec fonctions de recherche publique et accès privilégiés pour exploitants et organismes agréés."
+      },
+      "access": {
+        "formats": [
+          "interactive_web_search",
+          "linked_pdf_guide"
+        ],
+        "machine_readability": "queryable_web_application",
+        "bulk_download": false,
+        "api": false,
+        "authentication": "none_for_public_search; privileged_accounts_for_extended_functions",
+        "refresh": "operational"
+      },
+      "supports": [
+        "ski_lift_identifier",
+        "installation_candidate",
+        "station",
+        "municipality",
+        "operator_candidate",
+        "lift_family",
+        "technical_characteristics",
+        "status",
+        "municipal_ski_lift_tax_context"
+      ],
+      "unit_of_observation": "remontée mécanique ou tapis roulant",
+      "stable_keys": [
+        "cairn_identifier",
+        "catalogue_snapshot_or_query_date"
+      ],
+      "limitations": [
+        "Aucun export exhaustif public ni API documentée n'a été validé pendant cette recherche.",
+        "L'interface de consultation doit être utilisée conformément à ses fonctions publiques ; elle ne doit pas être aspirée sans point d'accès documenté.",
+        "Une remontée mécanique n'est pas une unité fiscale certaine et ne fournit ni chiffre d'affaires, ni tarif de taxe, ni produit.",
+        "Exploitant, propriétaire, autorité organisatrice et commune bénéficiaire peuvent être différents.",
+        "Les installations arrêtées, remplacées ou techniquement regroupées exigent une date et un statut.",
+        "L'absence d'un résultat peut provenir du filtre, du statut ou de l'accès et ne prouve pas l'inexistence."
+      ],
+      "next_action": "Tester manuellement la stabilité des identifiants et des résultats, documenter le guide CAIRN et demander ou localiser un export officiel avant de promouvoir la source à ready_to_ingest."
+    },
+    {
+      "id": "strmtg-ski-lifts-annual-reports",
+      "source_record_id": null,
+      "title": "Rapports annuels sur le parc, le trafic, les investissements et les événements des remontées mécaniques",
+      "publisher": "Service technique des remontées mécaniques et des transports guidés",
+      "url": "https://www.strmtg.developpement-durable.gouv.fr/le-parc-et-les-dispositions-du-controle-des-a666.html",
+      "evidence_urls": [
+        "https://www.strmtg.developpement-durable.gouv.fr/accidentologie-r69.html"
+      ],
+      "priority": 3,
+      "status": "support_only",
+      "authority_level": "official_sector_report",
+      "family": "ski_lift_tax_context",
+      "coverage": {
+        "geography": "France, avec répartitions par massif et catégories selon les rapports",
+        "period": "campagnes annuelles, dont 2024-2025",
+        "scope": "État du parc, trafic, investissements, événements d'exploitation et contrôles des remontées mécaniques et tapis roulants."
+      },
+      "access": {
+        "formats": [
+          "pdf",
+          "html_catalogue"
+        ],
+        "machine_readability": "annual_report_tables_and_charts",
+        "bulk_download": true,
+        "api": false,
+        "authentication": "none",
+        "refresh": "annual"
+      },
+      "supports": [
+        "park_aggregate",
+        "lift_family",
+        "massif",
+        "traffic",
+        "investment",
+        "operational_event",
+        "cairn_coverage_control",
+        "sector_activity_control"
+      ],
+      "unit_of_observation": "agrégat annuel par parc, type, massif ou indicateur",
+      "stable_keys": [
+        "campaign",
+        "report_section",
+        "indicator",
+        "dimension_values"
+      ],
+      "limitations": [
+        "Le rapport ne remplace pas le catalogue installation par installation.",
+        "Trafic, investissement et taille du parc ne constituent ni chiffre d'affaires taxable ni recette fiscale.",
+        "Les ventilations par massif ou technologie ne doivent pas être additionnées à leurs totaux.",
+        "Les campagnes ne coïncident pas nécessairement avec l'année civile ou fiscale.",
+        "La taxe communale peut dépendre d'une délibération, d'un tarif et d'une assiette non publiés dans le rapport."
+      ],
+      "next_action": "Créer un manifeste des rapports annuels, extraire uniquement les agrégats utiles et les utiliser pour contrôler la couverture CAIRN et les tendances du secteur."
+    },
+    {
+      "id": "dgddi-octroi-de-mer-corpus",
+      "source_record_id": null,
+      "title": "Corpus officiel des tarifs et exonérations d'octroi de mer",
+      "publisher": "Direction générale des douanes et droits indirects et directions régionales",
+      "url": "https://www.douane.gouv.fr/la-douane/opendata/mots-cles/octroi-de-mer",
+      "evidence_urls": [
+        "https://www.data.gouv.fr/datasets/octroi-de-mer-dans-les-departements-doutre-mer",
+        "https://www.douane.gouv.fr/fiche/fiscalite-douaniere-dans-les-departements-doutre-mer"
+      ],
+      "priority": 2,
+      "status": "candidate",
+      "authority_level": "official_customs_and_territorial_tariff_corpus",
+      "family": "octroi_de_mer",
+      "coverage": {
+        "geography": [
+          "Guadeloupe",
+          "Guyane",
+          "Martinique",
+          "Mayotte",
+          "La Réunion"
+        ],
+        "period": "publications historiques hétérogènes, avec documents visibles jusqu'en 2024 dans le corpus vérifié",
+        "catalogue_volume_seen": 41,
+        "scope": "Tarifs d'octroi de mer externe et interne, octroi de mer régional, exonérations, secteurs, intrants, produits et délibérations territoriales."
+      },
+      "access": {
+        "formats": [
+          "pdf",
+          "xls",
+          "xlsx",
+          "ods",
+          "zip",
+          "data_gouv_resources"
+        ],
+        "machine_readability": "heterogeneous_document_corpus",
+        "bulk_download": "file_by_file",
+        "api": false,
+        "authentication": "none",
+        "refresh": "territory_and_deliberation_specific"
+      },
+      "supports": [
+        "candidate_discovery",
+        "territory",
+        "product_nomenclature",
+        "external_rate",
+        "internal_rate",
+        "regional_component",
+        "exemption",
+        "eligible_sector",
+        "eligible_input",
+        "deliberation",
+        "effective_date"
+      ],
+      "unit_of_observation": "ligne tarifaire, produit, secteur ou exonération dans un document territorial daté",
+      "stable_keys": [
+        "territory",
+        "publication_or_deliberation_id",
+        "effective_date",
+        "product_code_or_rule"
+      ],
+      "limitations": [
+        "Le corpus n'est pas une table nationale homogène et courante couvrant les cinq territoires.",
+        "Les formats, nomenclatures, dates et niveaux de détail diffèrent fortement selon les directions régionales.",
+        "Les publications data.gouv.fr identifiées comportent des ressources anciennes ; leur date de catalogue ne prouve pas le droit en vigueur en 2026.",
+        "Octroi de mer interne, externe et régional doivent rester séparés, de même que taux, exonérations et différentiels.",
+        "Une ligne de nomenclature produit n'est pas un prélèvement autonome.",
+        "Les délibérations locales et leurs dates d'entrée en vigueur doivent être conservées ; le document le plus récent du portail n'est pas nécessairement complet.",
+        "Le nombre de publications ne correspond ni au nombre de taux ni au nombre de créances."
+      ],
+      "next_action": "Construire un manifeste par territoire, composante et date, inventorier les documents réellement récupérables et tester une extraction sur un territoire disposant d'un tableur avant toute consolidation nationale."
+    }
+  ],
+  "research_gaps": [
+    {
+      "gap": "Paramètres fiscaux nucléaires reliés aux INB",
+      "finding": "L'ASNR fournit les installations, catégories et états, mais aucune table publique unique n'a été identifiée qui relie annuellement chaque INB à la taxe, aux coefficients, au redevable, au paiement et au bénéficiaire.",
+      "consequence": "Construire une table de relations avec les textes financiers et les comptes plutôt qu'appliquer un tarif à la seule catégorie ASNR."
+    },
+    {
+      "gap": "Registre individuel ouvert des navires et créances TAEMUP",
+      "finding": "Le GUFIP publie des agrégats riches mais pas le registre national de propriété ni les créances individuelles.",
+      "consequence": "Limiter l'exploitation à la population, aux paramètres, aux résultats et aux contrôles agrégés."
+    },
+    {
+      "gap": "Export officiel complet de CAIRN",
+      "finding": "La recherche publique est accessible, avec des identifiants et une version d'application, mais aucun export ou API publique exhaustive n'a été trouvé.",
+      "consequence": "Conserver CAIRN en candidate et demander une voie officielle plutôt que d'automatiser l'interface."
+    },
+    {
+      "gap": "Table courante homogène de l'octroi de mer",
+      "finding": "Les publications restent fragmentées entre cinq territoires et de nombreux documents, dont plusieurs anciens.",
+      "consequence": "Créer un manifeste territorial et refuser toute valeur présentée comme taux national unique."
+    },
+    {
+      "gap": "Produit local de la taxe sur les remontées mécaniques",
+      "finding": "CAIRN et les rapports STRMTG décrivent le parc et l'activité, pas les délibérations, chiffres d'affaires taxables et produits par commune.",
+      "consequence": "Rechercher les taux et produits dans les délibérations et comptes locaux, en utilisant CAIRN uniquement pour le périmètre technique."
+    },
+    {
+      "gap": "Logements individuels soumis aux taxes de vacance",
+      "finding": "Les décrets donnent le champ communal mais aucun fichier public national ne relie chaque logement, sa durée de vacance, ses exemptions et son montant dû.",
+      "consequence": "Utiliser la liste communale comme filtre de périmètre et non comme rôle fiscal."
+    }
+  ],
+  "recommended_ingestion_order": [
+    {
+      "rank": 1,
+      "source_ids": [
+        "legifrance-vacant-housing-geography-2026-2027"
+      ],
+      "deliverable": "data/reference/vacant-housing-tax-communes-2026-2027.json",
+      "reason": "Les deux grandes annexes juridiques comportent directement les codes INSEE et documentent une transition de régime au 1er janvier 2027."
+    },
+    {
+      "rank": 2,
+      "source_ids": [
+        "asnr-inb-lists-2025"
+      ],
+      "deliverable": "data/reference/asnr-inb-2025.json",
+      "reason": "Deux tableaux annuels de taille maîtrisée fournissent un inventaire national, des identifiants stables et des états détaillés."
+    },
+    {
+      "rank": 3,
+      "source_ids": [
+        "gufip-taemup-activity-2025",
+        "mer-taemup-parameters-2026-2027"
+      ],
+      "deliverable": "data/reference/taemup-parameters-and-results-2022-2027.json",
+      "reason": "Le couple paramètres-résultats permet de structurer une famille entière avec population, collecte et affectations sans microdonnées."
+    },
+    {
+      "rank": 4,
+      "source_ids": [
+        "strmtg-ski-lifts-annual-reports"
+      ],
+      "deliverable": "data/reference/strmtg-ski-lifts-reports-manifest.json",
+      "reason": "Les rapports sont téléchargeables immédiatement et fourniront les agrégats nécessaires pour évaluer la couverture de CAIRN."
+    },
+    {
+      "rank": 5,
+      "source_ids": [
+        "strmtg-cairn-ski-lifts"
+      ],
+      "deliverable": "prototype documenté d'accès CAIRN ou demande d'export officiel",
+      "reason": "La source est riche au niveau installation, mais aucune extraction massive stable n'est encore démontrée."
+    },
+    {
+      "rank": 6,
+      "source_ids": [
+        "dgddi-octroi-de-mer-corpus"
+      ],
+      "deliverable": "data/reference/octroi-de-mer-publications-manifest.json",
+      "reason": "Un manifeste doit précéder l'extraction de documents hétérogènes et empêcher l'utilisation de tarifs anciens comme paramètres courants."
+    }
+  ]
+}
