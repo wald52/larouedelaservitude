@@ -14,6 +14,8 @@ Ce dossier conserve les sources officielles et les extractions normalisées util
 | [`bulk-sources-supplement-4-2026-09-03.json`](bulk-sources-supplement-4-2026-09-03.json) | Cinquième passe du 3 septembre 2026 : Douane, TARIC, COG, BANATIC, Sirene, M57, AT/MP, eau, OPCO et jeux |
 | [`bulk-sources-supplement-5-2026-09-03.json`](bulk-sources-supplement-5-2026-09-03.json) | Sixième passe du 3 septembre 2026 : DVF, Sitadel3, RSVERO, ANFR, registre RTE, aviation, IREP, ARCEP, Open Medic et BDNB |
 | [`bulk-sources-supplement-6-2026-09-03.json`](bulk-sources-supplement-6-2026-09-03.json) | Septième passe du 3 septembre 2026 : KALI, NAF, PCI, ICPE, BNV-D, SINOE, transports et assurance |
+| [`bulk-sources-supplement-7-2026-09-03.json`](bulk-sources-supplement-7-2026-09-03.json) | Huitième passe du 3 septembre 2026 : Camino, Agence ORE, SYDEREP, Agirc-Arrco, CNRACL, Ircantec, culture et viticulture |
+| [`bulk-sources-supplement-7-corrections-2026-09-03.json`](bulk-sources-supplement-7-corrections-2026-09-03.json) | Correction prioritaire de la huitième passe : remplace l’ancien état Ircantec par les jeux officiels actualisés en juillet et août 2026 |
 | [`ntl-france-2026.json`](ntl-france-2026.json) | Extraction des 141 lignes françaises de détail de la National tax list 2026 |
 | [`lfss-2026-annexe-3-impositions.json`](lfss-2026-annexe-3-impositions.json) | Transcription contrôlée du tableau 31 de l’annexe 3 du PLFSS 2026 |
 
@@ -44,6 +46,15 @@ La septième passe sur les nomenclatures d’activité et de branche, les instal
 réglementées, les déchets, l’assurance et la BNV-D est décrite dans
 [`docs/sources-massives-recherche-complementaire-6.md`](../../docs/sources-massives-recherche-complementaire-6.md).
 
+La huitième passe sur les titres miniers, les consommations énergétiques, les filières REP,
+les régimes complémentaires, les statistiques culturelles et la viticulture est décrite
+dans
+[`docs/sources-massives-recherche-complementaire-7.md`](../../docs/sources-massives-recherche-complementaire-7.md).
+
+La correction de fraîcheur des jeux Ircantec est décrite dans
+[`docs/sources-massives-recherche-complementaire-7-corrections.md`](../../docs/sources-massives-recherche-complementaire-7-corrections.md).
+Elle prévaut sur les champs contradictoires de la première rédaction de la huitième passe.
+
 ## Deux registres complémentaires
 
 `sources.json` et `bulk-sources.json` ne répondent pas à la même question :
@@ -57,6 +68,10 @@ Les fichiers datés `bulk-sources-supplement-*.json` sont des registres de reche
 intermédiaires. Les sources qui passent avec succès leur prototype ou leur première
 ingestion doivent ensuite être intégrées à `bulk-sources.json`, sans perdre la date et les
 preuves de leur évaluation.
+
+Un fichier `*-corrections-*.json` doit être appliqué avant toute ingestion du supplément
+qu’il vise. Il remplace explicitement les champs contradictoires sans effacer l’historique
+de la recherche ayant conduit à la correction.
 
 ## Principes de stockage
 
