@@ -17,6 +17,7 @@ Ce dossier conserve les sources officielles et les extractions normalisées util
 | [`bulk-sources-supplement-7-2026-09-03.json`](bulk-sources-supplement-7-2026-09-03.json) | Huitième passe du 3 septembre 2026 : Camino, Agence ORE, SYDEREP, Agirc-Arrco, CNRACL, Ircantec, culture et viticulture |
 | [`bulk-sources-supplement-7-corrections-2026-09-03.json`](bulk-sources-supplement-7-corrections-2026-09-03.json) | Correction prioritaire de la huitième passe : remplace l’ancien état Ircantec par les jeux officiels actualisés en juillet et août 2026 |
 | [`bulk-sources-supplement-8-2026-09-03.json`](bulk-sources-supplement-8-2026-09-03.json) | Neuvième passe du 3 septembre 2026 : installations nucléaires, TAEMUP, zonage des logements vacants, remontées mécaniques et octroi de mer |
+| [`bulk-sources-supplement-9-2026-09-03.json`](bulk-sources-supplement-9-2026-09-03.json) | Dixième passe du 3 septembre 2026 : FINESS+, SAE, masse salariale Urssaf, auto-entrepreneurs, épargne salariale et chaîne BOFiP–GLEIF–FIRDS pour la TTF |
 | [`ntl-france-2026.json`](ntl-france-2026.json) | Extraction des 141 lignes françaises de détail de la National tax list 2026 |
 | [`lfss-2026-annexe-3-impositions.json`](lfss-2026-annexe-3-impositions.json) | Transcription contrôlée du tableau 31 de l’annexe 3 du PLFSS 2026 |
 
@@ -59,6 +60,10 @@ Elle prévaut sur les champs contradictoires de la première rédaction de la hu
 La neuvième passe sur les installations nucléaires, la fiscalité de la plaisance, le
 zonage des logements vacants, les remontées mécaniques et l’octroi de mer est décrite dans
 [`docs/sources-massives-recherche-complementaire-8.md`](../../docs/sources-massives-recherche-complementaire-8.md).
+
+La dixième passe sur les référentiels sanitaires, les dénominateurs salariaux et la chaîne
+d’identification des émetteurs et instruments financiers est décrite dans
+[`docs/sources-massives-recherche-complementaire-9.md`](../../docs/sources-massives-recherche-complementaire-9.md).
 
 ## Deux registres complémentaires
 
