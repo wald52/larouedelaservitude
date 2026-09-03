@@ -1,0 +1,696 @@
+{
+  "schema_version": 1,
+  "verification_date": "2026-09-03",
+  "extends": [
+    "data/reference/bulk-sources.json",
+    "data/reference/bulk-sources-supplement-2026-09-02.json",
+    "data/reference/bulk-sources-supplement-2-2026-09-02.json",
+    "data/reference/bulk-sources-supplement-3-2026-09-03.json",
+    "data/reference/bulk-sources-supplement-4-2026-09-03.json",
+    "data/reference/bulk-sources-supplement-5-2026-09-03.json"
+  ],
+  "purpose": "Septième passe consacrée aux nomenclatures d'activité et de branche, aux référentiels cadastraux, aux installations réglementées et aux marchés de l'assurance, des transports, des déchets et des produits phytopharmaceutiques.",
+  "principle": "Les nomenclatures, registres d'opérateurs et données d'activité servent à résoudre le champ et l'identité des objets. Ils ne prouvent seuls ni l'existence juridique d'un prélèvement, ni son classement SEC, ni une dette ou une recette.",
+  "key_findings": [
+    {
+      "finding": "La BNV-D est une source d'assiette exceptionnellement proche d'un prélèvement précis.",
+      "impact": "Les ventes depuis 2008 et achats depuis 2013, classés notamment par catégorie de redevance, peuvent documenter en masse la redevance pour pollutions diffuses."
+    },
+    {
+      "finding": "Le corpus KALI et sa table de correspondance IDCC peuvent industrialiser la distinction entre obligations légales et obligations conventionnelles.",
+      "impact": "Les contributions prévues uniquement par une convention collective pourront être identifiées comme candidates hors périmètre des prélèvements obligatoires, au lieu d'être assimilées aux cotisations légales."
+    },
+    {
+      "finding": "La transition NAF rév. 2 vers NAF 2025 doit être modélisée avant toute jointure sectorielle.",
+      "impact": "La NAF rév. 2 reste applicable jusqu'à fin 2026 et la NAF 2025 entre en vigueur en janvier 2027 ; les codes ne doivent pas être mélangés."
+    },
+    {
+      "finding": "Le nouveau portail SINOE-Déchets fournit déjà des référentiels nationaux d'acteurs, services, communes, équipements, matrices et flux.",
+      "impact": "Il peut remplacer de nombreuses recherches locales sur le périmètre du service public des déchets et préparer le rapprochement TEOM, REOM, coûts et comptes locaux."
+    },
+    {
+      "finding": "REGAFI et les statistiques ACPR/EIOPA couvrent respectivement les opérateurs autorisés et les agrégats du marché de l'assurance.",
+      "impact": "Ils fournissent une infrastructure pour contrôler le périmètre des taxes d'assurance sans confondre primes prudentielles, primes taxables et recettes fiscales."
+    }
+  ],
+  "sources": [
+    {
+      "id": "dila-kali-bulk",
+      "title": "Base KALI — conventions collectives et accords de branche",
+      "publisher": "Direction de l'information légale et administrative",
+      "url": "https://echanges.dila.gouv.fr/OPENDATA/KALI/",
+      "evidence_urls": [
+        "https://www.service-public.gouv.fr/particuliers/vosdroits/F78",
+        "https://code.travail.gouv.fr/outils/convention-collective"
+      ],
+      "priority": 1,
+      "status": "candidate",
+      "family": "collective_agreements",
+      "coverage": {
+        "geography": "France",
+        "period": "snapshot global du 13 juillet 2025 et incréments observés jusqu'au 2 septembre 2026",
+        "scope": "Conventions collectives, accords, avenants et métadonnées de la base KALI.",
+        "auxiliary_file": "Dila_Kali_Liste_correspondances_conventions-idcc-20230306.xlsx",
+        "global_snapshot": "Freemium_kali_global_20250713-140000.tar.gz",
+        "latest_increment_seen": "KALI_20260902-210756.tar.gz"
+      },
+      "access": {
+        "formats": [
+          "tar.gz",
+          "xml",
+          "xlsx"
+        ],
+        "bulk_download": true,
+        "api": false,
+        "authentication": "none",
+        "refresh": "incremental"
+      },
+      "supports": [
+        "idcc",
+        "collective_agreement_identifier",
+        "collective_scope",
+        "agreement_effective_dates",
+        "conventional_contribution_candidate",
+        "legal_vs_conventional_classification",
+        "historical_text"
+      ],
+      "unit_of_observation": "objet KALI, version d'accord ou relation convention-IDCC",
+      "stable_keys": [
+        "kali_identifier",
+        "text_identifier",
+        "version_identifier",
+        "idcc"
+      ],
+      "limitations": [
+        "Une cotisation rendue obligatoire par une convention collective n'est pas nécessairement un prélèvement obligatoire au sens des comptes nationaux.",
+        "La table de correspondance convention-IDCC observée est datée du 6 mars 2023 et doit être contrôlée contre le corpus courant.",
+        "Le snapshot global est daté du 13 juillet 2025 ; les incréments suivants doivent être appliqués dans l'ordre, avec journal et idempotence.",
+        "Le code NAF ou APE aide à rechercher une convention, mais ne suffit pas à établir qu'elle est applicable à une entreprise.",
+        "Les accords d'entreprise et les conventions non étendues peuvent suivre des règles d'opposabilité différentes."
+      ],
+      "next_action": "Prototyper l'ingestion du fichier IDCC puis d'un sous-ensemble KALI relatif aux contributions, garanties collectives et organismes assureurs, avant d'appliquer tous les incréments."
+    },
+    {
+      "id": "insee-naf-transition-2026-2027",
+      "title": "NAF rév. 2, NAF 2025 et table de correspondance",
+      "publisher": "Insee",
+      "url": "https://www.insee.fr/fr/information/2406147",
+      "evidence_urls": [
+        "https://www.insee.fr/fr/information/2120875",
+        "https://www.insee.fr/fr/information/8617910"
+      ],
+      "priority": 1,
+      "status": "ready_to_ingest",
+      "family": "activity_classification",
+      "coverage": {
+        "geography": "France",
+        "period": "NAF rév. 2 en vigueur jusqu'au 31 décembre 2026 ; NAF 2025 à partir de janvier 2027",
+        "scope": "Sections, divisions, groupes, classes, sous-classes, libellés, notes explicatives et correspondances entre nomenclatures.",
+        "correspondence_edition": "janvier 2026"
+      },
+      "access": {
+        "formats": [
+          "xls",
+          "xlsx",
+          "dbf",
+          "pdf"
+        ],
+        "bulk_download": true,
+        "api": false,
+        "authentication": "none",
+        "refresh": "classification_cycle"
+      },
+      "supports": [
+        "ape_code",
+        "activity_code",
+        "activity_label",
+        "sector_scope",
+        "atmp_candidate",
+        "sectoral_tax_candidate",
+        "classification_crosswalk"
+      ],
+      "unit_of_observation": "poste de nomenclature ou relation de correspondance",
+      "stable_keys": [
+        "classification_version",
+        "classification_level",
+        "code"
+      ],
+      "limitations": [
+        "Un code APE ou NAF décrit l'activité principale statistique et ne prouve ni une convention applicable ni un assujettissement fiscal.",
+        "Une correspondance entre nomenclatures peut être un-à-plusieurs ou plusieurs-à-un.",
+        "La NAF 2025 ne doit pas être appliquée aux données de l'année 2026 comme si elle était déjà en vigueur.",
+        "Les notes explicatives peuvent être ajustées sans changement de structure ; leur édition doit être conservée."
+      ],
+      "next_action": "Ingérer la NAF rév. 2, la NAF 2025 et la table de correspondance comme dimensions versionnées, puis interdire toute jointure sectorielle sans version de nomenclature explicite."
+    },
+    {
+      "id": "dgfip-pci-cadastre-2026",
+      "title": "Plan cadastral informatisé — PCI Vecteur",
+      "publisher": "Direction générale des Finances publiques",
+      "url": "https://cadastre.data.gouv.fr/datasets/plan-cadastral-informatise",
+      "priority": 2,
+      "status": "ready_to_ingest",
+      "family": "cadastral_reference",
+      "coverage": {
+        "geography": "France entière à l'exception de Strasbourg et de quelques communes voisines",
+        "period": "millésimes trimestriels ou périodiques ; dernier millésime vérifié au 1er juin 2026",
+        "scope": "Feuilles, sections, parcelles, bâtiments et objets de gestion du plan cadastral.",
+        "vector_coverage_seen": "34 700 communes"
+      },
+      "access": {
+        "formats": [
+          "EDIGEO",
+          "DXF-PCI"
+        ],
+        "projections": [
+          "Lambert-93",
+          "Lambert CC 9 zones"
+        ],
+        "bulk_download": true,
+        "levels": [
+          "feuille",
+          "EPCI",
+          "département"
+        ],
+        "stable_urls": true,
+        "latest_alias": true,
+        "authentication": "none"
+      },
+      "supports": [
+        "cadastral_section",
+        "parcel_identifier",
+        "building_geometry",
+        "dvf_resolution",
+        "sitadel_resolution",
+        "territorial_coverage"
+      ],
+      "unit_of_observation": "objet géométrique cadastral dans une feuille et un millésime",
+      "stable_keys": [
+        "vintage",
+        "department_code",
+        "commune_code",
+        "section",
+        "parcel_number",
+        "object_type"
+      ],
+      "limitations": [
+        "Le plan cadastral ne contient ni propriétaire, ni valeur locative, ni assiette, ni produit fiscal.",
+        "Une parcelle, un bâtiment, un local fiscal et un bâtiment BDNB sont des unités différentes.",
+        "La couverture et la précision géométrique ne sont pas uniformes historiquement.",
+        "L'alias latest ne doit pas être utilisé comme provenance : le millésime réel doit être archivé.",
+        "Les exceptions territoriales empêchent de déduire l'inexistence d'une parcelle de son absence du PCI."
+      ],
+      "next_action": "Tester un téléchargement départemental EDIGEO au millésime du 1er juin 2026 et construire une table parcelle-bâtiment sans remplacer les identifiants DVF, Sitadel ou BDNB."
+    },
+    {
+      "id": "georisques-icpe-current",
+      "title": "Installations classées pour la protection de l'environnement",
+      "publisher": "Ministère de la Transition écologique / Géorisques",
+      "url": "https://www.georisques.gouv.fr/donnees/bases-de-donnees/installations-industrielles",
+      "evidence_urls": [
+        "https://www.data.gouv.fr/dataservices/api-georisques"
+      ],
+      "priority": 1,
+      "status": "ready_to_ingest",
+      "family": "regulated_industrial_installations",
+      "coverage": {
+        "geography": "France métropolitaine et DROM",
+        "period": "état courant et téléchargements annuels disponibles selon le portail",
+        "refresh": "quotidien",
+        "scope": "Installations soumises à autorisation ou enregistrement, en fonctionnement ou en cessation d'activité."
+      },
+      "access": {
+        "formats": [
+          "csv",
+          "shapefile",
+          "json_api"
+        ],
+        "bulk_download": true,
+        "levels": [
+          "national",
+          "régional",
+          "départemental",
+          "annuel"
+        ],
+        "api": true,
+        "api_base": "https://georisques.gouv.fr/api/v1/",
+        "api_limit": "1000 requêtes par minute et par IP",
+        "authentication": "none"
+      },
+      "supports": [
+        "icpe_identifier",
+        "siret_candidate",
+        "installation_status",
+        "authorization_regime",
+        "nomenclature_heading",
+        "seveso_status",
+        "ied_status",
+        "tgap_candidate",
+        "geolocation"
+      ],
+      "unit_of_observation": "installation classée ou relation d'activité et de nomenclature",
+      "stable_keys": [
+        "snapshot_date",
+        "installation_identifier",
+        "nomenclature_heading",
+        "activity_identifier"
+      ],
+      "limitations": [
+        "Une installation classée n'est pas automatiquement redevable de la TGAP ou d'une redevance environnementale.",
+        "Autorisation, enregistrement, déclaration et régime fiscal sont des notions distinctes.",
+        "Les cessations, changements d'exploitant et modifications de nomenclature doivent être historisés.",
+        "Les régimes et seuils environnementaux ne coïncident pas nécessairement avec les seuils fiscaux.",
+        "L'absence du registre ne prouve pas l'absence de toute activité taxable ou polluante."
+      ],
+      "next_action": "Archiver un export national et le schéma, normaliser les rubriques de nomenclature et produire une table de candidats vers les composantes TGAP et autres prélèvements sans calculer de dette."
+    },
+    {
+      "id": "ofb-bnvd-pesticides-2025",
+      "title": "BNV-D Traçabilité — ventes et achats de produits phytopharmaceutiques",
+      "publisher": "Office français de la biodiversité / agences et offices de l'eau",
+      "url": "https://www.data.gouv.fr/datasets/bnv-d-tracabilite-donnees-sur-les-ventes-de-produits-phytopharmaceutiques-1",
+      "evidence_urls": [
+        "https://www.eaufrance.fr/actualites/linfographie-et-les-donnees-ouvertes-de-la-bnv-d-millesime-2025-sont-disponibles",
+        "https://ventes-produits-phytopharmaceutiques.eaufrance.fr/search",
+        "https://hubeau.eaufrance.fr/page/api-vente-et-achat-de-produits-phytopharmaceutiques"
+      ],
+      "priority": 1,
+      "status": "ready_to_ingest",
+      "family": "diffuse_pollution_charge",
+      "coverage": {
+        "geography": "France hexagonale et outre-mer selon les jeux",
+        "period": "ventes 2008-2024 et achats 2013-2024 dans le millésime 2025",
+        "publication_online_since": "2026-04-21",
+        "scope": "Quantités vendues et achetées par produit ou substance, territoire, numéro AMM, fonction et catégorie de redevance."
+      },
+      "access": {
+        "formats": [
+          "csv",
+          "csv.gz",
+          "zip",
+          "json_api"
+        ],
+        "bulk_download": true,
+        "api": true,
+        "authentication": "none_for_open_data",
+        "refresh": "annual_after_stabilization"
+      },
+      "supports": [
+        "rpd_candidate",
+        "product_authorization_number",
+        "substance",
+        "quantity_sold",
+        "quantity_purchased",
+        "buyer_or_seller_geography",
+        "charge_category",
+        "product_function"
+      ],
+      "unit_of_observation": "agrégat annuel de quantité par produit ou substance et territoire",
+      "stable_keys": [
+        "data_kind",
+        "activity_year",
+        "product_or_substance_identifier",
+        "geographical_level",
+        "geographical_code",
+        "charge_category"
+      ],
+      "limitations": [
+        "Les données ouvertes sont des agrégats générés à partir de registres et bilans ; les données détaillées restreintes ne sont pas publiques.",
+        "La quantité vendue ou achetée ne fournit pas le montant de redevance acquitté.",
+        "Le territoire du point de vente et celui de l'acheteur correspondent à des sémantiques différentes.",
+        "La catégorie de redevance doit être versionnée avec le barème juridique de l'année.",
+        "Les données sont stabilisées après contrôles, généralement au dernier trimestre de l'année suivant l'activité ; elles ne sont pas un suivi courant."
+      ],
+      "next_action": "Ingérer les fichiers ventes et achats du millésime 2025, comparer les exports directs et l'API Hub'Eau, puis construire des agrégats par catégorie de redevance sans reconstruire les dettes individuelles."
+    },
+    {
+      "id": "ademe-sinoe-waste-2026",
+      "title": "SINOE-Déchets — dispositif national d'observation des déchets ménagers et assimilés",
+      "publisher": "ADEME",
+      "url": "https://data.sinoe-dechets.ademe.fr/",
+      "evidence_urls": [
+        "https://data.sinoe-dechets.ademe.fr/datasets",
+        "https://data.sinoe-dechets.ademe.fr/catalog-api-doc"
+      ],
+      "priority": 2,
+      "status": "ready_to_ingest",
+      "family": "public_waste_service",
+      "coverage": {
+        "geography": "France entière selon les jeux",
+        "period": "historique variable ; nouveau dispositif d'enquête 2025 et référentiels plus anciens",
+        "dataset_count_seen": 43,
+        "record_count_seen": 4644653,
+        "scope": "Acteurs, services, communes desservies, compétences, équipements, déchèteries, matrices, flux de collecte, référentiels territoriaux et validations."
+      },
+      "access": {
+        "formats": [
+          "download",
+          "api"
+        ],
+        "bulk_download": true,
+        "api": true,
+        "authentication": "none_for_public_data",
+        "license": "Licence Ouverte",
+        "refresh": "dataset_specific"
+      },
+      "supports": [
+        "waste_service_identifier",
+        "organizing_authority",
+        "served_commune",
+        "waste_competence",
+        "collection_flow",
+        "treatment_service",
+        "equipment",
+        "teom_reom_scope_context",
+        "validation_status"
+      ],
+      "unit_of_observation": "acteur, service, adhésion, équipement, flux, matrice ou référentiel selon le jeu",
+      "stable_keys": [
+        "dataset_identifier",
+        "survey_year",
+        "actor_or_service_identifier",
+        "record_identifier"
+      ],
+      "limitations": [
+        "Le portail 2025 est en déploiement progressif et tous les anciens jeux ne sont pas encore repris.",
+        "Les données antérieures à 2025 restent en partie sur l'ancien portail ADEME ; un manifeste multiportail est nécessaire.",
+        "Le service public des déchets peut être financé par TEOM, REOM, budget général et autres produits ; un service ne détermine pas seul le prélèvement applicable.",
+        "Un coût, un flux physique et une recette fiscale sont trois mesures différentes.",
+        "Le statut d'ouverture, de validation et le millésime d'enquête doivent être conservés."
+      ],
+      "next_action": "Ingérer d'abord les référentiels acteurs-services-communes, les compétences et les flux, puis rechercher dans les jeux historiques les coûts et modes de financement à rapprocher du REI et des balances locales."
+    },
+    {
+      "id": "art-transport-open-data",
+      "title": "Open data de l'Autorité de régulation des transports",
+      "publisher": "Autorité de régulation des transports",
+      "url": "https://www.autorite-transports.fr/observatoire-et-numerique/jeux-de-donnees-en-open-data/",
+      "evidence_urls": [
+        "https://opendata.autorite-transports.fr/"
+      ],
+      "priority": 2,
+      "status": "ready_to_ingest",
+      "family": "regulated_transport_markets",
+      "coverage": {
+        "geography": "France et marchés régulés concernés",
+        "period": "variable selon le jeu ; circulations ferroviaires de voyageurs depuis 2017",
+        "scope": "Transport ferroviaire, autocars, gares routières, autoroutes et aéroports : infrastructures, offre, fréquentation, trafic, qualité et résultats financiers.",
+        "notable_bulk_source": "base de circulation des trains de voyageurs depuis 2017, annoncée à 10 Go"
+      },
+      "access": {
+        "formats": [
+          "excel",
+          "bulk_files",
+          "data_portal"
+        ],
+        "bulk_download": true,
+        "api": "portal_specific_to_evaluate",
+        "license": "Licence Ouverte",
+        "refresh": "annual_quarterly_or_permanent"
+      },
+      "supports": [
+        "transport_operator_context",
+        "rail_activity",
+        "coach_activity",
+        "motorway_context",
+        "airport_finance",
+        "infrastructure_use",
+        "sector_revenue_control",
+        "beneficiary_context"
+      ],
+      "unit_of_observation": "indicateur, circulation, opérateur, infrastructure ou période selon le jeu",
+      "stable_keys": [
+        "dataset_identifier",
+        "publication_version",
+        "period",
+        "source_entity_identifier",
+        "indicator"
+      ],
+      "limitations": [
+        "Les jeux sont issus de déclarations d'acteurs retraitées à des fins statistiques et ne constituent pas des audits fiscaux.",
+        "Les données récentes peuvent être provisoires et les années N-2 seulement semi-définitives.",
+        "Trafic, fréquentation, péage, chiffre d'affaires, redevance d'infrastructure et prélèvement obligatoire sont des notions distinctes.",
+        "Les agrégats ou données protégées par le secret des affaires ne doivent pas être attribués à une entreprise précise.",
+        "Une activité régulée n'établit pas automatiquement un assujettissement ou un bénéficiaire fiscal."
+      ],
+      "next_action": "Créer un manifeste des jeux ferroviaires, autoroutiers et aéroportuaires et profiler leurs identifiants avant tout rapprochement avec les prélèvements sectoriels."
+    },
+    {
+      "id": "acpr-regafi-insurance-register",
+      "title": "REGAFI — registre des agents financiers et organismes d'assurance",
+      "publisher": "Autorité de contrôle prudentiel et de résolution",
+      "url": "https://acpr.banque-france.fr/fr/professionnels/vos-outils-et-services/consulter-les-registres/registre-des-agents-financiers-et-des-organismes-dassurance",
+      "evidence_urls": [
+        "https://www.regafi.fr/pages/api-acpr/"
+      ],
+      "priority": 2,
+      "status": "ready_to_ingest",
+      "family": "insurance_and_financial_entities",
+      "coverage": {
+        "geography": "France et organismes européens habilités à intervenir en France",
+        "period": "registre courant",
+        "refresh": "quotidien",
+        "scope": "Entreprises autorisées dans les secteurs bancaire, financier, des paiements et de l'assurance, avec activités habilitées."
+      },
+      "access": {
+        "formats": [
+          "web_register",
+          "api"
+        ],
+        "bulk_download": "api_to_profile",
+        "api": true,
+        "authentication": "to_verify"
+      },
+      "supports": [
+        "insurance_undertaking_identifier",
+        "authorization_status",
+        "authorized_activity",
+        "home_country",
+        "branch_or_services_passport",
+        "operator_scope_candidate"
+      ],
+      "unit_of_observation": "entité autorisée ou relation d'activité et de passeport",
+      "stable_keys": [
+        "regafi_identifier",
+        "entity_identifier",
+        "authorization_or_activity_code"
+      ],
+      "limitations": [
+        "Une autorisation d'assurance ne prouve pas que l'entité a encaissé des primes taxables en France pendant une année donnée.",
+        "Le registre courant ne remplace pas un historique des entrées, retraits, fusions et passeports.",
+        "La dénomination et l'adresse doivent être contrôlées pour éviter les usurpations ou homonymes.",
+        "REGAFI ne fournit ni primes, ni assiettes de taxes, ni recettes, ni classement SEC."
+      ],
+      "next_action": "Profiler l'API, produire un snapshot horodaté des organismes d'assurance habilités et relier les entités françaises à Sirene sans en déduire une assiette taxable."
+    },
+    {
+      "id": "acpr-webstat-insurance-market",
+      "title": "Webstat ACPR — banque et assurance en France",
+      "publisher": "Banque de France / Autorité de contrôle prudentiel et de résolution",
+      "url": "https://webstat.banque-france.fr/fr/catalogue/acpr/",
+      "evidence_urls": [
+        "https://acpr.banque-france.fr/fr/publications-et-statistiques/publications/les-chiffres-du-marche-francais-de-la-banque-et-de-lassurance-2024"
+      ],
+      "priority": 2,
+      "status": "candidate",
+      "family": "french_insurance_market_statistics",
+      "coverage": {
+        "geography": "France",
+        "period": "séries historiques variables selon l'indicateur",
+        "scope": "Séries statistiques ACPR relatives aux banques et assurances ; les rapports de marché renvoient directement aux séries Webstat."
+      },
+      "access": {
+        "formats": [
+          "webstat_series",
+          "excel_from_reports"
+        ],
+        "bulk_download": "to_evaluate",
+        "api": "to_evaluate",
+        "authentication": "to_verify",
+        "refresh": "series_specific"
+      },
+      "supports": [
+        "insurance_premiums_context",
+        "claims_context",
+        "insurance_branch",
+        "undertaking_population",
+        "market_history",
+        "tsca_control"
+      ],
+      "unit_of_observation": "observation chronologique par indicateur prudentiel ou de marché",
+      "stable_keys": [
+        "webstat_series_identifier",
+        "period"
+      ],
+      "limitations": [
+        "Une prime prudentielle ou comptable n'est pas nécessairement une prime imposable à la taxe sur les conventions d'assurance.",
+        "Les catégories prudentielles ne correspondent pas nécessairement aux risques et taux fiscaux.",
+        "Le catalogue et les rapports doivent être reliés à des identifiants de série stables avant automatisation.",
+        "Les agrégats ne fournissent ni le montant déclaré par organisme ni la ventilation fiscale complète."
+      ],
+      "next_action": "Identifier les séries Webstat portant sur primes et branches d'assurance, tester les exports et comparer leur couverture aux catégories EIOPA et aux recettes budgétaires."
+    },
+    {
+      "id": "eiopa-insurance-statistics",
+      "title": "Statistiques européennes de l'assurance",
+      "publisher": "Autorité européenne des assurances et des pensions professionnelles",
+      "url": "https://www.eiopa.europa.eu/tools-and-data/insurance-statistics_en",
+      "priority": 3,
+      "status": "support_only",
+      "family": "insurance_aggregate_control",
+      "coverage": {
+        "geography": "Union européenne et Espace économique européen, avec agrégats par pays",
+        "period": "séries Solvabilité II principalement depuis 2016 ; données annuelles jusqu'en 2025 et trimestrielles provisoires jusqu'au deuxième trimestre 2026 selon les tables",
+        "last_update_seen": "2026-09-01",
+        "scope": "Bilans, fonds propres, primes, sinistres, dépenses, expositions d'actifs et activité transfrontière."
+      },
+      "access": {
+        "formats": [
+          "xlsx",
+          "csv",
+          "zip",
+          "dashboard"
+        ],
+        "bulk_download": true,
+        "api": false,
+        "authentication": "none",
+        "refresh": "quarterly_and_annual"
+      },
+      "supports": [
+        "country_insurance_premiums",
+        "claims",
+        "expenses",
+        "cross_border_premiums",
+        "solvency_template",
+        "international_consistency"
+      ],
+      "unit_of_observation": "agrégat période × pays × indicateur × niveau solo ou groupe",
+      "stable_keys": [
+        "release_date",
+        "entity_level",
+        "frequency",
+        "country",
+        "indicator",
+        "period"
+      ],
+      "limitations": [
+        "Les données sont agrégées au niveau pays ou groupe et ne constituent pas une déclaration fiscale.",
+        "Les catégories Solvabilité II ne sont pas une nomenclature des risques taxables français.",
+        "Les données provisoires peuvent être révisées et ne doivent pas être mélangées aux séries finalisées.",
+        "Les historiques sont corrigés à chaque publication ; les releases précédentes doivent être archivées.",
+        "L'activité transfrontière complique le rapprochement avec les primes imposables territorialement en France."
+      ],
+      "next_action": "Archiver les séries annuelles et trimestrielles de primes, sinistres et dépenses pour la France, conserver les releases et les utiliser uniquement comme contrôle agrégé du marché de l'assurance."
+    }
+  ],
+  "research_gaps": [
+    {
+      "gap": "Table nationale univoque NAF-IDCC-CTP-DSN-prélèvement",
+      "finding": "Chaque référentiel apporte une relation partielle, mais aucune source officielle unique ne relie activité, convention, code déclaratif, créance juridique et classement SEC.",
+      "consequence": "Maintenir un graphe sourcé avec confiance et revue humaine plutôt qu'une jointure forcée."
+    },
+    {
+      "gap": "Historique complet et courant de correspondance IDCC",
+      "finding": "Le fichier de correspondance visible dans le répertoire KALI est daté de mars 2023.",
+      "consequence": "Le compléter par le corpus KALI courant et ne pas l'utiliser seul pour les situations 2026."
+    },
+    {
+      "gap": "Déclarations fiscales détaillées des taxes d'assurance",
+      "finding": "REGAFI, ACPR et EIOPA couvrent les organismes et primes de marché, mais aucun jeu public national détaillé par redevable, risque fiscal, taux, assiette et bénéficiaire n'a été identifié.",
+      "consequence": "Limiter les séries prudentielles aux contrôles de couverture et rechercher le produit dans les sources budgétaires et comptables."
+    },
+    {
+      "gap": "Passage ICPE ou IREP vers une composante TGAP",
+      "finding": "Les registres environnementaux ne publient pas une relation certaine entre rubrique, seuil fiscal, exonération, déclaration et paiement.",
+      "consequence": "Ne produire que des candidats et conserver explicitement les exclusions."
+    },
+    {
+      "gap": "Financement fiscal complet du service public des déchets dans le nouveau SINOE",
+      "finding": "Le nouveau portail publie progressivement ses jeux 2025, tandis que plusieurs données historiques restent sur l'ancien portail.",
+      "consequence": "Construire un manifeste multiportail et ne pas considérer l'absence actuelle d'un jeu comme une absence de donnée historique."
+    },
+    {
+      "gap": "Assiette individuelle de la redevance pour pollutions diffuses",
+      "finding": "Les registres et bilans détaillés BNV-D restent en accès restreint ; l'open data est agrégé.",
+      "consequence": "Documenter les quantités et catégories en masse sans reconstruire ni publier une dette individuelle."
+    },
+    {
+      "gap": "Export massif homogène du catalogue Webstat ACPR",
+      "finding": "Les séries sont consultables et liées depuis les rapports, mais le mécanisme d'export de l'ensemble utile doit encore être prototypé.",
+      "consequence": "Conserver la source en candidate jusqu'à validation des identifiants, formats et limites."
+    },
+    {
+      "gap": "Sources massives structurées des prélèvements culturels",
+      "finding": "Aucun jeu officiel transversal donnant simultanément assiettes, déclarants, montants et bénéficiaires des taxes cinéma, audiovisuel et spectacle n'a été identifié pendant cette passe.",
+      "consequence": "Conserver ce chantier ouvert et ne pas substituer des statistiques de fréquentation aux déclarations fiscales."
+    }
+  ],
+  "recommended_ingestion_order": [
+    {
+      "rank": 1,
+      "source_ids": [
+        "ofb-bnvd-pesticides-2025"
+      ],
+      "deliverable": "data/reference/bnvd-pesticides-2008-2024.json",
+      "reason": "La source est directement issue des déclarations utilisées pour établir une redevance et fournit fichiers et API."
+    },
+    {
+      "rank": 2,
+      "source_ids": [
+        "insee-naf-transition-2026-2027"
+      ],
+      "deliverable": "data/reference/naf-versioned-crosswalk.json",
+      "reason": "Une dimension d'activité versionnée sécurisera AT/MP, ICPE, conventions et prélèvements sectoriels."
+    },
+    {
+      "rank": 3,
+      "source_ids": [
+        "georisques-icpe-current"
+      ],
+      "deliverable": "data/reference/icpe-snapshot-and-nomenclature.json",
+      "reason": "Export national quotidien et API permettent de couvrir les installations réglementées sans recherche établissement par établissement."
+    },
+    {
+      "rank": 4,
+      "source_ids": [
+        "dila-kali-bulk"
+      ],
+      "deliverable": "prototype KALI-IDCC des contributions conventionnelles",
+      "reason": "La source peut éviter de confondre obligations conventionnelles privées et prélèvements légaux."
+    },
+    {
+      "rank": 5,
+      "source_ids": [
+        "ademe-sinoe-waste-2026"
+      ],
+      "deliverable": "data/reference/sinoe-waste-services-reference.json",
+      "reason": "Les référentiels acteurs-services-communes rendront réutilisables les rapprochements TEOM et REOM."
+    },
+    {
+      "rank": 6,
+      "source_ids": [
+        "dgfip-pci-cadastre-2026"
+      ],
+      "deliverable": "prototype départemental PCI-DVF-Sitadel",
+      "reason": "Le PCI résout les parcelles et bâtiments sans recourir au seul rapprochement textuel des adresses."
+    },
+    {
+      "rank": 7,
+      "source_ids": [
+        "acpr-regafi-insurance-register",
+        "acpr-webstat-insurance-market",
+        "eiopa-insurance-statistics"
+      ],
+      "deliverable": "data/reference/insurance-operators-and-market-controls.json",
+      "reason": "Le triptyque opérateurs français, séries nationales et contrôle européen couvre le secteur sans inventer une base TSCA."
+    },
+    {
+      "rank": 8,
+      "source_ids": [
+        "art-transport-open-data"
+      ],
+      "deliverable": "manifest ART des jeux de transport",
+      "reason": "Les jeux volumineux et multi-sectoriels peuvent contrôler plusieurs prélèvements de transport après les sources plus directement fiscales."
+    }
+  ]
+}
