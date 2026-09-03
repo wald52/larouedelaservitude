@@ -1,0 +1,293 @@
+{
+  "schema_version": 1,
+  "verification_date": "2026-09-04",
+  "extends": [
+    "data/reference/bulk-sources.json",
+    "data/reference/bulk-sources-supplement-9-2026-09-03.json"
+  ],
+  "purpose": "Onzième passe consacrée aux registres juridiques des entreprises et associations, aux paramètres de l'apprentissage, aux rémunérations publiques, aux pensions de l'État, à la PEEC et à la résolution LEI-SIREN.",
+  "principle": "Un registre d'identité, une annonce légale, un paramètre de financement ou une rémunération statistique ne prouve jamais seul l'assujettissement, le classement SEC, la dette, le paiement et la recette d'un prélèvement.",
+  "sources": [
+    {
+      "id": "inpi-rne-bulk-api",
+      "title": "Registre national des entreprises — SFTP et API Entreprises",
+      "publisher": "Institut national de la propriété industrielle",
+      "url": "https://data.inpi.fr/content/editorial/Serveur_ftp_entreprises",
+      "priority": 1,
+      "status": "candidate",
+      "coverage": {
+        "geography": "France",
+        "period": "stock et flux quotidiens ; comptes depuis 2017 ; actes et statuts depuis 1993",
+        "scope": "Identité, créations, modifications, cessations, actes, statuts et comptes annuels non confidentiels."
+      },
+      "access": {
+        "formats": ["json", "pdf", "sftp", "api"],
+        "bulk_download": true,
+        "api": true,
+        "authentication": "free_account_required",
+        "refresh": "daily"
+      },
+      "supports": ["siren", "legal_name", "legal_form", "legal_event", "annual_accounts", "historical_identity"],
+      "unit_of_observation": "dossier, formalité, acte ou dépôt de comptes",
+      "stable_keys": ["siren", "document_or_formality_identifier", "snapshot_or_flow_date"],
+      "limitations": [
+        "Le RNE ne prouve ni assujettissement fiscal, ni classement SEC, ni recette.",
+        "RNE, Sirene et BODACC ont des objets et dates différents.",
+        "L'authentification, la volumétrie et les documents PDF exigent un prototype."
+      ],
+      "next_action": "Prototyper les flux CMC et comptes sur les entités déjà présentes dans l'inventaire avant toute ingestion générale."
+    },
+    {
+      "id": "dila-bodacc-bulk-api",
+      "title": "BODACC — annonces civiles et commerciales, API et archives",
+      "publisher": "Direction de l'information légale et administrative",
+      "url": "https://www.data.gouv.fr/datasets/bodacc",
+      "priority": 1,
+      "status": "ready_to_ingest",
+      "coverage": {
+        "geography": "France",
+        "period": "archives numériques depuis 2008 et flux courants",
+        "scope": "Immatriculations, créations, modifications, radiations, ventes, procédures collectives et avis de dépôts de comptes."
+      },
+      "access": {
+        "formats": ["csv", "json", "excel", "xml", "api", "archives"],
+        "bulk_download": true,
+        "api": true,
+        "authentication": "none",
+        "refresh": "five_publication_days_per_week"
+      },
+      "supports": ["siren_candidate", "legal_name", "registration", "modification", "radiation", "collective_proceeding"],
+      "unit_of_observation": "annonce ou événement publié",
+      "stable_keys": ["announcement_identifier", "publication_date", "bulletin_kind"],
+      "limitations": [
+        "Une annonce n'est pas l'état consolidé courant de l'entreprise.",
+        "Plusieurs annonces peuvent décrire une même formalité ou procédure.",
+        "Un avis de dépôt de comptes ne fournit pas nécessairement les chiffres du dépôt."
+      ],
+      "next_action": "Construire une table d'événements depuis 2008 et la rapprocher du RNE et de Sirene sans écraser les annonces."
+    },
+    {
+      "id": "interior-rna-monthly",
+      "title": "Répertoire national des associations — RNA_waldec et RNA_import",
+      "publisher": "Ministère de l'Intérieur",
+      "url": "https://www.data.gouv.fr/datasets/repertoire-national-des-associations",
+      "priority": 1,
+      "status": "ready_to_ingest",
+      "coverage": {
+        "geography": "France hors Bas-Rhin, Haut-Rhin et Moselle",
+        "period": "associations créées depuis 1901 ; extractions mensuelles",
+        "scope": "Identité, nom, sigle, objet, siège et adresse de gestion des associations de la loi de 1901."
+      },
+      "access": {
+        "formats": ["zip", "structured_text", "documentation"],
+        "bulk_download": true,
+        "api": false,
+        "authentication": "none",
+        "refresh": "monthly"
+      },
+      "supports": ["rna_identifier", "association_name", "acronym", "purpose", "registered_office", "website"],
+      "unit_of_observation": "association dans une extraction RNA",
+      "stable_keys": ["snapshot_date", "rna_or_import_key", "extract_kind"],
+      "limitations": [
+        "Le champ exclut les associations de droit local d'Alsace-Moselle.",
+        "RNA_waldec et RNA_import ne doivent pas être concaténés sans provenance.",
+        "Le RNA ne fournit pas systématiquement SIREN, comptes ou classement SEC."
+      ],
+      "next_action": "Archiver les deux extractions courantes et les relier au JOAFE et à Sirene avec un état de confiance."
+    },
+    {
+      "id": "dila-joafe-announcements-accounts",
+      "title": "JOAFE — annonces et comptes des associations, fondations et fonds de dotation",
+      "publisher": "Direction de l'information légale et administrative",
+      "url": "https://www.data.gouv.fr/datasets/associations-joafe",
+      "priority": 1,
+      "status": "ready_to_ingest",
+      "coverage": {
+        "geography": "France selon le champ de publication",
+        "period": "annonces depuis l'origine et flux courants ; comptes publiés depuis 1998",
+        "scope": "Créations, modifications, dissolutions, fondations, fonds de dotation, décisions et comptes soumis à publication."
+      },
+      "access": {
+        "formats": ["xml", "xsd", "archives", "api_beta", "pdf_accounts"],
+        "bulk_download": true,
+        "api": true,
+        "authentication": "none",
+        "refresh": "weekly_and_publication_specific"
+      },
+      "supports": ["creation", "modification", "dissolution", "foundation", "endowment_fund", "published_accounts"],
+      "unit_of_observation": "annonce, décision ou dépôt de comptes publié",
+      "stable_keys": ["publication_identifier", "publication_date", "publication_kind"],
+      "limitations": [
+        "Une annonce n'est pas un état consolidé complet de l'organisme.",
+        "Toutes les associations ne sont pas soumises à la publication de comptes.",
+        "Le JOAFE ne fournit pas automatiquement le SIREN ou le classement SEC."
+      ],
+      "next_action": "Construire avec le RNA une chronologie des organismes non lucratifs et séparer les métadonnées des documents comptables."
+    },
+    {
+      "id": "france-competences-npec-apprentissage",
+      "title": "Référentiel des niveaux de prise en charge des contrats d'apprentissage",
+      "publisher": "France compétences",
+      "url": "https://www.francecompetences.fr/regulation-des-couts-et-des-niveaux-de-prise-en-charge/apprentissage/",
+      "priority": 1,
+      "status": "ready_to_ingest",
+      "coverage": {
+        "geography": "France",
+        "period": "versions successives, dont mai et septembre 2026",
+        "scope": "Codes RNCP, branches, OPCO et niveaux de prise en charge des contrats d'apprentissage."
+      },
+      "access": {
+        "formats": ["zip", "xlsx_or_csv"],
+        "bulk_download": true,
+        "api": false,
+        "authentication": "none",
+        "refresh": "versioned_publications"
+      },
+      "supports": ["rncp_code", "branch", "opco", "npec", "publication_version", "effective_parameter"],
+      "unit_of_observation": "relation RNCP-branche-OPCO-niveau dans une version",
+      "stable_keys": ["publication_version", "rncp_code", "branch_or_idcc", "opco"],
+      "limitations": [
+        "Un niveau de prise en charge n'est pas la contribution payée par l'employeur.",
+        "Un RNCP peut être lié à plusieurs branches ou valeurs.",
+        "Une nouvelle version ne doit pas effacer les versions antérieures."
+      ],
+      "next_action": "Archiver les versions 2026 et produire une table versionnée RNCP-branche-OPCO-NPEC."
+    },
+    {
+      "id": "insee-siasp-public-pay",
+      "title": "Siasp — emplois et rémunérations dans les trois versants de la fonction publique",
+      "publisher": "Insee",
+      "url": "https://www.insee.fr/fr/metadonnees/source/serie/s1322",
+      "priority": 1,
+      "status": "ready_to_ingest",
+      "coverage": {
+        "geography": "France selon le champ de chaque série",
+        "period": "Siasp depuis 2009 ; millésime 2024 publié en 2026",
+        "scope": "Effectifs, emplois, volumes de travail et rémunérations des fonctions publiques d'État, territoriale et hospitalière."
+      },
+      "access": {
+        "formats": ["xlsx", "csv", "web_tables", "methodology"],
+        "bulk_download": true,
+        "api": "to_evaluate",
+        "authentication": "none",
+        "refresh": "annual"
+      },
+      "supports": ["public_employee_count", "fte", "gross_salary", "net_salary", "public_service_branch", "methodological_break"],
+      "unit_of_observation": "agrégat annuel de population ou rémunération",
+      "stable_keys": ["publication", "data_vintage", "year", "public_service_branch", "indicator"],
+      "limitations": [
+        "Siasp est statistique et ne publie pas les paiements de cotisations par employeur.",
+        "Les exclusions et populations diffèrent selon les tableaux.",
+        "Le passage à la DSN crée des ruptures et rétropolations à conserver."
+      ],
+      "next_action": "Créer un manifeste des séries d'effectifs et de rémunération et conserver toutes les notes de champ et de rupture."
+    },
+    {
+      "id": "sre-cas-pensions-rates-statistics",
+      "title": "CAS Pensions — taux, documentation et comptes agrégés",
+      "publisher": "Service des retraites de l'État",
+      "url": "https://retraitesdeletat.gouv.fr/statistiques/cas.html",
+      "priority": 2,
+      "status": "ready_to_ingest",
+      "coverage": {
+        "geography": "Employeurs et agents relevant des régimes documentés",
+        "period": "historique et paramètres applicables en 2026",
+        "scope": "Retenue agent, contributions employeurs, ATI, ouvriers de l'État, recettes et dépenses du CAS Pensions."
+      },
+      "access": {
+        "formats": ["html", "xlsx", "web_publications"],
+        "bulk_download": true,
+        "api": false,
+        "authentication": "none",
+        "refresh": "annual_and_parameter_change"
+      },
+      "supports": ["employee_rate", "employer_rate", "ati_rate", "employer_category", "historical_rate", "cas_revenue"],
+      "unit_of_observation": "paramètre annuel, règle d'employeur ou agrégat du compte",
+      "stable_keys": ["parameter_or_series", "year_or_valid_from", "employer_or_regime_category"],
+      "limitations": [
+        "Le taux dépend de l'employeur, de la position, de la date et du régime.",
+        "Retenue agent, contribution employeur, ATI, RAFP et régularisations sont distinctes.",
+        "Les simulateurs sont des aides de calcul et ne constituent pas des observations."
+      ],
+      "next_action": "Structurer les taux 2021-2026 et les agrégats avec un type de flux explicite, puis rapprocher Siasp et les comptes publics."
+    },
+    {
+      "id": "ancols-peec-annual-reports",
+      "title": "ANCOLS — rapports annuels sur les emplois et ressources de la PEEC",
+      "publisher": "Agence nationale de contrôle du logement social",
+      "url": "https://www.ancols.fr/",
+      "priority": 2,
+      "status": "candidate",
+      "coverage": {
+        "geography": "France",
+        "period": "rapports annuels et études successives",
+        "scope": "Ressources, emplois, collecteurs, bénéficiaires, contrôles et évaluations de la participation des employeurs à l'effort de construction."
+      },
+      "access": {
+        "formats": ["pdf_reports", "web_publications"],
+        "bulk_download": "document_by_document",
+        "api": false,
+        "authentication": "none",
+        "refresh": "annual"
+      },
+      "supports": ["peec_resource", "peec_use", "collector", "beneficiary", "financial_flow", "control_finding"],
+      "unit_of_observation": "ligne ou agrégat d'un rapport",
+      "stable_keys": ["report_identifier", "reference_year", "table_or_page", "indicator"],
+      "limitations": [
+        "Ressources, prêts, subventions, investissements et retours sont des flux différents.",
+        "Les rapports ne publient pas les paiements de chaque employeur.",
+        "L'accès et les tableaux PDF doivent être stabilisés avant ingestion."
+      ],
+      "next_action": "Construire un manifeste des rapports 2019-2025 et valider une extraction reproductible des tableaux de ressources et emplois."
+    },
+    {
+      "id": "insee-lei-france-siren-crosswalk",
+      "title": "LEI France — fichier XML des LEI gérés par l'Insee avec SIREN ou code d'agrément",
+      "publisher": "Insee",
+      "url": "https://lei-france.insee.fr/faq",
+      "priority": 1,
+      "status": "ready_to_ingest",
+      "coverage": {
+        "geography": "Entités de droit français dont le LEI est géré par l'Insee",
+        "period": "fichier courant disponible sur trente jours glissants",
+        "scope": "LEI, données publiques, SIREN ou code d'agrément de l'entité."
+      },
+      "access": {
+        "formats": ["xml", "xml_schema"],
+        "bulk_download": true,
+        "api": false,
+        "authentication": "none",
+        "refresh": "rolling_30_day_publication"
+      },
+      "supports": ["lei", "siren", "approval_code", "legal_entity_identity", "lei_status", "ttf_issuer_crosswalk"],
+      "unit_of_observation": "LEI géré par l'Insee dans un fichier daté",
+      "stable_keys": ["file_publication_date", "lei"],
+      "limitations": [
+        "Le fichier ne couvre pas tous les LEI mondiaux ou transférés.",
+        "Un LEI ne prouve ni siège fiscal annuel, ni éligibilité à un prélèvement.",
+        "La fenêtre de trente jours doit être archivée pour constituer un historique."
+      ],
+      "next_action": "Archiver les fichiers disponibles et produire une table LEI-SIREN datée avant le rapprochement mondial GLEIF."
+    }
+  ],
+  "research_gaps": [
+    "Aucun état unifié ne fusionne correctement RNE, Sirene et BODACC.",
+    "Le RNA national exclut les associations de droit local d'Alsace-Moselle.",
+    "La correspondance RNA-JOAFE-SIREN reste incomplète pour les organismes anciens.",
+    "Les comptes publics ne couvrent pas toutes les associations et entreprises.",
+    "Le NPEC ne publie pas la contribution acquittée par chaque employeur.",
+    "Siasp et le CAS Pensions ne donnent pas les paiements par employeur et composante.",
+    "Les rapports ANCOLS ne publient pas les déclarations PEEC individuelles.",
+    "LEI France ne conserve qu'une fenêtre publique de trente jours."
+  ],
+  "recommended_ingestion_order": [
+    "dila-bodacc-bulk-api",
+    "interior-rna-monthly + dila-joafe-announcements-accounts",
+    "insee-lei-france-siren-crosswalk",
+    "france-competences-npec-apprentissage",
+    "insee-siasp-public-pay",
+    "sre-cas-pensions-rates-statistics",
+    "inpi-rne-bulk-api prototype",
+    "ancols-peec-annual-reports manifest"
+  ]
+}

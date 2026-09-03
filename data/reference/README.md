@@ -18,6 +18,7 @@ Ce dossier conserve les sources officielles et les extractions normalisées util
 | [`bulk-sources-supplement-7-corrections-2026-09-03.json`](bulk-sources-supplement-7-corrections-2026-09-03.json) | Correction prioritaire de la huitième passe : remplace l’ancien état Ircantec par les jeux officiels actualisés en juillet et août 2026 |
 | [`bulk-sources-supplement-8-2026-09-03.json`](bulk-sources-supplement-8-2026-09-03.json) | Neuvième passe du 3 septembre 2026 : installations nucléaires, TAEMUP, zonage des logements vacants, remontées mécaniques et octroi de mer |
 | [`bulk-sources-supplement-9-2026-09-03.json`](bulk-sources-supplement-9-2026-09-03.json) | Dixième passe du 3 septembre 2026 : FINESS+, SAE, masse salariale Urssaf, auto-entrepreneurs, épargne salariale et chaîne BOFiP–GLEIF–FIRDS pour la TTF |
+| [`bulk-sources-supplement-10-2026-09-04.json`](bulk-sources-supplement-10-2026-09-04.json) | Onzième passe du 4 septembre 2026 : RNE, BODACC, RNA, JOAFE, apprentissage, Siasp, CAS Pensions, PEEC et LEI France |
 | [`ntl-france-2026.json`](ntl-france-2026.json) | Extraction des 141 lignes françaises de détail de la National tax list 2026 |
 | [`lfss-2026-annexe-3-impositions.json`](lfss-2026-annexe-3-impositions.json) | Transcription contrôlée du tableau 31 de l’annexe 3 du PLFSS 2026 |
 
@@ -64,6 +65,11 @@ zonage des logements vacants, les remontées mécaniques et l’octroi de mer es
 La dixième passe sur les référentiels sanitaires, les dénominateurs salariaux et la chaîne
 d’identification des émetteurs et instruments financiers est décrite dans
 [`docs/sources-massives-recherche-complementaire-9.md`](../../docs/sources-massives-recherche-complementaire-9.md).
+
+La onzième passe sur les registres d’entreprises et d’associations, les paramètres de
+l’apprentissage, les rémunérations publiques, le CAS Pensions, la PEEC et la résolution
+LEI–SIREN est décrite dans
+[`docs/sources-massives-recherche-complementaire-10.md`](../../docs/sources-massives-recherche-complementaire-10.md).
 
 ## Deux registres complémentaires
 
