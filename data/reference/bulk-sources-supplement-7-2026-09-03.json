@@ -1,0 +1,672 @@
+{
+  "schema_version": 1,
+  "verification_date": "2026-09-03",
+  "extends": [
+    "data/reference/bulk-sources.json",
+    "data/reference/bulk-sources-supplement-2026-09-02.json",
+    "data/reference/bulk-sources-supplement-2-2026-09-02.json",
+    "data/reference/bulk-sources-supplement-3-2026-09-03.json",
+    "data/reference/bulk-sources-supplement-4-2026-09-03.json",
+    "data/reference/bulk-sources-supplement-5-2026-09-03.json",
+    "data/reference/bulk-sources-supplement-6-2026-09-03.json"
+  ],
+  "purpose": "Huitième passe consacrée aux titres miniers, consommations énergétiques, filières REP, statistiques culturelles, retraites complémentaires et déclarations vitivinicoles.",
+  "principle": "Les nouvelles sources permettent surtout de résoudre les opérateurs, produits, territoires, paramètres, quantités et agrégats. Une quantité physique, une affiliation, une autorisation ou une obligation réglementaire privée ne doit jamais devenir automatiquement une fiche de prélèvement obligatoire.",
+  "key_findings": [
+    {
+      "finding": "Camino fournit un cadastre minier public via une API GeoJSON.",
+      "impact": "Les titres, titulaires, SIREN, substances, surfaces, territoires et dates peuvent être extraits en une passe et reliés aux redevances minières sans rechercher chaque titre."
+    },
+    {
+      "finding": "L'Agence ORE diffuse les consommations d'électricité et de gaz de 2011 à 2024 à cinq mailles territoriales et par code NAF.",
+      "impact": "Les contrôles énergétiques peuvent être industrialisés par commune, EPCI, département, région et IRIS, sous réserve de traiter la rupture méthodologique à partir de 2022."
+    },
+    {
+      "finding": "SYDEREP publie les producteurs REP, leur identifiant unique, les adhérents des éco-organismes et plusieurs séries de quantités mises sur le marché et collectées.",
+      "impact": "La source permet de distinguer les redevances publiques, obligations réglementaires, contributions aux éco-organismes et simples indicateurs de filière."
+    },
+    {
+      "finding": "Agirc-Arrco centralise sur une même page les paramètres 2026 et le compte de résultat 2025 du régime.",
+      "impact": "Les taux, tranches, contributions d'équilibre et agrégats observés peuvent être documentés ensemble, sans assimiler compensation, cotisation Apec et cotisation retraite."
+    },
+    {
+      "finding": "Le ministère de la Culture publie les tableaux de ses Chiffres clés 2025 en XLS ou XLSX, fiche par fiche.",
+      "impact": "Les familles spectacle, musique, cinéma, vidéo, télévision et presse peuvent être contrôlées en masse malgré l'absence d'un registre fiscal culturel transversal."
+    },
+    {
+      "finding": "La Douane publie une série historique des quantités de vins soumises au droit de circulation et des sorties de chais.",
+      "impact": "Une source physique directement liée à une ancienne accise peut être historisée par campagne et département, tout en restant distincte de la recette fiscale."
+    }
+  ],
+  "sources": [
+    {
+      "id": "camino-mining-cadastre",
+      "source_record_id": null,
+      "title": "Camino — cadastre minier numérique ouvert",
+      "publisher": "Direction générale de l'aménagement, du logement et de la nature / administration des mines",
+      "url": "https://camino.beta.gouv.fr/",
+      "evidence_urls": [
+        "https://docs.camino.beta.gouv.fr/qgis/",
+        "https://api.camino.beta.gouv.fr/titres?format=geojson"
+      ],
+      "priority": 1,
+      "status": "ready_to_ingest",
+      "authority_level": "official_mining_cadastre",
+      "family": "mining_titles_and_royalties",
+      "coverage": {
+        "geography": "France et territoires relevant du cadastre publié",
+        "period": "état courant et dates historiques publiées dans chaque titre",
+        "scope": "Titres miniers et autorisations, périmètres, titulaires, amodiataires, domaines, substances, statuts et dates."
+      },
+      "access": {
+        "formats": [
+          "geojson",
+          "rest_api",
+          "web_application"
+        ],
+        "machine_readability": "structured_geospatial_api",
+        "bulk_download": true,
+        "api": true,
+        "authentication": "none_for_public_titles; token_for_restricted_qgis_feed",
+        "refresh": "continuous_operational"
+      },
+      "supports": [
+        "candidate_discovery",
+        "mining_title_identifier",
+        "title_type",
+        "mining_domain",
+        "title_status",
+        "application_and_validity_dates",
+        "geographical_perimeter",
+        "holder_siren",
+        "substance",
+        "financial_commitment",
+        "declared_volume"
+      ],
+      "unit_of_observation": "titre minier ou autorisation avec géométrie et propriétés",
+      "fields_available": [
+        "id",
+        "name",
+        "type",
+        "nature",
+        "domain",
+        "status",
+        "application_date",
+        "start_date",
+        "end_date",
+        "surface_km2",
+        "territories",
+        "administrations",
+        "holders",
+        "holder_siren",
+        "amodiataires",
+        "financial_commitment",
+        "substances",
+        "volume",
+        "geometry"
+      ],
+      "stable_keys": [
+        "camino_title_id",
+        "title_version_or_snapshot_date"
+      ],
+      "limitations": [
+        "Un titre ou une autorisation ne prouve ni l'extraction effective, ni la production taxable, ni le montant d'une redevance.",
+        "Les titulaires et amodiataires peuvent évoluer pendant la vie du titre et doivent être datés.",
+        "Certains titres ou autorisations ne sont accessibles qu'après authentification ; l'export public n'est donc pas nécessairement exhaustif.",
+        "Le volume ou l'engagement financier publié n'est pas automatiquement l'assiette juridique d'une redevance.",
+        "Le cadastre ne fournit ni classement SEC, ni paiement, ni recette budgétaire ou comptable."
+      ],
+      "next_action": "Archiver un snapshot GeoJSON public, conserver la géométrie et les titulaires avec leurs SIREN, puis produire une table de candidats vers les redevances minières et les comptes bénéficiaires sans calculer de dette."
+    },
+    {
+      "id": "agence-ore-electricity-gas-consumption",
+      "source_record_id": null,
+      "title": "Consommation annuelle d'électricité et de gaz aux différentes mailles territoriales",
+      "publisher": "Agence ORE et gestionnaires de réseaux de distribution",
+      "url": "https://www.agenceore.fr/opendata/recherche",
+      "priority": 1,
+      "status": "ready_to_ingest",
+      "authority_level": "official_energy_network_open_data",
+      "family": "energy_consumption_context",
+      "coverage": {
+        "geography": "IRIS, commune, EPCI, département et région",
+        "period": "2011-2024",
+        "scope": "Consommations livrées d'électricité et de gaz et nombre de points de livraison par secteur, catégorie de consommation et code NAF.",
+        "methodology_change": "nouvelle méthodologie publiée pour les jeux courants, avec rupture à documenter autour de 2022"
+      },
+      "access": {
+        "formats": [
+          "csv",
+          "json",
+          "api",
+          "opendatasoft_exports"
+        ],
+        "machine_readability": "structured_multidimensional_datasets",
+        "bulk_download": true,
+        "api": true,
+        "authentication": "none",
+        "refresh": "annual"
+      },
+      "supports": [
+        "electricity_consumption",
+        "gas_consumption",
+        "delivery_point_count",
+        "activity_sector",
+        "naf_code",
+        "territorial_distribution",
+        "energy_excise_control",
+        "network_tax_context",
+        "distributor_by_commune"
+      ],
+      "unit_of_observation": "année × énergie × maille géographique × secteur ou catégorie de consommation",
+      "fields_available": [
+        "year",
+        "energy",
+        "geographical_level",
+        "geographical_code",
+        "activity_sector",
+        "consumption_category",
+        "naf_code",
+        "consumption",
+        "delivery_point_count",
+        "data_status_or_secrecy_flag"
+      ],
+      "stable_keys": [
+        "dataset_id",
+        "methodology_version",
+        "year",
+        "energy",
+        "geographical_level",
+        "geographical_code",
+        "sector_or_naf"
+      ],
+      "limitations": [
+        "La consommation livrée par réseau n'est pas automatiquement une quantité taxable à l'accise.",
+        "Les autoconsommations, exonérations, remboursements, usages fiscaux et produits hors réseau peuvent suivre un autre périmètre.",
+        "Les valeurs protégées par le secret commercial peuvent être agrégées ou masquées.",
+        "Les anciennes séries jusqu'en 2021 ne sont plus maintenues et ne doivent pas être concaténées sans table de continuité avec la nouvelle méthodologie.",
+        "Les données 2024 ne prouvent pas un montant ou un champ juridique applicable en 2026.",
+        "Électricité et gaz ainsi que consommation, point de livraison et distributeur restent des dimensions distinctes."
+      ],
+      "next_action": "Créer un manifeste des cinq mailles courantes, ingérer d'abord les jeux commune et EPCI, conserver la version méthodologique et rapprocher uniquement les agrégats des statistiques d'accise et de la NTL."
+    },
+    {
+      "id": "ademe-syderep-rep",
+      "source_record_id": null,
+      "title": "SYDEREP — producteurs, identifiants uniques et données des filières REP",
+      "publisher": "ADEME",
+      "url": "https://www.data.gouv.fr/dataservices/rep-liste-des-producteurs-enregistres-dans-syderep-avec-leur-identifiant-unique",
+      "evidence_urls": [
+        "https://data.ademe.fr/data-fair/api/v1/datasets/rep-producteurs-idu/",
+        "https://www.data.gouv.fr/datasets/rep-liste-des-membres-adherents-des-eco-organismes-en-fin-dannee",
+        "https://filieres-rep.ademe.fr/"
+      ],
+      "priority": 1,
+      "status": "ready_to_ingest",
+      "authority_level": "official_extended_producer_responsibility_register",
+      "family": "extended_producer_responsibility",
+      "coverage": {
+        "geography": "France",
+        "period": "état courant des producteurs et séries annuelles variables selon les filières",
+        "scope": "Producteurs enregistrés et IDU, adhérents des éco-organismes, quantités mises sur le marché, tonnages collectés et indicateurs de filières REP.",
+        "producer_families": [
+          "ABJ",
+          "ASL",
+          "EEE",
+          "BPS",
+          "DISP-MED",
+          "EA",
+          "EMPAP",
+          "JOUET",
+          "LUB",
+          "MNU",
+          "PA",
+          "PCHIM",
+          "PMCB",
+          "PNEU",
+          "TLC",
+          "TABAC"
+        ]
+      },
+      "access": {
+        "formats": [
+          "api",
+          "csv",
+          "json",
+          "data_fair_exports"
+        ],
+        "machine_readability": "structured_api_and_tables",
+        "bulk_download": true,
+        "api": true,
+        "authentication": "none",
+        "refresh": "current_register_and_annual_series",
+        "api_availability_seen": "99.9%"
+      },
+      "supports": [
+        "producer_identifier",
+        "unique_rep_identifier",
+        "rep_sector",
+        "eco_organisation_membership",
+        "placed_on_market_quantity",
+        "collected_tonnage",
+        "producer_scope",
+        "public_fee_candidate",
+        "private_eco_contribution_candidate"
+      ],
+      "unit_of_observation": "producteur, adhésion, quantité de mise sur le marché ou tonnage collecté selon le jeu",
+      "stable_keys": [
+        "dataset_id",
+        "rep_sector",
+        "idu_or_producer_identifier",
+        "reference_year",
+        "record_identifier"
+      ],
+      "limitations": [
+        "L'identifiant unique REP prouve un enregistrement, pas le paiement d'une taxe ou d'une contribution donnée.",
+        "Une contribution versée à un éco-organisme peut être une obligation réglementaire privée et ne doit pas être classée automatiquement comme prélèvement obligatoire.",
+        "Les quantités mises sur le marché et tonnages collectés ne sont ni des assiettes fiscales universelles ni des recettes.",
+        "Les filières, unités, secrets et calendriers de publication diffèrent selon les produits.",
+        "Une même entreprise peut disposer de plusieurs IDU ou adhésions selon les filières.",
+        "La redevance annuelle due à l'ADEME, les éco-contributions et les sanctions doivent rester des objets distincts."
+      ],
+      "next_action": "Ingérer la liste des producteurs et adhérents, versionner les IDU par filière, puis inventorier séparément les jeux de quantités et classer chaque obligation comme prélèvement public, contribution privée réglementée, sanction ou élément hors périmètre."
+    },
+    {
+      "id": "agirc-arrco-parameters-results",
+      "source_record_id": null,
+      "title": "Paramètres et chiffres du régime Agirc-Arrco",
+      "publisher": "Agirc-Arrco",
+      "url": "https://www.agirc-arrco.fr/nous-connaitre/nos-etudes-et-publications/documentation-institutionnelle/parametres-et-donnees-statistiques/",
+      "evidence_urls": [
+        "https://www.agirc-arrco.fr/nous-connaitre/nos-etudes-et-publications/donnees-chiffrees/entreprises-cotisantes/",
+        "https://www.agirc-arrco.fr/nous-connaitre/nos-etudes-et-publications/documentation-institutionnelle/textes-de-reference/"
+      ],
+      "priority": 1,
+      "status": "ready_to_ingest",
+      "authority_level": "official_compulsory_supplementary_pension_scheme",
+      "family": "supplementary_pension_contributions",
+      "coverage": {
+        "geography": "France et champ du régime",
+        "period": "paramètres 2026 et compte de résultat 2024-2025, avec historiques de valeurs du point",
+        "scope": "Plafonds et tranches, taux de cotisation retraite, CEG, CET, cotisation Apec recouvrée, valeurs du point et agrégats de ressources et charges."
+      },
+      "access": {
+        "formats": [
+          "html_tables",
+          "web_publications"
+        ],
+        "machine_readability": "semi_structured_tables",
+        "bulk_download": false,
+        "api": false,
+        "authentication": "none",
+        "refresh": "annual_parameters_and_accounts"
+      },
+      "supports": [
+        "assessment_tranche",
+        "employee_rate",
+        "employer_rate",
+        "call_rate",
+        "ceg_rate",
+        "cet_rate",
+        "apec_collection_rate",
+        "point_purchase_value",
+        "point_service_value",
+        "observed_contribution_aggregate",
+        "compensation_aggregate",
+        "third_party_contribution_aggregate"
+      ],
+      "unit_of_observation": "paramètre annuel, tranche, composante de cotisation ou ligne agrégée de compte de résultat",
+      "stable_keys": [
+        "parameter_or_account_line",
+        "year",
+        "tranche_or_component"
+      ],
+      "limitations": [
+        "Les taux standard ne couvrent pas toutes les entreprises ayant conservé des taux supérieurs ou des assiettes dérogatoires.",
+        "La CEG, la CET, la cotisation de retraite et la cotisation Apec doivent rester séparées.",
+        "La cotisation Apec est recouvrée par les caisses Agirc-Arrco pour le compte d'un autre organisme.",
+        "Les produits de compensation des exonérations ne sont pas des cotisations acquittées par les entreprises.",
+        "Les cotisations de tiers et les cotisations des entreprises ne doivent pas être additionnées comme une même créance.",
+        "La page n'est pas un export tabulaire versionné et doit être archivée à chaque collecte.",
+        "Le classement SEC et la qualification précise de prélèvement doivent être recoupés dans les sources de comptabilité nationale."
+      ],
+      "next_action": "Créer un fichier versionné des paramètres 2026 et des agrégats 2024-2025, avec un identifiant distinct pour retraite, CEG, CET et Apec et une provenance HTML horodatée."
+    },
+    {
+      "id": "cdc-cnracl-contributors-employers",
+      "source_record_id": null,
+      "title": "CNRACL — actifs, cotisants et employeurs",
+      "publisher": "Caisse des Dépôts / CNRACL",
+      "url": "https://www.data.gouv.fr/datasets/actifs-et-cotisants-cnracl-1",
+      "priority": 2,
+      "status": "ready_to_ingest",
+      "authority_level": "official_public_service_pension_scheme_statistics",
+      "family": "public_service_pension_contributions",
+      "coverage": {
+        "geography": "France et champ CNRACL",
+        "period": "séries historiques variables selon les fichiers",
+        "catalogue_update_seen": "2026-08-14",
+        "scope": "Effectifs d'actifs et cotisants de la fonction publique territoriale et hospitalière et répartitions d'employeurs ou familles d'employeurs."
+      },
+      "access": {
+        "formats": [
+          "csv",
+          "txt",
+          "data_gouv_resources"
+        ],
+        "machine_readability": "structured_files_with_incomplete_documentation",
+        "bulk_download": true,
+        "api": false,
+        "authentication": "none",
+        "refresh": "irregular_or_annual"
+      },
+      "supports": [
+        "contributor_count",
+        "active_member_count",
+        "territorial_public_service",
+        "hospital_public_service",
+        "employer_family",
+        "scheme_scope",
+        "denominator_control"
+      ],
+      "unit_of_observation": "effectif agrégé par année, catégorie ou famille d'employeurs",
+      "stable_keys": [
+        "resource_id",
+        "year",
+        "population_or_employer_category",
+        "geographical_or_institutional_dimension"
+      ],
+      "limitations": [
+        "Un actif, un cotisant ou un employeur ne fournit ni assiette, ni taux, ni cotisation acquittée.",
+        "Les règles d'affiliation excluent notamment certaines activités réduites et doivent rester datées.",
+        "Les catégories d'employeurs ne constituent pas un classement SEC stable ou exhaustif.",
+        "La documentation de plusieurs ressources est incomplète et certains fichiers peuvent être indisponibles.",
+        "Les effectifs ne doivent pas être multipliés par un salaire ou un taux moyen pour reconstruire une recette observée."
+      ],
+      "next_action": "Créer un manifeste des ressources disponibles, ingérer les effectifs et familles d'employeurs avec leurs définitions et rapprocher uniquement les agrégats des comptes PLACSS, DREES et Insee."
+    },
+    {
+      "id": "cdc-ircantec-contributors-employers",
+      "source_record_id": null,
+      "title": "Ircantec — cotisants et employeurs",
+      "publisher": "Caisse des Dépôts / Ircantec",
+      "url": "https://www.data.gouv.fr/",
+      "priority": 3,
+      "status": "support_only",
+      "authority_level": "official_public_service_supplementary_pension_statistics",
+      "family": "public_service_supplementary_pension",
+      "coverage": {
+        "geography": "France et champ Ircantec",
+        "period": "historique publié dans les ressources disponibles",
+        "catalogue_update_seen": "2023-11-09",
+        "scope": "Effectifs de cotisants par employeur ou famille d'employeurs du régime complémentaire des agents non titulaires et autres populations affiliées."
+      },
+      "access": {
+        "formats": [
+          "csv_or_tabular_resources"
+        ],
+        "machine_readability": "structured_files_with_stale_metadata",
+        "bulk_download": true,
+        "api": false,
+        "authentication": "none",
+        "refresh": "not_currently_established"
+      },
+      "supports": [
+        "contributor_count",
+        "employer_family",
+        "public_non_tenured_scope",
+        "elected_official_scope",
+        "historical_scheme_control"
+      ],
+      "unit_of_observation": "effectif agrégé par employeur, catégorie ou année selon la ressource",
+      "stable_keys": [
+        "resource_id",
+        "year",
+        "employer_or_family"
+      ],
+      "limitations": [
+        "Le dernier état de catalogue identifié est trop ancien pour décrire le champ 2026 sans recoupement.",
+        "Un cotisant peut relever de plusieurs employeurs ou périodes et les conventions de comptage doivent être conservées.",
+        "Les effectifs ne fournissent ni taux, ni assiette, ni recette.",
+        "Une famille d'employeurs ne constitue ni une créance juridique ni un secteur SEC.",
+        "Le régime couvre plusieurs populations ayant des règles particulières."
+      ],
+      "next_action": "Retrouver les ressources exactes et leur documentation, mesurer leur dernier millésime utile et conserver cette source comme contrôle historique tant qu'une publication courante n'est pas identifiée."
+    },
+    {
+      "id": "minculture-chiffres-cles-2025-tableurs",
+      "source_record_id": null,
+      "title": "Chiffres clés 2025 de la culture et de la communication — tableaux",
+      "publisher": "Ministère de la Culture, Département des études, de la prospective et des statistiques",
+      "url": "https://www.culture.gouv.fr/espace-documentation/statistiques-ministerielles-de-la-culture2/publications/chiffres-cles-2025-de-la-culture-et-de-la-communication",
+      "priority": 2,
+      "status": "ready_to_ingest",
+      "authority_level": "official_cultural_statistics_compendium",
+      "family": "cultural_tax_context",
+      "coverage": {
+        "geography": "France, avec ventilations variables selon les fiches",
+        "period": "données principalement 2023-2025 selon les secteurs",
+        "publication_date": "2026-06-16",
+        "scope": "Économie et financement de la culture, spectacle vivant, musique, cinéma, vidéo, télévision, presse, patrimoine, emploi, entreprises et consommation culturelle."
+      },
+      "access": {
+        "formats": [
+          "xlsx",
+          "xls",
+          "pdf",
+          "html"
+        ],
+        "machine_readability": "many_companion_spreadsheets",
+        "bulk_download": "per_topic_files",
+        "api": false,
+        "authentication": "none",
+        "refresh": "annual"
+      },
+      "supports": [
+        "candidate_discovery",
+        "cultural_sector",
+        "ticketing_context",
+        "live_performance_activity",
+        "streaming_market_context",
+        "cinema_activity",
+        "video_market",
+        "television_advertising_context",
+        "cultural_financing",
+        "cultural_enterprise_count",
+        "tax_or_fee_aggregate_when_explicitly_published"
+      ],
+      "unit_of_observation": "ligne d'un tableau thématique, avec grain variable selon la source sous-jacente",
+      "stable_keys": [
+        "edition",
+        "topic",
+        "workbook_name",
+        "sheet_name",
+        "source_row",
+        "period",
+        "dimension_values"
+      ],
+      "limitations": [
+        "Le recueil compile de nombreuses sources statistiques et administratives : l'autorité de fond de chaque mesure reste celle du producteur sous-jacent.",
+        "Billetterie, chiffre d'affaires, fréquentation, diffusion, publicité et produit fiscal sont des notions distinctes.",
+        "Une ligne par secteur, support, spectacle ou œuvre ne constitue pas un prélèvement autonome.",
+        "Les estimations et millésimes diffèrent selon les fiches et doivent conserver leur statut.",
+        "Les taxes ou redevances citées dans une fiche doivent être rapprochées de leur base juridique et des comptes du bénéficiaire.",
+        "Les dizaines de classeurs doivent faire l'objet d'un manifeste ; une aspiration indiscriminée produirait beaucoup de données sans rapport direct avec l'audit."
+      ],
+      "next_action": "Créer un manifeste des classeurs et ingérer d'abord les thèmes spectacle vivant, musique enregistrée, cinéma, vidéo, télévision et financement, en conservant les producteurs et définitions sous-jacents."
+    },
+    {
+      "id": "dgddi-viticulture-duty-declarations",
+      "source_record_id": null,
+      "title": "Campagnes viti-vinicoles — quantités soumises au droit de circulation et sorties de chais",
+      "publisher": "Direction générale des douanes et droits indirects",
+      "url": "https://www.douane.gouv.fr/la-douane/opendata/mots-cles/droit-de-circulation",
+      "evidence_urls": [
+        "https://data.economie.gouv.fr/explore/assets/campagne-viti-vinicole/",
+        "https://www.data.gouv.fr/datasets/campagnes-viti-vinicoles-depuis-2011"
+      ],
+      "priority": 1,
+      "status": "ready_to_ingest",
+      "authority_level": "official_indirect_tax_declaration_statistics",
+      "family": "wine_and_cider_duties",
+      "coverage": {
+        "geography": "département pour les vins ; national pour certaines séries cidre",
+        "period": "campagnes depuis 2011 dans l'archive agrégée, avec publications historiques plus anciennes sur le portail Douane",
+        "latest_campaign_seen": "2024-2025, publiée le 2025-10-01",
+        "campaign_definition": "du 1er août au 31 juillet",
+        "scope": "Quantités de vins soumises au droit de circulation et quantités sorties des chais des récoltants et négociants vinificateurs ; certaines séries de cidre."
+      },
+      "access": {
+        "formats": [
+          "xlsx",
+          "xls",
+          "zip"
+        ],
+        "machine_readability": "annual_and_historical_spreadsheets",
+        "bulk_download": true,
+        "api": false,
+        "authentication": "none",
+        "refresh": "annual_campaign_and_historical_monthly"
+      },
+      "supports": [
+        "wine_quantity_subject_to_duty",
+        "wine_cellar_release",
+        "department",
+        "campaign_month",
+        "product_category",
+        "circulation_duty_context",
+        "cider_duty_context"
+      ],
+      "unit_of_observation": "campagne ou mois × département × catégorie de produit × type de quantité",
+      "stable_keys": [
+        "campaign",
+        "month_if_available",
+        "department_code",
+        "product_category",
+        "quantity_kind"
+      ],
+      "limitations": [
+        "La quantité soumise au droit de circulation n'est pas le montant du droit liquidé ou encaissé.",
+        "Les sorties de chais ne sont ni des ventes finales ni une assiette fiscale certaine.",
+        "La campagne viti-vinicole ne correspond ni à l'année civile ni nécessairement à l'exercice budgétaire.",
+        "Les catégories de produits, unités et formats doivent être harmonisés sans écraser les libellés historiques.",
+        "Les séries de vins et de cidres ont des mailles géographiques et calendriers différents.",
+        "La série ne couvre pas toutes les boissons alcooliques ou composantes d'accise."
+      ],
+      "next_action": "Archiver les campagnes depuis 2011, extraire séparément quantités taxables et sorties de chais, conserver la campagne et le mois puis rapprocher les agrégats des recettes douanières sans calculer de produit."
+    }
+  ],
+  "research_gaps": [
+    {
+      "gap": "Production minière, assiette et paiement par titre",
+      "finding": "Camino fournit les titres, titulaires, substances, surfaces et certaines valeurs, mais aucune table publique nationale univoque ne relie chaque titre à la production taxable, aux tarifs, déclarations, paiements et bénéficiaires des redevances minières.",
+      "consequence": "Conserver Camino comme cadastre juridique et géographique, puis rechercher les montants dans les comptes, rapports et déclarations sectorielles."
+    },
+    {
+      "gap": "Export public exhaustif de Camino",
+      "finding": "Certains titres et autorisations nécessitent un compte et une route authentifiée.",
+      "consequence": "Mesurer la couverture du flux public et ne jamais interpréter une absence comme inexistence du titre."
+    },
+    {
+      "gap": "Quantité énergétique taxable par redevable",
+      "finding": "L'Agence ORE publie des consommations territoriales et sectorielles, mais pas les déclarations d'accise, exonérations, remboursements ou quantités fiscales par redevable.",
+      "consequence": "Limiter les données énergétiques aux contrôles agrégés et aux dénominateurs physiques."
+    },
+    {
+      "gap": "Classification publique des obligations REP",
+      "finding": "SYDEREP rassemble des filières comportant redevances publiques, contributions aux éco-organismes, obligations en système individuel et sanctions, sans table indiquant directement leur classement en prélèvement obligatoire.",
+      "consequence": "Créer une classification sourcée obligation par obligation et interdire la promotion automatique des éco-contributions privées."
+    },
+    {
+      "gap": "Registre fiscal transversal des prélèvements culturels",
+      "finding": "Le ministère de la Culture publie de nombreux classeurs sectoriels, mais aucun jeu unique ne relie déclarants, assiettes, taux, montants et bénéficiaires des prélèvements cinéma, audiovisuel, spectacle, musique et presse.",
+      "consequence": "Utiliser les Chiffres clés comme catalogue de contrôle, puis revenir aux producteurs sous-jacents et aux comptes des bénéficiaires."
+    },
+    {
+      "gap": "Données sociales détaillées CNRACL et Ircantec",
+      "finding": "Les jeux ouverts identifiés documentent surtout les effectifs et familles d'employeurs, pas les cotisations observées par composante, taux, assiette et employeur.",
+      "consequence": "Réserver ces jeux aux dénominateurs et rapprocher les montants des comptes sociaux et publications institutionnelles."
+    },
+    {
+      "gap": "Référentiel Ircantec courant",
+      "finding": "Le dernier état de catalogue identifié est daté de novembre 2023.",
+      "consequence": "Maintenir la source en support_only et rechercher une publication plus récente avant toute conclusion sur 2026."
+    },
+    {
+      "gap": "Tarifs d'octroi de mer consolidés et versionnés",
+      "finding": "Les taux et exonérations sont publiés par territoire et dans des formats hétérogènes ; aucun fichier machine-readable unique et courant couvrant les cinq territoires n'a été identifié pendant cette passe.",
+      "consequence": "Ne pas lancer une ingestion nationale avant d'avoir constitué un manifeste par territoire, date d'effet, nomenclature produit et composante interne, externe ou régionale."
+    },
+    {
+      "gap": "Taxe annuelle sur les engins maritimes",
+      "finding": "Aucun fichier public national massif combinant caractéristiques des navires, longueur, puissance fiscale, exonérations et taxe payée n'a été identifié.",
+      "consequence": "Conserver les recherches au niveau juridique et budgétaire et ne pas utiliser les services de consultation individuelle comme pseudo-export."
+    }
+  ],
+  "recommended_ingestion_order": [
+    {
+      "rank": 1,
+      "source_ids": [
+        "ademe-syderep-rep"
+      ],
+      "deliverable": "data/reference/syderep-producers-and-rep-obligations.json",
+      "reason": "API officielle, nombreux secteurs et capacité à distinguer en masse prélèvements publics et obligations privées réglementées."
+    },
+    {
+      "rank": 2,
+      "source_ids": [
+        "agence-ore-electricity-gas-consumption"
+      ],
+      "deliverable": "data/reference/ore-energy-consumption-manifest.json",
+      "reason": "Jeux très volumineux et structurés couvrant cinq mailles, utiles à plusieurs familles énergétiques."
+    },
+    {
+      "rank": 3,
+      "source_ids": [
+        "camino-mining-cadastre"
+      ],
+      "deliverable": "data/reference/camino-mining-titles-snapshot.geojson",
+      "reason": "Une seule API remplace les recherches individuelles de titres, titulaires, SIREN, substances, statuts et territoires."
+    },
+    {
+      "rank": 4,
+      "source_ids": [
+        "dgddi-viticulture-duty-declarations"
+      ],
+      "deliverable": "data/reference/viticulture-duty-quantities-2011-2025.json",
+      "reason": "Série historique officielle directement associée à une accise et déjà diffusée en classeurs."
+    },
+    {
+      "rank": 5,
+      "source_ids": [
+        "agirc-arrco-parameters-results"
+      ],
+      "deliverable": "data/reference/agirc-arrco-parameters-and-results.json",
+      "reason": "Paramètres courants et agrégats observés sont disponibles ensemble et peuvent être structurés rapidement."
+    },
+    {
+      "rank": 6,
+      "source_ids": [
+        "minculture-chiffres-cles-2025-tableurs"
+      ],
+      "deliverable": "data/reference/culture-2025-workbooks-manifest.json",
+      "reason": "Un manifeste ciblé rendra accessibles plusieurs familles culturelles sans aspirer les dizaines de fichiers non pertinents."
+    },
+    {
+      "rank": 7,
+      "source_ids": [
+        "cdc-cnracl-contributors-employers"
+      ],
+      "deliverable": "data/reference/cnracl-contributors-employers-manifest.json",
+      "reason": "Les effectifs et familles d'employeurs complètent les comptes sociaux mais ne fournissent pas les cotisations."
+    },
+    {
+      "rank": 8,
+      "source_ids": [
+        "cdc-ircantec-contributors-employers"
+      ],
+      "deliverable": "évaluation de fraîcheur et de couverture Ircantec",
+      "reason": "La source est potentiellement utile mais trop ancienne pour être ingérée comme état courant sans nouvelle vérification."
+    }
+  ]
+}
