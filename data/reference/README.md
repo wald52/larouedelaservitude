@@ -14,6 +14,7 @@ Ce dossier conserve les sources officielles et les extractions normalisées util
 | [`bulk-sources-supplement-4-2026-09-03.json`](bulk-sources-supplement-4-2026-09-03.json) | Cinquième passe du 3 septembre 2026 : Douane, TARIC, COG, BANATIC, Sirene, M57, AT/MP, eau, OPCO et jeux |
 | [`bulk-sources-supplement-5-2026-09-03.json`](bulk-sources-supplement-5-2026-09-03.json) | Sixième passe du 3 septembre 2026 : DVF, Sitadel3, RSVERO, ANFR, registre RTE, aviation, IREP, ARCEP, Open Medic et BDNB |
 | [`bulk-sources-supplement-6-2026-09-03.json`](bulk-sources-supplement-6-2026-09-03.json) | Septième passe du 3 septembre 2026 : KALI, NAF, PCI, ICPE, BNV-D, SINOE, transports et assurance |
+| [`bulk-sources-supplement-7-2026-09-03.json`](bulk-sources-supplement-7-2026-09-03.json) | Huitième passe du 3 septembre 2026 : Camino, Agence ORE, SYDEREP, Agirc-Arrco, CNRACL, Ircantec, culture et viticulture |
 | [`ntl-france-2026.json`](ntl-france-2026.json) | Extraction des 141 lignes françaises de détail de la National tax list 2026 |
 | [`lfss-2026-annexe-3-impositions.json`](lfss-2026-annexe-3-impositions.json) | Transcription contrôlée du tableau 31 de l’annexe 3 du PLFSS 2026 |
 
@@ -43,6 +44,11 @@ La sixième passe sur les bases d’assiette physiques et sectorielles est décr
 La septième passe sur les nomenclatures d’activité et de branche, les installations
 réglementées, les déchets, l’assurance et la BNV-D est décrite dans
 [`docs/sources-massives-recherche-complementaire-6.md`](../../docs/sources-massives-recherche-complementaire-6.md).
+
+La huitième passe sur les titres miniers, les consommations énergétiques, les filières REP,
+les régimes complémentaires, les statistiques culturelles et la viticulture est décrite
+dans
+[`docs/sources-massives-recherche-complementaire-7.md`](../../docs/sources-massives-recherche-complementaire-7.md).
 
 ## Deux registres complémentaires
 
