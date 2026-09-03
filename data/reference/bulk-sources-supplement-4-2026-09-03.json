@@ -1,0 +1,396 @@
+{
+  "schema_version": 1,
+  "verification_date": "2026-09-03",
+  "extends": [
+    "data/reference/bulk-sources.json",
+    "data/reference/bulk-sources-supplement-2026-09-02.json",
+    "data/reference/bulk-sources-supplement-2-2026-09-02.json",
+    "data/reference/bulk-sources-supplement-3-2026-09-03.json"
+  ],
+  "purpose": "Cinquième passe consacrée aux nomenclatures, identifiants et barèmes permettant d'industrialiser les contrôles douaniers, territoriaux, sociaux, hydriques, de formation professionnelle et de jeux d'argent.",
+  "sources": [
+    {
+      "id": "dgddi-energy-tax-tables",
+      "title": "Droits et taxes applicables aux produits énergétiques — instantanés 2026",
+      "publisher": "Direction générale des douanes et droits indirects",
+      "url": "https://www.douane.gouv.fr/la-douane/opendata/auteurs/energie-environnement-et-lois-de-finances",
+      "priority": 1,
+      "status": "ready_to_ingest",
+      "family": "energy_excises",
+      "coverage": "Tarifs d'accise sur les énergies, TVA et CPSSP par produit ; instantanés 2026 repérés aux 1er janvier, février, mars, juillet et août pour le territoire douanier métropolitain.",
+      "access": {
+        "formats": ["ods", "pdf"],
+        "bulk_download": true,
+        "api": false,
+        "refresh": "parameter_change"
+      },
+      "supports": ["energy_product_code", "excise_rate", "vat_rate", "cpssp", "effective_date"],
+      "unit_of_observation": "produit × usage ou régime × composante fiscale × date d'effet",
+      "stable_keys": ["bulletin_number", "effective_date", "product_code", "tax_component"],
+      "limitations": [
+        "Le champ exclut les territoires ultramarins.",
+        "Un produit ou régime tarifaire n'est pas un prélèvement autonome.",
+        "Les tarifs ne fournissent ni quantités taxées ni recettes."
+      ],
+      "next_action": "Archiver tous les ODS 2026 et produire des intervalles de validité par produit, usage et composante."
+    },
+    {
+      "id": "dgddi-tobacco-prices-deliveries",
+      "title": "Prix homologués et livraisons mensuelles de tabacs manufacturés",
+      "publisher": "Direction générale des douanes et droits indirects",
+      "url": "https://www.douane.gouv.fr/la-douane/opendata/mots-cles/tabacs",
+      "evidence_urls": ["https://www.douane.gouv.fr/en/node/141"],
+      "priority": 1,
+      "status": "ready_to_ingest",
+      "family": "tobacco_excise_context",
+      "coverage": "Nomenclatures successives des références et prix homologués ; volumes mensuels livrés aux buralistes depuis janvier 2018. Derniers états vus : prix au 1er septembre 2026 et livraisons de juillet 2026.",
+      "access": {
+        "formats": ["ods", "pdf", "html"],
+        "bulk_download": true,
+        "api": false,
+        "refresh": "monthly_or_price_campaign"
+      },
+      "supports": ["tobacco_product_reference", "retail_price", "delivery_volume", "product_category", "effective_date"],
+      "unit_of_observation": "référence d'un instantané de prix ou catégorie de livraison mensuelle",
+      "stable_keys": ["dataset_kind", "effective_date_or_month", "product_reference_or_category"],
+      "limitations": [
+        "Le prix homologué n'est pas le montant d'accise.",
+        "Le volume livré n'est ni la consommation finale ni une recette.",
+        "Une référence commerciale ou catégorie de tabac n'est pas une créance distincte."
+      ],
+      "next_action": "Ingérer séparément prix et volumes et ne calculer que des indicateurs de contexte."
+    },
+    {
+      "id": "ec-taric-customs-measures",
+      "title": "TARIC — tarif intégré de l'Union européenne",
+      "publisher": "Commission européenne, DG TAXUD",
+      "url": "https://taxation-customs.ec.europa.eu/online-services/online-services-and-databases-customs/eu-customs-tariff-taric_en",
+      "priority": 2,
+      "status": "candidate",
+      "family": "customs_duties",
+      "coverage": "Nomenclature, droits de pays tiers, préférences, suspensions, contingents, composantes agricoles, antidumping, droits compensateurs et sauvegardes ; mises à jour quotidiennes.",
+      "access": {
+        "formats": ["web_database", "excel_announced"],
+        "bulk_download": "announced_but_unverified",
+        "api": false,
+        "refresh": "daily",
+        "verification_note": "Le lien officiel vers les données brutes Excel a renvoyé une erreur lors de la vérification."
+      },
+      "supports": ["goods_code", "customs_measure", "origin", "tariff_quota", "trade_defence_duty", "effective_date"],
+      "unit_of_observation": "mesure × code marchandise × zone géographique × période",
+      "stable_keys": ["goods_code", "measure_type", "geographical_area", "valid_from", "valid_to", "additional_code"],
+      "limitations": [
+        "TARIC exclut explicitement les taux nationaux de TVA et d'accise.",
+        "Toutes les mesures TARIC ne sont pas des prélèvements.",
+        "L'accès massif stable doit être validé avant ingestion."
+      ],
+      "next_action": "Retrouver un export brut stable et prototyper uniquement les mesures pécuniaires."
+    },
+    {
+      "id": "insee-cog-2026-history",
+      "title": "Code officiel géographique 2026 et historiques communaux",
+      "publisher": "Insee",
+      "url": "https://www.insee.fr/fr/information/8740222",
+      "priority": 1,
+      "status": "ready_to_ingest",
+      "family": "territorial_identifiers",
+      "coverage": "Entités du COG au 1er janvier 2026, événements communaux et couples code-libellé depuis 1943.",
+      "access": {
+        "formats": ["csv", "dbf", "zip"],
+        "bulk_download": true,
+        "api": "partial_metadata_api",
+        "refresh": "annual"
+      },
+      "supports": ["commune_code", "department_code", "region_code", "historical_name", "merger_event", "effective_date"],
+      "unit_of_observation": "entité géographique ou événement de transformation",
+      "stable_keys": ["entity_type", "code", "valid_from", "valid_to"],
+      "limitations": [
+        "Le COG ne fournit aucune donnée fiscale.",
+        "Le code peut survivre à un changement de nom ou une fusion.",
+        "Le millésime géographique doit correspondre à la date de la donnée fiscale."
+      ],
+      "next_action": "Faire du COG la dimension territoriale obligatoire de toutes les extractions locales."
+    },
+    {
+      "id": "dgcl-banatic-current",
+      "title": "BANATIC — base nationale sur les intercommunalités",
+      "publisher": "Direction générale des collectivités locales",
+      "url": "https://www.data.gouv.fr/datasets/base-nationale-sur-les-intercommunalites",
+      "priority": 1,
+      "status": "ready_to_ingest",
+      "family": "territorial_organizations",
+      "coverage": "Groupements, nature juridique, date de création, profil financier, compétences, périmètre des EPCI à fiscalité propre et table code INSEE-SIREN ; jeu mis à jour le 1er septembre 2026 lors de la vérification.",
+      "access": {
+        "formats": ["xlsx", "csv"],
+        "bulk_download": true,
+        "api": false,
+        "refresh": "current_snapshot"
+      },
+      "supports": ["grouping_siren", "legal_nature", "competence", "financial_profile", "fiscal_perimeter", "insee_to_siren"],
+      "unit_of_observation": "groupement, compétence ou lien de périmètre",
+      "stable_keys": ["resource_kind", "grouping_siren", "commune_code", "snapshot_date"],
+      "limitations": [
+        "Les ressources du même jeu ont des dates de mise à jour différentes.",
+        "Une compétence déclarée ne prouve pas le bénéficiaire d'une taxe donnée.",
+        "La photographie courante doit être archivée pour suivre les changements."
+      ],
+      "next_action": "Produire des tables datées de groupements, compétences et périmètres reliées au COG et à Sirene."
+    },
+    {
+      "id": "insee-sirene-bulk-history",
+      "title": "Base Sirene — stocks, historiques et liens de succession",
+      "publisher": "Insee",
+      "url": "https://www.insee.fr/fr/information/3591226",
+      "priority": 1,
+      "status": "ready_to_ingest",
+      "family": "institutional_identifiers",
+      "coverage": "Stocks courants d'entreprises et d'établissements, valeurs historisées et liens de succession des unités enregistrées depuis 1973.",
+      "access": {
+        "formats": ["csv_gz", "api"],
+        "bulk_download": true,
+        "api": true,
+        "refresh": "daily_api_and_periodic_bulk"
+      },
+      "supports": ["siren", "siret", "official_name", "legal_category", "activity_code", "historical_value", "successor"],
+      "unit_of_observation": "unité, période de valeur ou lien de succession",
+      "stable_keys": ["siren_or_siret", "history_start_date", "history_end_date", "field_or_successor"],
+      "limitations": [
+        "Sirene ne prouve pas le classement d'une unité dans S.13.",
+        "Une catégorie juridique ou activité ne qualifie pas un prélèvement.",
+        "L'état courant seul ne suffit pas pour les bénéficiaires historiques."
+      ],
+      "next_action": "Construire un résolveur SIREN/SIRET et noms historiques utilisé seulement comme couche d'identité."
+    },
+    {
+      "id": "dgfip-m57-2026-chart-of-accounts",
+      "title": "Référentiel budgétaire et comptable M57 — plans et transpositions 2026",
+      "publisher": "Direction générale des Finances publiques",
+      "url": "https://www.collectivites-locales.gouv.fr/gerer-les-finances-publiques-locales/budget/instructions-budgetaires-et-comptables/le-referentiel-m57/le-referentiel-budgetaire-et-comptable-m57",
+      "priority": 1,
+      "status": "ready_to_ingest",
+      "family": "local_accounting_nomenclature",
+      "coverage": "Instruction applicable au 1er janvier 2026, plans développé et abrégé, modèles budgétaires et tables de transposition M14/M52 vers M57.",
+      "access": {
+        "formats": ["pdf", "downloadable_crosswalks"],
+        "bulk_download": true,
+        "api": false,
+        "refresh": "annual"
+      },
+      "supports": ["account_code", "account_label", "tax_revenue_account", "transfer_account", "historical_account_crosswalk"],
+      "unit_of_observation": "compte ou relation de transposition",
+      "stable_keys": ["reference_version", "plan_variant", "account_code"],
+      "limitations": [
+        "Un compte comptable n'est pas une créance juridique.",
+        "Un compte peut agréger taxes, fractions, reversements ou reprises.",
+        "La transposition n'établit pas toujours une continuité économique parfaite."
+      ],
+      "next_action": "Extraire les plans et transpositions et construire une table de passage vers les balances locales."
+    },
+    {
+      "id": "legifrance-atmp-risk-rates-2026",
+      "title": "Taux collectifs AT/MP 2026 par code risque",
+      "publisher": "Légifrance / ministères sociaux",
+      "url": "https://www.legifrance.gouv.fr/loda/id/JORFTEXT000053228986",
+      "evidence_urls": [
+        "https://www.legifrance.gouv.fr/loda/article_lc/LEGIARTI000053266180",
+        "https://www.legifrance.gouv.fr/loda/article_lc/LEGIARTI000053266194",
+        "https://www.legifrance.gouv.fr/loda/id/JORFTEXT000053228971"
+      ],
+      "priority": 1,
+      "status": "ready_to_ingest",
+      "family": "occupational_accident_contribution",
+      "coverage": "Catégories et codes risque, taux nets collectifs 2026, Alsace-Moselle, coûts moyens et régime minier.",
+      "access": {
+        "formats": ["html"],
+        "bulk_download": false,
+        "api": "legifrance_or_legi_bulk",
+        "refresh": "annual"
+      },
+      "supports": ["risk_code", "risk_label", "collective_rate", "territorial_regime", "mining_crosswalk", "effective_year"],
+      "unit_of_observation": "code risque × régime × année",
+      "stable_keys": ["legal_text_id", "annex", "risk_code", "year"],
+      "limitations": [
+        "Chaque code risque n'est pas un prélèvement distinct.",
+        "Le taux collectif n'est pas nécessairement le taux notifié à un employeur.",
+        "Les régimes général, Alsace-Moselle et minier doivent rester séparés."
+      ],
+      "next_action": "Extraire les annexes et relier les risques aux établissements seulement comme candidats."
+    },
+    {
+      "id": "ofb-sispea-services-tariffs",
+      "title": "SISPEA — données annuelles des services, performances et tarifs",
+      "publisher": "Office français de la biodiversité",
+      "url": "https://services.eaufrance.fr/pro/telechargement",
+      "priority": 1,
+      "status": "ready_to_ingest",
+      "family": "water_service_and_performance",
+      "coverage": "Fichiers annuels 2008-2026 pour l'eau potable et l'assainissement ; descriptifs, ouvrages, indicateurs, variables et tarifs. Fichiers régénérés chaque semaine.",
+      "access": {
+        "formats": ["xls", "ods"],
+        "bulk_download": true,
+        "api": "legacy_not_preferred",
+        "refresh": "weekly_regeneration"
+      },
+      "supports": ["service_identifier", "organizing_authority", "competence", "service_tariff", "performance_indicator", "modulation_input"],
+      "unit_of_observation": "service × année × indicateur, variable ou composante tarifaire",
+      "stable_keys": ["year", "competence", "service_identifier", "field_code"],
+      "limitations": [
+        "Le prix total de l'eau mélange service et plusieurs taxes ou redevances.",
+        "La complétude et le statut de validation varient selon le millésime.",
+        "Une donnée de performance ne suffit pas à calculer le montant final de redevance."
+      ],
+      "next_action": "Commencer par le millésime 2024 validé et séparer tarifs de service, taxes, redevances et indicateurs."
+    },
+    {
+      "id": "hubeau-bnpe-water-withdrawals",
+      "title": "BNPE / Hub'Eau — prélèvements annuels en eau",
+      "publisher": "Office français de la biodiversité / BRGM / agences et offices de l'eau",
+      "url": "https://hubeau.eaufrance.fr/",
+      "evidence_urls": ["https://www.eaufrance.fr/actualites/un-acces-aux-donnees-nationales-de-prelevements-en-eau"],
+      "priority": 2,
+      "status": "ready_to_ingest",
+      "family": "water_abstraction_charge_context",
+      "coverage": "Ouvrages et volumes annuels directement prélevés, usages et types de ressource ; depuis 2012, voire 2008 pour certains bassins, jusqu'à N-2.",
+      "access": {
+        "formats": ["api", "csv", "json", "geojson"],
+        "bulk_download": true,
+        "api": true,
+        "refresh": "annual"
+      },
+      "supports": ["withdrawal_structure", "annual_volume", "water_use", "resource_type", "geolocation", "charge_base_context"],
+      "unit_of_observation": "ouvrage × année × usage",
+      "stable_keys": ["withdrawal_structure_id", "year", "use_code"],
+      "limitations": [
+        "Le volume prélevé n'est pas le volume consommé.",
+        "Le jeu ne fournit ni tarif ni montant acquitté.",
+        "Le champ issu de la gestion des redevances n'est pas exhaustif des petits prélèvements."
+      ],
+      "next_action": "Extraire les volumes avec les dictionnaires Sandre et les relier aux assiettes juridiques par bassin."
+    },
+    {
+      "id": "france-competences-siret-opco",
+      "title": "Table SIRET-OPCO",
+      "publisher": "France compétences",
+      "url": "https://www.data.gouv.fr/datasets/table-siret-opco",
+      "priority": 2,
+      "status": "ready_to_ingest",
+      "family": "vocational_training_and_apprenticeship",
+      "coverage": "Correspondance entre les SIRET d'employeurs redevables des contributions légales de formation et d'apprentissage, leur OPCO et un IDCC public ou une valeur d'échappement ; mise à jour vue le 11 août 2026.",
+      "access": {
+        "formats": ["csv", "pdf_dictionary"],
+        "bulk_download": true,
+        "api": "datagouv_resource_if_compatible",
+        "refresh": "operational",
+        "size_seen": "103.5 MB"
+      },
+      "supports": ["employer_siret", "opco", "public_idcc", "training_contribution_scope", "dsn_reference"],
+      "unit_of_observation": "SIRET × OPCO de rattachement",
+      "stable_keys": ["snapshot_date", "siret"],
+      "limitations": [
+        "La table ne fournit ni montant, ni taux, ni paiement.",
+        "Le rattachement OPCO ne prouve pas chaque contribution applicable.",
+        "L'IDCC établissement peut différer de celui déclaré au niveau du contrat."
+      ],
+      "next_action": "Ingérer le CSV et son dictionnaire, le joindre à Sirene et contrôler la couverture par OPCO."
+    },
+    {
+      "id": "anj-online-gaming-market",
+      "title": "Marché des jeux en ligne agréé 2010-2024",
+      "publisher": "Autorité nationale des jeux",
+      "url": "https://www.data.gouv.fr/datasets/donnees-sur-le-marche-des-jeux-en-ligne-paris-sportifs-hippiques-et-poker-de-2010-a-2024",
+      "priority": 2,
+      "status": "ready_to_ingest",
+      "family": "gambling_tax_base_context",
+      "coverage": "Comptes joueurs actifs, mises, produit brut des jeux et répartitions pour paris sportifs, hippiques et poker de 2010 à 2024.",
+      "access": {
+        "formats": ["xlsx", "csv"],
+        "bulk_download": true,
+        "api": false,
+        "refresh": "irregular_annual"
+      },
+      "supports": ["online_gambling_segment", "stakes", "gross_gaming_revenue", "active_player_accounts", "market_history"],
+      "unit_of_observation": "année × segment × indicateur",
+      "stable_keys": ["year", "game_segment", "indicator"],
+      "limitations": [
+        "Mises et PBJ ne sont pas des recettes fiscales.",
+        "Le jeu ouvert vérifié s'arrête à 2024.",
+        "Le périmètre en ligne ne couvre pas tout le marché des jeux."
+      ],
+      "next_action": "Vérifier l'identité CSV/XLSX et relier les indicateurs aux prélèvements sans convertir le PBJ en produit fiscal."
+    },
+    {
+      "id": "interior-authorized-casinos",
+      "title": "Liste des casinos autorisés en France",
+      "publisher": "Ministère de l'Intérieur",
+      "url": "https://www.data.gouv.fr/datasets/liste-des-casinos-de-france",
+      "priority": 3,
+      "status": "support_only",
+      "family": "casino_tax_scope",
+      "coverage": "Casinos autorisés par département et commune, avec société exploitante à partir de 2021 ; dernière mise à jour vue le 11 août 2025.",
+      "access": {
+        "formats": ["csv", "xlsx", "ods"],
+        "bulk_download": true,
+        "api": false,
+        "refresh": "irregular"
+      },
+      "supports": ["authorized_casino", "municipality", "operator_name", "local_applicability"],
+      "unit_of_observation": "casino autorisé dans un état de la liste",
+      "stable_keys": ["snapshot_date", "municipality", "operator_name", "casino_name"],
+      "limitations": [
+        "La liste ne fournit ni assiette, ni taux, ni recette.",
+        "Le dernier état est antérieur au jour de référence 2026.",
+        "Une autorisation ne prouve pas l'activité pendant toute l'année."
+      ],
+      "next_action": "Utiliser la liste comme contrôle de périmètre après normalisation COG-Sirene et vérification des changements 2026."
+    }
+  ],
+  "research_gaps": [
+    {
+      "gap": "Export brut TARIC stable",
+      "finding": "La Commission annonce un export Excel gratuit, mais le lien consulté n'était pas exploitable.",
+      "consequence": "Conserver TARIC en candidate et ne pas aspirer l'interface web."
+    },
+    {
+      "gap": "RITA en accès massif",
+      "finding": "L'encyclopédie tarifaire nationale permet des recherches fines, mais aucun export complet ou API publique documentée n'a été identifié.",
+      "consequence": "Utiliser RITA seulement pour les contrôles ponctuels."
+    },
+    {
+      "gap": "Catalogue SOLTéA complet téléchargeable",
+      "finding": "Un catalogue consultable et des listes officielles existent, sans export public complet et versionné localisé.",
+      "consequence": "Ne pas promettre une jointure massive des bénéficiaires du solde de taxe d'apprentissage."
+    },
+    {
+      "gap": "Taux AT/MP réellement notifié par établissement",
+      "finding": "Les tables collectives sont massives, mais aucun fichier public national ne fournit le taux individuel ou mixte de chaque SIRET.",
+      "consequence": "Le barème collectif ne prouve pas la dette d'un employeur."
+    },
+    {
+      "gap": "Chaîne complète des redevances de l'eau",
+      "finding": "SISPEA, BNPE et les agences couvrent séparément services, volumes, tarifs, coefficients et déclarations.",
+      "consequence": "Conserver un graphe de relations et interdire le calcul de recette à partir des seules données techniques."
+    },
+    {
+      "gap": "Secteur SEC des unités Sirene ou BANATIC",
+      "finding": "Ces sources donnent les identifiants et périmètres, pas un classement S.13 opposable et daté.",
+      "consequence": "Maintenir le rapprochement avec ODAC, ODAL et les comptes par sous-secteur."
+    },
+    {
+      "gap": "Millésime 2025 du jeu ouvert ANJ",
+      "finding": "Des informations 2025 existent, mais le jeu tabulaire vérifié porte encore sur 2010-2024.",
+      "consequence": "Ne pas mélanger les publications sans table de continuité."
+    }
+  ],
+  "recommended_ingestion_order": [
+    {"rank": 1, "source_ids": ["dgddi-energy-tax-tables"], "deliverable": "data/reference/dgddi-energy-tax-rates-2026.json"},
+    {"rank": 2, "source_ids": ["ofb-sispea-services-tariffs"], "deliverable": "snapshots SISPEA 2024 validés"},
+    {"rank": 3, "source_ids": ["legifrance-atmp-risk-rates-2026"], "deliverable": "data/reference/atmp-collective-risk-rates-2026.json"},
+    {"rank": 4, "source_ids": ["dgddi-tobacco-prices-deliveries"], "deliverable": "historique prix et volumes de tabac"},
+    {"rank": 5, "source_ids": ["insee-cog-2026-history", "dgcl-banatic-current", "insee-sirene-bulk-history"], "deliverable": "dimensions territoriales et institutionnelles"},
+    {"rank": 6, "source_ids": ["dgfip-m57-2026-chart-of-accounts"], "deliverable": "data/reference/m57-tax-account-crosswalk-2026.json"},
+    {"rank": 7, "source_ids": ["hubeau-bnpe-water-withdrawals"], "deliverable": "data/reference/bnpe-water-withdrawal-bases.json"},
+    {"rank": 8, "source_ids": ["france-competences-siret-opco"], "deliverable": "data/reference/siret-opco-snapshot.json"},
+    {"rank": 9, "source_ids": ["anj-online-gaming-market", "interior-authorized-casinos"], "deliverable": "contrôles du secteur des jeux"},
+    {"rank": 10, "source_ids": ["ec-taric-customs-measures"], "deliverable": "prototype TARIC de mesures pécuniaires"}
+  ]
+}
