@@ -1,0 +1,725 @@
+{
+  "schema_version": 1,
+  "verification_date": "2026-09-03",
+  "extends": [
+    "data/reference/bulk-sources.json",
+    "data/reference/bulk-sources-supplement-2026-09-02.json",
+    "data/reference/bulk-sources-supplement-2-2026-09-02.json",
+    "data/reference/bulk-sources-supplement-3-2026-09-03.json",
+    "data/reference/bulk-sources-supplement-4-2026-09-03.json",
+    "data/reference/bulk-sources-supplement-5-2026-09-03.json",
+    "data/reference/bulk-sources-supplement-6-2026-09-03.json",
+    "data/reference/bulk-sources-supplement-7-2026-09-03.json",
+    "data/reference/bulk-sources-supplement-7-corrections-2026-09-03.json",
+    "data/reference/bulk-sources-supplement-8-2026-09-03.json"
+  ],
+  "purpose": "Dixième passe consacrée aux établissements sanitaires, aux assiettes salariales et non salariées et à la chaîne d'identification des émetteurs et instruments utile à la taxe sur les transactions financières.",
+  "principle": "Identité d'un établissement, masse salariale, chiffre d'affaires, prime d'épargne salariale, émetteur ou instrument financier sont des couches de preuve distinctes. Aucune de ces observations ne doit être transformée directement en dette ou recette fiscale.",
+  "key_findings": [
+    {
+      "finding": "FINESS+ publie désormais deux flux JSON complets et complémentaires, Structures et Activités, avec mise à jour quotidienne et snapshots mensuels et annuels.",
+      "impact": "Les identifiants FINESS, SIREN, SIRET, statuts, groupes, activités, autorisations et dates peuvent être résolus en masse pour les établissements sanitaires et médico-sociaux."
+    },
+    {
+      "finding": "La SAE 2025 est disponible en CSV, Parquet et SAS, avec une base administrative en juillet et une base statistique annoncée pour fin octobre 2026.",
+      "impact": "Le projet peut conserver séparément la déclaration validée par établissement et la version statistiquement redressée, au lieu de mélanger les deux états."
+    },
+    {
+      "finding": "Open Urssaf publie des séries de masse salariale, d'emploi et d'établissements depuis 1998, ainsi que des séries d'auto-entrepreneurs et de chiffre d'affaires depuis 2009.",
+      "impact": "Les prélèvements assis sur les rémunérations ou l'activité indépendante disposent de dénominateurs nationaux, sectoriels et territoriaux structurés."
+    },
+    {
+      "finding": "La Dares publie un classeur annuel sur la participation, l'intéressement et les abondements.",
+      "impact": "Le forfait social, la CSG et la CRDS sur l'épargne salariale peuvent être contrôlés à partir de flux et populations documentés, sans traiter les primes comme des recettes."
+    },
+    {
+      "finding": "La liste BOFiP des sociétés dépassant le seuil de capitalisation de la taxe sur les transactions financières peut être reliée aux LEI et ISIN grâce à GLEIF, puis aux instruments grâce à FIRDS.",
+      "impact": "Le projet peut remplacer le rapprochement manuel des noms d'émetteurs par une chaîne versionnée émetteur juridique → LEI → ISIN → instrument, tout en conservant les conditions fiscales séparées."
+    }
+  ],
+  "sources": [
+    {
+      "id": "ans-finess-plus-structures",
+      "source_record_id": null,
+      "title": "FINESS+ — Structures FINESS-STR",
+      "publisher": "Agence du Numérique en Santé",
+      "url": "https://www.data.gouv.fr/datasets/finess-structures-1",
+      "evidence_urls": [
+        "https://github.com/ansforge/finess/blob/main/flux/out/data.gouv/structure/schema/schema-structures-v1.json"
+      ],
+      "priority": 1,
+      "status": "ready_to_ingest",
+      "authority_level": "official_health_and_social_establishment_register",
+      "family": "health_social_institutional_identifiers",
+      "coverage": {
+        "geography": "France, selon le champ des structures publiées dans FINESS",
+        "period": "état courant, snapshots mensuels et annuels",
+        "last_update_seen": "2026-09-03",
+        "scope": "Personnes morales-entités juridiques, entités géographiques d'exercice, groupements de coopération organiques et conventionnels."
+      },
+      "access": {
+        "formats": [
+          "json.gz",
+          "json_schema"
+        ],
+        "machine_readability": "complete_structured_json",
+        "bulk_download": true,
+        "api": false,
+        "authentication": "none",
+        "refresh": "daily_complete_file",
+        "history": {
+          "daily": "Le fichier quotidien remplace la version précédente.",
+          "monthly": "Snapshot publié le premier jour de chaque mois.",
+          "annual": "Snapshot publié au début de chaque année."
+        },
+        "daily_size_seen": "47.9 MB"
+      },
+      "supports": [
+        "finess_identifier",
+        "siren",
+        "siret",
+        "official_name",
+        "legal_status",
+        "legal_person_type",
+        "opening_and_closing_dates",
+        "geographical_entity",
+        "group_membership",
+        "address_and_cog",
+        "pricing_mode",
+        "budget_type",
+        "administrative_event",
+        "regulatory_commitment"
+      ],
+      "unit_of_observation": "structure juridique, entité géographique ou groupement FINESS",
+      "stable_keys": [
+        "schema_version",
+        "generated_at",
+        "internal_structure_identifier",
+        "finess_identifier"
+      ],
+      "limitations": [
+        "FINESS identifie et décrit les structures publiées ; il ne fournit ni créance, ni assiette, ni paiement, ni recette.",
+        "Numéro FINESS, SIREN et SIRET sont des identifiants différents et ne doivent pas être fusionnés.",
+        "Statut juridique, mode de tarification et type de budget ne suffisent pas à classer une unité dans S.13.",
+        "Le fichier quotidien remplace le précédent ; l'historisation exige l'archivage des snapshots et de leur empreinte.",
+        "Les structures en cours de publication ou non publiables peuvent être absentes du flux ouvert.",
+        "Une personne morale peut regrouper plusieurs entités géographiques et plusieurs activités."
+      ],
+      "next_action": "Archiver le quotidien du 3 septembre 2026, le snapshot mensuel d'août et le schéma, puis construire les dimensions FINESS-SIREN-SIRET et les relations PMEJ-EGE-GCO-GCC sans déduire le secteur SEC."
+    },
+    {
+      "id": "ans-finess-plus-activities",
+      "source_record_id": null,
+      "title": "FINESS+ — Activités FINESS-ACT",
+      "publisher": "Agence du Numérique en Santé",
+      "url": "https://www.data.gouv.fr/datasets/finess-activites-1",
+      "evidence_urls": [
+        "https://github.com/ansforge/finess/blob/main/flux/out/data.gouv/activite/schema/schema-activites-v1.json"
+      ],
+      "priority": 1,
+      "status": "ready_to_ingest",
+      "authority_level": "official_health_and_social_activity_register",
+      "family": "health_social_authorisations_and_activities",
+      "coverage": {
+        "geography": "France, selon le champ des activités publiables rattachées aux structures FINESS",
+        "period": "état courant, snapshots mensuels et annuels",
+        "last_update_seen": "2026-09-03",
+        "scope": "Activités autorisées ou exercées, liens réglementaires, équipements matériels lourds, capacités, zones et événements rattachés aux structures FINESS."
+      },
+      "access": {
+        "formats": [
+          "json.gz",
+          "json_schema"
+        ],
+        "machine_readability": "complete_structured_json",
+        "bulk_download": true,
+        "api": false,
+        "authentication": "none",
+        "refresh": "daily_complete_file",
+        "history": {
+          "daily": "Le fichier quotidien remplace la version précédente.",
+          "monthly": "Snapshot publié le premier jour de chaque mois.",
+          "annual": "Snapshot publié au début de chaque année."
+        },
+        "daily_size_seen": "55.5 MB"
+      },
+      "supports": [
+        "authorisation_identifier",
+        "authorised_activity",
+        "performed_activity",
+        "activity_state",
+        "activity_start_and_end_dates",
+        "capacity",
+        "intervention_area",
+        "regulated_health_activity",
+        "heavy_medical_equipment",
+        "administrative_event",
+        "regulatory_commitment",
+        "finess_structure_link"
+      ],
+      "unit_of_observation": "activité autorisée ou exercée rattachée à une structure FINESS",
+      "stable_keys": [
+        "schema_version",
+        "generated_at",
+        "activity_identifier",
+        "finess_structure_identifier"
+      ],
+      "limitations": [
+        "Activité autorisée, activité exercée et activité facturante sont des notions distinctes.",
+        "Une autorisation ne prouve pas une activité réelle pendant toute la période ni une assiette de prélèvement.",
+        "Le macro-état actif ou inactif et les événements détaillés doivent être conservés ensemble.",
+        "Une capacité ou un équipement ne doit pas être transformé en unité taxable sans texte fiscal explicite.",
+        "Les activités et équipements peuvent être rattachés à plusieurs niveaux de structure ; les jointures doivent suivre le schéma officiel.",
+        "Le flux ne fournit ni masse salariale, ni chiffre d'affaires, ni cotisation, ni recette."
+      ],
+      "next_action": "Ingérer le flux avec son schéma, relier les activités aux structures par les identifiants internes et FINESS et produire des candidats de champ pour les prélèvements sanitaires et sociaux sans calculer de dette."
+    },
+    {
+      "id": "drees-sae-2025",
+      "source_record_id": null,
+      "title": "Statistique annuelle des établissements de santé — base administrative 2025",
+      "publisher": "DREES",
+      "url": "https://data.drees.solidarites-sante.gouv.fr/explore/dataset/707_bases-administratives-sae/",
+      "evidence_urls": [
+        "https://drees.solidarites-sante.gouv.fr/communique-de-presse-jeux-de-donnees/jeux-de-donnees/sae-2025-mise-disposition-des-bases"
+      ],
+      "priority": 1,
+      "status": "ready_to_ingest",
+      "authority_level": "official_exhaustive_mandatory_health_establishment_survey",
+      "family": "health_establishment_activity_and_resources",
+      "coverage": {
+        "geography": "Tous les établissements de santé de France dans le champ de la SAE",
+        "period": "année 2025",
+        "publication_date": "2026-07-23",
+        "data_status": "administrative_provisional",
+        "future_statistical_release_announced": "fin octobre 2026",
+        "scope": "Capacités d'accueil, volumes d'activité, plateaux techniques et personnels des établissements publics et privés."
+      },
+      "access": {
+        "formats": [
+          "csv",
+          "parquet",
+          "sas7bdat"
+        ],
+        "machine_readability": "thematic_structured_files",
+        "bulk_download": true,
+        "api": "catalogue_and_dataset_api",
+        "authentication": "none",
+        "refresh": "annual",
+        "dataset_identifier": "707_bases-administratives-sae",
+        "format_transition": "2025 est la première diffusion en Parquet et la dernière diffusion annoncée en SAS7BDAT."
+      },
+      "supports": [
+        "health_establishment_scope",
+        "finess_link",
+        "public_private_status",
+        "capacity",
+        "hospital_activity",
+        "technical_platform",
+        "hospital_staff",
+        "thematic_questionnaire",
+        "administrative_declaration"
+      ],
+      "unit_of_observation": "réponse d'un établissement à un bordereau thématique de la SAE",
+      "stable_keys": [
+        "survey_year",
+        "release_kind",
+        "thematic_file",
+        "finess_or_establishment_identifier",
+        "source_row"
+      ],
+      "limitations": [
+        "La base administrative reproduit les déclarations validées avec la DREES sans redressements statistiques supplémentaires.",
+        "La base administrative 2025 est provisoire et ne doit pas être fusionnée avec la future base statistique redressée.",
+        "Chaque fichier correspond à un bordereau thématique ; une ligne d'un fichier n'est pas nécessairement une entité unique.",
+        "Capacité, activité, personnel et financement sont des dimensions distinctes et ne constituent pas une assiette fiscale certaine.",
+        "Les établissements publics et privés coexistent dans le champ ; leur présence ne prouve pas leur classement institutionnel SEC.",
+        "Les révisions de non-réponse et de cohérence de la base statistique doivent être conservées comme une autre version, pas écraser la déclaration administrative."
+      ],
+      "next_action": "Créer un manifeste des fichiers 2025, privilégier Parquet, identifier les clés FINESS et conserver release_kind=administrative ; préparer une ingestion séparée de la base statistique lorsqu'elle sera effectivement publiée."
+    },
+    {
+      "id": "urssaf-private-sector-payroll-employment",
+      "source_record_id": null,
+      "title": "Open Urssaf — effectifs, établissements employeurs et masse salariale du secteur privé",
+      "publisher": "Urssaf Caisse nationale",
+      "url": "https://open.urssaf.fr/explore/dataset/effectifs-salaries-et-masse-salariale-du-secteur-prive-france-entiere-x-na88/",
+      "evidence_urls": [
+        "https://open.urssaf.fr/explore/dataset/nombre-etab-effectifs-salaries-et-masse-salariale-secteur-prive-dep-x-na17i/"
+      ],
+      "priority": 1,
+      "status": "ready_to_ingest",
+      "authority_level": "official_social_collection_statistics",
+      "family": "payroll_based_levies",
+      "coverage": {
+        "geography": "France entière et plusieurs mailles territoriales selon le jeu",
+        "period": "depuis 1998",
+        "scope": "Effectifs salariés, nombre d'établissements employeurs et masse salariale par secteur NAF, avec séries trimestrielles et annuelles.",
+        "field": "secteur privé du régime général, hors agriculture et hors Mayotte",
+        "publication_lags": {
+          "national_quarterly": "fin de trimestre + environ 60 jours",
+          "department_annual": "fin de trimestre + environ 250 jours"
+        }
+      },
+      "access": {
+        "formats": [
+          "csv",
+          "json",
+          "api"
+        ],
+        "machine_readability": "structured_api_datasets",
+        "bulk_download": true,
+        "api": true,
+        "authentication": "none",
+        "refresh": "quarterly_and_annual"
+      },
+      "supports": [
+        "employer_establishment_count",
+        "employee_count",
+        "payroll",
+        "unrounded_social_security_base_context",
+        "naf_sector",
+        "temporary_worker_dimension",
+        "territory",
+        "quarterly_monitoring",
+        "historical_series"
+      ],
+      "unit_of_observation": "période × territoire × secteur d'activité × indicateur",
+      "stable_keys": [
+        "dataset_identifier",
+        "period",
+        "geographical_level",
+        "geographical_code",
+        "naf_version",
+        "sector_code",
+        "indicator"
+      ],
+      "limitations": [
+        "La masse salariale publiée correspond à l'assiette déplafonnée de Sécurité sociale, pas à l'assiette de tous les prélèvements sur les salaires.",
+        "Le champ exclut l'agriculture et Mayotte et ne doit pas être présenté comme l'ensemble de l'emploi français.",
+        "Les apprentis sont inclus à partir de la publication du premier trimestre 2023 alors qu'ils étaient auparavant exclus.",
+        "La généralisation de la DSN a entraîné des changements de méthode et des révisions de niveau.",
+        "Une masse salariale sectorielle ne fournit ni le taux effectif, ni les exonérations, ni la dette, ni l'encaissement d'une cotisation.",
+        "Les séries détaillées peuvent être révisées après détection d'anomalies déclaratives."
+      ],
+      "next_action": "Créer un manifeste des jeux national, régional, départemental, zone d'emploi et EPCI, ingérer d'abord France NA88 et département NA17i et conserver chaque avertissement méthodologique comme rupture de série."
+    },
+    {
+      "id": "urssaf-self-employed-microentrepreneurs",
+      "source_record_id": null,
+      "title": "Open Urssaf — auto-entrepreneurs par secteur d'activité",
+      "publisher": "Urssaf Caisse nationale",
+      "url": "https://open.urssaf.fr/explore/dataset/auto-entrepreneurs-par-secteur-dactivite/",
+      "priority": 2,
+      "status": "ready_to_ingest",
+      "authority_level": "official_social_collection_statistics",
+      "family": "self_employed_social_contributions",
+      "coverage": {
+        "geography": "France selon le champ du jeu",
+        "period": "depuis 2009",
+        "scope": "Immatriculations, radiations, auto-entrepreneurs administrativement ou économiquement actifs et chiffre d'affaires trimestriel par secteur.",
+        "publication_lag": "fin de semestre + environ 200 jours"
+      },
+      "access": {
+        "formats": [
+          "csv",
+          "json",
+          "api"
+        ],
+        "machine_readability": "structured_api_dataset",
+        "bulk_download": true,
+        "api": true,
+        "authentication": "none",
+        "refresh": "semiannual_publication_of_quarterly_series"
+      },
+      "supports": [
+        "microentrepreneur_registration",
+        "microentrepreneur_deregistration",
+        "administratively_active_count",
+        "economically_active_count",
+        "turnover",
+        "activity_sector",
+        "self_employed_contribution_context"
+      ],
+      "unit_of_observation": "trimestre × secteur d'activité × indicateur",
+      "stable_keys": [
+        "dataset_identifier",
+        "quarter",
+        "sector_code",
+        "indicator"
+      ],
+      "limitations": [
+        "Chiffre d'affaires déclaré n'est pas montant de cotisation ni revenu fiscal.",
+        "Actif administratif et actif économique sont des populations différentes.",
+        "Les radiations peuvent être réaffectées ou estimées rétrospectivement afin de corriger les traitements tardifs.",
+        "Les taux, seuils, exonérations, versements libératoires et régularisations doivent venir des textes et données de recouvrement.",
+        "Une immatriculation ou radiation trimestrielle ne constitue pas une recette.",
+        "Les agrégats sectoriels ne permettent pas de documenter une dette individuelle."
+      ],
+      "next_action": "Ingérer toutes les séries depuis 2009 avec les corrections méthodologiques, puis rapprocher le chiffre d'affaires agrégé des recettes sociales sans appliquer automatiquement un taux moyen."
+    },
+    {
+      "id": "dares-pipa-employee-savings-2024",
+      "source_record_id": null,
+      "title": "Dares — participation, intéressement et épargne salariale en 2024",
+      "publisher": "DARES",
+      "url": "https://dares.travail-emploi.gouv.fr/publication/lepargne-salariale-en-2024",
+      "evidence_urls": [
+        "https://dares.travail-emploi.gouv.fr/donnees/participation-interessement-et-epargne-salariale"
+      ],
+      "priority": 2,
+      "status": "ready_to_ingest",
+      "authority_level": "official_labour_statistics",
+      "family": "employee_savings_social_levies",
+      "coverage": {
+        "geography": "France, champ de l'enquête Pipa",
+        "period": "année 2024, avec séries historiques dans les éditions successives",
+        "publication_date": "2026-06-10",
+        "scope": "Participation, intéressement, abondements, accès des salariés aux dispositifs et montants selon la taille ou les caractéristiques des entreprises.",
+        "headline_gross_flows_eur": 27200000000
+      },
+      "access": {
+        "formats": [
+          "xlsx",
+          "pdf",
+          "html_publication"
+        ],
+        "machine_readability": "companion_spreadsheet",
+        "bulk_download": true,
+        "api": false,
+        "authentication": "none",
+        "refresh": "annual"
+      },
+      "supports": [
+        "participation_payment",
+        "profit_sharing_payment",
+        "employer_matching_contribution",
+        "recipient_employee_count",
+        "covered_company_count",
+        "company_size",
+        "activity_sector",
+        "average_payment",
+        "employee_savings_plan",
+        "forfait_social_context",
+        "csg_crds_context"
+      ],
+      "unit_of_observation": "agrégat statistique annuel par dispositif, population, taille ou secteur",
+      "stable_keys": [
+        "publication_year",
+        "reference_year",
+        "workbook_sheet",
+        "source_row",
+        "scheme",
+        "dimension_values"
+      ],
+      "limitations": [
+        "Participation, intéressement et abondement sont des flux versés aux salariés ou plans d'épargne, pas des recettes fiscales.",
+        "Le montant brut ne correspond pas à l'assiette de tous les prélèvements sociaux après exonérations, plafonds et options de placement.",
+        "Le forfait social, la CSG, la CRDS, les cotisations sociales et l'impôt sur le revenu suivent des champs différents.",
+        "Les résultats sont issus d'une enquête statistique et peuvent comporter estimations, redressements et arrondis.",
+        "Une ventilation par dispositif, taille ou secteur ne doit pas être ajoutée au total dont elle constitue la décomposition.",
+        "Les encours d'épargne et les versements annuels sont des mesures différentes."
+      ],
+      "next_action": "Archiver le classeur 2024 et les éditions antérieures, typer chaque montant par dispositif et population et rapprocher uniquement les agrégats des données Urssaf et budgétaires relatives aux prélèvements sociaux."
+    },
+    {
+      "id": "bofip-ttf-eligible-issuers-2026",
+      "source_record_id": null,
+      "title": "BOFiP — sociétés françaises dépassant le seuil de capitalisation de la taxe sur les transactions financières",
+      "publisher": "Direction générale des Finances publiques",
+      "url": "https://bofip.impots.gouv.fr/bofip/9789-PGP.html/identifiant=BOI-ANNX-000467-20251217",
+      "evidence_urls": [
+        "https://bofip.impots.gouv.fr/bofip/14873-PGP.html/ACTU-2025-00185"
+      ],
+      "priority": 1,
+      "status": "ready_to_ingest",
+      "authority_level": "official_tax_doctrine_annex",
+      "family": "financial_transaction_tax",
+      "coverage": {
+        "geography": "Sociétés dont le siège social est situé en France",
+        "capitalisation_reference_date": "2025-12-01",
+        "publication_date": "2025-12-17",
+        "legal_identifier": "BOI-ANNX-000467",
+        "source_record_count": 121,
+        "scope": "Sociétés dont la capitalisation boursière dépasse un milliard d'euros, critère mentionné à l'article 235 ter ZD du CGI."
+      },
+      "access": {
+        "formats": [
+          "html_list",
+          "pdf_export",
+          "version_history"
+        ],
+        "machine_readability": "structured_html_list",
+        "bulk_download": true,
+        "api": false,
+        "authentication": "none",
+        "refresh": "annual"
+      },
+      "supports": [
+        "candidate_discovery",
+        "issuer_name",
+        "capitalisation_threshold_scope",
+        "annual_reference_date",
+        "tax_year_candidate",
+        "historical_issuer_list"
+      ],
+      "unit_of_observation": "société nommée dans la liste annuelle BOFiP",
+      "stable_keys": [
+        "boi_legal_identifier",
+        "publication_date",
+        "raw_issuer_name"
+      ],
+      "limitations": [
+        "L'inscription d'un émetteur dans la liste ne rend pas toute acquisition de ses titres taxable.",
+        "La liste ne fournit ni SIREN, ni LEI, ni ISIN ; les identités doivent être résolues sans écraser le nom brut.",
+        "Les exemptions, types de titres, opérations, dates et autres conditions de l'article 235 ter ZD doivent être contrôlés séparément.",
+        "Une société peut changer de nom, fusionner, scinder ou émettre plusieurs catégories de titres.",
+        "La doctrine doit être recoupée avec le texte légal et le millésime d'application.",
+        "La liste ne fournit ni volume taxable, ni montant déclaré, ni recette."
+      ],
+      "next_action": "Extraire les 121 noms, comparer avec les versions BOFiP antérieures et résoudre chaque émetteur vers SIREN et LEI avec un état exact, probable, ambigu ou sans correspondance."
+    },
+    {
+      "id": "gleif-lei-golden-copy-isin-mapping",
+      "source_record_id": null,
+      "title": "GLEIF — Golden Copy LEI et relations ISIN-LEI",
+      "publisher": "Global Legal Entity Identifier Foundation et ANNA pour la relation ISIN-LEI",
+      "url": "https://www.gleif.org/en/lei-data/gleif-golden-copy/download-the-golden-copy",
+      "evidence_urls": [
+        "https://www.gleif.org/en/lei-data/lei-mapping/download-isin-to-lei-relationship-files"
+      ],
+      "priority": 1,
+      "status": "ready_to_ingest",
+      "authority_level": "global_standardised_legal_entity_reference",
+      "family": "financial_issuer_identification",
+      "coverage": {
+        "geography": "Mondiale",
+        "period": "état courant et deltas infra-journaliers ; relations ISIN-LEI quotidiennes",
+        "scope": "Identité des entités juridiques, relations de contrôle comptable, exceptions de déclaration et correspondances entre ISIN et LEI publiées par les agences de codification participantes."
+      },
+      "access": {
+        "formats": [
+          "csv",
+          "json",
+          "xml",
+          "zip",
+          "api"
+        ],
+        "machine_readability": "structured_standard_files",
+        "bulk_download": true,
+        "api": true,
+        "authentication": "none",
+        "refresh": {
+          "golden_copy": "trois publications par jour",
+          "golden_copy_times_utc": [
+            "02:00",
+            "10:00",
+            "18:00"
+          ],
+          "isin_lei": "daily"
+        },
+        "delta_windows": [
+          "8 hours",
+          "24 hours",
+          "7 days",
+          "31 days"
+        ]
+      },
+      "supports": [
+        "lei",
+        "legal_entity_name",
+        "legal_and_headquarters_address",
+        "registration_authority_identifier",
+        "lei_status",
+        "direct_parent",
+        "ultimate_parent",
+        "reporting_exception",
+        "isin",
+        "issuer_identity",
+        "issuer_group"
+      ],
+      "unit_of_observation": "enregistrement LEI, relation de parenté, exception ou paire ISIN-LEI",
+      "stable_keys": [
+        "file_publication_timestamp",
+        "lei",
+        "relationship_type_or_isin"
+      ],
+      "limitations": [
+        "Un LEI identifie une entité mais ne prouve ni son siège fiscal français, ni son éligibilité annuelle à la TTF.",
+        "Les relations de parenté décrivent la consolidation comptable et non l'assujettissement fiscal.",
+        "Le statut d'un LEI peut être émis, expiré, fusionné ou autrement modifié et doit être daté.",
+        "La correspondance ISIN-LEI ne couvre que les agences nationales participantes ; la page indique que l'extension aux anciens ISIN reste un objectif de plus long terme.",
+        "Un même émetteur possède plusieurs ISIN et un instrument peut changer de statut sans changement de l'émetteur.",
+        "La relation ISIN-LEI ne prouve ni la nature de titre de capital retenue par la TTF, ni une transaction taxable."
+      ],
+      "next_action": "Archiver une Golden Copy Level 1 et la relation ISIN-LEI du même jour, résoudre les émetteurs BOFiP par nom et identifiant d'autorité d'enregistrement et conserver les correspondances ambiguës pour revue."
+    },
+    {
+      "id": "esma-firds-reference-data",
+      "source_record_id": null,
+      "title": "ESMA — Financial Instruments Reference Data System",
+      "publisher": "Autorité européenne des marchés financiers",
+      "url": "https://registers.esma.europa.eu/publication/searchRegister?core=esma_registers_firds_files",
+      "evidence_urls": [
+        "https://www.esma.europa.eu/publications-and-data/databases-and-registers",
+        "https://registers.esma.europa.eu/publication/searchRegister?core=esma_registers_firds"
+      ],
+      "priority": 2,
+      "status": "candidate",
+      "authority_level": "official_european_financial_instrument_reference",
+      "family": "financial_instrument_identification",
+      "coverage": {
+        "geography": "Instruments déclarés dans le cadre européen MAR et MiFIR",
+        "period": "fichiers complets et différentiels, avec registre courant",
+        "scope": "Données de référence collectées auprès des plateformes de négociation et autorités nationales compétentes conformément à MAR article 4 et MiFIR article 27."
+      },
+      "access": {
+        "formats": [
+          "xml_full_files",
+          "xml_delta_files",
+          "search_register",
+          "csv_limited_search_export"
+        ],
+        "machine_readability": "high_volume_structured_files",
+        "bulk_download": true,
+        "api": false,
+        "authentication": "none",
+        "refresh": "operational",
+        "file_kinds": [
+          "FULINS",
+          "DLTINS"
+        ],
+        "operational_constraint": "L'export textuel de l'interface est limité en volume ; les fichiers complets et différentiels doivent être traités selon les instructions ESMA."
+      },
+      "supports": [
+        "isin",
+        "issuer_lei_candidate",
+        "financial_instrument_name",
+        "instrument_classification",
+        "trading_venue",
+        "admission_or_trading_dates",
+        "termination_status",
+        "relevant_competent_authority",
+        "full_and_delta_processing"
+      ],
+      "unit_of_observation": "enregistrement de référence d'un instrument sur une plateforme ou dans un fichier FIRDS",
+      "stable_keys": [
+        "file_publication_date",
+        "file_kind",
+        "isin",
+        "trading_venue_or_record_key"
+      ],
+      "limitations": [
+        "FIRDS décrit des instruments et leur négociation réglementaire ; il ne contient pas une variable d'éligibilité à la TTF française.",
+        "Un instrument actif sur une plateforme européenne n'est pas nécessairement un titre de capital taxable et l'absence ne prouve pas l'exonération.",
+        "Plusieurs enregistrements peuvent exister pour un ISIN selon les plateformes et événements de référence.",
+        "Les fichiers complets et deltas doivent être appliqués dans le bon ordre avec détection des fichiers manquants et idempotence.",
+        "L'identité de l'émetteur, la forme du titre et les exemptions doivent être rapprochées d'autres sources.",
+        "Le volume élevé interdit de considérer l'export limité de l'interface comme une extraction exhaustive."
+      ],
+      "next_action": "Prototyper trente jours de fichiers FULINS et DLTINS, documenter le schéma et le volume, puis mesurer la couverture des ISIN reliés aux 121 émetteurs BOFiP avant de promouvoir la source à ready_to_ingest."
+    }
+  ],
+  "research_gaps": [
+    {
+      "gap": "Classement SEC daté des structures FINESS",
+      "finding": "FINESS publie le statut juridique, le mode de tarification et des identifiants institutionnels, mais pas un classement S.13 versionné de chaque entité.",
+      "consequence": "Continuer de rapprocher FINESS de Sirene, ODAC/ODAL et des comptes par sous-secteur sans déduire le secteur du seul statut juridique."
+    },
+    {
+      "gap": "Paiements sociaux par établissement sanitaire",
+      "finding": "FINESS et SAE décrivent structures, activités, capacités et personnels, mais aucun jeu public ne relie chaque établissement à ses assiettes, taux, exonérations et paiements de cotisations.",
+      "consequence": "Limiter ces sources à l'identité, au champ et aux dénominateurs et utiliser Urssaf et les comptes sociaux pour les montants agrégés."
+    },
+    {
+      "gap": "Base statistique SAE 2025 non encore publiée au jour de référence",
+      "finding": "La DREES annonce la base statistique redressée pour fin octobre 2026 ; seule la base administrative 2025 est disponible au 3 septembre 2026.",
+      "consequence": "Ne pas étiqueter la base administrative comme donnée statistique définitive et prévoir une ingestion séparée future."
+    },
+    {
+      "gap": "Assiettes sociales individuelles publiques",
+      "finding": "Les séries Urssaf donnent la masse salariale ou le chiffre d'affaires agrégé, pas les bases et dettes de chaque redevable.",
+      "consequence": "Aucun taux moyen ne doit être appliqué pour fabriquer des recettes individuelles."
+    },
+    {
+      "gap": "Forfait social et prélèvements sur l'épargne salariale par dispositif et entreprise",
+      "finding": "La Dares décrit les primes, dispositifs et populations, mais aucun fichier public exhaustif ne relie chaque versement à son régime social effectif et au montant encaissé.",
+      "consequence": "Conserver les résultats Pipa comme contrôles agrégés et rechercher les recettes dans Urssaf, les comptes et les documents budgétaires."
+    },
+    {
+      "gap": "Identifiants des sociétés de la liste BOFiP TTF",
+      "finding": "La liste officielle ne publie que les noms des émetteurs, sans SIREN, LEI ni ISIN.",
+      "consequence": "Construire et revoir une table de passage BOFiP-Sirene-GLEIF au lieu de joindre directement sur le nom normalisé."
+    },
+    {
+      "gap": "Couverture complète ISIN-LEI",
+      "finding": "La relation GLEIF est quotidienne mais dépend des agences nationales participantes et la couverture des anciens ISIN reste incomplète.",
+      "consequence": "Utiliser FIRDS et d'autres références d'instruments pour les ISIN non couverts et conserver un état unresolved."
+    },
+    {
+      "gap": "Transactions françaises effectivement soumises à la TTF",
+      "finding": "Les listes d'émetteurs et d'instruments ne publient ni les acquisitions imposables, ni les exemptions appliquées, ni les déclarations et paiements par redevable.",
+      "consequence": "La chaîne BOFiP-GLEIF-FIRDS documente le périmètre candidat, pas la recette transaction par transaction."
+    }
+  ],
+  "recommended_ingestion_order": [
+    {
+      "rank": 1,
+      "source_ids": [
+        "ans-finess-plus-structures",
+        "ans-finess-plus-activities"
+      ],
+      "deliverable": "data/reference/finess-plus-2026-09-03-manifest.json",
+      "reason": "Deux flux quotidiens structurés, dotés de schémas officiels et de snapshots, résolvent immédiatement les identités et activités du champ sanitaire."
+    },
+    {
+      "rank": 2,
+      "source_ids": [
+        "bofip-ttf-eligible-issuers-2026",
+        "gleif-lei-golden-copy-isin-mapping"
+      ],
+      "deliverable": "data/reference/ttf-issuers-2026-identifiers.json",
+      "reason": "La liste courte de 121 émetteurs permet de tester rapidement une résolution d'identité robuste vers SIREN, LEI et ISIN."
+    },
+    {
+      "rank": 3,
+      "source_ids": [
+        "urssaf-private-sector-payroll-employment"
+      ],
+      "deliverable": "data/reference/urssaf-private-payroll-series-manifest.json",
+      "reason": "Les séries depuis 1998 fournissent le principal dénominateur agrégé des prélèvements assis sur les salaires."
+    },
+    {
+      "rank": 4,
+      "source_ids": [
+        "drees-sae-2025"
+      ],
+      "deliverable": "data/reference/sae-2025-administrative-manifest.json",
+      "reason": "Parquet permet une ingestion efficace, à condition de conserver le statut administratif provisoire."
+    },
+    {
+      "rank": 5,
+      "source_ids": [
+        "dares-pipa-employee-savings-2024"
+      ],
+      "deliverable": "data/reference/pipa-employee-savings-2024.json",
+      "reason": "Le classeur annuel apporte les flux et populations nécessaires au contrôle du forfait social et des prélèvements sociaux sur l'épargne salariale."
+    },
+    {
+      "rank": 6,
+      "source_ids": [
+        "urssaf-self-employed-microentrepreneurs"
+      ],
+      "deliverable": "data/reference/microentrepreneurs-sector-series.json",
+      "reason": "Le chiffre d'affaires et les populations depuis 2009 complètent le champ salarié sans nécessiter de données individuelles."
+    },
+    {
+      "rank": 7,
+      "source_ids": [
+        "esma-firds-reference-data"
+      ],
+      "deliverable": "prototype FIRDS de trente jours et rapport de couverture TTF",
+      "reason": "Le traitement des fichiers complets et différentiels doit être validé avant une ingestion générale à fort volume."
+    }
+  ]
+}
